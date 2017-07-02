@@ -1,0 +1,24 @@
+[
+    {
+        "id": "4",
+        "title": "Plaça",
+        "description": "",
+        "picture": {
+            "small_url": "https://scenes/00df.small.jpeg",
+            "medium_url": "https://scenes/00df.medium.jpeg",
+            "large_url": "https://scenes/00df.large.jpeg"
+        },
+        "latitude": 41.364679,
+        "longitude": 2.135489,
+        "experience_id": "5"
+    },
+    {
+        "id": "3",
+        "title": "Barri",
+        "description": "Lorem ipsum dolor sit amet",
+        "picture": null,
+        "latitude": 41.392682,
+        "longitude": 2.144423,
+        "experience_id": "5"
+    }
+]

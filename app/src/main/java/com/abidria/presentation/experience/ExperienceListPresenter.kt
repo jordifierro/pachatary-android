@@ -25,7 +25,7 @@ class ExperienceListPresenter @Inject constructor(private val experienceReposito
                             .subscribe({ experiences -> experienceListView.showExperienceList(experiences) })
     }
 
-    fun  onExperienceClick(experienceId: String) {
+    fun onExperienceClick(experienceId: String) {
         experienceListView.navigateToExperience(experienceId)
     }
 }

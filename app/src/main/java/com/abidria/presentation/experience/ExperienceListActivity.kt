@@ -41,17 +41,18 @@ class ExperienceListActivity : AppCompatActivity(), LifecycleRegistryOwner, Expe
     }
 
     override fun showExperienceList(experienceList: List<Experience>) {
-        recyclerView.adapter = ExperiencesListAdapter(layoutInflater, experienceList)
+        recyclerView.adapter = ExperiencesListAdapter(layoutInflater, experienceList,
+                                                      { id -> presenter.onExperienceClick(id) })
     }
 
     override fun navigateToExperience(experienceId: String) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        startActivity(ExperienceMapActivity.newIntent(this, experienceId))
     }
 
     override fun getLifecycle(): LifecycleRegistry = registry
 
-    class ExperiencesListAdapter(val inflater: LayoutInflater, val experienceList: List<Experience>) :
-                                                                        RecyclerView.Adapter<ExperienceViewHolder>() {
+    class ExperiencesListAdapter(val inflater: LayoutInflater, val experienceList: List<Experience>,
+                                 val onClick: (String) -> Unit) : RecyclerView.Adapter<ExperienceViewHolder>() {
 
         override fun onBindViewHolder(holder: ExperienceViewHolder?, position: Int) {
             holder?.bind(experienceList[position])
@@ -60,25 +61,31 @@ class ExperienceListActivity : AppCompatActivity(), LifecycleRegistryOwner, Expe
         override fun getItemCount(): Int = experienceList.size
 
         override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ExperienceViewHolder {
-            return ExperienceViewHolder(inflater.inflate(R.layout.experiences_list_item, parent, false))
+            return ExperienceViewHolder(inflater.inflate(R.layout.experiences_list_item, parent, false), onClick)
         }
     }
 
-    class ExperienceViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class ExperienceViewHolder(view: View, val onClick: (String) -> Unit)
+                                                                : RecyclerView.ViewHolder(view), View.OnClickListener {
 
         private val titleView: TextView
         private val pictureView: ImageView
+        lateinit var experienceId: String
 
         init {
             titleView = view.findViewById<TextView>(R.id.experience_title)
             pictureView = view.findViewById<ImageView>(R.id.experience_picture)
+            view.setOnClickListener(this)
         }
 
         fun bind(experience: Experience) {
+            this.experienceId = experience.id
             titleView.text = experience.title
             Picasso.with(pictureView.context)
-                   .load(experience.picture?.small)
+                   .load(experience.picture?.smallUrl)
                    .into(pictureView)
         }
+
+        override fun onClick(view: View?) = this.onClick(this.experienceId)
     }
 }

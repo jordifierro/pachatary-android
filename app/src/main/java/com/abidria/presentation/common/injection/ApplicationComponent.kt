@@ -2,6 +2,7 @@ package com.abidria.presentation.common.injection
 
 import com.abidria.data.common.injection.DataModule
 import com.abidria.presentation.experience.ExperienceListActivity
+import com.abidria.presentation.experience.ExperienceMapActivity
 import dagger.Component
 import javax.inject.Singleton
 
@@ -10,4 +11,5 @@ import javax.inject.Singleton
 interface ApplicationComponent {
 
     fun inject(experienceListActivity: ExperienceListActivity)
+    fun inject(experienceMapActivity: ExperienceMapActivity)
 }
