@@ -7,4 +7,5 @@ interface ExperienceMapView {
     fun showScenesOnMap(scenes: List<Scene>)
     fun mapLoadedFlowable(): Flowable<Boolean>
     fun setTitle(title: String)
+    fun navigateToScene(experienceId: String, sceneId: String)
 }

@@ -43,6 +43,10 @@ class ExperienceMapPresenter @Inject constructor(private val repository: SceneRe
                 .subscribe({ scenes -> view.showScenesOnMap(scenes) })
     }
 
+    fun onSceneClick(sceneId: String) {
+        view.navigateToScene(experienceId = experienceId, sceneId = sceneId)
+    }
+
     private fun mapLoadedFlowable() = view.mapLoadedFlowable()
                                           .subscribeOn(schedulerProvider.subscriber())
                                           .observeOn(schedulerProvider.observer())

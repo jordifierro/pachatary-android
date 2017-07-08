@@ -12,4 +12,8 @@ class SceneRepository(retrofit: Retrofit) {
                                                                          .map { it.toDomain() }
                                                                          .toList()
                                                                          .toFlowable()
+
+    fun getScene(experienceId: String, sceneId: String): Flowable<Scene> =
+            getScenes(experienceId).flatMapIterable { list -> list }
+                                   .filter { scene -> scene.id == sceneId }
 }

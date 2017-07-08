@@ -6,11 +6,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import com.abidria.BuildConfig
 import com.abidria.R
 import com.abidria.data.scene.Scene
 import com.abidria.presentation.common.AbidriaApplication
+import com.abidria.presentation.scene.SceneDetailActivity
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
@@ -86,16 +86,20 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView, LifecycleR
             }
 
             mapboxMap.setOnInfoWindowClickListener {
-                marker ->
-                Log.e("marker_id", markersHashMap.get(marker.id))
+                marker ->  presenter.onSceneClick(markersHashMap.get(marker.id)!!)
                 false
             }
             mapboxMap.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBoundsBuilder.build(), 50, 150, 50, 150))
         }
+
     }
 
     override fun setTitle(title: String) {
         supportActionBar?.title = title
+    }
+
+    override fun navigateToScene(experienceId: String, sceneId: String) {
+        startActivity(SceneDetailActivity.newIntent(context = this, experienceId = experienceId, sceneId = sceneId))
     }
 
     override fun getLifecycle(): LifecycleRegistry = registry

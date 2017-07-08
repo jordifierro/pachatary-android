@@ -56,4 +56,12 @@ class ExperienceMapPresenterTest {
 
         then(mockView).should().setTitle(title = "A")
     }
+
+    @Test
+    fun testNavigatesToSceneOnSceneClick() {
+
+        presenter.onSceneClick(sceneId = "8")
+
+        then(mockView).should().navigateToScene(experienceId = "5", sceneId = "8")
+    }
 }

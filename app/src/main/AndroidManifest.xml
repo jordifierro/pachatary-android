@@ -28,6 +28,10 @@
             android:name=".presentation.experience.ExperienceMapActivity"
             android:label="@string/title_activity_experience_map"
             android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".presentation.scene.SceneDetailActivity"
+            android:label="@string/title_activity_scene_detail"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>

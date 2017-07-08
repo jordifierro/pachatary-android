@@ -2,4 +2,5 @@
     <string name="app_name">Abidria</string>
     <string name="title_activity_experiences_list">Experiences</string>
     <string name="title_activity_experience_map">Map</string>
+    <string name="title_activity_scene_detail">Scene</string>
 </resources>
