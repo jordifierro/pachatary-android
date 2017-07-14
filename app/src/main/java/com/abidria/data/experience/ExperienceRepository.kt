@@ -1,19 +1,21 @@
 package com.abidria.data.experience
 
+import com.abidria.data.common.Result
 import io.reactivex.Flowable
-import retrofit2.Retrofit
 
-class ExperienceRepository(retrofit: Retrofit) {
+class ExperienceRepository(val apiRepository: ExperienceApiRepository) {
 
-    private val experienceApi: ExperienceApi = retrofit.create(ExperienceApi::class.java)
+    private val experiences: Flowable<Result<List<Experience>>> = apiRepository.experiencesFlowable()
+                                                                               .replay(1)
+                                                                               .autoConnect()
 
-    fun getExperiences(): Flowable<List<Experience>> = experienceApi.experiences()
-                                                                    .flatMapIterable { list -> list }
-                                                                    .map { it.toDomain() }
-                                                                    .toList()
-                                                                    .toFlowable()
+    fun experiencesFlowable(): Flowable<Result<List<Experience>>> = experiences
 
-    fun getExperience(experienceId: String): Flowable<Experience> =
-            getExperiences().flatMapIterable { list -> list }
-                            .filter { experience -> experience.id == experienceId }
+    fun refreshExperiences() {
+        apiRepository.refreshExperiences()
+    }
+
+    fun experienceFlowable(experienceId: String): Flowable<Result<Experience>> =
+        experiences
+            .map { Result(data = it.data?.first { experience ->  experience.id == experienceId }, error = it.error) }
 }

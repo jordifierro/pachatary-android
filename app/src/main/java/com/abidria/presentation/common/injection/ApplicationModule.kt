@@ -13,17 +13,14 @@ import javax.inject.Singleton
 class ApplicationModule {
 
     @Provides
-    @Singleton
     @Named("io")
     fun providerIOScheduler(): Scheduler = Schedulers.io()
 
     @Provides
-    @Singleton
     @Named("main")
     fun providerMainScheduler(): Scheduler = AndroidSchedulers.mainThread()
 
     @Provides
-    @Singleton
     fun provideSchedulerProvider(@Named("io") subscriberScheduler: Scheduler,
                                  @Named("main") observerScheduler: Scheduler): SchedulerProvider =
         SchedulerProvider(subscriberScheduler, observerScheduler)

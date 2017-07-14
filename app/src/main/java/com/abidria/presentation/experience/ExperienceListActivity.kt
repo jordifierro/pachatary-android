@@ -10,6 +10,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import com.abidria.R
 import com.abidria.data.experience.Experience
@@ -24,6 +26,8 @@ class ExperienceListActivity : AppCompatActivity(), LifecycleRegistryOwner, Expe
     lateinit var presenter: ExperienceListPresenter
 
     lateinit var recyclerView: RecyclerView
+    lateinit var progressBar: ProgressBar
+    lateinit var retryIcon: ImageView
 
     val registry: LifecycleRegistry = LifecycleRegistry(this)
 
@@ -32,12 +36,31 @@ class ExperienceListActivity : AppCompatActivity(), LifecycleRegistryOwner, Expe
         setContentView(R.layout.activity_experiences_list)
         setSupportActionBar(toolbar)
 
+        progressBar = findViewById<ProgressBar>(R.id.experiences_progressbar)
+        retryIcon = findViewById<ImageView>(R.id.experiences_retry)
+        retryIcon.setOnClickListener { presenter.onRetryClick() }
         recyclerView = findViewById<RecyclerView>(R.id.experiences_recyclerview)
         recyclerView.layoutManager = GridLayoutManager(this, 2)
 
         AbidriaApplication.injector.inject(this)
-        presenter.setView(this)
+        presenter.view = this
         registry.addObserver(presenter)
+    }
+
+    override fun showLoader() {
+        progressBar.visibility = View.VISIBLE
+    }
+
+    override fun hideLoader() {
+        progressBar.visibility = View.GONE
+    }
+
+    override fun showRetry() {
+        retryIcon.visibility = View.VISIBLE
+    }
+
+    override fun hideRetry() {
+        retryIcon.visibility = View.GONE
     }
 
     override fun showExperienceList(experienceList: List<Experience>) {

@@ -1,5 +1,6 @@
 package com.abidria.presentation.experience
 
+import com.abidria.data.common.Result
 import com.abidria.data.experience.Experience
 import com.abidria.data.experience.ExperienceRepository
 import com.abidria.presentation.common.injection.scheduler.SchedulerProvider
@@ -23,18 +24,42 @@ class ExperienceListPresenterTest {
         MockitoAnnotations.initMocks(this)
         val testSchedulerProvider = SchedulerProvider(Schedulers.trampoline(), Schedulers.trampoline())
         presenter = ExperienceListPresenter(mockRepository, testSchedulerProvider)
-        presenter.setView(mockView)
+        presenter.view = mockView
     }
 
     @Test
     fun testCreateAsksExperiencesAndShowsOnView() {
         val experienceA = Experience(id = "1", title = "A", description = "", picture = null)
         val experienceB = Experience(id = "2", title = "B", description = "", picture = null)
-        given(mockRepository.getExperiences()).willReturn(Flowable.just(arrayListOf(experienceA, experienceB)))
+        given(mockRepository.experiencesFlowable())
+                .willReturn(Flowable.just(Result<List<Experience>>(arrayListOf(experienceA, experienceB), null)))
 
         presenter.create()
 
+        then(mockView).should().showLoader()
         then(mockView).should().showExperienceList(arrayListOf(experienceA, experienceB))
+        then(mockView).should().hideLoader()
+    }
+
+    @Test
+    fun testCreateWhenResponseErrorShowsRetry() {
+        given(mockRepository.experiencesFlowable())
+                .willReturn(Flowable.just(Result<List<Experience>>(null, Exception())))
+
+        presenter.create()
+
+        then(mockView).should().hideLoader()
+        then(mockView).should().showRetry()
+    }
+
+    @Test
+    fun testOnRetryClickRetrieveExperiencesAndShowThem() {
+
+        presenter.onRetryClick()
+
+        then(mockView).should().hideRetry()
+        then(mockView).should().showLoader()
+        then(mockRepository).should().refreshExperiences()
     }
 
     @Test

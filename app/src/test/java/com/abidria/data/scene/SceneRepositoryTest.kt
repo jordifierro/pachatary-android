@@ -1,6 +1,6 @@
 package com.abidria.data.scene
 
-import com.abidria.data.experience.ExperienceRepositoryTest
+import com.abidria.data.experience.ExperienceApiRepositoryTest
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import io.reactivex.subscribers.TestSubscriber
@@ -28,9 +28,11 @@ class SceneRepositoryTest {
     @Test
     fun testGetScenesRequest() {
         val testSubscriber = TestSubscriber<List<Scene>>()
-        mockWebServer.enqueue(MockResponse())
+        mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(
+                ExperienceApiRepositoryTest::class.java.getResource("/api/GET_scenes_?experience.json").readText() ))
 
         repository.getScenes("7").subscribe(testSubscriber)
+        testSubscriber.awaitTerminalEvent()
 
         val request = mockWebServer.takeRequest()
         assertEquals("/scenes/?experience=7", request.getPath())
@@ -42,8 +44,7 @@ class SceneRepositoryTest {
     fun testGetScenesResponseSuccess() {
         val testSubscriber = TestSubscriber<List<Scene>>()
         mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(
-                ExperienceRepositoryTest::class.java.getResource("/api/GET_scenes_?experience.json").readText()
-        ))
+                ExperienceApiRepositoryTest::class.java.getResource("/api/GET_scenes_?experience.json").readText() ))
 
         repository.getScenes(experienceId = "").subscribe(testSubscriber)
         testSubscriber.awaitTerminalEvent()

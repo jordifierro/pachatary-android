@@ -12,6 +12,7 @@ class SceneRepository(retrofit: Retrofit) {
                                                                          .map { it.toDomain() }
                                                                          .toList()
                                                                          .toFlowable()
+                                                                         .retry(2)
 
     fun getScene(experienceId: String, sceneId: String): Flowable<Scene> =
             getScenes(experienceId).flatMapIterable { list -> list }

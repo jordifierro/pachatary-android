@@ -30,16 +30,16 @@ class ExperienceMapPresenter @Inject constructor(private val repository: SceneRe
     }
 
     private fun setExperienceTitle() {
-        experienceRepository.getExperience(experienceId)
+        experienceRepository.experienceFlowable(experienceId)
                             .subscribeOn(schedulerProvider.subscriber())
                             .observeOn(schedulerProvider.observer())
-                            .subscribe({ experience -> view.setTitle(experience.title)})
+                            .subscribe({ if (it.isSuccess()) view.setTitle(it.data!!.title)})
     }
 
     private fun setScenesOnMap() {
         Flowable.zip(mapLoadedFlowable(),
                      scenesFlowable(),
-                     BiFunction { success: Boolean, scenes: List<Scene> -> scenes })
+                     BiFunction { _: Boolean, scenes: List<Scene> -> scenes })
                 .subscribe({ scenes -> view.showScenesOnMap(scenes) })
     }
 

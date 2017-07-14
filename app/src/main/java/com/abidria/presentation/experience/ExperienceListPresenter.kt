@@ -7,25 +7,34 @@ import com.abidria.data.experience.ExperienceRepository
 import com.abidria.presentation.common.injection.scheduler.SchedulerProvider
 import javax.inject.Inject
 
-class ExperienceListPresenter @Inject constructor(private val experienceRepository: ExperienceRepository,
+class ExperienceListPresenter @Inject constructor(private val repository: ExperienceRepository,
                                                   private val schedulerProvider: SchedulerProvider)
                                                                                                 : LifecycleObserver {
 
-    lateinit var experienceListView: ExperienceListView
-
-    fun setView(experienceListView: ExperienceListView) {
-        this.experienceListView = experienceListView
-    }
+    lateinit var view: ExperienceListView
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun create() {
-        experienceRepository.getExperiences()
-                            .subscribeOn(schedulerProvider.subscriber())
-                            .observeOn(schedulerProvider.observer())
-                            .subscribe({ experiences -> experienceListView.showExperienceList(experiences) })
+        connectToExperiences()
+    }
+
+    fun onRetryClick() {
+        view.hideRetry()
+        view.showLoader()
+        repository.refreshExperiences()
     }
 
     fun onExperienceClick(experienceId: String) {
-        experienceListView.navigateToExperience(experienceId)
+        view.navigateToExperience(experienceId)
+    }
+
+    private fun connectToExperiences() {
+        view.showLoader()
+        repository.experiencesFlowable()
+                .subscribeOn(schedulerProvider.subscriber())
+                .observeOn(schedulerProvider.observer())
+                .subscribe({ view.hideLoader()
+                             if (it.isSuccess()) view.showExperienceList(it.data!!)
+                             else view.showRetry() })
     }
 }

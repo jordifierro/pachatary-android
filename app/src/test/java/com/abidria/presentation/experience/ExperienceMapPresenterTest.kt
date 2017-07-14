@@ -1,5 +1,6 @@
 package com.abidria.presentation.experience
 
+import com.abidria.data.common.Result
 import com.abidria.data.experience.Experience
 import com.abidria.data.experience.ExperienceRepository
 import com.abidria.data.scene.Scene
@@ -38,7 +39,7 @@ class ExperienceMapPresenterTest {
                 latitude = 0.0, longitude = 0.0, experienceId = "5")
         given(mockRepository.getScenes(experienceId = "5")).willReturn(Flowable.just(arrayListOf(sceneA, sceneB)))
         given(mockView.mapLoadedFlowable()).willReturn(Flowable.just(true))
-        given(mockExperienceRepository.getExperience("5")).willReturn(Flowable.never())
+        given(mockExperienceRepository.experienceFlowable("5")).willReturn(Flowable.never())
 
         presenter.create()
 
@@ -50,7 +51,8 @@ class ExperienceMapPresenterTest {
         val experienceA = Experience(id = "1", title = "A", description = "", picture = null)
         given(mockRepository.getScenes("5")).willReturn(Flowable.never())
         given(mockView.mapLoadedFlowable()).willReturn(Flowable.never())
-        given(mockExperienceRepository.getExperience(experienceId = "5")).willReturn(Flowable.just(experienceA))
+        given(mockExperienceRepository.experienceFlowable(experienceId = "5"))
+                .willReturn(Flowable.just(Result(experienceA, null)))
 
         presenter.create()
 

@@ -1,105 +1,107 @@
 package com.abidria.data.experience
 
-import com.google.gson.FieldNamingPolicy
-import com.google.gson.GsonBuilder
+import com.abidria.data.common.Result
+import io.reactivex.BackpressureStrategy
+import io.reactivex.Flowable
+import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.PublishSubject
 import io.reactivex.subscribers.TestSubscriber
-import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
+import org.junit.Before
 import org.junit.Test
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
+import org.mockito.BDDMockito.given
+import org.mockito.BDDMockito.then
+import org.mockito.Mock
+import org.mockito.MockitoAnnotations
+import java.util.*
 
 class ExperienceRepositoryTest {
 
-    val mockWebServer = MockWebServer()
-    var repository = ExperienceRepository(Retrofit.Builder()
-                                                  .baseUrl(mockWebServer.url("/"))
-                                                  .addConverterFactory( GsonConverterFactory.create(
-                                                      GsonBuilder().setFieldNamingPolicy(
-                                                                      FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                                                                   .create()))
-                                                  .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                                                  .build())
+    @Mock lateinit var mockApiRepository: ExperienceApiRepository
 
-    @Test
-    fun testGetExperiencesRequest() {
-        val testSubscriber = TestSubscriber<List<Experience>>()
-        mockWebServer.enqueue(MockResponse())
-
-        repository.getExperiences().subscribe(testSubscriber)
-
-        val request = mockWebServer.takeRequest()
-        assertEquals("/experiences/", request.getPath())
-        assertEquals("GET", request.getMethod())
-        assertEquals("", request.getBody().readUtf8())
+    @Before
+    fun setUp() {
+        MockitoAnnotations.initMocks(this)
     }
 
     @Test
-    fun testGetExperiencesResponseSuccess() {
-        val testSubscriber = TestSubscriber<List<Experience>>()
-        mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(
-            ExperienceRepositoryTest::class.java.getResource("/api/GET_experiences.json").readText()
-        ))
+    fun testRefreshExperiencesCallsApiRepoRefresh() {
+        given(mockApiRepository.experiencesFlowable()).willReturn(Flowable.never())
+        val repository = ExperienceRepository(mockApiRepository)
 
-        repository.getExperiences().subscribe(testSubscriber)
-        testSubscriber.awaitTerminalEvent()
+        repository.refreshExperiences()
 
-        assertEquals(0, testSubscriber.events.get(1).size)
-        assertEquals(1, testSubscriber.events.get(0).size)
-
-        val receivedExperiences = testSubscriber.events.get(0).get(0) as List<*>
-
-        val experience = receivedExperiences[0] as Experience
-        assertEquals("2", experience.id)
-        assertEquals("Baboon, el tío", experience.title)
-        assertEquals("jeje", experience.description)
-        assertEquals("https://experiences/8c29c4735.small.jpg", experience.picture!!.smallUrl)
-        assertEquals("https://experiences/8c29c4735.medium.jpg", experience.picture!!.mediumUrl)
-        assertEquals("https://experiences/8c29c4735.large.jpg", experience.picture!!.largeUrl)
-
-        val secondExperience = receivedExperiences[1] as Experience
-        assertEquals("3", secondExperience.id)
-        assertEquals("Magic Castle of Lost Swamps", secondExperience.title)
-        assertEquals("Don't try to go there!", secondExperience.description)
-        assertNull(secondExperience.picture)
+        then(mockApiRepository).should().refreshExperiences()
     }
 
     @Test
-    fun testGetExperienceRequest() {
-        val testSubscriber = TestSubscriber<Experience>()
-        mockWebServer.enqueue(MockResponse())
+    fun testExperiencesFlowableRecieveExperienceFromApiFlowable() {
+        val testSubscriber: TestSubscriber<Result<List<Experience>>> = TestSubscriber.create()
+        val experience = Experience(id = "1", title = "A", description = "", picture = null)
+        val publisher: PublishSubject<Result<List<Experience>>> = PublishSubject.create()
+        given(mockApiRepository.experiencesFlowable()).willReturn(publisher.toFlowable(BackpressureStrategy.LATEST))
+        val repository = ExperienceRepository(mockApiRepository)
 
-        repository.getExperience(experienceId = "2").subscribe(testSubscriber)
+        repository.experiencesFlowable().subscribeOn(Schedulers.trampoline()).subscribe(testSubscriber)
+        publisher.onNext(Result(data = Arrays.asList(experience), error = null))
+        publisher.onNext(Result(data = Arrays.asList(experience), error = null))
+        testSubscriber.awaitCount(2)
 
-        val request = mockWebServer.takeRequest()
-        assertEquals("/experiences/", request.getPath())
-        assertEquals("GET", request.getMethod())
-        assertEquals("", request.getBody().readUtf8())
+        val firstResult = testSubscriber.events.get(0).get(0) as Result<*>
+        val firstExperienceList = firstResult.data as List<*>
+        assertEquals(experience, firstExperienceList[0])
+
+        val secondResult = testSubscriber.events.get(0).get(1) as Result<*>
+        val secondExperienceList = secondResult.data as List<*>
+        assertEquals(experience, secondExperienceList[0])
     }
 
     @Test
-    fun testGetExperienceResponseSuccess() {
-        val testSubscriber = TestSubscriber<Experience>()
-        mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(
-                ExperienceRepositoryTest::class.java.getResource("/api/GET_experiences.json").readText()
-        ))
+    fun testExperiencesFlowableCachesLastResult() {
+        val testSubscriber: TestSubscriber<Result<List<Experience>>> = TestSubscriber.create()
+        val experienceA = Experience(id = "1", title = "A", description = "", picture = null)
+        val experienceB = Experience(id = "2", title = "B", description = "", picture = null)
+        val publisher: PublishSubject<Result<List<Experience>>> = PublishSubject.create()
+        given(mockApiRepository.experiencesFlowable()).willReturn(publisher.toFlowable(BackpressureStrategy.LATEST))
+        val repository = ExperienceRepository(mockApiRepository)
 
-        repository.getExperience(experienceId = "2").subscribe(testSubscriber)
-        testSubscriber.awaitTerminalEvent()
+        repository.experiencesFlowable().subscribeOn(Schedulers.trampoline()).subscribe(testSubscriber)
+        publisher.onNext(Result(data = Arrays.asList(experienceA), error = null))
+        publisher.onNext(Result(data = Arrays.asList(experienceB), error = null))
+        testSubscriber.awaitCount(2)
 
-        assertEquals(0, testSubscriber.events.get(1).size)
-        assertEquals(1, testSubscriber.events.get(0).size)
+        val firstResult = testSubscriber.events.get(0).get(0) as Result<*>
+        val firstExperienceList = firstResult.data as List<*>
+        assertEquals(experienceA, firstExperienceList[0])
 
-        val experience = testSubscriber.events.get(0).get(0) as Experience
+        val secondResult = testSubscriber.events.get(0).get(1) as Result<*>
+        val secondExperienceList = secondResult.data as List<*>
+        assertEquals(experienceB, secondExperienceList[0])
 
-        assertEquals("2", experience.id)
-        assertEquals("Baboon, el tío", experience.title)
-        assertEquals("jeje", experience.description)
-        assertEquals("https://experiences/8c29c4735.small.jpg", experience.picture!!.smallUrl)
-        assertEquals("https://experiences/8c29c4735.medium.jpg", experience.picture!!.mediumUrl)
-        assertEquals("https://experiences/8c29c4735.large.jpg", experience.picture!!.largeUrl)
+        val secondTestSubscriber: TestSubscriber<Result<List<Experience>>> = TestSubscriber.create()
+
+        repository.experiencesFlowable().subscribeOn(Schedulers.trampoline()).subscribe(secondTestSubscriber)
+        secondTestSubscriber.awaitCount(1)
+
+        val thirdResult = secondTestSubscriber.events.get(0).get(0) as Result<*>
+        val thirdExperienceList = thirdResult.data as List<*>
+        assertEquals(experienceB, thirdExperienceList[0])
+    }
+
+    @Test
+    fun testExperienceFlowableFiltersExperienceById() {
+        val testSubscriber: TestSubscriber<Result<Experience>> = TestSubscriber.create()
+        val experienceA = Experience(id = "1", title = "A", description = "", picture = null)
+        val experienceB = Experience(id = "2", title = "B", description = "", picture = null)
+        given(mockApiRepository.experiencesFlowable()).willReturn(
+                Flowable.just(Result(data = Arrays.asList(experienceA, experienceB), error = null)))
+                val repository = ExperienceRepository(mockApiRepository)
+
+        repository.experienceFlowable("2").subscribeOn(Schedulers.trampoline()).subscribe(testSubscriber)
+        testSubscriber.await()
+
+        val firstResult = testSubscriber.events.get(0).get(0) as Result<*>
+        val firstExperienceList = firstResult.data as Experience
+        assertEquals(experienceB, firstExperienceList)
     }
 }
