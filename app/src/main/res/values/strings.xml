@@ -3,7 +3,7 @@
 
     <string name="title_activity_experiences_list">Experiences</string>
     <string name="title_activity_experience_map">Map</string>
-    <string name="title_activity_scene_detail">Scene</string>
+    <string name="title_activity_scene_detail" />
 
     <string name="retry">Retry</string>
 </resources>

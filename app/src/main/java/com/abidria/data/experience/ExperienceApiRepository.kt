@@ -20,7 +20,7 @@ class ExperienceApiRepository (retrofit: Retrofit, @Named("io") val scheduler: S
             .startWith(true)
             .flatMap { experienceApi.experiences().subscribeOn(scheduler).toObservable() }
             .toFlowable(BackpressureStrategy.LATEST)
-            .compose(ParseNetworkResultTransformer({ it.map { mapper -> mapper.toDomain() } }))
+            .compose(ParseNetworkResultTransformer({ it.map { it.toDomain() } }))
 
     fun refreshExperiences() {
         publisher.onNext(Any())

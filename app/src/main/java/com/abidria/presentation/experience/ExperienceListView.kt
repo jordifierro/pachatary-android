@@ -1,10 +1,10 @@
 package com.abidria.presentation.experience
 
 import com.abidria.data.experience.Experience
+import com.abidria.presentation.common.view.LoaderView
 
-interface ExperienceListView {
-    fun showLoader()
-    fun hideLoader()
+interface ExperienceListView : LoaderView {
+
     fun showRetry()
     fun hideRetry()
     fun showExperienceList(experienceList: List<Experience>)

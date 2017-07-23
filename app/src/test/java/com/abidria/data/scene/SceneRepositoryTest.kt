@@ -1,77 +1,111 @@
 package com.abidria.data.scene
 
-import com.abidria.data.experience.ExperienceApiRepositoryTest
-import com.google.gson.FieldNamingPolicy
-import com.google.gson.GsonBuilder
+import com.abidria.data.common.Result
+import io.reactivex.Flowable
+import io.reactivex.observers.TestObserver
+import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.PublishSubject
 import io.reactivex.subscribers.TestSubscriber
-import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
+import org.junit.Before
 import org.junit.Test
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
+import org.mockito.BDDMockito.given
+import org.mockito.Mock
+import org.mockito.MockitoAnnotations
+import java.util.*
 
 class SceneRepositoryTest {
 
-    val mockWebServer = MockWebServer()
-    var repository = SceneRepository(Retrofit.Builder()
-                                             .baseUrl(mockWebServer.url("/"))
-                                             .addConverterFactory( GsonConverterFactory.create(
-                                                 GsonBuilder().setFieldNamingPolicy(
-                                                                 FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                                                              .create()))
-                                             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                                             .build())
+    @Mock lateinit var mockApiRepository: SceneApiRepository
+    lateinit var repository: SceneRepository
 
-    @Test
-    fun testGetScenesRequest() {
-        val testSubscriber = TestSubscriber<List<Scene>>()
-        mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(
-                ExperienceApiRepositoryTest::class.java.getResource("/api/GET_scenes_?experience.json").readText() ))
-
-        repository.getScenes("7").subscribe(testSubscriber)
-        testSubscriber.awaitTerminalEvent()
-
-        val request = mockWebServer.takeRequest()
-        assertEquals("/scenes/?experience=7", request.getPath())
-        assertEquals("GET", request.getMethod())
-        assertEquals("", request.getBody().readUtf8())
+    @Before
+    fun setUp() {
+        MockitoAnnotations.initMocks(this)
+        repository = SceneRepository(mockApiRepository)
     }
 
     @Test
-    fun testGetScenesResponseSuccess() {
-        val testSubscriber = TestSubscriber<List<Scene>>()
-        mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(
-                ExperienceApiRepositoryTest::class.java.getResource("/api/GET_scenes_?experience.json").readText() ))
+    fun testGetScenesFlowableReturnsApisOne() {
+        val scene = Scene(id = "9", title = "T", description = "", picture = null,
+                          latitude = 1.0, longitude = 0.0, experienceId = "3")
+        val scenesFlowable = Flowable.just(Result(Arrays.asList(scene), null))
+        given(mockApiRepository.scenesFlowableAndRefreshObserver("3"))
+                .willReturn(Pair(first = scenesFlowable, second = PublishSubject.create()))
+        val testSubscriber = TestSubscriber<Result<List<Scene>>>()
 
-        repository.getScenes(experienceId = "").subscribe(testSubscriber)
-        testSubscriber.awaitTerminalEvent()
+        repository.scenesFlowable("3")
+                .subscribeOn(Schedulers.trampoline()).subscribe(testSubscriber)
+        testSubscriber.awaitCount(1)
 
-        assertEquals(0, testSubscriber.events.get(1).size)
-        assertEquals(1, testSubscriber.events.get(0).size)
+        val receivedResult = testSubscriber.events.get(0).get(0) as Result<*>
+        val receivedScenes = receivedResult.data as List<*>
 
-        val receivedScenes = testSubscriber.events.get(0).get(0) as List<*>
+        assertEquals(scene, receivedScenes.get(0))
+    }
 
-        val firstScene = receivedScenes[0] as Scene
-        assertEquals("4", firstScene.id)
-        assertEquals("Plaça", firstScene.title)
-        assertEquals("", firstScene.description)
-        assertEquals("https://scenes/00df.small.jpeg", firstScene.picture!!.smallUrl)
-        assertEquals("https://scenes/00df.medium.jpeg", firstScene.picture!!.mediumUrl)
-        assertEquals("https://scenes/00df.large.jpeg", firstScene.picture!!.largeUrl)
-        assertEquals(41.364679, firstScene.latitude, 1e-15)
-        assertEquals(2.135489, firstScene.longitude, 1e-15)
-        assertEquals("5", firstScene.experienceId)
+    @Test
+    fun testGetScenesFlowableReturnsLastCached() {
+        val sceneA = Scene(id = "9", title = "T", description = "", picture = null,
+                           latitude = 1.0, longitude = 0.0, experienceId = "3")
+        val sceneB = Scene(id = "5", title = "B", description = "", picture = null,
+                           latitude = 1.0, longitude = 0.0, experienceId = "3")
+        val scenesFlowable = Flowable.just(Result(Arrays.asList(sceneA), null),
+                                            Result(Arrays.asList(sceneB), null))
+        given(mockApiRepository.scenesFlowableAndRefreshObserver("3"))
+                .willReturn(Pair(first = scenesFlowable, second = PublishSubject.create()))
+        val testSubscriber = TestSubscriber<Result<List<Scene>>>()
 
-        val secondScene = receivedScenes[1] as Scene
-        assertEquals("3", secondScene.id)
-        assertEquals("Barri", secondScene.title)
-        assertEquals("Lorem ipsum dolor sit amet", secondScene.description)
-        assertNull(secondScene.picture)
-        assertEquals(41.392682, secondScene.latitude, 1e-15)
-        assertEquals(2.144423, secondScene.longitude, 1e-15)
-        assertEquals("5", secondScene.experienceId)
+        repository.scenesFlowable("3")
+                .subscribeOn(Schedulers.trampoline()).subscribe(testSubscriber)
+        testSubscriber.awaitCount(1)
+
+        val receivedResult = testSubscriber.events.get(0).get(1) as Result<*>
+        val receivedScenes = receivedResult.data as List<*>
+
+        assertEquals(sceneB, receivedScenes.get(0))
+
+        val secondTestSubscriber = TestSubscriber<Result<List<Scene>>>()
+
+        repository.scenesFlowable("3")
+                .subscribeOn(Schedulers.trampoline()).subscribe(secondTestSubscriber)
+        secondTestSubscriber.awaitCount(1)
+
+        val secondReceivedResult = secondTestSubscriber.events.get(0).get(0) as Result<*>
+        val secondReceivedScenes = secondReceivedResult.data as List<*>
+
+        assertEquals(sceneB, secondReceivedScenes.get(0))
+    }
+
+    @Test
+    fun testRefreshEmitsOnCachedRefresherObserver() {
+        val testObserver = TestObserver<Any>()
+        given(mockApiRepository.scenesFlowableAndRefreshObserver("3"))
+                .willReturn(Pair(first = Flowable.never(), second = testObserver))
+
+        repository.scenesFlowable("3")
+        repository.refreshScenes("3")
+
+        testObserver.assertValueCount(1)
+    }
+
+    @Test
+    fun testGetSceneFlowableReturnsFiltered() {
+        val sceneA = Scene(id = "9", title = "T", description = "", picture = null,
+                           latitude = 1.0, longitude = 0.0, experienceId = "3")
+        val sceneB = Scene(id = "5", title = "U", description = "", picture = null,
+                latitude = 1.0, longitude = 0.0, experienceId = "3")
+        val scenesFlowable = Flowable.just(Result(Arrays.asList(sceneA, sceneB), null))
+        given(mockApiRepository.scenesFlowableAndRefreshObserver("3"))
+                .willReturn(Pair(first = scenesFlowable, second = PublishSubject.create()))
+        val testSubscriber = TestSubscriber<Result<Scene>>()
+
+        repository.sceneFlowable(experienceId = "3", sceneId = "5")
+                .subscribeOn(Schedulers.trampoline()).subscribe(testSubscriber)
+        testSubscriber.awaitCount(1)
+
+        val receivedResult = testSubscriber.events.get(0).get(0) as Result<*>
+
+        assertEquals(sceneB, receivedResult.data)
     }
 }

@@ -16,6 +16,5 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository) {
     }
 
     fun experienceFlowable(experienceId: String): Flowable<Result<Experience>> =
-        experiences
-            .map { Result(data = it.data?.first { experience ->  experience.id == experienceId }, error = it.error) }
+        experiences.map { Result(data = it.data?.first { it.id == experienceId }, error = it.error) }
 }

@@ -1,20 +1,29 @@
 package com.abidria.data.scene
 
+import com.abidria.data.common.Result
 import io.reactivex.Flowable
-import retrofit2.Retrofit
+import io.reactivex.Observer
 
-class SceneRepository(retrofit: Retrofit) {
+class SceneRepository(val apiRepository: SceneApiRepository) {
 
-    private val sceneApi: SceneApi = retrofit.create(SceneApi::class.java)
+    private val scenesStreamHashMap: HashMap<String, Pair<Flowable<Result<List<Scene>>>, Observer<Any>>> = HashMap()
 
-    fun getScenes(experienceId: String): Flowable<List<Scene>> = sceneApi.scenes(experienceId)
-                                                                         .flatMapIterable { list -> list }
-                                                                         .map { it.toDomain() }
-                                                                         .toList()
-                                                                         .toFlowable()
-                                                                         .retry(2)
+    fun scenesFlowable(experienceId: String): Flowable<Result<List<Scene>>> {
+        if (scenesStreamHashMap.get(experienceId) == null) {
+            val flowableRefresherPair = apiRepository.scenesFlowableAndRefreshObserver(experienceId)
+            val cachedScenesFlowable = flowableRefresherPair.first
+                                                                .replay(1)
+                                                                .autoConnect()
+            scenesStreamHashMap.put(experienceId,
+                    Pair(first = cachedScenesFlowable, second = flowableRefresherPair.second))
+        }
+        return scenesStreamHashMap.get(experienceId)!!.first
+    }
 
-    fun getScene(experienceId: String, sceneId: String): Flowable<Scene> =
-            getScenes(experienceId).flatMapIterable { list -> list }
-                                   .filter { scene -> scene.id == sceneId }
+    fun refreshScenes(experienceId: String) {
+        scenesStreamHashMap.get(experienceId)!!.second.onNext(Any())
+    }
+
+    fun sceneFlowable(experienceId: String, sceneId: String): Flowable<Result<Scene>> =
+        scenesFlowable(experienceId).map { Result(data = it.data?.first { it.id == sceneId }, error = it.error) }
 }

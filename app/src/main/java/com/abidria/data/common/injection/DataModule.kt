@@ -3,6 +3,7 @@ package com.abidria.data.common.injection
 import com.abidria.BuildConfig
 import com.abidria.data.experience.ExperienceApiRepository
 import com.abidria.data.experience.ExperienceRepository
+import com.abidria.data.scene.SceneApiRepository
 import com.abidria.data.scene.SceneRepository
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.google.gson.FieldNamingPolicy
@@ -34,7 +35,7 @@ class DataModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit(okHttpClient: OkHttpClient, gsonConverterFactory: Converter.Factory) =
+    fun provideRetrofit(okHttpClient: OkHttpClient, gsonConverterFactory: Converter.Factory): Retrofit =
             Retrofit.Builder()
                     .baseUrl(BuildConfig.API_URL)
                     .addConverterFactory(gsonConverterFactory)
@@ -44,14 +45,21 @@ class DataModule {
 
     @Provides
     @Singleton
-    fun provideExperienceApiRepository(retrofit: Retrofit, @Named("io") scheduler: Scheduler) =
+    fun provideExperienceApiRepository(retrofit: Retrofit, @Named("io") scheduler: Scheduler): ExperienceApiRepository =
             ExperienceApiRepository(retrofit, scheduler)
 
     @Provides
     @Singleton
-    fun provideExperienceRepository(apiRepository: ExperienceApiRepository) = ExperienceRepository(apiRepository)
+    fun provideExperienceRepository(apiRepository: ExperienceApiRepository): ExperienceRepository =
+            ExperienceRepository(apiRepository)
 
     @Provides
     @Singleton
-    fun provideSceneRepository(retrofit: Retrofit) = SceneRepository(retrofit)
+    fun provideSceneApiRepository(retrofit: Retrofit, @Named("io") scheduler: Scheduler): SceneApiRepository =
+            SceneApiRepository(retrofit, scheduler)
+
+    @Provides
+    @Singleton
+    fun provideSceneRepository(apiRepository: SceneApiRepository): SceneRepository =
+            SceneRepository(apiRepository)
 }

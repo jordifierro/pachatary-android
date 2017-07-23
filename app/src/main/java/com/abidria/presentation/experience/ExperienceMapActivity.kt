@@ -6,6 +6,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.View
+import android.widget.ProgressBar
 import com.abidria.BuildConfig
 import com.abidria.R
 import com.abidria.data.scene.Scene
@@ -32,8 +34,9 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView, LifecycleR
 
     lateinit var mapView: MapView
     lateinit var mapboxMap: MapboxMap
+    lateinit var progressBar: ProgressBar
 
-    val mapLoadedReplaySubject: ReplaySubject<Boolean> = ReplaySubject.create()
+    val mapLoadedReplaySubject: ReplaySubject<Any> = ReplaySubject.create()
 
     val registry: LifecycleRegistry = LifecycleRegistry(this)
 
@@ -55,12 +58,14 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView, LifecycleR
         setContentView(R.layout.activity_experience_map)
         setSupportActionBar(toolbar)
 
+        progressBar = findViewById<ProgressBar>(R.id.scenes_progressbar)
+        mapView = findViewById<MapView>(R.id.mapView)
+        mapView.onCreate(savedInstanceState)
+
         AbidriaApplication.injector.inject(this)
         presenter.setView(this, intent.getStringExtra(EXPERIENCE_ID))
         registry.addObserver(presenter)
 
-        mapView = findViewById<MapView>(R.id.mapView)
-        mapView.onCreate(savedInstanceState)
         mapView.getMapAsync { mapboxMap ->
             this.mapboxMap = mapboxMap
             mapLoadedReplaySubject.onNext(true)
@@ -68,10 +73,10 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView, LifecycleR
         }
     }
 
-    override fun mapLoadedFlowable(): Flowable<Boolean> = mapLoadedReplaySubject.toFlowable(BackpressureStrategy.LATEST)
+    override fun mapLoadedFlowable(): Flowable<Any> = mapLoadedReplaySubject.toFlowable(BackpressureStrategy.LATEST)
 
     override fun showScenesOnMap(scenes: List<Scene>) {
-        if (scenes.size > 0) {
+        if (scenes.isNotEmpty()) {
             markersHashMap.clear()
             val latLngBoundsBuilder: LatLngBounds.Builder = LatLngBounds.Builder()
 
@@ -91,7 +96,7 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView, LifecycleR
             }
             mapboxMap.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBoundsBuilder.build(), 50, 150, 50, 150))
         }
-
+        mapView.visibility = View.VISIBLE
     }
 
     override fun setTitle(title: String) {
@@ -100,6 +105,14 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView, LifecycleR
 
     override fun navigateToScene(experienceId: String, sceneId: String) {
         startActivity(SceneDetailActivity.newIntent(context = this, experienceId = experienceId, sceneId = sceneId))
+    }
+
+    override fun showLoader() {
+        progressBar.visibility = View.VISIBLE
+    }
+
+    override fun hideLoader() {
+        progressBar.visibility = View.GONE
     }
 
     override fun getLifecycle(): LifecycleRegistry = registry

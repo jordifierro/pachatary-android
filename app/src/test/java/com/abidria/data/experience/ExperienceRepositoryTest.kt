@@ -95,7 +95,7 @@ class ExperienceRepositoryTest {
         val experienceB = Experience(id = "2", title = "B", description = "", picture = null)
         given(mockApiRepository.experiencesFlowable()).willReturn(
                 Flowable.just(Result(data = Arrays.asList(experienceA, experienceB), error = null)))
-                val repository = ExperienceRepository(mockApiRepository)
+        val repository = ExperienceRepository(mockApiRepository)
 
         repository.experienceFlowable("2").subscribeOn(Schedulers.trampoline()).subscribe(testSubscriber)
         testSubscriber.await()

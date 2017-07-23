@@ -4,8 +4,12 @@ import com.abidria.data.common.Result
 import com.abidria.data.experience.Experience
 import com.abidria.data.experience.ExperienceRepository
 import com.abidria.presentation.common.injection.scheduler.SchedulerProvider
+import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.PublishSubject
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.BDDMockito.given
@@ -68,5 +72,22 @@ class ExperienceListPresenterTest {
         presenter.onExperienceClick("2")
 
         then(mockView).should().navigateToExperience("2")
+    }
+
+    @Test
+    fun testUnsubscribenOnDestroy() {
+        val testObservable = PublishSubject.create<Result<List<Experience>>>()
+        assertFalse(testObservable.hasObservers())
+
+        given(mockRepository.experiencesFlowable())
+                .willReturn(testObservable.toFlowable(BackpressureStrategy.LATEST))
+
+        presenter.create()
+
+        assertTrue(testObservable.hasObservers())
+
+        presenter.destroy()
+
+        assertFalse(testObservable.hasObservers())
     }
 }

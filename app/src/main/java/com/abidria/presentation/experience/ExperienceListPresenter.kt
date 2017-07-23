@@ -5,6 +5,7 @@ import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.OnLifecycleEvent
 import com.abidria.data.experience.ExperienceRepository
 import com.abidria.presentation.common.injection.scheduler.SchedulerProvider
+import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
 class ExperienceListPresenter @Inject constructor(private val repository: ExperienceRepository,
@@ -12,6 +13,8 @@ class ExperienceListPresenter @Inject constructor(private val repository: Experi
                                                                                                 : LifecycleObserver {
 
     lateinit var view: ExperienceListView
+
+    private var experiencesDisposable: Disposable? = null
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun create() {
@@ -30,11 +33,15 @@ class ExperienceListPresenter @Inject constructor(private val repository: Experi
 
     private fun connectToExperiences() {
         view.showLoader()
-        repository.experiencesFlowable()
-                .subscribeOn(schedulerProvider.subscriber())
-                .observeOn(schedulerProvider.observer())
-                .subscribe({ view.hideLoader()
-                             if (it.isSuccess()) view.showExperienceList(it.data!!)
-                             else view.showRetry() })
+        experiencesDisposable = repository.experiencesFlowable()
+                                          .subscribeOn(schedulerProvider.subscriber())
+                                          .observeOn(schedulerProvider.observer())
+                                          .subscribe({ view.hideLoader()
+                                                       if (it.isSuccess()) view.showExperienceList(it.data!!)
+                                                       else view.showRetry() })
+    }
+
+    fun destroy() {
+        experiencesDisposable?.dispose()
     }
 }
