@@ -1,2 +1,5 @@
 devApiUrl=
+devMapboxAccessToken=
+
+apiUrl=
 mapboxAccessToken=

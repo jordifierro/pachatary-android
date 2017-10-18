@@ -1,7 +1,6 @@
 package com.abidria.presentation.scene
 
 import android.arch.lifecycle.LifecycleRegistry
-import android.arch.lifecycle.LifecycleRegistryOwner
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -17,7 +16,7 @@ import kotlinx.android.synthetic.main.activity_experience_map.*
 import javax.inject.Inject
 
 
-class SceneDetailActivity : AppCompatActivity(), SceneDetailView, LifecycleRegistryOwner {
+class SceneDetailActivity : AppCompatActivity(), SceneDetailView {
 
     @Inject
     lateinit var presenter: SceneDetailPresenter

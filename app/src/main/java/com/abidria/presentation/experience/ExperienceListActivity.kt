@@ -1,7 +1,6 @@
 package com.abidria.presentation.experience
 
 import android.arch.lifecycle.LifecycleRegistry
-import android.arch.lifecycle.LifecycleRegistryOwner
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
@@ -10,7 +9,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import com.abidria.R
@@ -20,7 +18,7 @@ import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_experiences_list.*
 import javax.inject.Inject
 
-class ExperienceListActivity : AppCompatActivity(), LifecycleRegistryOwner, ExperienceListView {
+class ExperienceListActivity : AppCompatActivity(), ExperienceListView {
 
     @Inject
     lateinit var presenter: ExperienceListPresenter

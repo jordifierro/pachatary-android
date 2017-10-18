@@ -1,7 +1,6 @@
 package com.abidria.presentation.experience
 
 import android.arch.lifecycle.LifecycleRegistry
-import android.arch.lifecycle.LifecycleRegistryOwner
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -27,7 +26,7 @@ import kotlinx.android.synthetic.main.activity_experience_map.*
 import javax.inject.Inject
 
 
-class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView, LifecycleRegistryOwner {
+class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView {
 
     @Inject
     lateinit var presenter: ExperienceMapPresenter

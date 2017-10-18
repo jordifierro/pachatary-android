@@ -7,8 +7,7 @@ import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
+import org.junit.Assert.*
 import org.junit.Test
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -105,7 +104,7 @@ class ExperienceApiRepositoryTest {
         assertEquals(2, testSubscriber.events.get(0).size)
 
         val firstResult = testSubscriber.events.get(0).get(0) as Result<*>
-        assert(firstResult.isError())
+        assertTrue(firstResult.isSuccess())
 
         val secondResult = testSubscriber.events.get(0).get(1) as Result<*>
         val experiences = secondResult.data as List<*>
