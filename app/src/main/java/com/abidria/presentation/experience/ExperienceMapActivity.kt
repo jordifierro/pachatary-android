@@ -11,7 +11,7 @@ import com.abidria.BuildConfig
 import com.abidria.R
 import com.abidria.data.scene.Scene
 import com.abidria.presentation.common.AbidriaApplication
-import com.abidria.presentation.scene.SceneDetailActivity
+import com.abidria.presentation.scene.detail.SceneDetailActivity
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory

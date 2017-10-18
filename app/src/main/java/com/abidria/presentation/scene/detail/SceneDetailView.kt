@@ -1,4 +1,4 @@
-package com.abidria.presentation.scene
+package com.abidria.presentation.scene.detail
 
 import com.abidria.data.scene.Scene
 

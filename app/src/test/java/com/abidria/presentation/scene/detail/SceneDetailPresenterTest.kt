@@ -1,9 +1,11 @@
-package com.abidria.presentation.scene
+package com.abidria.presentation.scene.detail
 
 import com.abidria.data.common.Result
 import com.abidria.data.scene.Scene
 import com.abidria.data.scene.SceneRepository
 import com.abidria.presentation.common.injection.scheduler.SchedulerProvider
+import com.abidria.presentation.scene.detail.SceneDetailPresenter
+import com.abidria.presentation.scene.detail.SceneDetailView
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers

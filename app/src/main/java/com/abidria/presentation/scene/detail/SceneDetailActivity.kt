@@ -1,4 +1,4 @@
-package com.abidria.presentation.scene
+package com.abidria.presentation.scene.detail
 
 import android.arch.lifecycle.LifecycleRegistry
 import android.content.Context
