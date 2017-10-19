@@ -6,4 +6,9 @@
     <string name="title_activity_scene_detail" />
 
     <string name="retry">Retry</string>
+
+    <string name="title_activity_edit_title_and_description">Edit scene</string>
+    <string name="edit_title_and_description_title">Title:</string>
+    <string name="edit_title_and_description_description">Description:</string>
+    <string name="edit_title_and_description_done">Done</string>
 </resources>

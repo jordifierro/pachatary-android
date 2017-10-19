@@ -1,0 +1,17 @@
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="com.abidria.presentation.scene.create.EditTitleAndDescriptionActivity">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/edit_title_and_description_appbarlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay"/>
+
+    <include layout="@layout/content_edit_title_and_description" />
+
+</android.support.design.widget.CoordinatorLayout>
