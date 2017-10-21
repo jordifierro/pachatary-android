@@ -23,7 +23,7 @@ class EditTitleAndDescriptionPresenter @Inject constructor(): LifecycleObserver 
         val description = view.description()
 
         if (title.length >= MIN_TITLE_LENGTH && title.length <= MAX_TITLE_LENGTH)
-            view.finishWith(title=title, description=description)
+            view.finishWith(title = title, description = description)
         else view.showTitleLengthError()
     }
 }

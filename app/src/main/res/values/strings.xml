@@ -11,4 +11,7 @@
     <string name="edit_title_and_description_title">Title:</string>
     <string name="edit_title_and_description_description">Description:</string>
     <string name="edit_title_and_description_done">Done</string>
+
+    <string name="title_activity_select_location">Select Location</string>
+    <string name="select_location_done">Done</string>
 </resources>

@@ -39,7 +39,7 @@ class EditTitleAndDescriptionActivity : AppCompatActivity(), EditTitleAndDescrip
         titleEditText = findViewById<EditText>(R.id.edit_title_and_description_title_edittext)
         descriptionEditText = findViewById<EditText>(R.id.edit_title_and_description_description_edittext)
         doneButton = findViewById<Button>(R.id.edit_title_and_description_done_button)
-        doneButton.setOnClickListener { view -> presenter.doneButtonClick() }
+        doneButton.setOnClickListener { presenter.doneButtonClick() }
 
         AbidriaApplication.injector.inject(this)
         presenter.view = this
