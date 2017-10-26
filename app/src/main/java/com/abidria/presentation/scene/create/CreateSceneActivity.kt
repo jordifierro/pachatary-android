@@ -113,8 +113,6 @@ class CreateSceneActivity : AppCompatActivity(), CreateSceneView {
         } catch (exc: Exception) {
             Log.e("AndroidUploadService", exc.message, exc)
         }
-
-
     }
 
     override fun getLifecycle(): LifecycleRegistry = registry

@@ -61,5 +61,6 @@ class CreateScenePresenter @Inject constructor(private val sceneRepository: Scen
 
     fun onImageCropped(croppedImageUriString: String) {
         view.uploadImage(createdScene!!.id, croppedImageUriString)
+        view.finish()
     }
 }

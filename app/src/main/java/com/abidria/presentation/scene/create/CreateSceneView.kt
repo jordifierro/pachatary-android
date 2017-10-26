@@ -6,4 +6,5 @@ interface CreateSceneView {
     fun navigateToPickImage()
     fun navigateToCropImage(selectedImageUriString: String)
     fun uploadImage(sceneId: String, croppedImageUriString: String)
+    fun finish()
 }
