@@ -38,6 +38,10 @@ class CreateScenePresenter @Inject constructor(private val sceneRepository: Scen
         view.navigateToSelectLocation()
     }
 
+    fun onEditTitleAndDescriptionCanceled() {
+        view.finish()
+    }
+
     fun onLocationSelected(latitude: Double, longitude: Double) {
         this.latitude = latitude
         this.longitude = longitude
@@ -50,6 +54,10 @@ class CreateScenePresenter @Inject constructor(private val sceneRepository: Scen
                 .subscribe({ onSceneCreatedCorrectly(it.data!!) })
     }
 
+    fun onSelectLocationCanceled() {
+        view.navigateToEditTitleAndDescription()
+    }
+
     fun onSceneCreatedCorrectly(scene: Scene) {
         this.createdScene = scene
         view.navigateToPickImage()
@@ -59,8 +67,16 @@ class CreateScenePresenter @Inject constructor(private val sceneRepository: Scen
         view.navigateToCropImage(selectedImageUriString)
     }
 
+    fun onPickImageCanceled() {
+        view.finish()
+    }
+
     fun onImageCropped(croppedImageUriString: String) {
         view.uploadImage(createdScene!!.id, croppedImageUriString)
         view.finish()
+    }
+
+    fun onCropImageCanceled() {
+        view.navigateToPickImage()
     }
 }

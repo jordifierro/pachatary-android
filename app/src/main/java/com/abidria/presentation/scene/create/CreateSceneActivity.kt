@@ -61,13 +61,21 @@ class CreateSceneActivity : AppCompatActivity(), CreateSceneView {
             presenter.onTitleAndDescriptionEdited(
                     title = data!!.extras.getString(EditTitleAndDescriptionActivity.TITLE),
                     description = data.extras.getString(EditTitleAndDescriptionActivity.DESCRIPTION))
+        else if (requestCode == EDIT_TITLE_AND_DESCRIPTION && resultCode == Activity.RESULT_CANCELED)
+            presenter.onEditTitleAndDescriptionCanceled()
         else if (requestCode == SELECT_LOCATION && resultCode == Activity.RESULT_OK)
             presenter.onLocationSelected(latitude = data!!.extras.getDouble(SelectLocationActivity.LATITUDE),
                                          longitude = data.extras.getDouble(SelectLocationActivity.LONGITUDE))
+        else if (requestCode == SELECT_LOCATION && resultCode == Activity.RESULT_CANCELED)
+            presenter.onSelectLocationCanceled()
         else if (requestCode == SELECT_IMAGE && resultCode == Activity.RESULT_OK)
             presenter.onImagePicked(Matisse.obtainResult(data)[0].toString())
+        else if (requestCode == SELECT_IMAGE && resultCode == Activity.RESULT_CANCELED)
+            presenter.onPickImageCanceled()
         else if (requestCode == CROP_IMAGE && resultCode == Activity.RESULT_OK)
             presenter.onImageCropped(UCrop.getOutput(data!!).toString())
+        else if (requestCode == CROP_IMAGE && resultCode == Activity.RESULT_CANCELED)
+            presenter.onCropImageCanceled()
     }
 
     override fun navigateToEditTitleAndDescription() {
