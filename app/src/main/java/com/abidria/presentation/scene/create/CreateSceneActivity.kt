@@ -10,21 +10,18 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.webkit.MimeTypeMap
-import android.widget.Toast
 import com.abidria.BuildConfig
 import com.abidria.R
 import com.abidria.presentation.common.AbidriaApplication
 import com.yalantis.ucrop.UCrop
 import com.zhihu.matisse.Matisse
-import com.zhihu.matisse.MimeType
 import com.zhihu.matisse.MimeType.allOf
 import com.zhihu.matisse.engine.impl.PicassoEngine
+import kotlinx.android.synthetic.main.activity_create_scene.*
+import net.gotev.uploadservice.MultipartUploadRequest
+import net.gotev.uploadservice.UploadNotificationConfig
 import java.io.File
 import javax.inject.Inject
-import net.gotev.uploadservice.UploadNotificationConfig
-import net.gotev.uploadservice.MultipartUploadRequest
-
-
 
 
 class CreateSceneActivity : AppCompatActivity(), CreateSceneView {
@@ -52,6 +49,7 @@ class CreateSceneActivity : AppCompatActivity(), CreateSceneView {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_scene)
+        setSupportActionBar(toolbar)
 
         AbidriaApplication.injector.inject(this)
         presenter.setView(this, intent.getStringExtra(EXPERIENCE_ID))
