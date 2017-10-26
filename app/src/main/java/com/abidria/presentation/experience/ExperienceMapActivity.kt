@@ -4,6 +4,7 @@ import android.arch.lifecycle.LifecycleRegistry
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.ProgressBar
@@ -11,6 +12,7 @@ import com.abidria.BuildConfig
 import com.abidria.R
 import com.abidria.data.scene.Scene
 import com.abidria.presentation.common.AbidriaApplication
+import com.abidria.presentation.scene.create.CreateSceneActivity
 import com.abidria.presentation.scene.detail.SceneDetailActivity
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions
@@ -23,6 +25,7 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.subjects.ReplaySubject
 import kotlinx.android.synthetic.main.activity_experience_map.*
+import java.util.*
 import javax.inject.Inject
 
 
@@ -34,6 +37,7 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView {
     lateinit var mapView: MapView
     lateinit var mapboxMap: MapboxMap
     lateinit var progressBar: ProgressBar
+    lateinit var createSceneButton: FloatingActionButton
 
     val mapLoadedReplaySubject: ReplaySubject<Any> = ReplaySubject.create()
 
@@ -42,7 +46,7 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView {
     val markersHashMap: HashMap<Long, String> = HashMap()
 
     companion object {
-        private val EXPERIENCE_ID = "experience_id"
+        private val EXPERIENCE_ID = "experienceId"
 
         fun newIntent(context: Context, experienceId: String): Intent {
             val intent = Intent(context, ExperienceMapActivity::class.java)
@@ -60,6 +64,8 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView {
         progressBar = findViewById<ProgressBar>(R.id.scenes_progressbar)
         mapView = findViewById<MapView>(R.id.mapView)
         mapView.onCreate(savedInstanceState)
+        createSceneButton = findViewById<FloatingActionButton>(R.id.create_new_scene_button)
+        createSceneButton.setOnClickListener { presenter.onCreateSceneClick() }
 
         AbidriaApplication.injector.inject(this)
         presenter.setView(this, intent.getStringExtra(EXPERIENCE_ID))
@@ -89,6 +95,14 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView {
                 latLngBoundsBuilder.include(latLng)
             }
 
+            if (scenes.size == 1) {
+                val latLng1 = LatLng(scenes[0].latitude + 0.002, scenes[0].longitude + 0.002)
+                val latLng2 = LatLng(scenes[0].latitude + 0.002, scenes[0].longitude - 0.002)
+                val latLng3 = LatLng(scenes[0].latitude - 0.002, scenes[0].longitude + 0.002)
+                val latLng4 = LatLng(scenes[0].latitude - 0.002, scenes[0].longitude - 0.002)
+                latLngBoundsBuilder.includes(Arrays.asList(latLng1, latLng2, latLng3, latLng4))
+            }
+
             mapboxMap.setOnInfoWindowClickListener {
                 marker ->  presenter.onSceneClick(markersHashMap.get(marker.id)!!)
                 false
@@ -104,6 +118,10 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView {
 
     override fun navigateToScene(experienceId: String, sceneId: String) {
         startActivity(SceneDetailActivity.newIntent(context = this, experienceId = experienceId, sceneId = sceneId))
+    }
+
+    override fun navigateToCreateScene(experienceId: String) {
+        startActivity(CreateSceneActivity.newIntent(context = this, experienceId = experienceId))
     }
 
     override fun showLoader() {

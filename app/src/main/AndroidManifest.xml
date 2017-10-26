@@ -20,7 +20,13 @@
         <activity
             android:name=".presentation.experience.ExperienceListActivity"
             android:label="@string/title_activity_experiences_list"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".presentation.experience.ExperienceMapActivity"
             android:label="@string/title_activity_experience_map"
@@ -29,13 +35,10 @@
             android:name=".presentation.scene.detail.SceneDetailActivity"
             android:label="@string/title_activity_scene_detail"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".presentation.scene.create.CreateSceneActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        <activity
+            android:name=".presentation.scene.create.CreateSceneActivity"
+            android:label="@string/title_activity_create_scene"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".presentation.scene.create.EditTitleAndDescriptionActivity"
             android:label="@string/title_activity_edit_title_and_description"

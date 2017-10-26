@@ -4,8 +4,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/edit_title_and_description"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.abidria.presentation.scene.create.EditTitleAndDescriptionActivity"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:showIn="@layout/activity_edit_title_and_description">
 
     <LinearLayout
         android:layout_width="match_parent"

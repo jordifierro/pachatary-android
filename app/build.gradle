@@ -81,4 +81,6 @@ dependencies {
 
     implementation 'com.zhihu.android:matisse:0.4.3'
     implementation 'com.github.yalantis:ucrop:2.2.1-native'
+    implementation 'net.gotev:uploadservice:3.4'
+    implementation 'net.gotev:uploadservice-okhttp:3.4'
 }

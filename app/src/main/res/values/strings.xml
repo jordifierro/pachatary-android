@@ -4,6 +4,7 @@
     <string name="title_activity_experiences_list">Experiences</string>
     <string name="title_activity_experience_map">Map</string>
     <string name="title_activity_scene_detail" />
+    <string name="title_activity_create_scene">Create scene</string>
 
     <string name="retry">Retry</string>
 
@@ -14,4 +15,5 @@
 
     <string name="title_activity_select_location">Select Location</string>
     <string name="select_location_done">Done</string>
+    <string name="title_activity_cosa">CosaActivity</string>
 </resources>

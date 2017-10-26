@@ -1,34 +1,86 @@
 package com.abidria.presentation.scene.create
 
+import android.app.Activity
+import android.arch.lifecycle.LifecycleRegistry
+import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
+import android.webkit.MimeTypeMap
 import android.widget.Toast
+import com.abidria.BuildConfig
 import com.abidria.R
+import com.abidria.presentation.common.AbidriaApplication
 import com.yalantis.ucrop.UCrop
 import com.zhihu.matisse.Matisse
 import com.zhihu.matisse.MimeType
-import com.zhihu.matisse.MimeType.*
+import com.zhihu.matisse.MimeType.allOf
 import com.zhihu.matisse.engine.impl.PicassoEngine
 import java.io.File
+import javax.inject.Inject
+import net.gotev.uploadservice.UploadNotificationConfig
+import net.gotev.uploadservice.MultipartUploadRequest
 
 
-class CreateSceneActivity : AppCompatActivity() {
+
+
+class CreateSceneActivity : AppCompatActivity(), CreateSceneView {
 
     val EDIT_TITLE_AND_DESCRIPTION = 1
     val SELECT_LOCATION = 2
     val SELECT_IMAGE = 3
     val CROP_IMAGE = UCrop.REQUEST_CROP
 
+    @Inject
+    lateinit var presenter: CreateScenePresenter
+
+    val registry: LifecycleRegistry = LifecycleRegistry(this)
+
+    companion object {
+        private val EXPERIENCE_ID = "experienceId"
+
+        fun newIntent(context: Context, experienceId: String): Intent {
+            val intent = Intent(context, CreateSceneActivity::class.java)
+            intent.putExtra(EXPERIENCE_ID, experienceId)
+            return intent
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_scene)
-        // val editTitleAndDescriptionIntent = EditTitleAndDescriptionActivity.newIntent(this)
-        // val selectLocationIntent = SelectLocationActivity.newIntent(this)
-        // startActivityForResult(selectLocationIntent, SELECT_LOCATION)
 
+        AbidriaApplication.injector.inject(this)
+        presenter.setView(this, intent.getStringExtra(EXPERIENCE_ID))
+        registry.addObserver(presenter)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == EDIT_TITLE_AND_DESCRIPTION && resultCode == Activity.RESULT_OK)
+            presenter.onTitleAndDescriptionEdited(
+                    title = data!!.extras.getString(EditTitleAndDescriptionActivity.TITLE),
+                    description = data.extras.getString(EditTitleAndDescriptionActivity.DESCRIPTION))
+        else if (requestCode == SELECT_LOCATION && resultCode == Activity.RESULT_OK)
+            presenter.onLocationSelected(latitude = data!!.extras.getDouble(SelectLocationActivity.LATITUDE),
+                                         longitude = data.extras.getDouble(SelectLocationActivity.LONGITUDE))
+        else if (requestCode == SELECT_IMAGE && resultCode == Activity.RESULT_OK)
+            presenter.onImagePicked(Matisse.obtainResult(data)[0].toString())
+        else if (requestCode == CROP_IMAGE && resultCode == Activity.RESULT_OK)
+            presenter.onImageCropped(UCrop.getOutput(data!!).toString())
+    }
+
+    override fun navigateToEditTitleAndDescription() {
+        startActivityForResult(EditTitleAndDescriptionActivity.newIntent(this), EDIT_TITLE_AND_DESCRIPTION)
+    }
+
+    override fun navigateToSelectLocation() {
+        startActivityForResult(SelectLocationActivity.newIntent(this), SELECT_LOCATION)
+    }
+
+    override fun navigateToPickImage() {
         Matisse.from(this)
                 .choose(allOf())
                 .countable(true)
@@ -39,28 +91,33 @@ class CreateSceneActivity : AppCompatActivity() {
                 .forResult(SELECT_IMAGE)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == EDIT_TITLE_AND_DESCRIPTION)
-            Toast.makeText(this, "title: " + data!!.extras.getString(EditTitleAndDescriptionActivity.TITLE)
-                + ", desc: " + data.extras.getString(EditTitleAndDescriptionActivity.DESCRIPTION), Toast.LENGTH_LONG)
-                    .show()
-        else if (requestCode == SELECT_LOCATION)
-            Toast.makeText(this, "latitude: " + data!!.extras.getDouble(SelectLocationActivity.LATITUDE).toString()
-                    + ", longitude: " + data.extras.getDouble(SelectLocationActivity.LONGITUDE).toString(), Toast.LENGTH_LONG)
-                    .show()
-        else if (requestCode == SELECT_IMAGE) {
-            val selectedImageUri = Matisse.obtainResult(data)[0]
-            Toast.makeText(this, "selected image: " + selectedImageUri, Toast.LENGTH_LONG).show()
-            val outputDir = this.cacheDir
-            val outputFile = File.createTempFile("scene", "", outputDir)
-            val outputUri = Uri.fromFile(outputFile)
-            UCrop.of(selectedImageUri, outputUri)
-                    .withAspectRatio(1.0f, 1.0f)
-                    .withMaxResultSize(2000, 2000)
-                    .start(this)
-        } else if (requestCode == CROP_IMAGE) {
-            val resultUri = UCrop.getOutput(data!!)
-            Toast.makeText(this, "cropped image: " + resultUri, Toast.LENGTH_LONG).show()
-        }
+    override fun navigateToCropImage(selectedImageUriString: String) {
+        var extension = File(Uri.parse(selectedImageUriString).path).extension
+        if (extension == "") extension = MimeTypeMap.getSingleton()
+                .getExtensionFromMimeType(this.getContentResolver().getType(Uri.parse(selectedImageUriString)))
+
+        val outputUri = Uri.fromFile(File.createTempFile("scene", "." + extension, this.cacheDir))
+        UCrop.of(Uri.parse(selectedImageUriString), outputUri)
+                .withAspectRatio(1.0f, 1.0f)
+                .withMaxResultSize(2000, 2000)
+                .start(this)
     }
+
+    override fun uploadImage(sceneId: String, croppedImageUriString: String) {
+        try {
+            val uploadId = MultipartUploadRequest(this,
+                    BuildConfig.API_URL + "/scenes/" + sceneId + "/picture/")
+                    // starting from 3.1+, you can also use content:// URI string instead of absolute file
+                    .addFileToUpload(Uri.parse(croppedImageUriString).path, "picture")
+                    .setNotificationConfig(UploadNotificationConfig())
+                    .setMaxRetries(2)
+                    .startUpload()
+        } catch (exc: Exception) {
+            Log.e("AndroidUploadService", exc.message, exc)
+        }
+
+
+    }
+
+    override fun getLifecycle(): LifecycleRegistry = registry
 }

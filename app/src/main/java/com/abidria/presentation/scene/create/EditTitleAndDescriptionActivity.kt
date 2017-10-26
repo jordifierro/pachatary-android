@@ -11,6 +11,7 @@ import android.widget.EditText
 import android.widget.Toast
 import com.abidria.R
 import com.abidria.presentation.common.AbidriaApplication
+import kotlinx.android.synthetic.main.activity_edit_title_and_description.*
 import javax.inject.Inject
 
 
@@ -35,6 +36,7 @@ class EditTitleAndDescriptionActivity : AppCompatActivity(), EditTitleAndDescrip
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_title_and_description)
+        setSupportActionBar(toolbar)
 
         titleEditText = findViewById<EditText>(R.id.edit_title_and_description_title_edittext)
         descriptionEditText = findViewById<EditText>(R.id.edit_title_and_description_description_edittext)

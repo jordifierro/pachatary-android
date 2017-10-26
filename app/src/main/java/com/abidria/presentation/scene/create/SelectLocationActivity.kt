@@ -7,7 +7,6 @@ import android.content.Intent
 import android.graphics.PointF
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.widget.Button
 import com.abidria.BuildConfig
 import com.abidria.R

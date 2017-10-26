@@ -10,4 +10,5 @@ interface ExperienceMapView : LoaderView {
     fun mapLoadedFlowable(): Flowable<Any>
     fun setTitle(title: String)
     fun navigateToScene(experienceId: String, sceneId: String)
+    fun navigateToCreateScene(experienceId: String)
 }

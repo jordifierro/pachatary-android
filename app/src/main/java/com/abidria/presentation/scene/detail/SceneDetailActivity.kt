@@ -28,7 +28,7 @@ class SceneDetailActivity : AppCompatActivity(), SceneDetailView {
     val registry: LifecycleRegistry = LifecycleRegistry(this)
 
     companion object {
-        private val EXPERIENCE_ID = "experience_id"
+        private val EXPERIENCE_ID = "experienceId"
         private val SCENE_ID = "scene_id"
 
         fun newIntent(context: Context, experienceId: String, sceneId: String): Intent {

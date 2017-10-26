@@ -22,4 +22,10 @@ class SceneApiRepository(retrofit: Retrofit, @Named("io") val scheduler: Schedul
                                         .compose(ParseNetworkResultTransformer({ it.map { it.toDomain() } })),
                     second = refreshPublisher)
     }
+
+    fun createScene(scene: Scene): Flowable<Result<Scene>> =
+        sceneApi.createScene(title = scene.title, description = scene.description,
+                             latitude = scene.latitude, longitude = scene.longitude,
+                             experienceId = scene.experienceId)
+                .compose(ParseNetworkResultTransformer({ it.toDomain() }))
 }
