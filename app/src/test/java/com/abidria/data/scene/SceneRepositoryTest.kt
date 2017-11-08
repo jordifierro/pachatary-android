@@ -9,6 +9,7 @@ import io.reactivex.subscribers.TestSubscriber
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import org.mockito.BDDMockito
 import org.mockito.BDDMockito.given
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
@@ -107,5 +108,18 @@ class SceneRepositoryTest {
         val receivedResult = testSubscriber.events.get(0).get(0) as Result<*>
 
         assertEquals(sceneB, receivedResult.data)
+    }
+
+    @Test
+    fun testCreateSceneReturnsApiCreatedScene() {
+        val sceneToCreate = Scene(id = "9", title = "T", description = "", picture = null,
+                                  latitude = 1.0, longitude = 0.0, experienceId = "3")
+        val resultFlowable = Flowable.never<Result<Scene>>()
+        given(mockApiRepository.createScene(sceneToCreate)).willReturn(resultFlowable)
+
+        val result = repository.createScene(sceneToCreate)
+
+        assertEquals(resultFlowable, result)
+        BDDMockito.then(mockApiRepository).should().createScene(sceneToCreate)
     }
 }

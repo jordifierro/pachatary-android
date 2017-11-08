@@ -3,6 +3,7 @@ package com.abidria.data.scene
 import com.abidria.data.common.Result
 import com.abidria.data.experience.ExperienceApiRepositoryTest
 import com.google.gson.FieldNamingPolicy
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
@@ -110,5 +111,52 @@ class SceneApiRepositoryTest {
 
         assertEquals(0, testSubscriber.events.get(1).size)
         assertEquals(2, testSubscriber.events.get(0).size)
+    }
+
+    @Test
+    fun testCreateSceneRequest() {
+        val testSubscriber = TestSubscriber<Result<Scene>>()
+        mockWebServer.enqueue(MockResponse().setResponseCode(201).setBody(
+                ExperienceApiRepositoryTest::class.java.getResource("/api/POST_scenes_?experience.json").readText()))
+        val scene = Scene(id = "1", title = "T", description = "desc",
+                          latitude = 1.0, longitude = -2.3, experienceId = "3", picture = null)
+
+        repository.createScene(scene).subscribe(testSubscriber)
+        testSubscriber.awaitCount(1)
+
+        val request = mockWebServer.takeRequest()
+        assertEquals("/scenes/", request.getPath())
+        assertEquals("POST", request.getMethod())
+        assertEquals("title=T&description=desc&latitude=1.0&longitude=-2.3&experience_id=3",
+                     request.getBody().readUtf8())
+    }
+
+    @Test
+    fun testCreateSceneResponseSuccess() {
+        val testSubscriber = TestSubscriber<Result<Scene>>()
+        mockWebServer.enqueue(MockResponse().setResponseCode(201).setBody(
+                ExperienceApiRepositoryTest::class.java.getResource("/api/POST_scenes_?experience.json").readText()))
+
+        val scene = Scene(id = "1", title = "T", description = "desc",
+                latitude = 1.0, longitude = -2.3, experienceId = "3", picture = null)
+
+        repository.createScene(scene).subscribe(testSubscriber)
+        testSubscriber.awaitCount(1)
+
+        assertEquals(0, testSubscriber.events.get(1).size)
+        assertEquals(1, testSubscriber.events.get(0).size)
+
+        val receivedResult = testSubscriber.events.get(0).get(0) as Result<*>
+        val receivedScene = receivedResult.data as Scene
+
+        assertEquals("4", receivedScene.id)
+        assertEquals("Plaça", receivedScene.title)
+        assertEquals("", receivedScene.description)
+        assertEquals("https://scenes/00df.small.jpeg", receivedScene.picture!!.smallUrl)
+        assertEquals("https://scenes/00df.medium.jpeg", receivedScene.picture!!.mediumUrl)
+        assertEquals("https://scenes/00df.large.jpeg", receivedScene.picture!!.largeUrl)
+        assertEquals(41.364679, receivedScene.latitude, 1e-15)
+        assertEquals(2.135489, receivedScene.longitude, 1e-15)
+        assertEquals("5", receivedScene.experienceId)
     }
 }
