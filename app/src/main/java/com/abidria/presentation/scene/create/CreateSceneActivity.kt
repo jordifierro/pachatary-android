@@ -8,9 +8,7 @@ import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.webkit.MimeTypeMap
-import com.abidria.BuildConfig
 import com.abidria.R
 import com.abidria.presentation.common.AbidriaApplication
 import com.yalantis.ucrop.UCrop
@@ -18,8 +16,6 @@ import com.zhihu.matisse.Matisse
 import com.zhihu.matisse.MimeType.allOf
 import com.zhihu.matisse.engine.impl.PicassoEngine
 import kotlinx.android.synthetic.main.activity_create_scene.*
-import net.gotev.uploadservice.MultipartUploadRequest
-import net.gotev.uploadservice.UploadNotificationConfig
 import java.io.File
 import javax.inject.Inject
 
@@ -107,20 +103,6 @@ class CreateSceneActivity : AppCompatActivity(), CreateSceneView {
                 .withAspectRatio(1.0f, 1.0f)
                 .withMaxResultSize(2000, 2000)
                 .start(this)
-    }
-
-    override fun uploadImage(sceneId: String, croppedImageUriString: String) {
-        try {
-            val uploadId = MultipartUploadRequest(this,
-                    BuildConfig.API_URL + "/scenes/" + sceneId + "/picture/")
-                    // starting from 3.1+, you can also use content:// URI string instead of absolute file
-                    .addFileToUpload(Uri.parse(croppedImageUriString).path, "picture")
-                    .setNotificationConfig(UploadNotificationConfig())
-                    .setMaxRetries(2)
-                    .startUpload()
-        } catch (exc: Exception) {
-            Log.e("AndroidUploadService", exc.message, exc)
-        }
     }
 
     override fun getLifecycle(): LifecycleRegistry = registry

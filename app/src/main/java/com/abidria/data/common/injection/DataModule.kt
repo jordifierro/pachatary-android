@@ -1,5 +1,6 @@
 package com.abidria.data.common.injection
 
+import android.content.Context
 import com.abidria.BuildConfig
 import com.abidria.data.experience.ExperienceApiRepository
 import com.abidria.data.experience.ExperienceRepository
@@ -55,8 +56,9 @@ class DataModule {
 
     @Provides
     @Singleton
-    fun provideSceneApiRepository(retrofit: Retrofit, @Named("io") scheduler: Scheduler): SceneApiRepository =
-            SceneApiRepository(retrofit, scheduler)
+    fun provideSceneApiRepository(retrofit: Retrofit, @Named("io") scheduler: Scheduler,
+                                  context: Context): SceneApiRepository =
+            SceneApiRepository(retrofit, scheduler, context)
 
     @Provides
     @Singleton

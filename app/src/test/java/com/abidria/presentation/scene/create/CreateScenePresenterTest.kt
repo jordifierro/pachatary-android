@@ -271,7 +271,7 @@ class CreateScenePresenterTest {
         }
 
         fun presenter_should_upload_that_cropped_image_with_created_scene_id() {
-            BDDMockito.then(mockView).should().uploadImage(receivedCreatedScene!!.id, croppedImage)
+            BDDMockito.then(mockRepository).should().uploadScenePicture(receivedCreatedScene!!.id, croppedImage)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

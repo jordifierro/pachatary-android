@@ -28,4 +28,8 @@ class SceneRepository(private val apiRepository: SceneApiRepository) {
         scenesFlowable(experienceId).map { Result(data = it.data?.first { it.id == sceneId }, error = it.error) }
 
     fun createScene(scene: Scene) = apiRepository.createScene(scene)
+
+    fun uploadScenePicture(sceneId: String, croppedImageUriString: String) {
+        apiRepository.uploadScenePicture(sceneId, croppedImageUriString)
+    }
 }

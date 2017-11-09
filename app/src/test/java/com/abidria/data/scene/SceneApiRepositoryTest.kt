@@ -1,5 +1,6 @@
 package com.abidria.data.scene
 
+import android.content.Context
 import com.abidria.data.common.Result
 import com.abidria.data.experience.ExperienceApiRepositoryTest
 import com.google.gson.FieldNamingPolicy
@@ -12,12 +13,15 @@ import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.mockito.Mock
+import org.mockito.Mockito.mock
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 class SceneApiRepositoryTest {
 
+    val mockContext: Context = mock(Context::class.java)
     val mockWebServer = MockWebServer()
     var repository = SceneApiRepository(Retrofit.Builder()
             .baseUrl(mockWebServer.url("/"))
@@ -27,7 +31,7 @@ class SceneApiRepositoryTest {
                             .create()))
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .build(),
-            Schedulers.trampoline())
+            Schedulers.trampoline(), mockContext)
 
     @Test
     fun testGetScenesRequest() {
