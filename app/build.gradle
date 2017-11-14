@@ -22,6 +22,9 @@ android {
         testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
+        all {
+            buildConfigField 'int', 'MAX_IMAGE_SIZE', "1600"
+        }
         debug {
             buildConfigField 'String', 'API_URL', '"' + appProperties['devApiUrl'] + '"'
             buildConfigField 'String', 'MAPBOX_ACCESS_TOKEN', '"' + appProperties['devMapboxAccessToken'] + '"'

@@ -11,13 +11,15 @@ import android.net.Uri
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.webkit.MimeTypeMap
+import com.abidria.BuildConfig
 import com.abidria.R
 import com.abidria.presentation.common.AbidriaApplication
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.yalantis.ucrop.UCrop
 import com.zhihu.matisse.Matisse
-import com.zhihu.matisse.MimeType.allOf
+import com.zhihu.matisse.MimeType
+import com.zhihu.matisse.MimeType.*
 import com.zhihu.matisse.engine.impl.PicassoEngine
 import kotlinx.android.synthetic.main.activity_create_scene.*
 import java.io.File
@@ -99,8 +101,8 @@ class CreateSceneActivity : AppCompatActivity(), CreateSceneView {
 
     override fun navigateToPickImage() {
         Matisse.from(this)
-                .choose(allOf())
-                .countable(true)
+                .choose(MimeType.of(JPEG, PNG))
+                .countable(false)
                 .maxSelectable(1)
                 .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
                 .thumbnailScale(0.85f)
@@ -116,7 +118,7 @@ class CreateSceneActivity : AppCompatActivity(), CreateSceneView {
         val outputUri = Uri.fromFile(File.createTempFile("scene", "." + extension, this.cacheDir))
         UCrop.of(Uri.parse(selectedImageUriString), outputUri)
                 .withAspectRatio(1.0f, 1.0f)
-                .withMaxResultSize(2000, 2000)
+                .withMaxResultSize(BuildConfig.MAX_IMAGE_SIZE, BuildConfig.MAX_IMAGE_SIZE)
                 .start(this)
     }
 
