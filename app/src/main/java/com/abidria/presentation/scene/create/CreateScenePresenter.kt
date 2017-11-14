@@ -18,6 +18,9 @@ class CreateScenePresenter @Inject constructor(private val sceneRepository: Scen
     var latitude = 0.0
     var longitude = 0.0
     var createdScene: Scene? = null
+    var lastLocationFound = false
+    var lastLatitude = 0.0
+    var lastLongitude = 0.0
 
     fun setView(view: CreateSceneView, experienceId: String) {
         this.view = view
@@ -32,10 +35,18 @@ class CreateScenePresenter @Inject constructor(private val sceneRepository: Scen
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun destroy() {}
 
+    fun onLastLocationFound(latitude: Double, longitude: Double) {
+        lastLatitude = latitude
+        lastLongitude = longitude
+        lastLocationFound = true
+    }
+
     fun onTitleAndDescriptionEdited(title: String, description: String) {
         this.title = title
         this.description = description
-        view.navigateToSelectLocation()
+        var locationType = SelectLocationPresenter.LocationType.UNKNWON
+        if (lastLocationFound) locationType = SelectLocationPresenter.LocationType.APROX
+        view.navigateToSelectLocation(lastLatitude, lastLongitude, locationType)
     }
 
     fun onEditTitleAndDescriptionCanceled() {

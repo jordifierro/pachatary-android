@@ -11,7 +11,9 @@ import android.widget.Button
 import com.abidria.BuildConfig
 import com.abidria.R
 import com.abidria.presentation.common.AbidriaApplication
+import com.abidria.presentation.scene.create.SelectLocationPresenter.LocationType
 import com.mapbox.mapboxsdk.Mapbox
+import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
@@ -28,13 +30,28 @@ class SelectLocationActivity : AppCompatActivity(), SelectLocationView {
     lateinit var mapboxMap: MapboxMap
     lateinit var doneButton: Button
 
+    lateinit var initialLocationType: SelectLocationPresenter.LocationType
+    var initialLatitude = 0.0
+    var initialLongitude = 0.0
+
     val registry: LifecycleRegistry = LifecycleRegistry(this)
 
     companion object {
         val LATITUDE = "latitude"
         val LONGITUDE = "longitude"
 
-        fun newIntent(context: Context): Intent = Intent(context, SelectLocationActivity::class.java)
+        val INITIAL_LATITUDE = "initial_latitude"
+        val INITIAL_LONGITUDE = "initial_longitude"
+        val INITIAL_LOCATION_TYPE = "initial_location_type"
+
+        fun newIntent(context: Context, initialLatitude: Double = 0.0,
+                      initialLongitude: Double = 0.0, initialType: LocationType = LocationType.UNKNWON): Intent {
+            val intent = Intent(context, SelectLocationActivity::class.java)
+            intent.putExtra(INITIAL_LATITUDE, initialLatitude)
+            intent.putExtra(INITIAL_LONGITUDE, initialLongitude)
+            intent.putExtra(INITIAL_LOCATION_TYPE, initialType)
+            return intent
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,16 +60,31 @@ class SelectLocationActivity : AppCompatActivity(), SelectLocationView {
         setContentView(R.layout.activity_select_location)
         setSupportActionBar(toolbar)
 
+        initialLatitude = intent.getDoubleExtra(INITIAL_LATITUDE, 0.0)
+        initialLongitude = intent.getDoubleExtra(INITIAL_LONGITUDE, 0.0)
+        initialLocationType = intent.getSerializableExtra(INITIAL_LOCATION_TYPE) as LocationType
+
         mapView = findViewById<MapView>(R.id.select_location_mapview)
         mapView.onCreate(savedInstanceState)
-        mapView.getMapAsync { mapboxMap -> this.mapboxMap = mapboxMap }
 
         doneButton = findViewById<Button>(R.id.select_location_done_button)
         doneButton.setOnClickListener { presenter.doneButtonClick() }
 
         AbidriaApplication.injector.inject(this)
-        presenter.view = this
+        presenter.setViewAndInitialLocation(view = this, initialLatitude = initialLatitude,
+                                            initialLongitude = initialLongitude,
+                                            initialLocationType = initialLocationType)
         registry.addObserver(presenter)
+    }
+
+    override fun setInitialLocation(latitude: Double, longitude: Double, zoomLevel: SelectLocationView.ZoomLevel) {
+        mapView.getMapAsync { mapboxMap ->
+            this.mapboxMap = mapboxMap
+            this.mapboxMap.cameraPosition = CameraPosition.Builder()
+                                                                .target(LatLng(latitude, longitude))
+                                                                .zoom(zoomLevel.zoom)
+                                                                .build()
+        }
     }
 
     fun center(): LatLng {

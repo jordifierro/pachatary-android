@@ -35,7 +35,24 @@ class CreateScenePresenterTest {
         } then {
             title_should_be_saved()
             description_should_be_saved()
-            presenter_should_navigate_to_select_location()
+            presenter_should_navigate_to_select_location_initially_unknown()
+        }
+    }
+
+    @Test
+    fun on_last_location_found_it_sets_an_initial_location_when_select() {
+        given {
+            a_title()
+            a_description()
+            a_person_latitude()
+            a_person_longitude()
+        } whenn {
+            last_location_found()
+            title_and_description_are_edited()
+        } then {
+            title_should_be_saved()
+            description_should_be_saved()
+            presenter_should_navigate_to_select_location_with_initial_aproximation()
         }
     }
 
@@ -142,6 +159,8 @@ class CreateScenePresenterTest {
         var description = ""
         var latitude = 0.0
         var longitude = 0.0
+        var personLastKnowLatitude = 0.0
+        var personLastKnowLongitude = 0.0
         var image = ""
         var croppedImage = ""
         var sentCreatedScene: Scene? = null
@@ -172,6 +191,14 @@ class CreateScenePresenterTest {
 
         fun a_longitude() {
             longitude = -0.3
+        }
+
+        fun a_person_latitude() {
+            personLastKnowLatitude = 1.7
+        }
+
+        fun a_person_longitude() {
+            personLastKnowLongitude = -4.3
         }
 
         fun an_image() {
@@ -210,6 +237,10 @@ class CreateScenePresenterTest {
             presenter.onEditTitleAndDescriptionCanceled()
         }
 
+        fun last_location_found() {
+            presenter.onLastLocationFound(personLastKnowLatitude, personLastKnowLongitude)
+        }
+
         fun location_is_selected() {
             presenter.onLocationSelected(latitude, longitude)
         }
@@ -246,8 +277,14 @@ class CreateScenePresenterTest {
             Assert.assertEquals(description, presenter.description)
         }
 
-        fun presenter_should_navigate_to_select_location() {
-            BDDMockito.then(mockView).should().navigateToSelectLocation()
+        fun presenter_should_navigate_to_select_location_initially_unknown() {
+            BDDMockito.then(mockView).should().navigateToSelectLocation(personLastKnowLatitude, personLastKnowLongitude,
+                                                                        SelectLocationPresenter.LocationType.UNKNWON)
+        }
+
+        fun presenter_should_navigate_to_select_location_with_initial_aproximation() {
+            BDDMockito.then(mockView).should().navigateToSelectLocation(personLastKnowLatitude, personLastKnowLongitude,
+                                                                        SelectLocationPresenter.LocationType.APROX)
         }
 
         fun presenter_should_finish_view() {

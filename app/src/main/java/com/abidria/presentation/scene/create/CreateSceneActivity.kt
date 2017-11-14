@@ -1,6 +1,8 @@
 package com.abidria.presentation.scene.create
 
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.LifecycleRegistry
 import android.content.Context
 import android.content.Intent
@@ -11,6 +13,8 @@ import android.support.v7.app.AppCompatActivity
 import android.webkit.MimeTypeMap
 import com.abidria.R
 import com.abidria.presentation.common.AbidriaApplication
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.yalantis.ucrop.UCrop
 import com.zhihu.matisse.Matisse
 import com.zhihu.matisse.MimeType.allOf
@@ -30,6 +34,8 @@ class CreateSceneActivity : AppCompatActivity(), CreateSceneView {
     @Inject
     lateinit var presenter: CreateScenePresenter
 
+    lateinit var fusedLocationClient: FusedLocationProviderClient
+
     val registry: LifecycleRegistry = LifecycleRegistry(this)
 
     companion object {
@@ -42,10 +48,16 @@ class CreateSceneActivity : AppCompatActivity(), CreateSceneView {
         }
     }
 
+    @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_scene)
         setSupportActionBar(toolbar)
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+            if (location != null) presenter.onLastLocationFound(location.latitude, location.longitude)
+        }
 
         AbidriaApplication.injector.inject(this)
         presenter.setView(this, intent.getStringExtra(EXPERIENCE_ID))
@@ -78,8 +90,11 @@ class CreateSceneActivity : AppCompatActivity(), CreateSceneView {
         startActivityForResult(EditTitleAndDescriptionActivity.newIntent(this), EDIT_TITLE_AND_DESCRIPTION)
     }
 
-    override fun navigateToSelectLocation() {
-        startActivityForResult(SelectLocationActivity.newIntent(this), SELECT_LOCATION)
+    override fun navigateToSelectLocation(latitude: Double, longitude: Double,
+                                          locationType: SelectLocationPresenter.LocationType) {
+        startActivityForResult(
+                SelectLocationActivity.newIntent(this, initialLatitude = latitude, initialLongitude = longitude,
+                                                 initialType = locationType), SELECT_LOCATION)
     }
 
     override fun navigateToPickImage() {

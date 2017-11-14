@@ -66,9 +66,9 @@ dependencies {
     kapt 'com.google.dagger:dagger-compiler:2.11'
     compileOnly 'javax.annotation:jsr250-api:1.0'
 
-    implementation 'android.arch.lifecycle:runtime:1.0.0'
-    implementation 'android.arch.lifecycle:extensions:1.0.0-beta2'
-    kapt 'android.arch.lifecycle:compiler:1.0.0-beta2'
+    implementation 'android.arch.lifecycle:runtime:1.0.3'
+    implementation 'android.arch.lifecycle:extensions:1.0.0'
+    kapt 'android.arch.lifecycle:compiler:1.0.0'
 
     testImplementation 'org.mockito:mockito-core:2.8.47'
 
@@ -83,4 +83,6 @@ dependencies {
     implementation 'com.github.yalantis:ucrop:2.2.1-native'
     implementation 'net.gotev:uploadservice:3.4'
     implementation 'net.gotev:uploadservice-okhttp:3.4'
+
+    implementation 'com.google.android.gms:play-services-location:11.6.0'
 }
