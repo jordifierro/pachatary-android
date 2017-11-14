@@ -10,6 +10,7 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Observer
 import io.reactivex.Scheduler
+import io.reactivex.functions.Function
 import io.reactivex.subjects.PublishSubject
 import net.gotev.uploadservice.MultipartUploadRequest
 import net.gotev.uploadservice.UploadNotificationConfig
@@ -20,12 +21,13 @@ class SceneApiRepository(retrofit: Retrofit, @Named("io") val scheduler: Schedul
 
     private val sceneApi: SceneApi = retrofit.create(SceneApi::class.java)
 
-    fun scenesFlowableAndRefreshObserver(experienceId: String): Pair<Flowable<Result<List<Scene>>>, Observer<Any>> {
+    fun scenesFlowableAndRefreshObserver(experienceId: String):
+            Pair<Flowable<Result<List<Scene>>>, Observer<Any>> {
         val refreshPublisher: PublishSubject<Any> = PublishSubject.create()
         return Pair(first = refreshPublisher.startWith(Any())
-                                        .flatMap { sceneApi.scenes(experienceId).subscribeOn(scheduler).toObservable() }
-                                        .toFlowable(BackpressureStrategy.LATEST)
-                                        .compose(ParseNetworkResultTransformer({ it.map { it.toDomain() } })),
+                            .flatMap { sceneApi.scenes(experienceId).subscribeOn(scheduler).toObservable() }
+                            .toFlowable(BackpressureStrategy.LATEST)
+                            .compose<Result<List<Scene>>>(ParseNetworkResultTransformer({ it.map { it.toDomain() } })),
                     second = refreshPublisher)
     }
 

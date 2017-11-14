@@ -3,6 +3,7 @@ package com.abidria.data.scene
 import com.abidria.data.common.Result
 import io.reactivex.Flowable
 import io.reactivex.Observer
+import io.reactivex.functions.Function
 
 class SceneRepository(private val apiRepository: SceneApiRepository) {
 
@@ -12,8 +13,11 @@ class SceneRepository(private val apiRepository: SceneApiRepository) {
         if (scenesStreamHashMap.get(experienceId) == null) {
             val flowableRefresherPair = apiRepository.scenesFlowableAndRefreshObserver(experienceId)
             val cachedScenesFlowable = flowableRefresherPair.first
-                                                                .replay(1)
-                                                                .autoConnect()
+                    .map { Function<Result<List<Scene>>, Result<List<Scene>>> { _ -> it } }
+                    .scan(Result(listOf<Scene>(), null), { oldValue, func -> func.apply(oldValue) })
+                    .skip(1)
+                    .replay(1)
+                    .autoConnect()
             scenesStreamHashMap.put(experienceId,
                     Pair(first = cachedScenesFlowable, second = flowableRefresherPair.second))
         }
