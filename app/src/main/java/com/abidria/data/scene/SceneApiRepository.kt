@@ -10,7 +10,6 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Observer
 import io.reactivex.Scheduler
-import io.reactivex.functions.Function
 import io.reactivex.subjects.PublishSubject
 import net.gotev.uploadservice.MultipartUploadRequest
 import net.gotev.uploadservice.UploadNotificationConfig

@@ -43,7 +43,8 @@ class ExperienceMapPresenter @Inject constructor(private val repository: SceneRe
 
     private fun setScenesOnMap() {
         view.showLoader()
-        scenesDisposable = Flowable.zip(mapLoadedFlowable(),
+        scenesDisposable = Flowable.combineLatest(
+                                        mapLoadedFlowable(),
                                         scenesFlowable(),
                                         BiFunction { _: Any, scenesResult: Result<List<Scene>> -> scenesResult })
                                    .subscribe({ view.showScenesOnMap(it.data!!)
