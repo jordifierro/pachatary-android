@@ -14,6 +14,7 @@ class SceneRepository(private val apiRepository: SceneApiRepository) {
 
     private val scenesStreamHashMap: HashMap<String, FlowableRefresherAndAdder> = HashMap()
     val adderObservable = PublishSubject.create<Scene>()
+    val updaterObservable = PublishSubject.create<Scene>()
 
     fun scenesFlowable(experienceId: String): Flowable<Result<List<Scene>>> {
         if (scenesStreamHashMap.get(experienceId) == null) {
@@ -28,6 +29,14 @@ class SceneRepository(private val apiRepository: SceneApiRepository) {
                                         { r ->
                                             val listWithNewElement = r.data!!.union(listOf(t))
                                             Result(listWithNewElement.toList(), null)
+                                        }
+                                    },
+                            updaterObservable
+                                    .toFlowable(BackpressureStrategy.LATEST)
+                                    .map { t -> Function<Result<List<Scene>>, Result<List<Scene>>>
+                                        { r ->
+                                            val updatedList = r.data!!.filter { e -> e.id == t.id }.map { t }
+                                            Result(updatedList, null)
                                         }
                                     }
                             )
@@ -56,6 +65,7 @@ class SceneRepository(private val apiRepository: SceneApiRepository) {
     }
 
     fun uploadScenePicture(sceneId: String, croppedImageUriString: String) {
-        apiRepository.uploadScenePicture(sceneId, croppedImageUriString)
+        val delegate = { scene: Scene -> updaterObservable.onNext(scene)}
+        apiRepository.uploadScenePicture(sceneId, croppedImageUriString, delegate)
     }
 }
