@@ -2,11 +2,11 @@ package com.abidria.presentation.scene.create
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.LifecycleRegistry
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -19,7 +19,8 @@ import com.google.android.gms.location.LocationServices
 import com.yalantis.ucrop.UCrop
 import com.zhihu.matisse.Matisse
 import com.zhihu.matisse.MimeType
-import com.zhihu.matisse.MimeType.*
+import com.zhihu.matisse.MimeType.JPEG
+import com.zhihu.matisse.MimeType.PNG
 import com.zhihu.matisse.engine.impl.PicassoEngine
 import kotlinx.android.synthetic.main.activity_create_scene.*
 import java.io.File
@@ -56,9 +57,11 @@ class CreateSceneActivity : AppCompatActivity(), CreateSceneView {
         setContentView(R.layout.activity_create_scene)
         setSupportActionBar(toolbar)
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-            if (location != null) presenter.onLastLocationFound(location.latitude, location.longitude)
+        if (checkLocationPermission()) {
+            fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                if (location != null) presenter.onLastLocationFound(location.latitude, location.longitude)
+            }
         }
 
         AbidriaApplication.injector.inject(this)
@@ -123,4 +126,8 @@ class CreateSceneActivity : AppCompatActivity(), CreateSceneView {
     }
 
     override fun getLifecycle(): LifecycleRegistry = registry
+
+    private fun checkLocationPermission() =
+            this.checkCallingOrSelfPermission("android.permission.ACCESS_COARSE_LOCATION") ==
+                PackageManager.PERMISSION_GRANTED
 }
