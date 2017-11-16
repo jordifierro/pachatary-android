@@ -14,7 +14,7 @@ A group of `scenes` are defined as an `experience`.
 ## App screens
 
 Application is (and will be) under construction.
-There are already three screens.
+There are already some screens.
 Here is a quick documentation about them:
 
 #### ExperienceListActivity
@@ -44,6 +44,37 @@ picture, title and description.
 Scroll (with a cool parallax effect) is enabled
 to allow full text read.
 
+#### CreateSceneActivity
+
+This screen is used to handle the scene creation form flow.
+It only appears visible to the user to show a loader while creating the scene.
+Here are the form screens:
+
+##### EditTitleAndDescriptionActivity
+![SceneDetailActivity](https://s3-eu-west-1.amazonaws.com/abidria/static/edit-title-and-description-screenshot.jpg)
+
+This screen simply lets the user introduce a title and description.
+Title has to be between 1 and 30 chars.
+
+##### SelectLocationActivity
+![SceneDetailActivity](https://s3-eu-west-1.amazonaws.com/abidria/static/select-location-screenshot.jpg)
+
+This activity shows a map to allow user select a location.
+It starts with the last known user location to make the process faster.
+
+##### PickImageActivity
+![PickImageActivity](https://raw.githubusercontent.com/zhihu/Matisse/master/image/screenshot_zhihu.png)
+
+It uses [Matisse](https://github.com/zhihu/Matisse) library to make
+user pick an image from gallery.
+
+#### CropImageActivity
+![CropImageActivity](https://lh3.googleusercontent.com/1AaLxbfgADNljb4626mYYydeVSrpe1rGX04v25SRbDMPc2yO0O0fpLY2Wxz4TRva4Q=h900)
+
+It uses [uCrop](https://github.com/Yalantis/uCrop) library to let
+user crop image to make it square.
+
+
 ## Documentation
 
 Correct responsibility assignment and deep unit testing are main goals.
@@ -55,10 +86,16 @@ Views are totally passive
 and there are no visual tests yet.
 
 RxJava plays a very important role on the system.
-Repositories are split in normal and api.
+Repositories are split in frontal and api.
 The second one manages the retrofit requests,
 and the first one handles caching,
 both made reactively to reach the subscribed presenters.
+
+Frontal repository uses an special pattern that consists on
+merging the different source of scenes modification flowables
+and making them emit functions instead of scene objects.
+That allows streams to modify the state of the cached
+elements using `scan` RxJava operator.
 
 All classes follow dependency injection pattern (with Dagger2).
 
@@ -88,6 +125,6 @@ cp app/app.properties.sample app/app.properties
 ```
 * Fill `app.properties`: `devApiUrl` with your local server url
 and get a [Mapbox](https://www.mapbox.com/) account
-to get your own `mapboxAccessToken`.
+to get your own `mapboxAccessToken` (same for `dev-`).
 
 * You are ready to run the application on your device!
