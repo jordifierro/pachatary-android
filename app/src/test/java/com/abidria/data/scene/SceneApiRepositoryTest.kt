@@ -4,7 +4,6 @@ import android.content.Context
 import com.abidria.data.common.Result
 import com.abidria.data.experience.ExperienceApiRepositoryTest
 import com.google.gson.FieldNamingPolicy
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
@@ -13,7 +12,6 @@ import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
-import org.mockito.Mock
 import org.mockito.Mockito.mock
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -39,7 +37,7 @@ class SceneApiRepositoryTest {
         mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(
                 ExperienceApiRepositoryTest::class.java.getResource("/api/GET_scenes_?experience.json").readText()))
 
-        repository.scenesFlowableAndRefreshObserver("7").first.subscribe(testSubscriber)
+        repository.scenesRequestFlowable("7").first.subscribe(testSubscriber)
         testSubscriber.awaitCount(1)
 
         val request = mockWebServer.takeRequest()
@@ -54,7 +52,7 @@ class SceneApiRepositoryTest {
         mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(
                 ExperienceApiRepositoryTest::class.java.getResource("/api/GET_scenes_?experience.json").readText()))
 
-        repository.scenesFlowableAndRefreshObserver(experienceId = "").first.subscribe(testSubscriber)
+        repository.scenesRequestFlowable(experienceId = "").first.subscribe(testSubscriber)
         testSubscriber.awaitCount(1)
 
         assertEquals(0, testSubscriber.events.get(1).size)
@@ -93,7 +91,7 @@ class SceneApiRepositoryTest {
         mockWebServer.enqueue(MockResponse().setResponseCode(500))
         mockWebServer.enqueue(MockResponse().setResponseCode(500))
 
-        repository.scenesFlowableAndRefreshObserver(experienceId = "").first.subscribe(testSubscriber)
+        repository.scenesRequestFlowable(experienceId = "").first.subscribe(testSubscriber)
         testSubscriber.awaitCount(3)
 
         assertEquals(1, testSubscriber.events.get(1).size)
@@ -108,7 +106,7 @@ class SceneApiRepositoryTest {
         mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(
             ExperienceApiRepositoryTest::class.java.getResource("/api/GET_scenes_?experience.json").readText()))
 
-        val scenesFlowableAndRefresher = repository.scenesFlowableAndRefreshObserver(experienceId = "2")
+        val scenesFlowableAndRefresher = repository.scenesRequestFlowable(experienceId = "2")
         scenesFlowableAndRefresher.first.subscribe(testSubscriber)
         scenesFlowableAndRefresher.second.onNext(Any())
         testSubscriber.awaitCount(2)

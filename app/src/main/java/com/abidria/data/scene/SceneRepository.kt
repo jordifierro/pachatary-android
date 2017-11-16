@@ -1,59 +1,19 @@
 package com.abidria.data.scene
 
 import com.abidria.data.common.Result
-import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
-import io.reactivex.Observer
-import io.reactivex.functions.Function
-import io.reactivex.subjects.PublishSubject
 
-class SceneRepository(private val apiRepository: SceneApiRepository) {
+class SceneRepository(val apiRepository: SceneApiRepository, val streamFactory: SceneStreamFactory) {
 
-    class FlowableRefresherAndAdder(val flowable: Flowable<Result<List<Scene>>>, val refresher: Observer<Any>,
-                                    val adder: Observer<Scene>)
-
-    private val scenesStreamHashMap: HashMap<String, FlowableRefresherAndAdder> = HashMap()
-    val adderObservable = PublishSubject.create<Scene>()
-    val updaterObservable = PublishSubject.create<Scene>()
+    private val scenesStreamHashMap: HashMap<String, SceneStreamFactory.ScenesStream> = HashMap()
 
     fun scenesFlowable(experienceId: String): Flowable<Result<List<Scene>>> {
         if (scenesStreamHashMap.get(experienceId) == null) {
-            val flowableRefresherPair = apiRepository.scenesFlowableAndRefreshObserver(experienceId)
-            val cachedScenesFlowable =
-                    Flowable.merge(
-                            flowableRefresherPair.first
-                                .map { Function<Result<List<Scene>>, Result<List<Scene>>> { _ -> it } },
-                            adderObservable
-                                    .toFlowable(BackpressureStrategy.LATEST)
-                                    .map { t -> Function<Result<List<Scene>>, Result<List<Scene>>>
-                                        { r ->
-                                            val listWithNewElement = r.data!!.union(listOf(t))
-                                            Result(listWithNewElement.toList(), null)
-                                        }
-                                    },
-                            updaterObservable
-                                    .toFlowable(BackpressureStrategy.LATEST)
-                                    .map { t -> Function<Result<List<Scene>>, Result<List<Scene>>>
-                                        { r ->
-                                            val updatedList = r.data!!.filter { e -> e.id == t.id }.map { t }
-                                            Result(updatedList, null)
-                                        }
-                                    }
-                            )
-                    .scan(Result(listOf<Scene>(), null), { oldValue, func -> func.apply(oldValue) })
-                    .skip(1)
-                    .replay(1)
-                    .autoConnect()
-            scenesStreamHashMap.put(experienceId,
-                    FlowableRefresherAndAdder(flowable = cachedScenesFlowable,
-                                              refresher = flowableRefresherPair.second,
-                                              adder = adderObservable))
+            val streams = streamFactory.create()
+            scenesStreamHashMap.put(experienceId, streams)
+            apiRepository.scenesRequestFlowable(experienceId).subscribe({ streams.replaceAllScenesObserver.onNext(it) })
         }
-        return scenesStreamHashMap.get(experienceId)!!.flowable
-    }
-
-    fun refreshScenes(experienceId: String) {
-        scenesStreamHashMap.get(experienceId)!!.refresher.onNext(Any())
+        return scenesStreamHashMap.get(experienceId)!!.scenesFlowable
     }
 
     fun sceneFlowable(experienceId: String, sceneId: String): Flowable<Result<Scene>> =
@@ -61,11 +21,12 @@ class SceneRepository(private val apiRepository: SceneApiRepository) {
 
     fun createScene(scene: Scene): Flowable<Result<Scene>> {
         return apiRepository.createScene(scene)
-                .doOnNext { t -> adderObservable.onNext(t.data!!) }
+                .doOnNext { t -> scenesStreamHashMap.get(scene.experienceId)!!.addOrUpdateSceneObserver.onNext(t) }
     }
 
     fun uploadScenePicture(sceneId: String, croppedImageUriString: String) {
-        val delegate = { scene: Scene -> updaterObservable.onNext(scene)}
+        val delegate = { scene: Scene ->
+            scenesStreamHashMap.get(scene.experienceId)!!.addOrUpdateSceneObserver.onNext(Result(scene, null))}
         apiRepository.uploadScenePicture(sceneId, croppedImageUriString, delegate)
     }
 }

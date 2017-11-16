@@ -6,6 +6,7 @@ import com.abidria.data.experience.ExperienceApiRepository
 import com.abidria.data.experience.ExperienceRepository
 import com.abidria.data.scene.SceneApiRepository
 import com.abidria.data.scene.SceneRepository
+import com.abidria.data.scene.SceneStreamFactory
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
@@ -62,6 +63,11 @@ class DataModule {
 
     @Provides
     @Singleton
-    fun provideSceneRepository(apiRepository: SceneApiRepository): SceneRepository =
-            SceneRepository(apiRepository)
+    fun provideScenesStreamFactory() = SceneStreamFactory()
+
+    @Provides
+    @Singleton
+    fun provideSceneRepository(apiRepository: SceneApiRepository,
+                               sceneStreamFactory: SceneStreamFactory): SceneRepository =
+            SceneRepository(apiRepository, sceneStreamFactory)
 }

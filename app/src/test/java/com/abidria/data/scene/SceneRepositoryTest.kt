@@ -52,19 +52,6 @@ class SceneRepositoryTest {
     }
 
     @Test
-    fun test_refresh_emits_on_cached_refresher_observer() {
-        given {
-            an_experience_id()
-            an_api_repository_that_returns_an_observer()
-        } whenn {
-            subscription_is_made_to_experience_id_scenes_flowable()
-            refresh_scenes_is_called_for_that_experience_id()
-        } then {
-            one_emition_should_be_made_through_that_observer()
-        }
-    }
-
-    @Test
     fun test_get_scene_flowable_returns_only_scene_filtered() {
         given {
             an_experience_id()
@@ -99,6 +86,7 @@ class SceneRepositoryTest {
     class ScenarioMaker {
         lateinit var repository: SceneRepository
         @Mock lateinit var mockApiRepository: SceneApiRepository
+        @Mock lateinit var mockScenesStreamFactory: SceneStreamFactory
         var experience_id = ""
         lateinit var scene: Scene
         lateinit var anotherScene: Scene
@@ -112,7 +100,7 @@ class SceneRepositoryTest {
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
-            repository = SceneRepository(mockApiRepository)
+            repository = SceneRepository(mockApiRepository, mockScenesStreamFactory)
 
             return this
         }
@@ -149,12 +137,12 @@ class SceneRepositoryTest {
         }
 
         fun an_api_repository_that_returns_that_flowable() {
-            BDDMockito.given(mockApiRepository.scenesFlowableAndRefreshObserver(experience_id))
+            BDDMockito.given(mockApiRepository.scenesRequestFlowable(experience_id))
                     .willReturn(Pair(first = scenesFlowable, second = PublishSubject.create()))
         }
 
         fun an_api_repository_that_returns_an_observer() {
-            BDDMockito.given(mockApiRepository.scenesFlowableAndRefreshObserver(experience_id))
+            BDDMockito.given(mockApiRepository.scenesRequestFlowable(experience_id))
                         .willReturn(Pair(first = Flowable.never(), second = testObserver))
         }
 
@@ -163,16 +151,12 @@ class SceneRepositoryTest {
         }
 
         fun a_repository() {
-            repository = SceneRepository(mockApiRepository)
+            repository = SceneRepository(mockApiRepository, mockScenesStreamFactory)
         }
 
         fun subscription_is_made_to_experience_id_scenes_flowable() {
             repository.scenesFlowable(experience_id).subscribeOn(Schedulers.trampoline()).subscribe(testSubscriber)
             testSubscriber.awaitCount(1)
-        }
-
-        fun refresh_scenes_is_called_for_that_experience_id() {
-            repository.refreshScenes(experience_id)
         }
 
         fun another_subscription_is_made_to_experience_id_scenes_flowable() {

@@ -7,35 +7,25 @@ import com.abidria.BuildConfig
 import com.abidria.data.common.ParseNetworkResultTransformer
 import com.abidria.data.common.Result
 import com.abidria.data.picture.Picture
-import com.google.gson.Gson
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
-import io.reactivex.Observer
 import io.reactivex.Scheduler
 import io.reactivex.subjects.PublishSubject
-import net.gotev.uploadservice.MultipartUploadRequest
-import net.gotev.uploadservice.UploadNotificationConfig
-import net.gotev.uploadservice.UploadStatusDelegate
+import net.gotev.uploadservice.*
+import org.json.JSONObject
 import retrofit2.Retrofit
 import javax.inject.Named
-import net.gotev.uploadservice.UploadInfo
-import net.gotev.uploadservice.ServerResponse
-import org.json.JSONObject
 
 
 class SceneApiRepository(retrofit: Retrofit, @Named("io") val scheduler: Scheduler, val context: Context) {
 
     private val sceneApi: SceneApi = retrofit.create(SceneApi::class.java)
 
-    fun scenesFlowableAndRefreshObserver(experienceId: String):
-            Pair<Flowable<Result<List<Scene>>>, Observer<Any>> {
-        val refreshPublisher: PublishSubject<Any> = PublishSubject.create()
-        return Pair(first = refreshPublisher.startWith(Any())
+    fun scenesRequestFlowable(experienceId: String): Flowable<Result<List<Scene>>> =
+        PublishSubject.create<Any>().startWith(Any())
                             .flatMap { sceneApi.scenes(experienceId).subscribeOn(scheduler).toObservable() }
                             .toFlowable(BackpressureStrategy.LATEST)
-                            .compose<Result<List<Scene>>>(ParseNetworkResultTransformer({ it.map { it.toDomain() } })),
-                    second = refreshPublisher)
-    }
+                            .compose<Result<List<Scene>>>(ParseNetworkResultTransformer({ it.map { it.toDomain() } }))
 
     fun createScene(scene: Scene): Flowable<Result<Scene>> =
         sceneApi.createScene(title = scene.title, description = scene.description,
