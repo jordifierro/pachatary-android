@@ -25,8 +25,9 @@ class SceneRepository(val apiRepository: SceneApiRepository, val streamFactory: 
     }
 
     fun uploadScenePicture(sceneId: String, croppedImageUriString: String) {
-        val delegate = { scene: Scene ->
-            scenesStreamHashMap.get(scene.experienceId)!!.addOrUpdateSceneObserver.onNext(Result(scene, null))}
         apiRepository.uploadScenePicture(sceneId, croppedImageUriString, delegate)
     }
+
+    internal val delegate = { scene: Scene ->
+        scenesStreamHashMap.get(scene.experienceId)!!.addOrUpdateSceneObserver.onNext(Result(scene, null))}
 }
