@@ -66,7 +66,7 @@ class CreateScenePresenter @Inject constructor(private val sceneRepository: Scen
     }
 
     fun onSelectLocationCanceled() {
-        view.navigateToEditTitleAndDescription()
+        view.navigateToEditTitleAndDescription(title, description)
     }
 
     fun onSceneCreatedCorrectly(scene: Scene) {

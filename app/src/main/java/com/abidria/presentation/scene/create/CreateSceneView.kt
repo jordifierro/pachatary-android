@@ -1,7 +1,7 @@
 package com.abidria.presentation.scene.create
 
 interface CreateSceneView {
-    fun navigateToEditTitleAndDescription()
+    fun navigateToEditTitleAndDescription(initialTitle: String = "", initialDescription: String = "")
     fun navigateToSelectLocation(latitude: Double, longitude: Double,
                                  locationType: SelectLocationPresenter.LocationType)
     fun navigateToPickImage()

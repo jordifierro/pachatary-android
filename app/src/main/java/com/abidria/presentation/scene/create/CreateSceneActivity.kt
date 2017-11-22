@@ -91,8 +91,10 @@ class CreateSceneActivity : AppCompatActivity(), CreateSceneView {
             presenter.onCropImageCanceled()
     }
 
-    override fun navigateToEditTitleAndDescription() {
-        startActivityForResult(EditTitleAndDescriptionActivity.newIntent(this), EDIT_TITLE_AND_DESCRIPTION)
+    override fun navigateToEditTitleAndDescription(initialTitle: String, initialDescription: String) {
+        startActivityForResult(
+                EditTitleAndDescriptionActivity.newIntent(this, initialTitle, initialDescription),
+                EDIT_TITLE_AND_DESCRIPTION)
     }
 
     override fun navigateToSelectLocation(latitude: Double, longitude: Double,

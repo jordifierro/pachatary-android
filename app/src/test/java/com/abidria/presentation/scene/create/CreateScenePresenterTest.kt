@@ -88,11 +88,14 @@ class CreateScenePresenterTest {
     @Test
     fun on_location_selection_canceled_should_navigate_to_edit_title() {
         given {
+            a_title()
+            a_description()
             nothing()
         } whenn {
+            title_and_description_are_edited()
             select_location_canceled()
         } then {
-            presenter_should_navigate_to_edit_title_and_description()
+            presenter_should_navigate_to_edit_title_and_description_with_previous_title_and_description()
         }
     }
 
@@ -267,6 +270,10 @@ class CreateScenePresenterTest {
 
         fun presenter_should_navigate_to_edit_title_and_description() {
             BDDMockito.then(mockView).should().navigateToEditTitleAndDescription()
+        }
+
+        fun presenter_should_navigate_to_edit_title_and_description_with_previous_title_and_description() {
+            BDDMockito.then(mockView).should().navigateToEditTitleAndDescription(title, description)
         }
 
         fun title_should_be_saved() {
