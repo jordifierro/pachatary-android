@@ -30,7 +30,15 @@ class EditTitleAndDescriptionActivity : AppCompatActivity(), EditTitleAndDescrip
         val TITLE = "title"
         val DESCRIPTION = "description"
 
-        fun newIntent(context: Context): Intent = Intent(context, EditTitleAndDescriptionActivity::class.java)
+        val INITIAL_TITLE = "initial_title"
+        val INITIAL_DESCRIPTION = "initial_description"
+
+        fun newIntent(context: Context, initialTitle: String = "", initialDescription: String = ""): Intent {
+            val intent = Intent(context, EditTitleAndDescriptionActivity::class.java)
+            intent.putExtra(INITIAL_TITLE, initialTitle)
+            intent.putExtra(INITIAL_DESCRIPTION, initialDescription)
+            return intent
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,12 +52,19 @@ class EditTitleAndDescriptionActivity : AppCompatActivity(), EditTitleAndDescrip
         doneButton.setOnClickListener { presenter.doneButtonClick() }
 
         AbidriaApplication.injector.inject(this)
-        presenter.view = this
+        val initialTitle = intent.getStringExtra(INITIAL_TITLE)
+        val initialDescription = intent.getStringExtra(INITIAL_DESCRIPTION)
+        presenter.setViewAndInitialTitleAndDescription(this, initialTitle, initialDescription)
         registry.addObserver(presenter)
     }
 
     override fun title(): String = titleEditText.text.toString()
     override fun description(): String = descriptionEditText.text.toString()
+
+    override fun setTitleAndDescription(title: String, description: String) {
+        titleEditText.setText(title)
+        descriptionEditText.setText(description)
+    }
 
     override fun finishWith(title: String, description: String) {
         val returnIntent = Intent()

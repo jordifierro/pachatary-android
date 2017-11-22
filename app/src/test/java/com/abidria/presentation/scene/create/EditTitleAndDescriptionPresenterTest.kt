@@ -9,6 +9,19 @@ import org.mockito.MockitoAnnotations
 class EditTitleAndDescriptionPresenterTest {
 
     @Test
+    fun presenter_sets_to_the_view_initial_values() {
+        given {
+            an_initial_title()
+            an_initial_description()
+            a_presenter_instantiated_with_view_and_initial_values()
+        } whenn {
+            presenter_is_created()
+        } then {
+            presenter_should_set_initial_title_and_description_to_the_view()
+        }
+    }
+
+    @Test
     fun no_title_should_show_error() {
         given {
             no_title()
@@ -47,6 +60,8 @@ class EditTitleAndDescriptionPresenterTest {
     class ScenarioMaker {
         private lateinit var presenter: EditTitleAndDescriptionPresenter
         @Mock private lateinit var mockView: EditTitleAndDescriptionView
+        private var initialTitle = ""
+        private var initialDescription = ""
         private var title = ""
         private var description = ""
 
@@ -56,6 +71,14 @@ class EditTitleAndDescriptionPresenterTest {
             presenter.view = mockView
 
             return this
+        }
+
+        fun an_initial_title() {
+            initialTitle = "some"
+        }
+
+        fun an_initial_description() {
+            initialDescription = "other"
         }
 
         fun no_title() {
@@ -74,10 +97,18 @@ class EditTitleAndDescriptionPresenterTest {
             description = "some description"
         }
 
+        fun a_presenter_instantiated_with_view_and_initial_values() {
+            presenter.setViewAndInitialTitleAndDescription(mockView, initialTitle, initialDescription)
+        }
+
         fun done_button_is_clicked() {
             given(mockView.title()).willReturn(title)
             given(mockView.description()).willReturn(description)
             presenter.doneButtonClick()
+        }
+
+        fun presenter_is_created() {
+            presenter.create()
         }
 
         fun finish_should_be_called_with_title_and_description() {
@@ -86,6 +117,10 @@ class EditTitleAndDescriptionPresenterTest {
 
         fun error_should_be_shown() {
             then(mockView).should().showTitleLengthError()
+        }
+
+        fun presenter_should_set_initial_title_and_description_to_the_view() {
+            then(mockView).should().setTitleAndDescription(initialTitle, initialDescription)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

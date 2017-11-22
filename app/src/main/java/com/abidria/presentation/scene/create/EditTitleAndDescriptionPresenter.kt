@@ -11,9 +11,20 @@ class EditTitleAndDescriptionPresenter @Inject constructor(): LifecycleObserver 
     val MAX_TITLE_LENGTH = 30
 
     lateinit var view: EditTitleAndDescriptionView
+    var initialTitle = ""
+    var initialDescription = ""
+
+    fun setViewAndInitialTitleAndDescription(view: EditTitleAndDescriptionView,
+                                             initialTitle: String, initialDescription: String) {
+        this.view = view
+        this.initialTitle = initialTitle
+        this.initialDescription = initialDescription
+    }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    fun create() {}
+    fun create() {
+        view.setTitleAndDescription(initialTitle, initialDescription)
+    }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun destroy() {}
