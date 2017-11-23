@@ -5,7 +5,6 @@ import android.app.Activity
 import android.arch.lifecycle.LifecycleRegistry
 import android.content.Context
 import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
@@ -14,14 +13,11 @@ import android.webkit.MimeTypeMap
 import com.abidria.BuildConfig
 import com.abidria.R
 import com.abidria.presentation.common.AbidriaApplication
+import com.abidria.presentation.common.view.PickImageActivity
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.yalantis.ucrop.UCrop
 import com.zhihu.matisse.Matisse
-import com.zhihu.matisse.MimeType
-import com.zhihu.matisse.MimeType.JPEG
-import com.zhihu.matisse.MimeType.PNG
-import com.zhihu.matisse.engine.impl.PicassoEngine
 import kotlinx.android.synthetic.main.activity_create_scene.*
 import java.io.File
 import javax.inject.Inject
@@ -31,7 +27,7 @@ class CreateSceneActivity : AppCompatActivity(), CreateSceneView {
 
     val EDIT_TITLE_AND_DESCRIPTION = 1
     val SELECT_LOCATION = 2
-    val SELECT_IMAGE = 3
+    val PICK_IMAGE = 3
     val CROP_IMAGE = UCrop.REQUEST_CROP
 
     @Inject
@@ -81,9 +77,9 @@ class CreateSceneActivity : AppCompatActivity(), CreateSceneView {
                                          longitude = data.extras.getDouble(SelectLocationActivity.LONGITUDE))
         else if (requestCode == SELECT_LOCATION && resultCode == Activity.RESULT_CANCELED)
             presenter.onSelectLocationCanceled()
-        else if (requestCode == SELECT_IMAGE && resultCode == Activity.RESULT_OK)
-            presenter.onImagePicked(Matisse.obtainResult(data)[0].toString())
-        else if (requestCode == SELECT_IMAGE && resultCode == Activity.RESULT_CANCELED)
+        else if (requestCode == PICK_IMAGE && resultCode == Activity.RESULT_OK)
+            presenter.onImagePicked(PickImageActivity.getPickedImageUriStringFromResultData(data!!))
+        else if (requestCode == PICK_IMAGE && resultCode == Activity.RESULT_CANCELED)
             presenter.onPickImageCanceled()
         else if (requestCode == CROP_IMAGE && resultCode == Activity.RESULT_OK)
             presenter.onImageCropped(UCrop.getOutput(data!!).toString())
@@ -105,14 +101,7 @@ class CreateSceneActivity : AppCompatActivity(), CreateSceneView {
     }
 
     override fun navigateToPickImage() {
-        Matisse.from(this)
-                .choose(MimeType.of(JPEG, PNG))
-                .countable(false)
-                .maxSelectable(1)
-                .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
-                .thumbnailScale(0.85f)
-                .imageEngine(PicassoEngine())
-                .forResult(SELECT_IMAGE)
+        PickImageActivity.startActivityForResult(this, PICK_IMAGE)
     }
 
     override fun navigateToCropImage(selectedImageUriString: String) {
