@@ -44,10 +44,12 @@ picture, title and description.
 Scroll (with a cool parallax effect) is enabled
 to allow full text read.
 
-#### CreateSceneActivity
+#### CreateSceneActivity and EditSceneActivity
 
-This screen is used to handle the scene creation form flow.
-It only appears visible to the user to show a loader while creating the scene.
+This screens are used to handle the scene creation and edition form flow
+(that are almost the same).
+They only appears visible to the user to show a loader while creating the scene
+or ask user if wants to modify the scene picture.
 Here are the form screens:
 
 ##### EditTitleAndDescriptionActivity

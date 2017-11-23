@@ -20,14 +20,17 @@ class SceneRepository(val apiRepository: SceneApiRepository, val streamFactory: 
         scenesFlowable(experienceId).map { Result(data = it.data?.first { it.id == sceneId }, error = it.error) }
 
     fun createScene(scene: Scene): Flowable<Result<Scene>> {
-        return apiRepository.createScene(scene)
-                .doOnNext { t -> scenesStreamHashMap.get(scene.experienceId)!!.addOrUpdateSceneObserver.onNext(t) }
+        return apiRepository.createScene(scene).doOnNext(emitThroughAddOrUpdate)
+    }
+
+    fun editScene(scene: Scene): Flowable<Result<Scene>> {
+        return apiRepository.editScene(scene).doOnNext(emitThroughAddOrUpdate)
     }
 
     fun uploadScenePicture(sceneId: String, croppedImageUriString: String) {
-        apiRepository.uploadScenePicture(sceneId, croppedImageUriString, delegate)
+        apiRepository.uploadScenePicture(sceneId, croppedImageUriString, emitThroughAddOrUpdate)
     }
 
-    internal val delegate = { scene: Scene ->
-        scenesStreamHashMap.get(scene.experienceId)!!.addOrUpdateSceneObserver.onNext(Result(scene, null))}
+    internal val emitThroughAddOrUpdate = { resultScene: Result<Scene> ->
+        scenesStreamHashMap.get(resultScene.data!!.experienceId)!!.addOrUpdateSceneObserver.onNext(resultScene) }
 }

@@ -33,7 +33,13 @@ class SceneApiRepository(retrofit: Retrofit, @Named("io") val scheduler: Schedul
                              experienceId = scene.experienceId)
                 .compose(ParseNetworkResultTransformer({ it.toDomain() }))
 
-    fun uploadScenePicture(sceneId: String, croppedImageUriString: String, delegate: (scene: Scene) -> Unit) {
+    fun editScene(scene: Scene): Flowable<Result<Scene>> =
+        sceneApi.editScene(scene.id, scene.title, scene.description,
+                           scene.latitude, scene.longitude, scene.experienceId)
+                .compose(ParseNetworkResultTransformer({ it.toDomain() }))
+
+    fun uploadScenePicture(sceneId: String, croppedImageUriString: String,
+                           delegate: (resultScene: Result<Scene>) -> Unit) {
         try {
             val uploadId = MultipartUploadRequest(context,
                     BuildConfig.API_URL + "/scenes/" + sceneId + "/picture/")
@@ -48,7 +54,7 @@ class SceneApiRepository(retrofit: Retrofit, @Named("io") val scheduler: Schedul
                         override fun onCompleted(context: Context, uploadInfo: UploadInfo,
                                                  serverResponse: ServerResponse) {
                             val jsonScene = JSONObject(serverResponse.bodyAsString)
-                            delegate(parseSceneJson(jsonScene))
+                            delegate(Result(parseSceneJson(jsonScene), null))
                         }
                     })
                     .startUpload()
@@ -73,5 +79,4 @@ class SceneApiRepository(retrofit: Retrofit, @Named("io") val scheduler: Schedul
         return Scene(id = id, title = title, description = description, latitude = latitude,
                      longitude = longitude, experienceId = experienceId, picture = picture)
     }
-
 }

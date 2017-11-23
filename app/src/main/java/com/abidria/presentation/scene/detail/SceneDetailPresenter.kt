@@ -35,4 +35,8 @@ class SceneDetailPresenter @Inject constructor(private val repository: SceneRepo
     fun destroy() {
         sceneDisposable?.dispose()
     }
+
+    fun onEditSceneClick() {
+        view.navigateToEditScene(sceneId, experienceId)
+    }
 }

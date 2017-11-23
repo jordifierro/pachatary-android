@@ -228,7 +228,7 @@ class SceneRepositoryTest {
         }
 
         fun delegate_is_called_with_scene() {
-            repository.delegate.invoke(scene)
+            repository.emitThroughAddOrUpdate.invoke(Result(scene, null))
         }
 
         fun should_return_flowable_created_by_factory() {
@@ -273,7 +273,7 @@ class SceneRepositoryTest {
 
         fun should_call_api_upload_scene_picture_with_scene_id_and_image_uri_string() {
             BDDMockito.then(mockApiRepository).should()
-                    .uploadScenePicture(sceneId, croppedImageUriString, repository.delegate)
+                    .uploadScenePicture(sceneId, croppedImageUriString, repository.emitThroughAddOrUpdate)
         }
 
         fun delegate_param_should_emit_scene_through_add_or_update_observer() {

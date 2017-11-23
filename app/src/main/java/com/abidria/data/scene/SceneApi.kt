@@ -16,4 +16,13 @@ interface SceneApi {
                     @Field("latitude") latitude: Double,
                     @Field("longitude") longitude: Double,
                     @Field("experience_id") experienceId: String): Flowable<Result<SceneMapper>>
+
+    @FormUrlEncoded
+    @PATCH("/scenes/{id}")
+    fun editScene(@Path("id") id: String,
+                  @Field("title") title: String,
+                  @Field("description") description: String,
+                  @Field("latitude") latitude: Double,
+                  @Field("longitude") longitude: Double,
+                  @Field("experience_id") experienceId: String): Flowable<Result<SceneMapper>>
 }

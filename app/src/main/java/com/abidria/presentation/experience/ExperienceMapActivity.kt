@@ -83,6 +83,7 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView {
     override fun showScenesOnMap(scenes: List<Scene>) {
         if (scenes.isNotEmpty()) {
             markersHashMap.clear()
+            mapboxMap.clear()
             val latLngBoundsBuilder: LatLngBounds.Builder = LatLngBounds.Builder()
 
             for (scene in scenes) {
