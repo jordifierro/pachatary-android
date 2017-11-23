@@ -13,6 +13,7 @@ import android.webkit.MimeTypeMap
 import com.abidria.BuildConfig
 import com.abidria.R
 import com.abidria.presentation.common.AbidriaApplication
+import com.abidria.presentation.common.view.CropImageActivity
 import com.abidria.presentation.common.view.PickImageActivity
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -82,7 +83,7 @@ class CreateSceneActivity : AppCompatActivity(), CreateSceneView {
         else if (requestCode == PICK_IMAGE && resultCode == Activity.RESULT_CANCELED)
             presenter.onPickImageCanceled()
         else if (requestCode == CROP_IMAGE && resultCode == Activity.RESULT_OK)
-            presenter.onImageCropped(UCrop.getOutput(data!!).toString())
+            presenter.onImageCropped(CropImageActivity.getCroppedImageUriStringFromResultData(data!!))
         else if (requestCode == CROP_IMAGE && resultCode == Activity.RESULT_CANCELED)
             presenter.onCropImageCanceled()
     }
@@ -105,15 +106,7 @@ class CreateSceneActivity : AppCompatActivity(), CreateSceneView {
     }
 
     override fun navigateToCropImage(selectedImageUriString: String) {
-        var extension = File(Uri.parse(selectedImageUriString).path).extension
-        if (extension == "") extension = MimeTypeMap.getSingleton()
-                .getExtensionFromMimeType(this.getContentResolver().getType(Uri.parse(selectedImageUriString)))
-
-        val outputUri = Uri.fromFile(File.createTempFile("scene", "." + extension, this.cacheDir))
-        UCrop.of(Uri.parse(selectedImageUriString), outputUri)
-                .withAspectRatio(1.0f, 1.0f)
-                .withMaxResultSize(BuildConfig.MAX_IMAGE_SIZE, BuildConfig.MAX_IMAGE_SIZE)
-                .start(this)
+        CropImageActivity.startActivityForResult(this, selectedImageUriString)
     }
 
     override fun getLifecycle(): LifecycleRegistry = registry
