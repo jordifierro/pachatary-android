@@ -1,5 +1,6 @@
 package com.abidria.data.experience
 
+import android.content.Context
 import com.abidria.data.common.Result
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
@@ -9,12 +10,14 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert.*
 import org.junit.Test
+import org.mockito.Mockito.mock
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 class ExperienceApiRepositoryTest {
 
+    val mockContext: Context = mock(Context::class.java)
     val mockWebServer = MockWebServer()
     val repository = ExperienceApiRepository(Retrofit.Builder()
             .baseUrl(mockWebServer.url("/"))
@@ -24,7 +27,7 @@ class ExperienceApiRepositoryTest {
                             .create()))
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .build(),
-            Schedulers.trampoline())
+            Schedulers.trampoline(), mockContext)
 
     @Test
     fun testGetExperiencesRequest() {

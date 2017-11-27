@@ -49,8 +49,9 @@ class DataModule {
 
     @Provides
     @Singleton
-    fun provideExperienceApiRepository(retrofit: Retrofit, @Named("io") scheduler: Scheduler): ExperienceApiRepository =
-            ExperienceApiRepository(retrofit, scheduler)
+    fun provideExperienceApiRepository(retrofit: Retrofit, @Named("io") scheduler: Scheduler,
+                                       context: Context): ExperienceApiRepository =
+            ExperienceApiRepository(retrofit, scheduler, context)
 
     @Provides
     @Singleton

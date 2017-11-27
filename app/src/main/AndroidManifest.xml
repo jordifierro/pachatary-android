@@ -56,6 +56,10 @@
             android:name=".presentation.scene.create.EditSceneActivity"
             android:label="@string/title_activity_edit_scene"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".presentation.experience.create.CreateExperienceActivity"
+            android:label="@string/title_activity_create_experience"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

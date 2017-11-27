@@ -44,4 +44,8 @@ class ExperienceListPresenter @Inject constructor(private val repository: Experi
     fun destroy() {
         experiencesDisposable?.dispose()
     }
+
+    fun onCreateExperienceClick() {
+        view.navigateToCreateExperience()
+    }
 }

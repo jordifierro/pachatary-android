@@ -3,6 +3,7 @@ package com.abidria.presentation.common.injection
 import com.abidria.data.common.injection.DataModule
 import com.abidria.presentation.experience.ExperienceListActivity
 import com.abidria.presentation.experience.ExperienceMapActivity
+import com.abidria.presentation.experience.create.CreateExperienceActivity
 import com.abidria.presentation.scene.create.CreateSceneActivity
 import com.abidria.presentation.scene.create.EditSceneActivity
 import com.abidria.presentation.scene.create.EditTitleAndDescriptionActivity
@@ -22,4 +23,5 @@ interface ApplicationComponent {
     fun inject(selectLocationActivity: SelectLocationActivity)
     fun inject(createSceneActivity: CreateSceneActivity)
     fun inject(editSceneActivity: EditSceneActivity)
+    fun inject(createExperienceActivity: CreateExperienceActivity)
 }

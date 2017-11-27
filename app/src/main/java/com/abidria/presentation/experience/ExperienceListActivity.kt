@@ -2,6 +2,7 @@ package com.abidria.presentation.experience
 
 import android.arch.lifecycle.LifecycleRegistry
 import android.os.Bundle
+import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -14,6 +15,7 @@ import android.widget.TextView
 import com.abidria.R
 import com.abidria.data.experience.Experience
 import com.abidria.presentation.common.AbidriaApplication
+import com.abidria.presentation.experience.create.CreateExperienceActivity
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_experiences_list.*
 import javax.inject.Inject
@@ -26,6 +28,7 @@ class ExperienceListActivity : AppCompatActivity(), ExperienceListView {
     lateinit var recyclerView: RecyclerView
     lateinit var progressBar: ProgressBar
     lateinit var retryIcon: ImageView
+    lateinit var createExperienceButton: FloatingActionButton
 
     val registry: LifecycleRegistry = LifecycleRegistry(this)
 
@@ -39,6 +42,8 @@ class ExperienceListActivity : AppCompatActivity(), ExperienceListView {
         retryIcon.setOnClickListener { presenter.onRetryClick() }
         recyclerView = findViewById<RecyclerView>(R.id.experiences_recyclerview)
         recyclerView.layoutManager = GridLayoutManager(this, 2)
+        createExperienceButton = findViewById<FloatingActionButton>(R.id.create_new_experience_button)
+        createExperienceButton.setOnClickListener { presenter.onCreateExperienceClick() }
 
         AbidriaApplication.injector.inject(this)
         presenter.view = this
@@ -68,6 +73,10 @@ class ExperienceListActivity : AppCompatActivity(), ExperienceListView {
 
     override fun navigateToExperience(experienceId: String) {
         startActivity(ExperienceMapActivity.newIntent(this, experienceId))
+    }
+
+    override fun navigateToCreateExperience() {
+        startActivity(CreateExperienceActivity.newIntent(context = this))
     }
 
     override fun getLifecycle(): LifecycleRegistry = registry

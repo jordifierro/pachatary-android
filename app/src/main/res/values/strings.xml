@@ -5,6 +5,7 @@
     <string name="title_activity_experience_map">Map</string>
     <string name="title_activity_scene_detail" />
     <string name="title_activity_create_scene">Create scene</string>
+    <string name="title_activity_create_experience">Create experience</string>
 
     <string name="retry">Retry</string>
 

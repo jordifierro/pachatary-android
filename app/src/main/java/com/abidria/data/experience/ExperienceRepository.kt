@@ -23,4 +23,15 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
 
     fun experienceFlowable(experienceId: String): Flowable<Result<Experience>> =
         experiencesFlowable().map { Result(data = it.data?.first { it.id == experienceId }, error = it.error) }
+
+    fun createExperience(experience: Experience): Flowable<Result<Experience>> {
+        return apiRepository.createExperience(experience).doOnNext(emitThroughAddOrUpdate)
+    }
+
+    fun uploadExperiencePicture(experienceId: String, croppedImageUriString: String) {
+        apiRepository.uploadExperiencePicture(experienceId, croppedImageUriString, emitThroughAddOrUpdate)
+    }
+
+    internal val emitThroughAddOrUpdate = { resultExperience: Result<Experience> ->
+                                                    experiencesStream!!.addOrUpdateObserver.onNext(resultExperience) }
 }

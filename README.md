@@ -46,10 +46,10 @@ to allow full text read.
 
 #### CreateSceneActivity and EditSceneActivity
 
-This screens are used to handle the scene creation and edition form flow
+This screens are used to handle the scene and experience creation and edition form flow
 (that are almost the same).
-They only appears visible to the user to show a loader while creating the scene
-or ask user if wants to modify the scene picture.
+They only appears visible to the user to show a loader while creating the scene/experience
+or ask user if wants to modify the scene/experience picture.
 Here are the form screens:
 
 ##### EditTitleAndDescriptionActivity
@@ -61,7 +61,7 @@ Title has to be between 1 and 30 chars.
 ##### SelectLocationActivity
 ![SceneDetailActivity](https://s3-eu-west-1.amazonaws.com/abidria/static/select-location-screenshot.jpg)
 
-This activity shows a map to allow user select a location.
+This activity shows a map to allow user select a location (only for scenes).
 It starts with the last known user location to make the process faster.
 
 ##### PickImageActivity
