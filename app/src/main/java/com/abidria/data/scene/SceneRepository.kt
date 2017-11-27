@@ -1,19 +1,20 @@
 package com.abidria.data.scene
 
 import com.abidria.data.common.Result
+import com.abidria.data.common.ResultStreamFactory
 import io.reactivex.Flowable
 
-class SceneRepository(val apiRepository: SceneApiRepository, val streamFactory: SceneStreamFactory) {
+class SceneRepository(val apiRepository: SceneApiRepository, val streamFactory: ResultStreamFactory<Scene>) {
 
-    private val scenesStreamHashMap: HashMap<String, SceneStreamFactory.ScenesStream> = HashMap()
+    private val scenesStreamHashMap: HashMap<String, ResultStreamFactory.ResultStream<Scene>> = HashMap()
 
     fun scenesFlowable(experienceId: String): Flowable<Result<List<Scene>>> {
         if (scenesStreamHashMap.get(experienceId) == null) {
             val streams = streamFactory.create()
             scenesStreamHashMap.put(experienceId, streams)
-            apiRepository.scenesRequestFlowable(experienceId).subscribe({ streams.replaceAllScenesObserver.onNext(it) })
+            apiRepository.scenesRequestFlowable(experienceId).subscribe({ streams.replaceAllObserver.onNext(it) })
         }
-        return scenesStreamHashMap.get(experienceId)!!.scenesFlowable
+        return scenesStreamHashMap.get(experienceId)!!.resultFlowable
     }
 
     fun sceneFlowable(experienceId: String, sceneId: String): Flowable<Result<Scene>> =
@@ -32,5 +33,5 @@ class SceneRepository(val apiRepository: SceneApiRepository, val streamFactory: 
     }
 
     internal val emitThroughAddOrUpdate = { resultScene: Result<Scene> ->
-        scenesStreamHashMap.get(resultScene.data!!.experienceId)!!.addOrUpdateSceneObserver.onNext(resultScene) }
+        scenesStreamHashMap.get(resultScene.data!!.experienceId)!!.addOrUpdateObserver.onNext(resultScene) }
 }

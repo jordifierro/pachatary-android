@@ -1,6 +1,7 @@
 package com.abidria.data.experience
 
 import com.abidria.data.common.Result
+import com.abidria.data.common.ResultStreamFactory
 import io.reactivex.Flowable
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
@@ -77,7 +78,7 @@ class ExperienceRepositoryTest {
     class ScenarioMaker {
         lateinit var repository: ExperienceRepository
         @Mock lateinit var mockApiRepository: ExperienceApiRepository
-        @Mock lateinit var mockExperiencesStreamFactory: ExperienceStreamFactory
+        @Mock lateinit var mockExperiencesStreamFactory: ResultStreamFactory<Experience>
         var experienceId = ""
         lateinit var experience: Experience
         lateinit var secondExperience: Experience
@@ -109,7 +110,7 @@ class ExperienceRepositoryTest {
             addOrUpdateObserver.onSubscribe(addOrUpdateObserver)
             experiencesFlowable = Flowable.never()
             BDDMockito.given(mockExperiencesStreamFactory.create()).willReturn(
-                    ExperienceStreamFactory.ExperiencesStream(replaceAllObserver, addOrUpdateObserver, experiencesFlowable))
+                    ResultStreamFactory.ResultStream(replaceAllObserver, addOrUpdateObserver, experiencesFlowable))
         }
 
         fun an_experiences_stream_factory_that_returns_another_stream_when_called_again() {
@@ -119,8 +120,8 @@ class ExperienceRepositoryTest {
             secondAddOrUpdateObserver.onSubscribe(addOrUpdateObserver)
             secondExperiencesFlowable = Flowable.never()
             BDDMockito.given(mockExperiencesStreamFactory.create()).willReturn(
-                    ExperienceStreamFactory.ExperiencesStream(secondReplaceAllObserver,
-                                                    secondAddOrUpdateObserver, secondExperiencesFlowable))
+                    ResultStreamFactory.ResultStream(secondReplaceAllObserver,
+                                                     secondAddOrUpdateObserver, secondExperiencesFlowable))
         }
 
         fun an_experiences_stream_factory_that_returns_stream_with_several_experiences() {
@@ -130,7 +131,7 @@ class ExperienceRepositoryTest {
             addOrUpdateObserver = TestObserver.create()
             experiencesFlowable = Flowable.just(Result(listOf(experienceA, experienceB), null))
             BDDMockito.given(mockExperiencesStreamFactory.create()).willReturn(
-                    ExperienceStreamFactory.ExperiencesStream(replaceAllObserver, addOrUpdateObserver, experiencesFlowable))
+                    ResultStreamFactory.ResultStream(replaceAllObserver, addOrUpdateObserver, experiencesFlowable))
         }
 
         fun an_api_repo_that_returns_experiences_flowable_with_an_experience() {

@@ -2,12 +2,13 @@ package com.abidria.data.common.injection
 
 import android.content.Context
 import com.abidria.BuildConfig
+import com.abidria.data.common.ResultStreamFactory
+import com.abidria.data.experience.Experience
 import com.abidria.data.experience.ExperienceApiRepository
 import com.abidria.data.experience.ExperienceRepository
-import com.abidria.data.experience.ExperienceStreamFactory
+import com.abidria.data.scene.Scene
 import com.abidria.data.scene.SceneApiRepository
 import com.abidria.data.scene.SceneRepository
-import com.abidria.data.scene.SceneStreamFactory
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
@@ -53,12 +54,12 @@ class DataModule {
 
     @Provides
     @Singleton
-    fun provideExperienceStreamFactory() = ExperienceStreamFactory()
+    fun provideExperienceStreamFactory() = ResultStreamFactory<Experience>()
 
     @Provides
     @Singleton
     fun provideExperienceRepository(apiRepository: ExperienceApiRepository,
-                                    experienceStreamFactory: ExperienceStreamFactory): ExperienceRepository =
+                                    experienceStreamFactory: ResultStreamFactory<Experience>): ExperienceRepository =
             ExperienceRepository(apiRepository, experienceStreamFactory)
 
     @Provides
@@ -69,11 +70,11 @@ class DataModule {
 
     @Provides
     @Singleton
-    fun provideScenesStreamFactory() = SceneStreamFactory()
+    fun provideScenesStreamFactory() = ResultStreamFactory<Scene>()
 
     @Provides
     @Singleton
     fun provideSceneRepository(apiRepository: SceneApiRepository,
-                               sceneStreamFactory: SceneStreamFactory): SceneRepository =
+                               sceneStreamFactory: ResultStreamFactory<Scene>): SceneRepository =
             SceneRepository(apiRepository, sceneStreamFactory)
 }

@@ -1,6 +1,7 @@
 package com.abidria.data.scene
 
 import com.abidria.data.common.Result
+import com.abidria.data.common.ResultStreamFactory
 import io.reactivex.Flowable
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
@@ -107,7 +108,7 @@ class SceneRepositoryTest {
     class ScenarioMaker {
         lateinit var repository: SceneRepository
         @Mock lateinit var mockApiRepository: SceneApiRepository
-        @Mock lateinit var mockScenesStreamFactory: SceneStreamFactory
+        @Mock lateinit var mockScenesStreamFactory: ResultStreamFactory<Scene>
         var experienceId = ""
         var secondExperienceId = ""
         var sceneId = ""
@@ -161,7 +162,7 @@ class SceneRepositoryTest {
             addOrUpdateObserver.onSubscribe(addOrUpdateObserver)
             scenesFlowable = Flowable.never()
             BDDMockito.given(mockScenesStreamFactory.create()).willReturn(
-                    SceneStreamFactory.ScenesStream(replaceAllObserver, addOrUpdateObserver, scenesFlowable))
+                    ResultStreamFactory.ResultStream(replaceAllObserver, addOrUpdateObserver, scenesFlowable))
         }
 
         fun an_scenes_stream_factory_that_returns_another_stream_when_called_again() {
@@ -171,8 +172,8 @@ class SceneRepositoryTest {
             secondAddOrUpdateObserver.onSubscribe(addOrUpdateObserver)
             secondScenesFlowable = Flowable.never()
             BDDMockito.given(mockScenesStreamFactory.create()).willReturn(
-                    SceneStreamFactory.ScenesStream(secondReplaceAllObserver,
-                                                    secondAddOrUpdateObserver, secondScenesFlowable))
+                    ResultStreamFactory.ResultStream(secondReplaceAllObserver,
+                                                     secondAddOrUpdateObserver, secondScenesFlowable))
         }
 
         fun an_scenes_stream_factory_that_returns_stream_with_several_scenes() {
@@ -184,7 +185,7 @@ class SceneRepositoryTest {
             addOrUpdateObserver = TestObserver.create()
             scenesFlowable = Flowable.just(Result(listOf(sceneA, sceneB), null))
             BDDMockito.given(mockScenesStreamFactory.create()).willReturn(
-                    SceneStreamFactory.ScenesStream(replaceAllObserver, addOrUpdateObserver, scenesFlowable))
+                    ResultStreamFactory.ResultStream(replaceAllObserver, addOrUpdateObserver, scenesFlowable))
         }
 
         fun an_api_repo_that_returns_scenes_flowable_with_an_scene() {

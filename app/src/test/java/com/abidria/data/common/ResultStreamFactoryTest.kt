@@ -1,19 +1,12 @@
-package com.abidria.data.scene
+package com.abidria.data.common
 
-import com.abidria.data.common.Result
-import io.reactivex.Flowable
-import io.reactivex.observers.TestObserver
+import com.abidria.data.scene.Scene
 import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.PublishSubject
 import io.reactivex.subscribers.TestSubscriber
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.mockito.BDDMockito
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
-import java.util.*
 
-class SceneStreamFactoryTest {
+class ResultStreamFactoryTest {
 
     @Test
     fun test_stream_caches_last_item_emitted() {
@@ -71,52 +64,52 @@ class SceneStreamFactoryTest {
         lateinit var updatedScene: Scene
         lateinit var oldScenes: List<Scene>
         lateinit var newScenes: List<Scene>
-        lateinit var stream: SceneStreamFactory.ScenesStream
+        lateinit var stream: ResultStreamFactory.ResultStream<Scene>
         val testSubscriber: TestSubscriber<Result<List<Scene>>> = TestSubscriber.create()
         val secondTestSubscriber: TestSubscriber<Result<List<Scene>>> = TestSubscriber.create()
 
         fun buildScenario(): ScenarioMaker {
             newScene = Scene("5", "Title", "description", null,
-                             2.6, 1.2, "1")
+                    2.6, 1.2, "1")
             updatedScene = Scene("1", "Other", "info", null,
-                                 3.4, 0.9, "1")
+                    3.4, 0.9, "1")
             val firstScene = Scene("1", "A", "a", null,
-                                   3.4, 0.9, "1")
+                    3.4, 0.9, "1")
             val secondScene = Scene("2", "B", "b", null,
-                                    3.4, 0.9, "1")
+                    3.4, 0.9, "1")
             oldScenes = listOf(firstScene, secondScene)
             val thirdScene = Scene("3", "C", "c", null,
-                                   3.4, 0.9, "1")
+                    3.4, 0.9, "1")
             val forthScene = Scene("4", "D", "d", null,
-                                   3.4, 0.9, "1")
+                    3.4, 0.9, "1")
             newScenes = listOf(thirdScene, forthScene)
 
             return this
         }
 
         fun a_created_stream() {
-            stream = SceneStreamFactory().create()
-            stream.scenesFlowable.subscribeOn(Schedulers.trampoline()).subscribe(testSubscriber)
+            stream = ResultStreamFactory<Scene>().create()
+            stream.resultFlowable.subscribeOn(Schedulers.trampoline()).subscribe(testSubscriber)
         }
 
         fun a_list_of_scenes_is_emitted_through_replace_all_observer() {
-            stream.replaceAllScenesObserver.onNext(Result(oldScenes, null))
+            stream.replaceAllObserver.onNext(Result(oldScenes, null))
         }
 
         fun new_scene_is_emitted_through_add_or_update() {
-            stream.addOrUpdateSceneObserver.onNext(Result(newScene, null))
+            stream.addOrUpdateObserver.onNext(Result(newScene, null))
         }
 
         fun modified_scene_is_emitted_through_add_or_update() {
-            stream.addOrUpdateSceneObserver.onNext(Result(updatedScene, null))
+            stream.addOrUpdateObserver.onNext(Result(updatedScene, null))
         }
 
         fun a_new_list_is_emitted_through_replace_all_observer() {
-            stream.replaceAllScenesObserver.onNext(Result(newScenes, null))
+            stream.replaceAllObserver.onNext(Result(newScenes, null))
         }
 
         fun another_observer_subscribes_to_flowable() {
-            stream.scenesFlowable.subscribeOn(Schedulers.trampoline()).subscribe(secondTestSubscriber)
+            stream.resultFlowable.subscribeOn(Schedulers.trampoline()).subscribe(secondTestSubscriber)
         }
 
         fun a_list_with_previous_scenes_and_new_one_should_be_received() {
