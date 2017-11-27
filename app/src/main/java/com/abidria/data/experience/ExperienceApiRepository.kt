@@ -13,16 +13,10 @@ class ExperienceApiRepository (retrofit: Retrofit, @Named("io") val scheduler: S
 
     private val experienceApi: ExperienceApi = retrofit.create(ExperienceApi::class.java)
 
-    private val publisher: PublishSubject<Any> = PublishSubject.create<Any>()
-
     fun experiencesFlowable(): Flowable<Result<List<Experience>>> =
-        publisher
+        PublishSubject.create<Any>()
             .startWith(true)
             .flatMap { experienceApi.experiences().subscribeOn(scheduler).toObservable() }
             .toFlowable(BackpressureStrategy.LATEST)
             .compose(ParseNetworkResultTransformer({ it.map { it.toDomain() } }))
-
-    fun refreshExperiences() {
-        publisher.onNext(Any())
-    }
 }

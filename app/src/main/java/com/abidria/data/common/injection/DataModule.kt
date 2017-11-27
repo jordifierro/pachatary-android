@@ -4,6 +4,7 @@ import android.content.Context
 import com.abidria.BuildConfig
 import com.abidria.data.experience.ExperienceApiRepository
 import com.abidria.data.experience.ExperienceRepository
+import com.abidria.data.experience.ExperienceStreamFactory
 import com.abidria.data.scene.SceneApiRepository
 import com.abidria.data.scene.SceneRepository
 import com.abidria.data.scene.SceneStreamFactory
@@ -52,8 +53,13 @@ class DataModule {
 
     @Provides
     @Singleton
-    fun provideExperienceRepository(apiRepository: ExperienceApiRepository): ExperienceRepository =
-            ExperienceRepository(apiRepository)
+    fun provideExperienceStreamFactory() = ExperienceStreamFactory()
+
+    @Provides
+    @Singleton
+    fun provideExperienceRepository(apiRepository: ExperienceApiRepository,
+                                    experienceStreamFactory: ExperienceStreamFactory): ExperienceRepository =
+            ExperienceRepository(apiRepository, experienceStreamFactory)
 
     @Provides
     @Singleton

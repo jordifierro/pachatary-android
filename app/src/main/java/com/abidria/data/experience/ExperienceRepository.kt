@@ -3,18 +3,23 @@ package com.abidria.data.experience
 import com.abidria.data.common.Result
 import io.reactivex.Flowable
 
-class ExperienceRepository(val apiRepository: ExperienceApiRepository) {
+class ExperienceRepository(val apiRepository: ExperienceApiRepository,
+                           val experienceStreamFactory: ExperienceStreamFactory) {
 
-    private val experiences: Flowable<Result<List<Experience>>> = apiRepository.experiencesFlowable()
-                                                                               .replay(1)
-                                                                               .autoConnect()
+    private var experiencesStream: ExperienceStreamFactory.ExperiencesStream? = null
 
-    fun experiencesFlowable(): Flowable<Result<List<Experience>>> = experiences
+    fun experiencesFlowable(): Flowable<Result<List<Experience>>> {
+        if (experiencesStream == null) {
+            experiencesStream = experienceStreamFactory.create()
+            refreshExperiences()
+        }
+        return experiencesStream!!.experiencesFlowable
+    }
 
     fun refreshExperiences() {
-        apiRepository.refreshExperiences()
+        apiRepository.experiencesFlowable().subscribe { experiencesStream!!.replaceAllExperiencesObserver.onNext(it) }
     }
 
     fun experienceFlowable(experienceId: String): Flowable<Result<Experience>> =
-        experiences.map { Result(data = it.data?.first { it.id == experienceId }, error = it.error) }
+        experiencesFlowable().map { Result(data = it.data?.first { it.id == experienceId }, error = it.error) }
 }

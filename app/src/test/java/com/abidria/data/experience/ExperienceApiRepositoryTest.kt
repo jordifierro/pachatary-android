@@ -87,40 +87,4 @@ class ExperienceApiRepositoryTest {
         assertEquals(0, testSubscriber.events.get(0).size)
         assertEquals(3, mockWebServer.requestCount)
     }
-
-    @Test
-    fun testEmitThroughRefresherAsksAgain() {
-        val testSubscriber = TestSubscriber<Result<List<Experience>>>()
-        mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(
-                ExperienceApiRepositoryTest::class.java.getResource("/api/GET_experiences.json").readText()))
-        mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(
-                ExperienceApiRepositoryTest::class.java.getResource("/api/GET_experiences.json").readText()))
-
-        repository.experiencesFlowable().subscribeOn(Schedulers.trampoline()).subscribe(testSubscriber)
-        repository.refreshExperiences()
-        testSubscriber.awaitCount(2)
-
-        assertEquals(0, testSubscriber.events.get(1).size)
-        assertEquals(2, testSubscriber.events.get(0).size)
-
-        val firstResult = testSubscriber.events.get(0).get(0) as Result<*>
-        assertTrue(firstResult.isSuccess())
-
-        val secondResult = testSubscriber.events.get(0).get(1) as Result<*>
-        val experiences = secondResult.data as List<*>
-
-        val experience = experiences[0] as Experience
-        assertEquals("2", experience.id)
-        assertEquals("Baboon, el tío", experience.title)
-        assertEquals("jeje", experience.description)
-        assertEquals("https://experiences/8c29c4735.small.jpg", experience.picture!!.smallUrl)
-        assertEquals("https://experiences/8c29c4735.medium.jpg", experience.picture!!.mediumUrl)
-        assertEquals("https://experiences/8c29c4735.large.jpg", experience.picture!!.largeUrl)
-
-        val secondExperience = experiences[1] as Experience
-        assertEquals("3", secondExperience.id)
-        assertEquals("Magic Castle of Lost Swamps", secondExperience.title)
-        assertEquals("Don't try to go there!", secondExperience.description)
-        assertNull(secondExperience.picture)
-    }
 }
