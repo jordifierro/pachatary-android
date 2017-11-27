@@ -19,7 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".presentation.experience.ExperienceListActivity"
+            android:name=".presentation.experience.show.ExperienceListActivity"
             android:label="@string/title_activity_experiences_list"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -29,23 +29,23 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".presentation.experience.ExperienceMapActivity"
+            android:name=".presentation.experience.show.ExperienceMapActivity"
             android:label="@string/title_activity_experience_map"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".presentation.scene.detail.SceneDetailActivity"
+            android:name=".presentation.scene.show.SceneDetailActivity"
             android:label="@string/title_activity_scene_detail"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".presentation.scene.create.CreateSceneActivity"
+            android:name=".presentation.scene.edition.CreateSceneActivity"
             android:label="@string/title_activity_create_scene"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".presentation.scene.create.EditTitleAndDescriptionActivity"
+            android:name=".presentation.common.view.edition.EditTitleAndDescriptionActivity"
             android:label="@string/title_activity_edit_title_and_description"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".presentation.scene.create.SelectLocationActivity"
+            android:name=".presentation.common.view.edition.SelectLocationActivity"
             android:label="@string/title_activity_select_location"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
@@ -53,11 +53,11 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
-            android:name=".presentation.scene.create.EditSceneActivity"
+            android:name=".presentation.scene.edition.EditSceneActivity"
             android:label="@string/title_activity_edit_scene"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".presentation.experience.create.CreateExperienceActivity"
+            android:name=".presentation.experience.edition.CreateExperienceActivity"
             android:label="@string/title_activity_create_experience"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>

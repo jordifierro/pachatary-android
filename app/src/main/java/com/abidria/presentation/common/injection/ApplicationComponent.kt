@@ -1,14 +1,14 @@
 package com.abidria.presentation.common.injection
 
 import com.abidria.data.common.injection.DataModule
-import com.abidria.presentation.experience.ExperienceListActivity
-import com.abidria.presentation.experience.ExperienceMapActivity
-import com.abidria.presentation.experience.create.CreateExperienceActivity
-import com.abidria.presentation.scene.create.CreateSceneActivity
-import com.abidria.presentation.scene.create.EditSceneActivity
-import com.abidria.presentation.scene.create.EditTitleAndDescriptionActivity
-import com.abidria.presentation.scene.create.SelectLocationActivity
-import com.abidria.presentation.scene.detail.SceneDetailActivity
+import com.abidria.presentation.experience.show.ExperienceListActivity
+import com.abidria.presentation.experience.show.ExperienceMapActivity
+import com.abidria.presentation.experience.edition.CreateExperienceActivity
+import com.abidria.presentation.scene.edition.CreateSceneActivity
+import com.abidria.presentation.scene.edition.EditSceneActivity
+import com.abidria.presentation.common.view.edition.EditTitleAndDescriptionActivity
+import com.abidria.presentation.common.view.edition.SelectLocationActivity
+import com.abidria.presentation.scene.show.SceneDetailActivity
 import dagger.Component
 import javax.inject.Singleton
 
