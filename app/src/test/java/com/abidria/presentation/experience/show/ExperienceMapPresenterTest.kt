@@ -74,6 +74,17 @@ class ExperienceMapPresenterTest {
     }
 
     @Test
+    fun testNavigatesToEditExperienceOnEditExperienceClick() {
+        given {
+            nothing()
+        } whenn {
+            edit_experience_button_is_clicked()
+        } then {
+            view_should_navigate_to_edit_experience_with_experience_id()
+        }
+    }
+
+    @Test
     fun testUnsubscribenOnDestroy() {
         given {
             scenes_experiences_and_map_observables()
@@ -182,6 +193,10 @@ class ExperienceMapPresenterTest {
             presenter.onCreateSceneClick()
         }
 
+        fun edit_experience_button_is_clicked() {
+            presenter.onEditExperienceClick()
+        }
+
         fun view_should_show_loader() {
             BDDMockito.then(mockView).should().showLoader()
         }
@@ -216,6 +231,10 @@ class ExperienceMapPresenterTest {
             assertFalse(scenesObservable.hasObservers())
             assertFalse(experienceObservable.hasObservers())
             assertFalse(mapObservable.hasObservers())
+        }
+
+        fun view_should_navigate_to_edit_experience_with_experience_id() {
+            BDDMockito.then(mockView).should().navigateToEditExperience(experienceId)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

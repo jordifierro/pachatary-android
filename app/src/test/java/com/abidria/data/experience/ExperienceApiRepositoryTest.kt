@@ -90,4 +90,88 @@ class ExperienceApiRepositoryTest {
         assertEquals(0, testSubscriber.events.get(0).size)
         assertEquals(3, mockWebServer.requestCount)
     }
+
+    @Test
+    fun testCreateExperienceRequest() {
+        val testSubscriber = TestSubscriber<Result<Experience>>()
+        mockWebServer.enqueue(MockResponse().setResponseCode(201).setBody(
+                ExperienceApiRepositoryTest::class.java.getResource("/api/POST_experiences.json").readText()))
+        val experience = Experience(id = "1", title = "T", description = "desc", picture = null)
+
+        repository.createExperience(experience).subscribe(testSubscriber)
+        testSubscriber.awaitCount(1)
+
+        val request = mockWebServer.takeRequest()
+        assertEquals("/experiences/", request.getPath())
+        assertEquals("POST", request.getMethod())
+        assertEquals("title=T&description=desc",
+                request.getBody().readUtf8())
+    }
+
+    @Test
+    fun testCreateExperienceResponseSuccess() {
+        val testSubscriber = TestSubscriber<Result<Experience>>()
+        mockWebServer.enqueue(MockResponse().setResponseCode(201).setBody(
+                ExperienceApiRepositoryTest::class.java.getResource("/api/POST_experiences.json").readText()))
+
+        val experience = Experience(id = "1", title = "T", description = "desc", picture = null)
+
+        repository.createExperience(experience).subscribe(testSubscriber)
+        testSubscriber.awaitCount(1)
+
+        assertEquals(0, testSubscriber.events.get(1).size)
+        assertEquals(1, testSubscriber.events.get(0).size)
+
+        val receivedResult = testSubscriber.events.get(0).get(0) as Result<*>
+        val receivedExperience = receivedResult.data as Experience
+
+        assertEquals("4", receivedExperience.id)
+        assertEquals("Plaça", receivedExperience.title)
+        assertEquals("", receivedExperience.description)
+        assertEquals("https://experiences/00df.small.jpeg", receivedExperience.picture!!.smallUrl)
+        assertEquals("https://experiences/00df.medium.jpeg", receivedExperience.picture!!.mediumUrl)
+        assertEquals("https://experiences/00df.large.jpeg", receivedExperience.picture!!.largeUrl)
+    }
+
+    @Test
+    fun testEditExperienceRequest() {
+        val testSubscriber = TestSubscriber<Result<Experience>>()
+        mockWebServer.enqueue(MockResponse().setResponseCode(201).setBody(
+                ExperienceApiRepositoryTest::class.java.getResource("/api/PATCH_experience_id.json").readText()))
+        val experience = Experience(id = "1", title = "T", description = "desc", picture = null)
+
+        repository.editExperience(experience).subscribe(testSubscriber)
+        testSubscriber.awaitCount(1)
+
+        val request = mockWebServer.takeRequest()
+        assertEquals("/experiences/1", request.getPath())
+        assertEquals("PATCH", request.getMethod())
+        assertEquals("title=T&description=desc",
+                request.getBody().readUtf8())
+    }
+
+    @Test
+    fun testEditExperienceResponseSuccess() {
+        val testSubscriber = TestSubscriber<Result<Experience>>()
+        mockWebServer.enqueue(MockResponse().setResponseCode(201).setBody(
+                ExperienceApiRepositoryTest::class.java.getResource("/api/PATCH_experience_id.json").readText()))
+
+        val experience = Experience(id = "1", title = "T", description = "desc", picture = null)
+
+        repository.editExperience(experience).subscribe(testSubscriber)
+        testSubscriber.awaitCount(1)
+
+        assertEquals(0, testSubscriber.events.get(1).size)
+        assertEquals(1, testSubscriber.events.get(0).size)
+
+        val receivedResult = testSubscriber.events.get(0).get(0) as Result<*>
+        val receivedExperience = receivedResult.data as Experience
+
+        assertEquals("4", receivedExperience.id)
+        assertEquals("Plaça", receivedExperience.title)
+        assertEquals("", receivedExperience.description)
+        assertEquals("https://experiences/00df.small.jpeg", receivedExperience.picture!!.smallUrl)
+        assertEquals("https://experiences/00df.medium.jpeg", receivedExperience.picture!!.mediumUrl)
+        assertEquals("https://experiences/00df.large.jpeg", receivedExperience.picture!!.largeUrl)
+    }
 }

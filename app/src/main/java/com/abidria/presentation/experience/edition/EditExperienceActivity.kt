@@ -1,6 +1,5 @@
-package com.abidria.presentation.scene.edition
+package com.abidria.presentation.experience.edition
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.arch.lifecycle.LifecycleRegistry
 import android.content.Context
@@ -12,47 +11,41 @@ import android.support.v7.app.AppCompatActivity
 import com.abidria.R
 import com.abidria.presentation.common.AbidriaApplication
 import com.abidria.presentation.common.view.edition.CropImageActivity
-import com.abidria.presentation.common.view.edition.PickImageActivity
 import com.abidria.presentation.common.view.edition.EditTitleAndDescriptionActivity
-import com.abidria.presentation.common.view.edition.SelectLocationActivity
-import com.abidria.presentation.common.view.edition.SelectLocationPresenter
+import com.abidria.presentation.common.view.edition.PickImageActivity
 import com.yalantis.ucrop.UCrop
-import kotlinx.android.synthetic.main.activity_create_scene.*
+import kotlinx.android.synthetic.main.activity_create_experience.*
 import javax.inject.Inject
 
 
-class EditSceneActivity : AppCompatActivity(), EditSceneView {
+class EditExperienceActivity : AppCompatActivity(), EditExperienceView {
 
     val EDIT_TITLE_AND_DESCRIPTION = 1
-    val SELECT_LOCATION = 2
-    val PICK_IMAGE = 3
+    val PICK_IMAGE = 2
     val CROP_IMAGE = UCrop.REQUEST_CROP
 
     @Inject
-    lateinit var presenter: EditScenePresenter
+    lateinit var presenter: EditExperiencePresenter
 
     val registry: LifecycleRegistry = LifecycleRegistry(this)
 
     companion object {
         private val EXPERIENCE_ID = "experience_id"
-        private val SCENE_ID = "scene_id"
 
-        fun newIntent(context: Context, experienceId: String, sceneId: String): Intent {
-            val intent = Intent(context, EditSceneActivity::class.java)
+        fun newIntent(context: Context, experienceId: String): Intent {
+            val intent = Intent(context, EditExperienceActivity::class.java)
             intent.putExtra(EXPERIENCE_ID, experienceId)
-            intent.putExtra(SCENE_ID, sceneId)
             return intent
         }
     }
 
-    @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_create_scene)
+        setContentView(R.layout.activity_create_experience)
         setSupportActionBar(toolbar)
 
         AbidriaApplication.injector.inject(this)
-        presenter.setView(this, intent.getStringExtra(EXPERIENCE_ID), intent.getStringExtra(SCENE_ID))
+        presenter.setView(this, intent.getStringExtra(EXPERIENCE_ID))
         registry.addObserver(presenter)
     }
 
@@ -63,11 +56,6 @@ class EditSceneActivity : AppCompatActivity(), EditSceneView {
                     description = data.extras.getString(EditTitleAndDescriptionActivity.DESCRIPTION))
         else if (requestCode == EDIT_TITLE_AND_DESCRIPTION && resultCode == Activity.RESULT_CANCELED)
             presenter.onEditTitleAndDescriptionCanceled()
-        else if (requestCode == SELECT_LOCATION && resultCode == Activity.RESULT_OK)
-            presenter.onLocationSelected(latitude = data!!.extras.getDouble(SelectLocationActivity.LATITUDE),
-                                         longitude = data.extras.getDouble(SelectLocationActivity.LONGITUDE))
-        else if (requestCode == SELECT_LOCATION && resultCode == Activity.RESULT_CANCELED)
-            presenter.onSelectLocationCanceled()
         else if (requestCode == PICK_IMAGE && resultCode == Activity.RESULT_OK)
             presenter.onImagePicked(PickImageActivity.getPickedImageUriStringFromResultData(data!!))
         else if (requestCode == PICK_IMAGE && resultCode == Activity.RESULT_CANCELED)
@@ -84,13 +72,6 @@ class EditSceneActivity : AppCompatActivity(), EditSceneView {
                 EDIT_TITLE_AND_DESCRIPTION)
     }
 
-    override fun navigateToSelectLocation(latitude: Double, longitude: Double,
-                                          locationType: SelectLocationPresenter.LocationType) {
-        startActivityForResult(
-                SelectLocationActivity.newIntent(this, initialLatitude = latitude, initialLongitude = longitude,
-                                                 initialType = locationType), SELECT_LOCATION)
-    }
-
     override fun navigateToPickImage() {
         PickImageActivity.startActivityForResult(this, PICK_IMAGE)
     }
@@ -104,8 +85,8 @@ class EditSceneActivity : AppCompatActivity(), EditSceneView {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
             builder = AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
         else builder = AlertDialog.Builder(this)
-        builder.setTitle(R.string.dialog_title_scene_edited)
-                .setMessage(R.string.dialog_question_edit_scene_picture)
+        builder.setTitle(R.string.dialog_title_experience_edited)
+                .setMessage(R.string.dialog_question_edit_experience_picture)
                 .setPositiveButton(android.R.string.yes,
                         { dialog, which -> presenter.onAskUserEditPictureResponse(userWantsToEditPicture = true) })
                 .setNegativeButton(android.R.string.no,

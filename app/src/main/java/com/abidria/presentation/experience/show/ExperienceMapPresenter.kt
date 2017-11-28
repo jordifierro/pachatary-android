@@ -71,4 +71,8 @@ class ExperienceMapPresenter @Inject constructor(private val repository: SceneRe
         experienceDisposable?.dispose()
         scenesDisposable?.dispose()
     }
+
+    fun onEditExperienceClick() {
+        view.navigateToEditExperience(experienceId)
+    }
 }

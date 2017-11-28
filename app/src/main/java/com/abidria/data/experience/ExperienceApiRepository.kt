@@ -31,6 +31,10 @@ class ExperienceApiRepository (retrofit: Retrofit, @Named("io") val scheduler: S
             experienceApi.createExperience(title = experience.title, description = experience.description)
                     .compose(ParseNetworkResultTransformer({ it.toDomain() }))
 
+    fun editExperience(experience: Experience): Flowable<Result<Experience>> =
+            experienceApi.editExperience(experience.id, experience.title, experience.description)
+                    .compose(ParseNetworkResultTransformer({ it.toDomain() }))
+
     fun uploadExperiencePicture(experienceId: String, croppedImageUriString: String,
                                 delegate: (resultExperience: Result<Experience>) -> Unit) {
         try {

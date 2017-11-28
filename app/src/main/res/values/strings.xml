@@ -5,6 +5,7 @@
     <string name="title_activity_experience_map">Map</string>
     <string name="title_activity_scene_detail" />
     <string name="title_activity_create_scene">Create scene</string>
+    <string name="fab_title_add_scene">Add new scene</string>
     <string name="title_activity_create_experience">Create experience</string>
 
     <string name="retry">Retry</string>
@@ -19,5 +20,9 @@
 
     <string name="title_activity_edit_scene">Edit scene</string>
     <string name="dialog_title_scene_edited">Scene changes saved</string>
-    <string name="dialog_question_edit_picture">Do you also want to change scene picture?</string>
+    <string name="dialog_question_edit_scene_picture">Do you also want to change scene picture?</string>
+
+    <string name="title_activity_edit_experience">Edit experience</string>
+    <string name="dialog_title_experience_edited">Experience changes saved</string>
+    <string name="dialog_question_edit_experience_picture">Do you also want to change experience picture?</string>
 </resources>

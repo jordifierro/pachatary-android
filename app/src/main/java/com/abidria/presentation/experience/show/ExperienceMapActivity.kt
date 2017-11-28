@@ -4,7 +4,6 @@ import android.arch.lifecycle.LifecycleRegistry
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.ProgressBar
@@ -12,8 +11,10 @@ import com.abidria.BuildConfig
 import com.abidria.R
 import com.abidria.data.scene.Scene
 import com.abidria.presentation.common.AbidriaApplication
+import com.abidria.presentation.experience.edition.EditExperienceActivity
 import com.abidria.presentation.scene.edition.CreateSceneActivity
 import com.abidria.presentation.scene.show.SceneDetailActivity
+import com.getbase.floatingactionbutton.FloatingActionButton
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
@@ -38,6 +39,7 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView {
     lateinit var mapboxMap: MapboxMap
     lateinit var progressBar: ProgressBar
     lateinit var createSceneButton: FloatingActionButton
+    lateinit var editExperienceButton: FloatingActionButton
 
     val mapLoadedReplaySubject: ReplaySubject<Any> = ReplaySubject.create()
 
@@ -66,6 +68,8 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView {
         mapView.onCreate(savedInstanceState)
         createSceneButton = findViewById<FloatingActionButton>(R.id.create_new_scene_button)
         createSceneButton.setOnClickListener { presenter.onCreateSceneClick() }
+        editExperienceButton = findViewById<FloatingActionButton>(R.id.edit_experience_button)
+        editExperienceButton.setOnClickListener { presenter.onEditExperienceClick() }
 
         AbidriaApplication.injector.inject(this)
         presenter.setView(this, intent.getStringExtra(EXPERIENCE_ID))
@@ -119,6 +123,10 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView {
 
     override fun navigateToScene(experienceId: String, sceneId: String) {
         startActivity(SceneDetailActivity.newIntent(context = this, experienceId = experienceId, sceneId = sceneId))
+    }
+
+    override fun navigateToEditExperience(experienceId: String) {
+        startActivity(EditExperienceActivity.newIntent(context = this, experienceId = experienceId))
     }
 
     override fun navigateToCreateScene(experienceId: String) {

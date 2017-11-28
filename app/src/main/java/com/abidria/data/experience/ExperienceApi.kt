@@ -2,10 +2,7 @@ package com.abidria.data.experience
 
 import io.reactivex.Flowable
 import retrofit2.adapter.rxjava2.Result
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
-import retrofit2.http.GET
-import retrofit2.http.POST
+import retrofit2.http.*
 
 interface ExperienceApi {
 
@@ -16,4 +13,10 @@ interface ExperienceApi {
     @POST("/experiences/")
     fun createExperience(@Field("title") title: String,
                          @Field("description") description: String) : Flowable<Result<ExperienceMapper>>
+
+    @FormUrlEncoded
+    @PATCH("/experiences/{id}")
+    fun editExperience(@Path("id") id: String,
+                       @Field("title") title: String,
+                       @Field("description") description: String): Flowable<Result<ExperienceMapper>>
 }

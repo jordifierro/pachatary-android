@@ -28,6 +28,10 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
         return apiRepository.createExperience(experience).doOnNext(emitThroughAddOrUpdate)
     }
 
+    fun editExperience(experience: Experience): Flowable<Result<Experience>> {
+        return apiRepository.editExperience(experience).doOnNext(emitThroughAddOrUpdate)
+    }
+
     fun uploadExperiencePicture(experienceId: String, croppedImageUriString: String) {
         apiRepository.uploadExperiencePicture(experienceId, croppedImageUriString, emitThroughAddOrUpdate)
     }
