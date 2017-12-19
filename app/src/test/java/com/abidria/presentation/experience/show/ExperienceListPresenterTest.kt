@@ -1,5 +1,7 @@
 package com.abidria.presentation.experience.show
 
+import com.abidria.data.auth.AuthRepository
+import com.abidria.data.auth.AuthToken
 import com.abidria.data.common.Result
 import com.abidria.data.experience.Experience
 import com.abidria.data.experience.ExperienceRepository
@@ -24,21 +26,42 @@ class ExperienceListPresenterTest {
     lateinit var presenter: ExperienceListPresenter
     @Mock lateinit var mockView: ExperienceListView
     @Mock lateinit var mockRepository: ExperienceRepository
+    @Mock lateinit var mockAuthRepository: AuthRepository
 
     @Before
     fun setUp() {
         MockitoAnnotations.initMocks(this)
         val testSchedulerProvider = SchedulerProvider(Schedulers.trampoline(), Schedulers.trampoline())
-        presenter = ExperienceListPresenter(mockRepository, testSchedulerProvider)
+        presenter = ExperienceListPresenter(mockRepository, mockAuthRepository, testSchedulerProvider)
         presenter.view = mockView
     }
 
     @Test
-    fun testCreateAsksExperiencesAndShowsOnView() {
+    fun testCreateAsksExperiencesAndShowsOnViewIfNotHasCredentials() {
+        given(mockAuthRepository.hasPersonCredentials()).willReturn(false)
+        given(mockAuthRepository.getPersonInvitation()).willReturn(
+                Flowable.just(Result(AuthToken("A", "R"), null)))
         val experienceA = Experience(id = "1", title = "A", description = "", picture = null)
         val experienceB = Experience(id = "2", title = "B", description = "", picture = null)
         given(mockRepository.experiencesFlowable())
                 .willReturn(Flowable.just(Result<List<Experience>>(arrayListOf(experienceA, experienceB), null)))
+
+        presenter.create()
+
+        then(mockAuthRepository).should().hasPersonCredentials()
+        then(mockAuthRepository).should().getPersonInvitation()
+        then(mockView).should().showLoader()
+        then(mockView).should().showExperienceList(arrayListOf(experienceA, experienceB))
+        then(mockView).should().hideLoader()
+    }
+
+    @Test
+    fun testCreateAsksExperiencesAndShowsOnViewIfAlreadyHasCredentials() {
+        val experienceA = Experience(id = "1", title = "A", description = "", picture = null)
+        val experienceB = Experience(id = "2", title = "B", description = "", picture = null)
+        given(mockRepository.experiencesFlowable())
+                .willReturn(Flowable.just(Result<List<Experience>>(arrayListOf(experienceA, experienceB), null)))
+        given(mockAuthRepository.hasPersonCredentials()).willReturn(true)
 
         presenter.create()
 
@@ -51,6 +74,7 @@ class ExperienceListPresenterTest {
     fun testCreateWhenResponseErrorShowsRetry() {
         given(mockRepository.experiencesFlowable())
                 .willReturn(Flowable.just(Result<List<Experience>>(null, Exception())))
+        given(mockAuthRepository.hasPersonCredentials()).willReturn(true)
 
         presenter.create()
 
@@ -91,6 +115,7 @@ class ExperienceListPresenterTest {
 
         given(mockRepository.experiencesFlowable())
                 .willReturn(testObservable.toFlowable(BackpressureStrategy.LATEST))
+        given(mockAuthRepository.hasPersonCredentials()).willReturn(true)
 
         presenter.create()
 

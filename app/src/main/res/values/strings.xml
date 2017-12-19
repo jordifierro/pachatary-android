@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">Abidria</string>
 
+    <string name="auth_sharedpreferences_file">auth_prefs</string>
+    <string name="auth_access_token_key">auth_access_token</string>
+    <string name="auth_refresh_token_key">auth_refresh_token</string>
+
     <string name="title_activity_experiences_list">Experiences</string>
     <string name="title_activity_experience_map">Map</string>
     <string name="title_activity_scene_detail" />

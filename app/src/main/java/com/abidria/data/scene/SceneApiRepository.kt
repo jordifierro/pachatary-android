@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import com.abidria.BuildConfig
+import com.abidria.data.auth.AuthHttpInterceptor
 import com.abidria.data.common.ParseNetworkResultTransformer
 import com.abidria.data.common.Result
 import com.abidria.data.picture.Picture
@@ -17,7 +18,8 @@ import retrofit2.Retrofit
 import javax.inject.Named
 
 
-class SceneApiRepository(retrofit: Retrofit, @Named("io") val scheduler: Scheduler, val context: Context) {
+class SceneApiRepository(retrofit: Retrofit, @Named("io") val scheduler: Scheduler,
+                         val context: Context, val authHttpInterceptor: AuthHttpInterceptor) {
 
     private val sceneApi: SceneApi = retrofit.create(SceneApi::class.java)
 
@@ -41,11 +43,13 @@ class SceneApiRepository(retrofit: Retrofit, @Named("io") val scheduler: Schedul
     fun uploadScenePicture(sceneId: String, croppedImageUriString: String,
                            delegate: (resultScene: Result<Scene>) -> Unit) {
         try {
+            val authHeader = authHttpInterceptor.getAuthHeader()
             val uploadId = MultipartUploadRequest(context,
                     BuildConfig.API_URL + "/scenes/" + sceneId + "/picture/")
                     .addFileToUpload(Uri.parse(croppedImageUriString).path, "picture")
                     .setNotificationConfig(UploadNotificationConfig())
                     .setMaxRetries(2)
+                    .addHeader(authHeader.key, authHeader.value)
                     .setDelegate(object : UploadStatusDelegate {
                         override fun onProgress(context: Context, uploadInfo: UploadInfo) {}
                         override fun onError(context: Context, uploadInfo: UploadInfo, serverResponse: ServerResponse,

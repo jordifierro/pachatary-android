@@ -28,10 +28,12 @@ android {
         debug {
             buildConfigField 'String', 'API_URL', '"' + appProperties['devApiUrl'] + '"'
             buildConfigField 'String', 'MAPBOX_ACCESS_TOKEN', '"' + appProperties['devMapboxAccessToken'] + '"'
+            buildConfigField 'String', 'CLIENT_SECRET_KEY', '"' + appProperties['devClientSecretKey'] + '"'
         }
         release {
             buildConfigField 'String', 'API_URL', '"' + appProperties['apiUrl'] + '"'
             buildConfigField 'String', 'MAPBOX_ACCESS_TOKEN', '"' + appProperties['mapboxAccessToken'] + '"'
+            buildConfigField 'String', 'CLIENT_SECRET_KEY', '"' + appProperties['clientSecretKey'] + '"'
 
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'

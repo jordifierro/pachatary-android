@@ -1,5 +1,7 @@
 devApiUrl=
 devMapboxAccessToken=
+devClientSecretKey=
 
 apiUrl=
 mapboxAccessToken=
+clientSecretKey=

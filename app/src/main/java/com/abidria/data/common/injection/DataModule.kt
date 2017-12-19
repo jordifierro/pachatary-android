@@ -2,6 +2,10 @@ package com.abidria.data.common.injection
 
 import android.content.Context
 import com.abidria.BuildConfig
+import com.abidria.data.auth.AuthApiRepository
+import com.abidria.data.auth.AuthHttpInterceptor
+import com.abidria.data.auth.AuthRepository
+import com.abidria.data.auth.AuthStorageRepository
 import com.abidria.data.common.ResultStreamFactory
 import com.abidria.data.experience.Experience
 import com.abidria.data.experience.ExperienceApiRepository
@@ -28,8 +32,14 @@ class DataModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient = OkHttpClient.Builder()
+    fun provideAuthHttpInterceptor(authStorageRepository: AuthStorageRepository) =
+            AuthHttpInterceptor(authStorageRepository)
+
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(authHttpInterceptor: AuthHttpInterceptor): OkHttpClient = OkHttpClient.Builder()
                                                           .addNetworkInterceptor(StethoInterceptor())
+                                                          .addInterceptor(authHttpInterceptor)
                                                           .build()
 
     @Provides
@@ -49,9 +59,9 @@ class DataModule {
 
     @Provides
     @Singleton
-    fun provideExperienceApiRepository(retrofit: Retrofit, @Named("io") scheduler: Scheduler,
-                                       context: Context): ExperienceApiRepository =
-            ExperienceApiRepository(retrofit, scheduler, context)
+    fun provideExperienceApiRepository(retrofit: Retrofit, @Named("io") scheduler: Scheduler, context: Context,
+                                       authHttpInterceptor: AuthHttpInterceptor): ExperienceApiRepository =
+            ExperienceApiRepository(retrofit, scheduler, context, authHttpInterceptor)
 
     @Provides
     @Singleton
@@ -66,8 +76,8 @@ class DataModule {
     @Provides
     @Singleton
     fun provideSceneApiRepository(retrofit: Retrofit, @Named("io") scheduler: Scheduler,
-                                  context: Context): SceneApiRepository =
-            SceneApiRepository(retrofit, scheduler, context)
+                                  context: Context, authHttpInterceptor: AuthHttpInterceptor): SceneApiRepository =
+            SceneApiRepository(retrofit, scheduler, context, authHttpInterceptor)
 
     @Provides
     @Singleton
@@ -78,4 +88,18 @@ class DataModule {
     fun provideSceneRepository(apiRepository: SceneApiRepository,
                                sceneStreamFactory: ResultStreamFactory<Scene>): SceneRepository =
             SceneRepository(apiRepository, sceneStreamFactory)
+
+    @Provides
+    @Singleton
+    fun provideAuthStorageRepository(context: Context) = AuthStorageRepository(context)
+
+    @Provides
+    @Singleton
+    fun provideAuthApiRepository(retrofit: Retrofit) = AuthApiRepository(retrofit, BuildConfig.CLIENT_SECRET_KEY)
+
+    @Provides
+    @Singleton
+    fun provideAuthRepository(authStorageRepository: AuthStorageRepository,
+                              authApiRepository: AuthApiRepository) =
+            AuthRepository(authStorageRepository, authApiRepository)
 }

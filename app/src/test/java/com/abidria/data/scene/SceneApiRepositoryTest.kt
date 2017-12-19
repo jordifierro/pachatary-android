@@ -1,6 +1,7 @@
 package com.abidria.data.scene
 
 import android.content.Context
+import com.abidria.data.auth.AuthHttpInterceptor
 import com.abidria.data.common.Result
 import com.abidria.data.experience.ExperienceApiRepositoryTest
 import com.google.gson.FieldNamingPolicy
@@ -19,7 +20,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class SceneApiRepositoryTest {
 
-    val mockContext: Context = mock(Context::class.java)
+    val mockContext = mock(Context::class.java)
+    val mockAuthHttpInterceptor = mock(AuthHttpInterceptor::class.java)
     val mockWebServer = MockWebServer()
     var repository = SceneApiRepository(Retrofit.Builder()
             .baseUrl(mockWebServer.url("/"))
@@ -29,7 +31,7 @@ class SceneApiRepositoryTest {
                             .create()))
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .build(),
-            Schedulers.trampoline(), mockContext)
+            Schedulers.trampoline(), mockContext, mockAuthHttpInterceptor)
 
     @Test
     fun testGetScenesRequest() {
