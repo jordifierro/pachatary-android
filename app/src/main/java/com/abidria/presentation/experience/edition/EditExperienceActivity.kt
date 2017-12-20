@@ -88,9 +88,9 @@ class EditExperienceActivity : AppCompatActivity(), EditExperienceView {
         builder.setTitle(R.string.dialog_title_experience_edited)
                 .setMessage(R.string.dialog_question_edit_experience_picture)
                 .setPositiveButton(android.R.string.yes,
-                        { dialog, which -> presenter.onAskUserEditPictureResponse(userWantsToEditPicture = true) })
+                        { _, _ -> presenter.onAskUserEditPictureResponse(userWantsToEditPicture = true) })
                 .setNegativeButton(android.R.string.no,
-                        { dialog, which -> presenter.onAskUserEditPictureResponse(userWantsToEditPicture = false) })
+                        { _, _ -> presenter.onAskUserEditPictureResponse(userWantsToEditPicture = false) })
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show()
     }
