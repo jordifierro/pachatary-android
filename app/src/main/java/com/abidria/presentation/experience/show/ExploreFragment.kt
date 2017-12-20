@@ -1,9 +1,10 @@
 package com.abidria.presentation.experience.show
 
+import android.arch.lifecycle.Lifecycle
+import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.LifecycleRegistry
 import android.os.Bundle
-import android.support.design.widget.FloatingActionButton
-import android.support.v7.app.AppCompatActivity
+import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -17,37 +18,40 @@ import com.abidria.data.experience.Experience
 import com.abidria.presentation.common.AbidriaApplication
 import com.abidria.presentation.experience.edition.CreateExperienceActivity
 import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.activity_experiences_list.*
 import javax.inject.Inject
 
-class ExperienceListActivity : AppCompatActivity(), ExperienceListView {
+class ExploreFragment : Fragment(), ExploreView, LifecycleOwner {
+
+    companion object {
+        fun newInstance(): ExploreFragment {
+            val experiencesMineFragment = ExploreFragment()
+            return experiencesMineFragment
+        }
+    }
 
     @Inject
-    lateinit var presenter: ExperienceListPresenter
+    lateinit var presenter: ExplorePresenter
 
     lateinit var recyclerView: RecyclerView
     lateinit var progressBar: ProgressBar
     lateinit var retryIcon: ImageView
-    lateinit var createExperienceButton: FloatingActionButton
 
     val registry: LifecycleRegistry = LifecycleRegistry(this)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_experiences_list)
-        setSupportActionBar(toolbar)
+    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
+        val view = inflater!!.inflate(R.layout.fragment_explore, container, false)
 
-        progressBar = findViewById<ProgressBar>(R.id.experiences_progressbar)
-        retryIcon = findViewById<ImageView>(R.id.experiences_retry)
+        progressBar = view.findViewById<ProgressBar>(R.id.experiences_progressbar)
+        retryIcon = view.findViewById<ImageView>(R.id.experiences_retry)
         retryIcon.setOnClickListener { presenter.onRetryClick() }
-        recyclerView = findViewById<RecyclerView>(R.id.experiences_recyclerview)
-        recyclerView.layoutManager = GridLayoutManager(this, 2)
-        createExperienceButton = findViewById<FloatingActionButton>(R.id.create_new_experience_button)
-        createExperienceButton.setOnClickListener { presenter.onCreateExperienceClick() }
+        recyclerView = view.findViewById<RecyclerView>(R.id.experiences_recyclerview)
+        recyclerView.layoutManager = GridLayoutManager(activity, 2)
 
         AbidriaApplication.injector.inject(this)
         presenter.view = this
         registry.addObserver(presenter)
+        return view
     }
 
     override fun showLoader() {
@@ -72,11 +76,11 @@ class ExperienceListActivity : AppCompatActivity(), ExperienceListView {
     }
 
     override fun navigateToExperience(experienceId: String) {
-        startActivity(ExperienceMapActivity.newIntent(this, experienceId))
+        startActivity(ExperienceMapActivity.newIntent(activity, experienceId))
     }
 
     override fun navigateToCreateExperience() {
-        startActivity(CreateExperienceActivity.newIntent(context = this))
+        startActivity(CreateExperienceActivity.newIntent(context = activity))
     }
 
     override fun getLifecycle(): LifecycleRegistry = registry
@@ -91,12 +95,13 @@ class ExperienceListActivity : AppCompatActivity(), ExperienceListView {
         override fun getItemCount(): Int = experienceList.size
 
         override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ExperienceViewHolder {
-            return ExperienceViewHolder(inflater.inflate(R.layout.experiences_list_item, parent, false), onClick)
+            return ExperienceViewHolder(inflater.inflate(R.layout.experiences_list_item,
+                                        parent, false), onClick)
         }
     }
 
     class ExperienceViewHolder(view: View, val onClick: (String) -> Unit)
-                                                                : RecyclerView.ViewHolder(view), View.OnClickListener {
+        : RecyclerView.ViewHolder(view), View.OnClickListener {
 
         private val titleView: TextView
         private val pictureView: ImageView
@@ -112,10 +117,40 @@ class ExperienceListActivity : AppCompatActivity(), ExperienceListView {
             this.experienceId = experience.id
             titleView.text = experience.title
             Picasso.with(pictureView.context)
-                   .load(experience.picture?.smallUrl)
-                   .into(pictureView)
+                    .load(experience.picture?.smallUrl)
+                    .into(pictureView)
         }
 
         override fun onClick(view: View?) = this.onClick(this.experienceId)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        registry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        registry.handleLifecycleEvent(Lifecycle.Event.ON_START)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        registry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    }
+
+    override fun onPause() {
+        registry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+        super.onPause()
+    }
+
+    override fun onStop() {
+        registry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+        super.onStop()
+    }
+
+    override fun onDestroy() {
+        registry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+        super.onDestroy()
     }
 }

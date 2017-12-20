@@ -6,8 +6,6 @@ import com.abidria.data.common.Result
 import com.abidria.data.experience.Experience
 import com.abidria.data.experience.ExperienceRepository
 import com.abidria.presentation.common.injection.scheduler.SchedulerProvider
-import com.abidria.presentation.experience.show.ExperienceListPresenter
-import com.abidria.presentation.experience.show.ExperienceListView
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
@@ -21,10 +19,10 @@ import org.mockito.BDDMockito.then
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 
-class ExperienceListPresenterTest {
+class ExplorePresenterTest {
 
-    lateinit var presenter: ExperienceListPresenter
-    @Mock lateinit var mockView: ExperienceListView
+    lateinit var presenter: ExplorePresenter
+    @Mock lateinit var mockView: ExploreView
     @Mock lateinit var mockRepository: ExperienceRepository
     @Mock lateinit var mockAuthRepository: AuthRepository
 
@@ -32,7 +30,7 @@ class ExperienceListPresenterTest {
     fun setUp() {
         MockitoAnnotations.initMocks(this)
         val testSchedulerProvider = SchedulerProvider(Schedulers.trampoline(), Schedulers.trampoline())
-        presenter = ExperienceListPresenter(mockRepository, mockAuthRepository, testSchedulerProvider)
+        presenter = ExplorePresenter(mockRepository, mockAuthRepository, testSchedulerProvider)
         presenter.view = mockView
     }
 

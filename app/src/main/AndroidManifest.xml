@@ -27,10 +27,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".presentation.experience.show.ExperienceListActivity"
-            android:label="@string/title_activity_experiences_list"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
             android:name=".presentation.experience.show.ExperienceMapActivity"
             android:label="@string/title_activity_experience_map"
             android:theme="@style/AppTheme.NoActionBar" />

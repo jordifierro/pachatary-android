@@ -9,12 +9,12 @@ import com.abidria.presentation.common.injection.scheduler.SchedulerProvider
 import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
-class ExperienceListPresenter @Inject constructor(private val repository: ExperienceRepository,
-                                                  private val authRepository: AuthRepository,
-                                                  private val schedulerProvider: SchedulerProvider)
+class ExplorePresenter @Inject constructor(private val repository: ExperienceRepository,
+                                           private val authRepository: AuthRepository,
+                                           private val schedulerProvider: SchedulerProvider)
                                                                                                 : LifecycleObserver {
 
-    lateinit var view: ExperienceListView
+    lateinit var view: ExploreView
 
     private var experiencesDisposable: Disposable? = null
 

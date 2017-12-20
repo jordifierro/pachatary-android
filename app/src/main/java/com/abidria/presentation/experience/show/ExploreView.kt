@@ -3,7 +3,7 @@ package com.abidria.presentation.experience.show
 import com.abidria.data.experience.Experience
 import com.abidria.presentation.common.view.LoaderView
 
-interface ExperienceListView : LoaderView {
+interface ExploreView : LoaderView {
 
     fun showRetry()
     fun hideRetry()
