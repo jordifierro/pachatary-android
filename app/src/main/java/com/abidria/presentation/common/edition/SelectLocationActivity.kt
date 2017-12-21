@@ -1,4 +1,4 @@
-package com.abidria.presentation.common.view.edition
+package com.abidria.presentation.common.edition
 
 import android.app.Activity
 import android.arch.lifecycle.LifecycleRegistry
@@ -11,7 +11,7 @@ import android.widget.Button
 import com.abidria.BuildConfig
 import com.abidria.R
 import com.abidria.presentation.common.AbidriaApplication
-import com.abidria.presentation.common.view.edition.SelectLocationPresenter.LocationType
+import com.abidria.presentation.common.edition.SelectLocationPresenter.LocationType
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng

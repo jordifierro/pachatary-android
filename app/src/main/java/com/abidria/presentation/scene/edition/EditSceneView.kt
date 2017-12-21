@@ -1,6 +1,6 @@
 package com.abidria.presentation.scene.edition
 
-import com.abidria.presentation.common.view.edition.SelectLocationPresenter
+import com.abidria.presentation.common.edition.SelectLocationPresenter
 
 interface EditSceneView {
     fun navigateToEditTitleAndDescription(initialTitle: String = "", initialDescription: String = "")

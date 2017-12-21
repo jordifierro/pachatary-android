@@ -8,9 +8,9 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.abidria.R
 import com.abidria.presentation.common.AbidriaApplication
-import com.abidria.presentation.common.view.edition.CropImageActivity
-import com.abidria.presentation.common.view.edition.PickImageActivity
-import com.abidria.presentation.common.view.edition.EditTitleAndDescriptionActivity
+import com.abidria.presentation.common.edition.CropImageActivity
+import com.abidria.presentation.common.edition.PickImageActivity
+import com.abidria.presentation.common.edition.EditTitleAndDescriptionActivity
 import com.yalantis.ucrop.UCrop
 import kotlinx.android.synthetic.main.activity_create_experience.*
 import javax.inject.Inject

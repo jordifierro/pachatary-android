@@ -5,8 +5,8 @@ import com.abidria.presentation.experience.show.ExperienceMapActivity
 import com.abidria.presentation.experience.edition.CreateExperienceActivity
 import com.abidria.presentation.scene.edition.CreateSceneActivity
 import com.abidria.presentation.scene.edition.EditSceneActivity
-import com.abidria.presentation.common.view.edition.EditTitleAndDescriptionActivity
-import com.abidria.presentation.common.view.edition.SelectLocationActivity
+import com.abidria.presentation.common.edition.EditTitleAndDescriptionActivity
+import com.abidria.presentation.common.edition.SelectLocationActivity
 import com.abidria.presentation.experience.edition.EditExperienceActivity
 import com.abidria.presentation.experience.show.ExploreFragment
 import com.abidria.presentation.scene.show.SceneDetailActivity

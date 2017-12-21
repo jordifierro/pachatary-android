@@ -6,7 +6,6 @@ import android.arch.lifecycle.OnLifecycleEvent
 import com.abidria.data.experience.Experience
 import com.abidria.data.experience.ExperienceRepository
 import com.abidria.presentation.common.injection.scheduler.SchedulerProvider
-import com.abidria.presentation.common.view.edition.SelectLocationPresenter
 import javax.inject.Inject
 
 class EditExperiencePresenter @Inject constructor(private val experienceRepository: ExperienceRepository,

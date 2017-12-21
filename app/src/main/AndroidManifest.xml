@@ -39,11 +39,11 @@
             android:label="@string/title_activity_create_scene"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".presentation.common.view.edition.EditTitleAndDescriptionActivity"
+            android:name="com.abidria.presentation.common.edition.EditTitleAndDescriptionActivity"
             android:label="@string/title_activity_edit_title_and_description"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".presentation.common.view.edition.SelectLocationActivity"
+            android:name="com.abidria.presentation.common.edition.SelectLocationActivity"
             android:label="@string/title_activity_select_location"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity

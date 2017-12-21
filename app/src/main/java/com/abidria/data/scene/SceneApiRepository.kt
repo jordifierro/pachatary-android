@@ -44,7 +44,7 @@ class SceneApiRepository(retrofit: Retrofit, @Named("io") val scheduler: Schedul
                            delegate: (resultScene: Result<Scene>) -> Unit) {
         try {
             val authHeader = authHttpInterceptor.getAuthHeader()
-            val uploadId = MultipartUploadRequest(context,
+            MultipartUploadRequest(context,
                     BuildConfig.API_URL + "/scenes/" + sceneId + "/picture/")
                     .addFileToUpload(Uri.parse(croppedImageUriString).path, "picture")
                     .setNotificationConfig(UploadNotificationConfig())

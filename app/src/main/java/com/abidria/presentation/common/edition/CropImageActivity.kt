@@ -1,4 +1,4 @@
-package com.abidria.presentation.common.view.edition
+package com.abidria.presentation.common.edition
 
 import android.app.Activity
 import android.content.Intent
@@ -23,6 +23,6 @@ class CropImageActivity {
                     .start(activity)
         }
 
-        fun getCroppedImageUriStringFromResultData(data: Intent) = UCrop.getOutput(data!!).toString()
+        fun getCroppedImageUriStringFromResultData(data: Intent) = UCrop.getOutput(data).toString()
     }
 }

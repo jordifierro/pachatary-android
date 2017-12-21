@@ -41,7 +41,7 @@ class ExperienceApiRepository (retrofit: Retrofit, @Named("io") val scheduler: S
                                 delegate: (resultExperience: Result<Experience>) -> Unit) {
         try {
             val authHeader = authHttpInterceptor.getAuthHeader()
-            val uploadId = MultipartUploadRequest(context,
+            MultipartUploadRequest(context,
                     BuildConfig.API_URL + "/experiences/" + experienceId + "/picture/")
                     .addFileToUpload(Uri.parse(croppedImageUriString).path, "picture")
                     .setNotificationConfig(UploadNotificationConfig())

@@ -6,7 +6,7 @@ import android.arch.lifecycle.OnLifecycleEvent
 import com.abidria.data.scene.Scene
 import com.abidria.data.scene.SceneRepository
 import com.abidria.presentation.common.injection.scheduler.SchedulerProvider
-import com.abidria.presentation.common.view.edition.SelectLocationPresenter
+import com.abidria.presentation.common.edition.SelectLocationPresenter
 import javax.inject.Inject
 
 class CreateScenePresenter @Inject constructor(private val sceneRepository: SceneRepository,

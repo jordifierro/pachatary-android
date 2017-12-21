@@ -1,10 +1,7 @@
 package com.abidria.presentation.experience.show
 
-import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleOwner
-import android.arch.lifecycle.LifecycleRegistry
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -16,11 +13,12 @@ import android.widget.TextView
 import com.abidria.R
 import com.abidria.data.experience.Experience
 import com.abidria.presentation.common.AbidriaApplication
+import com.abidria.presentation.common.LifecycleFragment
 import com.abidria.presentation.experience.edition.CreateExperienceActivity
 import com.squareup.picasso.Picasso
 import javax.inject.Inject
 
-class ExploreFragment : Fragment(), ExploreView, LifecycleOwner {
+class ExploreFragment : LifecycleFragment(), ExploreView, LifecycleOwner {
 
     companion object {
         fun newInstance(): ExploreFragment {
@@ -36,8 +34,6 @@ class ExploreFragment : Fragment(), ExploreView, LifecycleOwner {
     lateinit var progressBar: ProgressBar
     lateinit var retryIcon: ImageView
 
-    val registry: LifecycleRegistry = LifecycleRegistry(this)
-
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val view = inflater!!.inflate(R.layout.fragment_explore, container, false)
@@ -50,7 +46,7 @@ class ExploreFragment : Fragment(), ExploreView, LifecycleOwner {
 
         AbidriaApplication.injector.inject(this)
         presenter.view = this
-        registry.addObserver(presenter)
+        lifecycle.addObserver(presenter)
         return view
     }
 
@@ -82,8 +78,6 @@ class ExploreFragment : Fragment(), ExploreView, LifecycleOwner {
     override fun navigateToCreateExperience() {
         startActivity(CreateExperienceActivity.newIntent(context = activity))
     }
-
-    override fun getLifecycle(): LifecycleRegistry = registry
 
     class ExperiencesListAdapter(val inflater: LayoutInflater, val experienceList: List<Experience>,
                                  val onClick: (String) -> Unit) : RecyclerView.Adapter<ExperienceViewHolder>() {
@@ -122,35 +116,5 @@ class ExploreFragment : Fragment(), ExploreView, LifecycleOwner {
         }
 
         override fun onClick(view: View?) = this.onClick(this.experienceId)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        registry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        registry.handleLifecycleEvent(Lifecycle.Event.ON_START)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        registry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    }
-
-    override fun onPause() {
-        registry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-        super.onPause()
-    }
-
-    override fun onStop() {
-        registry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
-        super.onStop()
-    }
-
-    override fun onDestroy() {
-        registry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-        super.onDestroy()
     }
 }

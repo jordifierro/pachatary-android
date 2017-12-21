@@ -1,4 +1,4 @@
-package com.abidria.presentation.common.view.edition
+package com.abidria.presentation.common.edition
 
 interface EditTitleAndDescriptionView {
     fun title(): String

@@ -4,7 +4,7 @@ import com.abidria.data.common.Result
 import com.abidria.data.scene.Scene
 import com.abidria.data.scene.SceneRepository
 import com.abidria.presentation.common.injection.scheduler.SchedulerProvider
-import com.abidria.presentation.common.view.edition.SelectLocationPresenter
+import com.abidria.presentation.common.edition.SelectLocationPresenter
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 import org.junit.Assert
