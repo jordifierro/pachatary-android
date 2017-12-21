@@ -9,5 +9,4 @@ interface ExploreView : LoaderView {
     fun hideRetry()
     fun showExperienceList(experienceList: List<Experience>)
     fun navigateToExperience(experienceId: String)
-    fun navigateToCreateExperience()
 }

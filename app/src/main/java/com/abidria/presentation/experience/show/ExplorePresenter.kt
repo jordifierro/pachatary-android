@@ -54,8 +54,4 @@ class ExplorePresenter @Inject constructor(private val repository: ExperienceRep
     fun destroy() {
         experiencesDisposable?.dispose()
     }
-
-    fun onCreateExperienceClick() {
-        view.navigateToCreateExperience()
-    }
 }

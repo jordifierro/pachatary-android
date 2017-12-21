@@ -99,14 +99,6 @@ class ExplorePresenterTest {
     }
 
     @Test
-    fun testCreateNewExperienceButtonClick() {
-
-        presenter.onCreateExperienceClick()
-
-        then(mockView).should().navigateToCreateExperience()
-    }
-
-    @Test
     fun testUnsubscribenOnDestroy() {
         val testObservable = PublishSubject.create<Result<List<Experience>>>()
         assertFalse(testObservable.hasObservers())

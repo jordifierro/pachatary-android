@@ -74,10 +74,6 @@ class ExploreFragment : LifecycleFragment(), ExploreView {
         startActivity(ExperienceMapActivity.newIntent(activity, experienceId))
     }
 
-    override fun navigateToCreateExperience() {
-        startActivity(CreateExperienceActivity.newIntent(context = activity))
-    }
-
     class ExperiencesListAdapter(val inflater: LayoutInflater, val experienceList: List<Experience>,
                                  val onClick: (String) -> Unit) : RecyclerView.Adapter<ExperienceViewHolder>() {
 
