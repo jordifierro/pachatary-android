@@ -1,5 +1,6 @@
 package com.abidria.presentation.experience.show
 
+import android.arch.lifecycle.LifecycleOwner
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -17,17 +18,17 @@ import com.abidria.presentation.experience.edition.CreateExperienceActivity
 import com.squareup.picasso.Picasso
 import javax.inject.Inject
 
-class ExploreFragment : LifecycleFragment(), ExploreView {
+class MyExperiencesFragment : LifecycleFragment(), MyExperiencesView {
 
     companion object {
-        fun newInstance(): ExploreFragment {
-            val experiencesMineFragment = ExploreFragment()
+        fun newInstance(): MyExperiencesFragment {
+            val experiencesMineFragment = MyExperiencesFragment()
             return experiencesMineFragment
         }
     }
 
     @Inject
-    lateinit var presenter: ExplorePresenter
+    lateinit var presenter: MyExperiencesPresenter
 
     lateinit var recyclerView: RecyclerView
     lateinit var progressBar: ProgressBar
@@ -35,7 +36,7 @@ class ExploreFragment : LifecycleFragment(), ExploreView {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val view = inflater!!.inflate(R.layout.fragment_explore, container, false)
+        val view = inflater!!.inflate(R.layout.fragment_my_experiences, container, false)
 
         progressBar = view.findViewById<ProgressBar>(R.id.experiences_progressbar)
         retryIcon = view.findViewById<ImageView>(R.id.experiences_retry)
