@@ -12,7 +12,7 @@ class SceneRepository(val apiRepository: SceneApiRepository, val streamFactory: 
         if (scenesStreamHashMap.get(experienceId) == null) {
             val streams = streamFactory.create()
             scenesStreamHashMap.put(experienceId, streams)
-            apiRepository.scenesRequestFlowable(experienceId).subscribe({ streams.addListObserver.onNext(it) })
+            apiRepository.scenesRequestFlowable(experienceId).subscribe({ streams.addOrUpdateObserver.onNext(it) })
         }
         return scenesStreamHashMap.get(experienceId)!!.resultFlowable
     }
@@ -33,5 +33,6 @@ class SceneRepository(val apiRepository: SceneApiRepository, val streamFactory: 
     }
 
     internal val emitThroughAddOrUpdate = { resultScene: Result<Scene> ->
-        scenesStreamHashMap.get(resultScene.data!!.experienceId)!!.addOrUpdateObserver.onNext(resultScene) }
+        scenesStreamHashMap.get(resultScene.data!!.experienceId)!!.addOrUpdateObserver.onNext(
+                Result(listOf(resultScene.data), null)) }
 }

@@ -28,7 +28,7 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
     fun refreshExperiences() {
         apiRepository.exploreExperiencesFlowable().subscribe {
             experiencesStream!!.removeAllThatObserver.onNext({ experience: Experience -> !experience.isMine })
-            experiencesStream!!.addListObserver.onNext(it) }
+            experiencesStream!!.addOrUpdateObserver.onNext(it) }
     }
 
     fun myExperiencesFlowable() : Flowable<Result<List<Experience>>> {
@@ -43,7 +43,7 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
     fun refreshMyExperiences() {
         apiRepository.myExperiencesFlowable().subscribe {
             experiencesStream!!.removeAllThatObserver.onNext({ experience: Experience -> experience.isMine })
-            experiencesStream!!.addListObserver.onNext(it) }
+            experiencesStream!!.addOrUpdateObserver.onNext(it) }
     }
 
     fun experienceFlowable(experienceId: String): Flowable<Result<Experience>> =
@@ -62,6 +62,7 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
         apiRepository.uploadExperiencePicture(experienceId, croppedImageUriString, emitThroughAddOrUpdate)
     }
 
-    internal val emitThroughAddOrUpdate = { resultExperience: Result<Experience> ->
-                                                    experiencesStream!!.addOrUpdateObserver.onNext(resultExperience) }
+    internal val emitThroughAddOrUpdate =
+            { resultExperience: Result<Experience> ->
+                experiencesStream!!.addOrUpdateObserver.onNext(Result(listOf(resultExperience.data!!), null)) }
 }

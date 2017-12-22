@@ -107,7 +107,7 @@ class ResultStreamFactoryTest {
         }
 
         fun a_list_of_scenes_is_emitted_through_add_list_observer() {
-            stream.addListObserver.onNext(Result(oldScenes, null))
+            stream.addOrUpdateObserver.onNext(Result(oldScenes, null))
         }
 
         fun a_function_that_filter_non_2_id_is_emitted_through_remove_all_that_obsever() {
@@ -115,15 +115,15 @@ class ResultStreamFactoryTest {
         }
 
         fun new_scene_is_emitted_through_add_or_update() {
-            stream.addOrUpdateObserver.onNext(Result(newScene, null))
+            stream.addOrUpdateObserver.onNext(Result(listOf(newScene), null))
         }
 
         fun modified_scene_is_emitted_through_add_or_update() {
-            stream.addOrUpdateObserver.onNext(Result(updatedScene, null))
+            stream.addOrUpdateObserver.onNext(Result(listOf(updatedScene), null))
         }
 
         fun a_new_list_is_emitted_through_add_list_observer() {
-            stream.addListObserver.onNext(Result(newScenes, null))
+            stream.addOrUpdateObserver.onNext(Result(newScenes, null))
         }
 
         fun another_observer_subscribes_to_flowable() {

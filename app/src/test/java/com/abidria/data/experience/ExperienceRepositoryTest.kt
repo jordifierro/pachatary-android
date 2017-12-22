@@ -101,12 +101,10 @@ class ExperienceRepositoryTest {
         lateinit var experience: Experience
         lateinit var secondExperience: Experience
         lateinit var experiencesFlowable: Flowable<Result<List<Experience>>>
-        lateinit var addOrUpdateObserver: TestObserver<Result<Experience>>
-        lateinit var addListObserver: TestObserver<Result<List<Experience>>>
+        lateinit var addOrUpdateObserver: TestObserver<Result<List<Experience>>>
         lateinit var removeAllThatObserver: TestObserver<(Experience) -> Boolean>
         lateinit var secondExperiencesFlowable: Flowable<Result<List<Experience>>>
         lateinit var secondAddOrUpdateObserver: TestObserver<Result<Experience>>
-        lateinit var secondAddListObserver: TestObserver<Result<List<Experience>>>
         lateinit var secondRemoveAllThatObserver: TestObserver<(Experience) -> Boolean>
         lateinit var apiExperiencesFlowable: Flowable<Result<List<Experience>>>
         lateinit var experiencesFlowableResult: Flowable<Result<List<Experience>>>
@@ -146,39 +144,32 @@ class ExperienceRepositoryTest {
             experienceB = Experience(id = "2", title = "T", description = "desc", picture = null)
             experienceC = Experience(id = "3", title = "T", description = "desc", picture = null, isMine = true)
             experienceD = Experience(id = "4", title = "T", description = "desc", picture = null, isMine = true)
-            addListObserver = TestObserver.create()
-            addListObserver.onSubscribe(addListObserver)
             addOrUpdateObserver = TestObserver.create()
+            addOrUpdateObserver.onSubscribe(addOrUpdateObserver)
             removeAllThatObserver = TestObserver.create()
             experiencesFlowable = Flowable.just(
                     Result(listOf(experienceA, experienceB, experienceC, experienceD), null))
             BDDMockito.given(mockExperiencesStreamFactory.create()).willReturn(
-                    ResultStreamFactory.ResultStream(addListObserver, addOrUpdateObserver,
-                                                     removeAllThatObserver, experiencesFlowable))
+                    ResultStreamFactory.ResultStream(addOrUpdateObserver, removeAllThatObserver, experiencesFlowable))
         }
 
         fun an_experiences_stream_factory_that_returns_stream() {
-            addListObserver = TestObserver.create()
-            addListObserver.onSubscribe(addListObserver)
             addOrUpdateObserver = TestObserver.create()
             addOrUpdateObserver.onSubscribe(addOrUpdateObserver)
             removeAllThatObserver = TestObserver.create()
             experiencesFlowable = Flowable.never()
             BDDMockito.given(mockExperiencesStreamFactory.create()).willReturn(
-                    ResultStreamFactory.ResultStream(addListObserver, addOrUpdateObserver,
-                                                     removeAllThatObserver, experiencesFlowable))
+                    ResultStreamFactory.ResultStream(addOrUpdateObserver, removeAllThatObserver, experiencesFlowable))
         }
 
         fun an_experiences_stream_factory_that_returns_stream_with_several_experiences() {
             val experienceA = Experience(id = "1", title = "T", description = "desc", picture = null)
             val experienceB = Experience(id = "2", title = "T", description = "desc", picture = null)
-            addListObserver = TestObserver.create()
             addOrUpdateObserver = TestObserver.create()
             removeAllThatObserver = TestObserver.create()
             experiencesFlowable = Flowable.just(Result(listOf(experienceA, experienceB), null))
             BDDMockito.given(mockExperiencesStreamFactory.create()).willReturn(
-                    ResultStreamFactory.ResultStream(addListObserver, addOrUpdateObserver,
-                                                     removeAllThatObserver, experiencesFlowable))
+                    ResultStreamFactory.ResultStream(addOrUpdateObserver, removeAllThatObserver, experiencesFlowable))
         }
 
         fun an_api_repo_that_returns_my_experiences_flowable_with_an_experience() {
@@ -243,8 +234,8 @@ class ExperienceRepositoryTest {
             val lambda = removeAllThatObserver.events.get(0).get(0) as (Experience) -> Boolean
             assertTrue(lambda(Experience("1", "T", "d", picture = null, isMine = true)))
             assertFalse(lambda(Experience("1", "T", "d", picture = null, isMine = false)))
-            addListObserver.onComplete()
-            addListObserver.assertResult(Result(listOf(experience), null))
+            addOrUpdateObserver.onComplete()
+            addOrUpdateObserver.assertResult(Result(listOf(experience), null))
         }
 
         fun should_remove_all_not_mine_exps_and_add_experience_received_by_api_repo() {
@@ -252,8 +243,8 @@ class ExperienceRepositoryTest {
             val lambda = removeAllThatObserver.events.get(0).get(0) as (Experience) -> Boolean
             assertFalse(lambda(Experience("1", "T", "d", picture = null, isMine = true)))
             assertTrue(lambda(Experience("1", "T", "d", picture = null, isMine = false)))
-            addListObserver.onComplete()
-            addListObserver.assertResult(Result(listOf(experience), null))
+            addOrUpdateObserver.onComplete()
+            addOrUpdateObserver.assertResult(Result(listOf(experience), null))
         }
 
         fun only_experience_with_experience_id_should_be_received() {
@@ -272,7 +263,7 @@ class ExperienceRepositoryTest {
 
         fun delegate_param_should_emit_experience_through_add_or_update_observer() {
             addOrUpdateObserver.onComplete()
-            addOrUpdateObserver.assertResult(Result(experience, null))
+            addOrUpdateObserver.assertResult(Result(listOf(experience), null))
         }
 
         fun should_call_api_created_experience() {
@@ -282,7 +273,7 @@ class ExperienceRepositoryTest {
         fun should_emit_created_experience_through_add_or_update_experiences_observer() {
             createdExperienceFlowableResult.subscribeOn(Schedulers.trampoline()).subscribe()
             addOrUpdateObserver.onComplete()
-            addOrUpdateObserver.assertResult(Result(experience, null))
+            addOrUpdateObserver.assertResult(Result(listOf(experience), null))
         }
 
         infix fun start(func: ScenarioMaker.() -> Unit) = buildScenario().given(func)

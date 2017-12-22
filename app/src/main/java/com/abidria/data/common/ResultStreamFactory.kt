@@ -9,14 +9,12 @@ import io.reactivex.subjects.PublishSubject
 
 class ResultStreamFactory<T> where T : Identifiable {
 
-    data class ResultStream<T>(val addListObserver: Observer<Result<List<T>>>,
-                               val addOrUpdateObserver: Observer<Result<T>>,
+    data class ResultStream<T>(val addOrUpdateObserver: Observer<Result<List<T>>>,
                                val removeAllThatObserver: Observer<(T) -> Boolean>,
                                val resultFlowable: Flowable<Result<List<T>>>)
 
     fun create(): ResultStream<T> {
-        val addListSubject = PublishSubject.create<Result<List<T>>>()
-        val addOrUpdateSubject = PublishSubject.create<Result<T>>()
+        val addOrUpdateSubject = PublishSubject.create<Result<List<T>>>()
         val removeAllThatSubject = PublishSubject.create<(T) -> Boolean>()
         val resultFlowable = Flowable.merge(
                 removeAllThatSubject.toFlowable(BackpressureStrategy.LATEST)
@@ -25,28 +23,16 @@ class ResultStreamFactory<T> where T : Identifiable {
                                     val newExperiencesAfterRemove = previousTResult.data!!.filterNot(filterOperation)
                                     Result(newExperiencesAfterRemove, null)
                                 } },
-                addListSubject.toFlowable(BackpressureStrategy.LATEST)
-                        .map { tElementToBeAddedResult -> Function<Result<List<T>>, Result<List<T>>> {
-                            previousTResult ->
-                                Result(previousTResult.data!!.union(tElementToBeAddedResult.data!!).toList(),
-                                        null) } },
                 addOrUpdateSubject.toFlowable(BackpressureStrategy.LATEST)
-                        .map { newTResult -> Function<Result<List<T>>, Result<List<T>>>
+                        .map { newTListResult -> Function<Result<List<T>>, Result<List<T>>>
                                 { previousTListResult ->
-                                    if (previousTListResult.data!!
-                                            .filter { it.id == newTResult.data!!.id }.size > 0) {
-                                        val updatedTList = previousTListResult.data
-                                                .map { scene ->
-                                                    if (scene.id == newTResult.data!!.id) newTResult.data
-                                                    else scene
-                                                }
-                                        Result(updatedTList.toList(), null)
+                                    var newList = previousTListResult.data!!
+                                    for (t in newTListResult.data!!) {
+                                        if (newList.find { it.id == t.id } != null)
+                                            newList = newList.map { scene -> if (scene.id == t.id) t else scene }
+                                        else newList = newList.union(listOf(t)).toList()
                                     }
-                                    else {
-                                        val updatedTsSet =
-                                                previousTListResult.data.union(listOf(newTResult.data!!))
-                                        Result(updatedTsSet.toList(), null)
-                                    }
+                                    Result(newList, null)
                                 }
                              }
                         )
@@ -54,6 +40,6 @@ class ResultStreamFactory<T> where T : Identifiable {
                         .skip(1)
                         .replay(1)
                         .autoConnect()
-        return ResultStream(addListSubject, addOrUpdateSubject, removeAllThatSubject, resultFlowable)
+        return ResultStream(addOrUpdateSubject, removeAllThatSubject, resultFlowable)
     }
 }
