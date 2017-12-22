@@ -8,21 +8,47 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
                            val experienceStreamFactory: ResultStreamFactory<Experience>) {
 
     private var experiencesStream: ResultStreamFactory.ResultStream<Experience>? = null
+    private var exploreExperiencesFlowable: Flowable<Result<List<Experience>>>? = null
+    private var myExperiencesFlowable: Flowable<Result<List<Experience>>>? = null
 
-    fun experiencesFlowable(): Flowable<Result<List<Experience>>> {
-        if (experiencesStream == null) {
-            experiencesStream = experienceStreamFactory.create()
+    private fun experiencesFlowable(): ResultStreamFactory.ResultStream<Experience> {
+        if (experiencesStream == null) experiencesStream = experienceStreamFactory.create()
+        return experiencesStream!!
+    }
+
+    fun exploreExperiencesFlowable() : Flowable<Result<List<Experience>>> {
+        if (exploreExperiencesFlowable == null) {
+            exploreExperiencesFlowable = experiencesFlowable().resultFlowable
+                    .map { Result(it.data!!.filter { !it.isMine }, null) }
             refreshExperiences()
         }
-        return experiencesStream!!.resultFlowable
+        return exploreExperiencesFlowable!!
     }
 
     fun refreshExperiences() {
-        apiRepository.experiencesFlowable().subscribe { experiencesStream!!.replaceAllObserver.onNext(it) }
+        apiRepository.exploreExperiencesFlowable().subscribe {
+            experiencesStream!!.removeAllThatObserver.onNext({ experience: Experience -> !experience.isMine })
+            experiencesStream!!.addListObserver.onNext(it) }
+    }
+
+    fun myExperiencesFlowable() : Flowable<Result<List<Experience>>> {
+        if (myExperiencesFlowable == null) {
+            myExperiencesFlowable = experiencesFlowable().resultFlowable
+                    .map { Result(it.data!!.filter { it.isMine }, null) }
+            refreshMyExperiences()
+        }
+        return myExperiencesFlowable!!
+    }
+
+    fun refreshMyExperiences() {
+        apiRepository.myExperiencesFlowable().subscribe {
+            experiencesStream!!.removeAllThatObserver.onNext({ experience: Experience -> experience.isMine })
+            experiencesStream!!.addListObserver.onNext(it) }
     }
 
     fun experienceFlowable(experienceId: String): Flowable<Result<Experience>> =
-        experiencesFlowable().map { Result(data = it.data?.first { it.id == experienceId }, error = it.error) }
+        experiencesFlowable().resultFlowable
+                .map { Result(data = it.data?.first { it.id == experienceId }, error = it.error) }
 
     fun createExperience(experience: Experience): Flowable<Result<Experience>> {
         return apiRepository.createExperience(experience).doOnNext(emitThroughAddOrUpdate)

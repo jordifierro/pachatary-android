@@ -8,10 +8,8 @@ import com.abidria.data.auth.AuthHttpInterceptor
 import com.abidria.data.common.ParseNetworkResultTransformer
 import com.abidria.data.common.Result
 import com.abidria.data.picture.Picture
-import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Scheduler
-import io.reactivex.subjects.PublishSubject
 import net.gotev.uploadservice.*
 import org.json.JSONObject
 import retrofit2.Retrofit
@@ -22,12 +20,16 @@ class ExperienceApiRepository (retrofit: Retrofit, @Named("io") val scheduler: S
 
     private val experienceApi: ExperienceApi = retrofit.create(ExperienceApi::class.java)
 
-    fun experiencesFlowable(): Flowable<Result<List<Experience>>> =
-        PublishSubject.create<Any>()
-            .startWith(true)
-            .flatMap { experienceApi.experiences().subscribeOn(scheduler).toObservable() }
-            .toFlowable(BackpressureStrategy.LATEST)
-            .compose(ParseNetworkResultTransformer({ it.map { it.toDomain() } }))
+    fun exploreExperiencesFlowable(): Flowable<Result<List<Experience>>> =
+            experienceApi.exploreExperiences()
+                .compose<Result<List<Experience>>>(ParseNetworkResultTransformer({ it.map { it.toDomain() } }))
+                .subscribeOn(scheduler)
+
+    fun myExperiencesFlowable(): Flowable<Result<List<Experience>>> =
+            experienceApi.myExperiences()
+                    .compose<Result<List<Experience>>>(ParseNetworkResultTransformer(
+                            { it.map { it.toDomain(isMine = true) } }))
+                    .subscribeOn(scheduler)
 
     fun createExperience(experience: Experience): Flowable<Result<Experience>> =
             experienceApi.createExperience(title = experience.title, description = experience.description)
@@ -42,7 +44,7 @@ class ExperienceApiRepository (retrofit: Retrofit, @Named("io") val scheduler: S
         try {
             val authHeader = authHttpInterceptor.getAuthHeader()
             MultipartUploadRequest(context,
-                    BuildConfig.API_URL + "/experiences/" + experienceId + "/picture/")
+                    BuildConfig.API_URL + "/exploreExperiences/" + experienceId + "/picture/")
                     .addFileToUpload(Uri.parse(croppedImageUriString).path, "picture")
                     .setNotificationConfig(UploadNotificationConfig())
                     .setMaxRetries(2)

@@ -3,7 +3,7 @@ This repo contains the Android application
 code for Abidria project.
 This simple app aims to be a reference
 to discover interesting places
-and also to record our past experiences,
+and also to record our past exploreExperiences,
 sharing content with other people.
 
 Application domain is composed by `scenes`,
@@ -21,7 +21,7 @@ Here is a quick documentation about them:
 ![ExperienceListActivity](https://s3-eu-west-1.amazonaws.com/abidria/static/experience-list-screenshot.jpg)
 
 This is the screen that appears when you open the app.
-It shows experiences (title and picture) in a scrollable list.
+It shows exploreExperiences (title and picture) in a scrollable list.
 When an item is clicked,
 it navigates to the selected experience map view.
 

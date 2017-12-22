@@ -41,7 +41,7 @@ class ExplorePresenterTest {
                 Flowable.just(Result(AuthToken("A", "R"), null)))
         val experienceA = Experience(id = "1", title = "A", description = "", picture = null)
         val experienceB = Experience(id = "2", title = "B", description = "", picture = null)
-        given(mockRepository.experiencesFlowable())
+        given(mockRepository.exploreExperiencesFlowable())
                 .willReturn(Flowable.just(Result<List<Experience>>(arrayListOf(experienceA, experienceB), null)))
 
         presenter.create()
@@ -57,7 +57,7 @@ class ExplorePresenterTest {
     fun testCreateAsksExperiencesAndShowsOnViewIfAlreadyHasCredentials() {
         val experienceA = Experience(id = "1", title = "A", description = "", picture = null)
         val experienceB = Experience(id = "2", title = "B", description = "", picture = null)
-        given(mockRepository.experiencesFlowable())
+        given(mockRepository.exploreExperiencesFlowable())
                 .willReturn(Flowable.just(Result<List<Experience>>(arrayListOf(experienceA, experienceB), null)))
         given(mockAuthRepository.hasPersonCredentials()).willReturn(true)
 
@@ -70,7 +70,7 @@ class ExplorePresenterTest {
 
     @Test
     fun testCreateWhenResponseErrorShowsRetry() {
-        given(mockRepository.experiencesFlowable())
+        given(mockRepository.exploreExperiencesFlowable())
                 .willReturn(Flowable.just(Result<List<Experience>>(null, Exception())))
         given(mockAuthRepository.hasPersonCredentials()).willReturn(true)
 
@@ -103,7 +103,7 @@ class ExplorePresenterTest {
         val testObservable = PublishSubject.create<Result<List<Experience>>>()
         assertFalse(testObservable.hasObservers())
 
-        given(mockRepository.experiencesFlowable())
+        given(mockRepository.exploreExperiencesFlowable())
                 .willReturn(testObservable.toFlowable(BackpressureStrategy.LATEST))
         given(mockAuthRepository.hasPersonCredentials()).willReturn(true)
 

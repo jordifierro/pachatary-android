@@ -116,10 +116,12 @@ class SceneRepositoryTest {
         lateinit var scene: Scene
         lateinit var scenesFlowable: Flowable<Result<List<Scene>>>
         lateinit var addOrUpdateObserver: TestObserver<Result<Scene>>
-        lateinit var replaceAllObserver: TestObserver<Result<List<Scene>>>
+        lateinit var addListObserver: TestObserver<Result<List<Scene>>>
+        lateinit var removeAllThatObserver: TestObserver<(Scene) -> Boolean>
         lateinit var secondScenesFlowable: Flowable<Result<List<Scene>>>
         lateinit var secondAddOrUpdateObserver: TestObserver<Result<Scene>>
-        lateinit var secondReplaceAllObserver: TestObserver<Result<List<Scene>>>
+        lateinit var secondAddListObserver: TestObserver<Result<List<Scene>>>
+        lateinit var secondRemoveAllThatObserver: TestObserver<(Scene) -> Boolean>
         lateinit var apiScenesFlowable: Flowable<Result<List<Scene>>>
         lateinit var scenesFlowableResult: Flowable<Result<List<Scene>>>
         lateinit var secondScenesFlowableResult: Flowable<Result<List<Scene>>>
@@ -156,24 +158,27 @@ class SceneRepositoryTest {
         }
 
         fun an_scenes_stream_factory_that_returns_stream() {
-            replaceAllObserver = TestObserver.create()
-            replaceAllObserver.onSubscribe(replaceAllObserver)
+            addListObserver = TestObserver.create()
+            addListObserver.onSubscribe(addListObserver)
             addOrUpdateObserver = TestObserver.create()
             addOrUpdateObserver.onSubscribe(addOrUpdateObserver)
+            removeAllThatObserver = TestObserver.create()
             scenesFlowable = Flowable.never()
             BDDMockito.given(mockScenesStreamFactory.create()).willReturn(
-                    ResultStreamFactory.ResultStream(replaceAllObserver, addOrUpdateObserver, scenesFlowable))
+                    ResultStreamFactory.ResultStream(addListObserver, addOrUpdateObserver,
+                                                     removeAllThatObserver, scenesFlowable))
         }
 
         fun an_scenes_stream_factory_that_returns_another_stream_when_called_again() {
-            secondReplaceAllObserver = TestObserver.create()
-            secondReplaceAllObserver.onSubscribe(replaceAllObserver)
+            secondAddListObserver = TestObserver.create()
+            secondAddListObserver.onSubscribe(addListObserver)
             secondAddOrUpdateObserver = TestObserver.create()
             secondAddOrUpdateObserver.onSubscribe(addOrUpdateObserver)
+            secondRemoveAllThatObserver = TestObserver.create()
             secondScenesFlowable = Flowable.never()
             BDDMockito.given(mockScenesStreamFactory.create()).willReturn(
-                    ResultStreamFactory.ResultStream(secondReplaceAllObserver,
-                                                     secondAddOrUpdateObserver, secondScenesFlowable))
+                    ResultStreamFactory.ResultStream(secondAddListObserver, secondAddOrUpdateObserver,
+                                                     secondRemoveAllThatObserver, secondScenesFlowable))
         }
 
         fun an_scenes_stream_factory_that_returns_stream_with_several_scenes() {
@@ -181,11 +186,13 @@ class SceneRepositoryTest {
                                latitude = 1.0, longitude = -2.3, experienceId = "3", picture = null)
             val sceneB = Scene(id = "2", title = "T", description = "desc",
                                latitude = 1.0, longitude = -2.3, experienceId = "3", picture = null)
-            replaceAllObserver = TestObserver.create()
+            addListObserver = TestObserver.create()
             addOrUpdateObserver = TestObserver.create()
+            removeAllThatObserver = TestObserver.create()
             scenesFlowable = Flowable.just(Result(listOf(sceneA, sceneB), null))
             BDDMockito.given(mockScenesStreamFactory.create()).willReturn(
-                    ResultStreamFactory.ResultStream(replaceAllObserver, addOrUpdateObserver, scenesFlowable))
+                    ResultStreamFactory.ResultStream(addListObserver, addOrUpdateObserver,
+                                                     removeAllThatObserver, scenesFlowable))
         }
 
         fun an_api_repo_that_returns_scenes_flowable_with_an_scene() {
@@ -237,8 +244,8 @@ class SceneRepositoryTest {
         }
 
         fun should_connect_api_scenes_flowable_on_next_to_replace_all_scenes_observer() {
-            replaceAllObserver.onComplete()
-            replaceAllObserver.assertResult(Result(listOf(scene), null))
+            addListObserver.onComplete()
+            addListObserver.assertResult(Result(listOf(scene), null))
         }
 
         fun first_result_should_be_first_scenes_flowable() {

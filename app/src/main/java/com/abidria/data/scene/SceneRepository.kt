@@ -12,7 +12,7 @@ class SceneRepository(val apiRepository: SceneApiRepository, val streamFactory: 
         if (scenesStreamHashMap.get(experienceId) == null) {
             val streams = streamFactory.create()
             scenesStreamHashMap.put(experienceId, streams)
-            apiRepository.scenesRequestFlowable(experienceId).subscribe({ streams.replaceAllObserver.onNext(it) })
+            apiRepository.scenesRequestFlowable(experienceId).subscribe({ streams.addListObserver.onNext(it) })
         }
         return scenesStreamHashMap.get(experienceId)!!.resultFlowable
     }

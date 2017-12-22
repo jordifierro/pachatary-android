@@ -43,7 +43,7 @@ class MyExperiencesPresenter @Inject constructor(private val repository: Experie
 
     private fun connectToExperiences() {
         view.showLoader()
-        experiencesDisposable = repository.experiencesFlowable()
+        experiencesDisposable = repository.myExperiencesFlowable()
                                           .subscribeOn(schedulerProvider.subscriber())
                                           .observeOn(schedulerProvider.observer())
                                           .subscribe({ view.hideLoader()

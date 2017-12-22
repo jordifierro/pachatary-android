@@ -7,7 +7,7 @@ import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
 import org.junit.Assert
-import org.junit.Assert.assertEquals
+import org.junit.Assert.*
 import org.junit.Test
 import org.mockito.BDDMockito
 import org.mockito.Mock
@@ -17,46 +17,28 @@ import org.mockito.MockitoAnnotations
 class ExperienceRepositoryTest {
 
     @Test
-    fun test_experiences_flowable_return_stream_flowable_connected_with_api_request() {
+    fun test_my_experiences_flowable_return_my_experiences_and_refresh_them() {
         given {
-            an_experiences_stream_factory_that_returns_stream()
-            an_api_repo_that_returns_experiences_flowable_with_an_experience()
+            an_experiences_stream_factory_that_returns_four_experiences()
+            an_api_repo_that_returns_my_experiences_flowable_with_an_experience()
         } whenn {
-            experiences_flowable_is_called()
+            my_experiences_flowable_is_called()
         } then {
-            should_return_flowable_created_by_factory()
-            should_connect_api_experiences_flowable_on_next_to_replace_all_experiences_observer()
+            should_return_flowable_with_two_mine_experiences()
+            should_remove_all_mine_exps_and_add_experience_received_by_api_repo()
         }
     }
 
     @Test
-    fun test_on_refresh_experiences_asks_again_to_api_repo_and_emits_new_result_through_replace_all() {
+    fun test_explore_experiences_flowable_return_explore_experiences_and_refresh_them() {
         given {
-            an_experiences_stream_factory_that_returns_stream()
-            an_api_repo_that_returns_experiences_flowable_with_an_experience()
+            an_experiences_stream_factory_that_returns_four_experiences()
+            an_api_repo_that_returns_explore_experiences_flowable_with_an_experience()
         } whenn {
-            experiences_flowable_is_called()
-        } given {
-            an_api_repo_that_returns_experiences_flowable_with_another_experience()
-        } whenn {
-            refresh_experiences_is_called()
+            explore_experiences_flowable_is_called()
         } then {
-            should_emit_first_and_second_experience_through_replace_all()
-        }
-    }
-
-    @Test
-    fun test_same_experience_experiences_flowable_call_returns_same_flowable() {
-        given {
-            an_experiences_stream_factory_that_returns_stream()
-            an_experiences_stream_factory_that_returns_another_stream_when_called_again()
-            an_api_repo_that_returns_experiences_flowable_with_an_experience()
-        } whenn {
-            experiences_flowable_is_called()
-            experiences_flowable_is_called_again()
-        } then {
-            first_result_should_be_experiences_flowable()
-            second_result_should_be_same_experiences_flowable()
+            should_return_flowable_with_two_not_mine_experiences()
+            should_remove_all_not_mine_exps_and_add_experience_received_by_api_repo()
         }
     }
 
@@ -65,7 +47,6 @@ class ExperienceRepositoryTest {
         given {
             an_experience_id()
             an_experiences_stream_factory_that_returns_stream_with_several_experiences()
-            an_api_repo_that_returns_experiences_flowable_with_an_experience()
         } whenn {
             experience_flowable_is_called_with_experience_id()
         } then {
@@ -79,7 +60,6 @@ class ExperienceRepositoryTest {
             an_experience_id()
             an_experience()
             an_experiences_stream_factory_that_returns_stream()
-            an_api_repo_that_returns_experiences_flowable_with_an_experience()
             an_api_repo_that_returns_created_experience()
         } whenn {
             experiences_flowable_is_called_with_experience_id()
@@ -97,7 +77,6 @@ class ExperienceRepositoryTest {
             an_experience()
             a_cropped_image_uri_string()
             an_experiences_stream_factory_that_returns_stream()
-            an_api_repo_that_returns_experiences_flowable_with_an_experience()
         } whenn {
             experiences_flowable_is_called_with_experience_id()
             upload_experience_picture_is_called()
@@ -123,14 +102,20 @@ class ExperienceRepositoryTest {
         lateinit var secondExperience: Experience
         lateinit var experiencesFlowable: Flowable<Result<List<Experience>>>
         lateinit var addOrUpdateObserver: TestObserver<Result<Experience>>
-        lateinit var replaceAllObserver: TestObserver<Result<List<Experience>>>
+        lateinit var addListObserver: TestObserver<Result<List<Experience>>>
+        lateinit var removeAllThatObserver: TestObserver<(Experience) -> Boolean>
         lateinit var secondExperiencesFlowable: Flowable<Result<List<Experience>>>
         lateinit var secondAddOrUpdateObserver: TestObserver<Result<Experience>>
-        lateinit var secondReplaceAllObserver: TestObserver<Result<List<Experience>>>
+        lateinit var secondAddListObserver: TestObserver<Result<List<Experience>>>
+        lateinit var secondRemoveAllThatObserver: TestObserver<(Experience) -> Boolean>
         lateinit var apiExperiencesFlowable: Flowable<Result<List<Experience>>>
         lateinit var experiencesFlowableResult: Flowable<Result<List<Experience>>>
         lateinit var experienceFlowableResult: Flowable<Result<Experience>>
         lateinit var createdExperienceFlowableResult: Flowable<Result<Experience>>
+        lateinit var experienceA: Experience
+        lateinit var experienceB: Experience
+        lateinit var experienceC: Experience
+        lateinit var experienceD: Experience
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
@@ -156,62 +141,70 @@ class ExperienceRepositoryTest {
             BDDMockito.given(mockApiRepository.createExperience(experience)).willReturn(createdExperienceFlowable)
         }
 
-
-        fun an_experiences_stream_factory_that_returns_stream() {
-            replaceAllObserver = TestObserver.create()
-            replaceAllObserver.onSubscribe(replaceAllObserver)
+        fun an_experiences_stream_factory_that_returns_four_experiences() {
+            experienceA = Experience(id = "1", title = "T", description = "desc", picture = null)
+            experienceB = Experience(id = "2", title = "T", description = "desc", picture = null)
+            experienceC = Experience(id = "3", title = "T", description = "desc", picture = null, isMine = true)
+            experienceD = Experience(id = "4", title = "T", description = "desc", picture = null, isMine = true)
+            addListObserver = TestObserver.create()
+            addListObserver.onSubscribe(addListObserver)
             addOrUpdateObserver = TestObserver.create()
-            addOrUpdateObserver.onSubscribe(addOrUpdateObserver)
-            experiencesFlowable = Flowable.never()
+            removeAllThatObserver = TestObserver.create()
+            experiencesFlowable = Flowable.just(
+                    Result(listOf(experienceA, experienceB, experienceC, experienceD), null))
             BDDMockito.given(mockExperiencesStreamFactory.create()).willReturn(
-                    ResultStreamFactory.ResultStream(replaceAllObserver, addOrUpdateObserver, experiencesFlowable))
+                    ResultStreamFactory.ResultStream(addListObserver, addOrUpdateObserver,
+                                                     removeAllThatObserver, experiencesFlowable))
         }
 
-        fun an_experiences_stream_factory_that_returns_another_stream_when_called_again() {
-            secondReplaceAllObserver = TestObserver.create()
-            secondReplaceAllObserver.onSubscribe(replaceAllObserver)
-            secondAddOrUpdateObserver = TestObserver.create()
-            secondAddOrUpdateObserver.onSubscribe(addOrUpdateObserver)
-            secondExperiencesFlowable = Flowable.never()
+        fun an_experiences_stream_factory_that_returns_stream() {
+            addListObserver = TestObserver.create()
+            addListObserver.onSubscribe(addListObserver)
+            addOrUpdateObserver = TestObserver.create()
+            addOrUpdateObserver.onSubscribe(addOrUpdateObserver)
+            removeAllThatObserver = TestObserver.create()
+            experiencesFlowable = Flowable.never()
             BDDMockito.given(mockExperiencesStreamFactory.create()).willReturn(
-                    ResultStreamFactory.ResultStream(secondReplaceAllObserver,
-                                                     secondAddOrUpdateObserver, secondExperiencesFlowable))
+                    ResultStreamFactory.ResultStream(addListObserver, addOrUpdateObserver,
+                                                     removeAllThatObserver, experiencesFlowable))
         }
 
         fun an_experiences_stream_factory_that_returns_stream_with_several_experiences() {
             val experienceA = Experience(id = "1", title = "T", description = "desc", picture = null)
             val experienceB = Experience(id = "2", title = "T", description = "desc", picture = null)
-            replaceAllObserver = TestObserver.create()
+            addListObserver = TestObserver.create()
             addOrUpdateObserver = TestObserver.create()
+            removeAllThatObserver = TestObserver.create()
             experiencesFlowable = Flowable.just(Result(listOf(experienceA, experienceB), null))
             BDDMockito.given(mockExperiencesStreamFactory.create()).willReturn(
-                    ResultStreamFactory.ResultStream(replaceAllObserver, addOrUpdateObserver, experiencesFlowable))
+                    ResultStreamFactory.ResultStream(addListObserver, addOrUpdateObserver,
+                                                     removeAllThatObserver, experiencesFlowable))
         }
 
-        fun an_api_repo_that_returns_experiences_flowable_with_an_experience() {
-            experience = Experience("2", "T", "d", null)
+        fun an_api_repo_that_returns_my_experiences_flowable_with_an_experience() {
+            experience = Experience("2", "T", "d", null, isMine = true)
             apiExperiencesFlowable = Flowable.just(Result(listOf(experience), null))
 
-            BDDMockito.given(mockApiRepository.experiencesFlowable()).willReturn(apiExperiencesFlowable)
+            BDDMockito.given(mockApiRepository.myExperiencesFlowable()).willReturn(apiExperiencesFlowable)
         }
 
-        fun an_api_repo_that_returns_experiences_flowable_with_another_experience() {
-            secondExperience = Experience("4", "Y", "g", null)
+        fun an_api_repo_that_returns_explore_experiences_flowable_with_an_experience() {
+            experience = Experience("2", "T", "d", null, isMine = true)
+            apiExperiencesFlowable = Flowable.just(Result(listOf(experience), null))
 
-            BDDMockito.given(mockApiRepository.experiencesFlowable())
-                    .willReturn(Flowable.just(Result(listOf(secondExperience), null)))
+            BDDMockito.given(mockApiRepository.exploreExperiencesFlowable()).willReturn(apiExperiencesFlowable)
         }
 
-        fun experiences_flowable_is_called() {
-            experiencesFlowableResult = repository.experiencesFlowable()
+        fun my_experiences_flowable_is_called() {
+            experiencesFlowableResult = repository.myExperiencesFlowable()
+        }
+
+        fun explore_experiences_flowable_is_called() {
+            experiencesFlowableResult = repository.exploreExperiencesFlowable()
         }
 
         fun experiences_flowable_is_called_with_experience_id() {
             experienceFlowableResult = repository.experienceFlowable(experienceId)
-        }
-
-        fun refresh_experiences_is_called() {
-            repository.refreshExperiences()
         }
 
         fun create_experience_is_called() {
@@ -222,10 +215,6 @@ class ExperienceRepositoryTest {
             repository.emitThroughAddOrUpdate.invoke(Result(experience, null))
         }
 
-        fun experiences_flowable_is_called_again() {
-            secondExperiencesFlowable = repository.experiencesFlowable()
-        }
-
         fun experience_flowable_is_called_with_experience_id() {
             experienceFlowableResult = repository.experienceFlowable(experienceId)
         }
@@ -234,27 +223,37 @@ class ExperienceRepositoryTest {
             repository.uploadExperiencePicture(experienceId, croppedImageUriString)
         }
 
-        fun should_return_flowable_created_by_factory() {
-            Assert.assertEquals(experiencesFlowable, experiencesFlowableResult)
+        fun should_return_flowable_with_two_mine_experiences() {
+            val testSubscriber = TestSubscriber<Result<List<Experience>>>()
+            experiencesFlowableResult.subscribeOn(Schedulers.trampoline()).subscribe(testSubscriber)
+            testSubscriber.awaitCount(1)
+            val result = testSubscriber.events.get(0).get(0) as Result<List<Experience>>
+            assertEquals(result, Result(listOf(experienceC, experienceD), null))
         }
 
-        fun should_connect_api_experiences_flowable_on_next_to_replace_all_experiences_observer() {
-            replaceAllObserver.onComplete()
-            replaceAllObserver.assertResult(Result(listOf(experience), null))
+        fun should_return_flowable_with_two_not_mine_experiences() {
+            val testSubscriber = TestSubscriber<Result<List<Experience>>>()
+            experiencesFlowableResult.subscribeOn(Schedulers.trampoline()).subscribe(testSubscriber)
+            testSubscriber.awaitCount(1)
+            testSubscriber.assertResult(Result(listOf(experienceA, experienceB), null))
         }
 
-        fun should_emit_first_and_second_experience_through_replace_all() {
-            replaceAllObserver.onComplete()
-            replaceAllObserver.assertResult(Result(listOf(experience), null),
-                                            Result(listOf(secondExperience), null))
+        fun should_remove_all_mine_exps_and_add_experience_received_by_api_repo() {
+            removeAllThatObserver.onComplete()
+            val lambda = removeAllThatObserver.events.get(0).get(0) as (Experience) -> Boolean
+            assertTrue(lambda(Experience("1", "T", "d", picture = null, isMine = true)))
+            assertFalse(lambda(Experience("1", "T", "d", picture = null, isMine = false)))
+            addListObserver.onComplete()
+            addListObserver.assertResult(Result(listOf(experience), null))
         }
 
-        fun first_result_should_be_experiences_flowable() {
-            Assert.assertEquals(experiencesFlowable, experiencesFlowableResult)
-        }
-
-        fun second_result_should_be_same_experiences_flowable() {
-            Assert.assertEquals(secondExperiencesFlowable, experiencesFlowableResult)
+        fun should_remove_all_not_mine_exps_and_add_experience_received_by_api_repo() {
+            removeAllThatObserver.onComplete()
+            val lambda = removeAllThatObserver.events.get(0).get(0) as (Experience) -> Boolean
+            assertFalse(lambda(Experience("1", "T", "d", picture = null, isMine = true)))
+            assertTrue(lambda(Experience("1", "T", "d", picture = null, isMine = false)))
+            addListObserver.onComplete()
+            addListObserver.assertResult(Result(listOf(experience), null))
         }
 
         fun only_experience_with_experience_id_should_be_received() {

@@ -1,5 +1,6 @@
 package com.abidria.data.common
 
+import com.abidria.data.experience.Experience
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Observer
@@ -8,16 +9,27 @@ import io.reactivex.subjects.PublishSubject
 
 class ResultStreamFactory<T> where T : Identifiable {
 
-    data class ResultStream<T>(val replaceAllObserver: Observer<Result<List<T>>>,
+    data class ResultStream<T>(val addListObserver: Observer<Result<List<T>>>,
                                val addOrUpdateObserver: Observer<Result<T>>,
+                               val removeAllThatObserver: Observer<(T) -> Boolean>,
                                val resultFlowable: Flowable<Result<List<T>>>)
 
     fun create(): ResultStream<T> {
-        val replaceAllSubject = PublishSubject.create<Result<List<T>>>()
+        val addListSubject = PublishSubject.create<Result<List<T>>>()
         val addOrUpdateSubject = PublishSubject.create<Result<T>>()
+        val removeAllThatSubject = PublishSubject.create<(T) -> Boolean>()
         val resultFlowable = Flowable.merge(
-                replaceAllSubject.toFlowable(BackpressureStrategy.LATEST)
-                        .map { Function<Result<List<T>>, Result<List<T>>> { _ -> it } },
+                removeAllThatSubject.toFlowable(BackpressureStrategy.LATEST)
+                        .map { filterOperation: (T) -> Boolean -> Function<Result<List<T>>, Result<List<T>>>
+                                { previousTResult ->
+                                    val newExperiencesAfterRemove = previousTResult.data!!.filterNot(filterOperation)
+                                    Result(newExperiencesAfterRemove, null)
+                                } },
+                addListSubject.toFlowable(BackpressureStrategy.LATEST)
+                        .map { tElementToBeAddedResult -> Function<Result<List<T>>, Result<List<T>>> {
+                            previousTResult ->
+                                Result(previousTResult.data!!.union(tElementToBeAddedResult.data!!).toList(),
+                                        null) } },
                 addOrUpdateSubject.toFlowable(BackpressureStrategy.LATEST)
                         .map { newTResult -> Function<Result<List<T>>, Result<List<T>>>
                                 { previousTListResult ->
@@ -42,6 +54,6 @@ class ResultStreamFactory<T> where T : Identifiable {
                         .skip(1)
                         .replay(1)
                         .autoConnect()
-        return ResultStream<T>(replaceAllSubject, addOrUpdateSubject, resultFlowable)
+        return ResultStream(addListSubject, addOrUpdateSubject, removeAllThatSubject, resultFlowable)
     }
 }
