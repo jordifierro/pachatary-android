@@ -11,8 +11,6 @@ import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.Test
 import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.then
@@ -21,98 +19,214 @@ import org.mockito.MockitoAnnotations
 
 class ExplorePresenterTest {
 
-    lateinit var presenter: ExplorePresenter
-    @Mock lateinit var mockView: ExploreView
-    @Mock lateinit var mockRepository: ExperienceRepository
-    @Mock lateinit var mockAuthRepository: AuthRepository
-
-    @Before
-    fun setUp() {
-        MockitoAnnotations.initMocks(this)
-        val testSchedulerProvider = SchedulerProvider(Schedulers.trampoline(), Schedulers.trampoline())
-        presenter = ExplorePresenter(mockRepository, mockAuthRepository, testSchedulerProvider)
-        presenter.view = mockView
+    @Test
+    fun test_create_asks_experiences_and_ask_invitation_if_not_has_credentials() {
+        given {
+            an_auth_repo_has_no_credentials()
+            an_auth_repo_returns_auth_token_on_get_person_invitation()
+            an_experience()
+            another_experience()
+            an_experience_repo_that_returns_both_on_my_experiences_flowable()
+        } whenn {
+            create_presenter()
+        } then {
+            should_call_auth_repo_has_person_credentials()
+            should_call_auth_repo_get_person_invitation()
+            should_show_view_loader()
+            should_show_received_experiences()
+            should_hide_view_loader()
+        }
     }
 
     @Test
-    fun testCreateAsksExperiencesAndShowsOnViewIfNotHasCredentials() {
-        given(mockAuthRepository.hasPersonCredentials()).willReturn(false)
-        given(mockAuthRepository.getPersonInvitation()).willReturn(
-                Flowable.just(Result(AuthToken("A", "R"), null)))
-        val experienceA = Experience(id = "1", title = "A", description = "", picture = null)
-        val experienceB = Experience(id = "2", title = "B", description = "", picture = null)
-        given(mockRepository.exploreExperiencesFlowable())
-                .willReturn(Flowable.just(Result<List<Experience>>(arrayListOf(experienceA, experienceB), null)))
-
-        presenter.create()
-
-        then(mockAuthRepository).should().hasPersonCredentials()
-        then(mockAuthRepository).should().getPersonInvitation()
-        then(mockView).should().showLoader()
-        then(mockView).should().showExperienceList(arrayListOf(experienceA, experienceB))
-        then(mockView).should().hideLoader()
+    fun test_create_asks_experiences_and_shows_if_already_has_credentials() {
+        given {
+            an_auth_repo_has_credentials()
+            an_experience()
+            another_experience()
+            an_experience_repo_that_returns_both_on_my_experiences_flowable()
+        } whenn {
+            create_presenter()
+        } then {
+            should_show_view_loader()
+            should_show_received_experiences()
+            should_hide_view_loader()
+        }
     }
 
     @Test
-    fun testCreateAsksExperiencesAndShowsOnViewIfAlreadyHasCredentials() {
-        val experienceA = Experience(id = "1", title = "A", description = "", picture = null)
-        val experienceB = Experience(id = "2", title = "B", description = "", picture = null)
-        given(mockRepository.exploreExperiencesFlowable())
-                .willReturn(Flowable.just(Result<List<Experience>>(arrayListOf(experienceA, experienceB), null)))
-        given(mockAuthRepository.hasPersonCredentials()).willReturn(true)
-
-        presenter.create()
-
-        then(mockView).should().showLoader()
-        then(mockView).should().showExperienceList(arrayListOf(experienceA, experienceB))
-        then(mockView).should().hideLoader()
+    fun test_create_when_response_error_shows_retry() {
+        given {
+            an_auth_repo_has_credentials()
+            an_experience_repo_that_returns_exception()
+        } whenn {
+            create_presenter()
+        } then {
+            should_hide_view_loader()
+            should_show_view_retry()
+        }
     }
 
     @Test
-    fun testCreateWhenResponseErrorShowsRetry() {
-        given(mockRepository.exploreExperiencesFlowable())
-                .willReturn(Flowable.just(Result<List<Experience>>(null, Exception())))
-        given(mockAuthRepository.hasPersonCredentials()).willReturn(true)
-
-        presenter.create()
-
-        then(mockView).should().hideLoader()
-        then(mockView).should().showRetry()
+    fun test_on_retry_click_retrive_experiences_and_shows_them() {
+        given {
+            nothing()
+        } whenn {
+            retry_clicked()
+        } then {
+            should_hide_view_retry()
+            should_show_view_loader()
+            should_call_repo_refresh_experiences()
+        }
     }
 
     @Test
-    fun testOnRetryClickRetrieveExperiencesAndShowThem() {
-
-        presenter.onRetryClick()
-
-        then(mockView).should().hideRetry()
-        then(mockView).should().showLoader()
-        then(mockRepository).should().refreshExperiences()
+    fun test_experience_tapped() {
+        given {
+            nothing()
+        } whenn {
+            experience_click("2")
+        } then {
+            should_navigate_to_experience("2")
+        }
     }
 
     @Test
-    fun testExperienceTapped() {
-
-        presenter.onExperienceClick("2")
-
-        then(mockView).should().navigateToExperience("2")
+    fun test_unsubscribe_on_destroy() {
+        given {
+            an_auth_repo_has_credentials()
+            a_test_observable()
+            an_experience_repo_that_returns_test_observable()
+        } whenn {
+            create_presenter()
+            destroy_presenter()
+        } then {
+            should_unsubscribe_observable()
+        }
     }
 
-    @Test
-    fun testUnsubscribenOnDestroy() {
-        val testObservable = PublishSubject.create<Result<List<Experience>>>()
-        assertFalse(testObservable.hasObservers())
+    private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
-        given(mockRepository.exploreExperiencesFlowable())
-                .willReturn(testObservable.toFlowable(BackpressureStrategy.LATEST))
-        given(mockAuthRepository.hasPersonCredentials()).willReturn(true)
+    class ScenarioMaker {
 
-        presenter.create()
+        lateinit var presenter: ExplorePresenter
+        @Mock lateinit var mockView: ExploreView
+        @Mock lateinit var mockRepository: ExperienceRepository
+        @Mock lateinit var mockAuthRepository: AuthRepository
+        lateinit var experienceA: Experience
+        lateinit var experienceB: Experience
+        lateinit var testObservable: PublishSubject<Result<List<Experience>>>
 
-        assertTrue(testObservable.hasObservers())
+        fun buildScenario(): ScenarioMaker {
+            MockitoAnnotations.initMocks(this)
+            val testSchedulerProvider = SchedulerProvider(Schedulers.trampoline(), Schedulers.trampoline())
+            presenter = ExplorePresenter(mockRepository, mockAuthRepository, testSchedulerProvider)
+            presenter.view = mockView
 
-        presenter.destroy()
+            return this
+        }
 
-        assertFalse(testObservable.hasObservers())
+        fun nothing() {}
+
+        fun an_auth_repo_has_no_credentials() {
+            given(mockAuthRepository.hasPersonCredentials()).willReturn(false)
+        }
+
+        fun an_auth_repo_has_credentials() {
+            given(mockAuthRepository.hasPersonCredentials()).willReturn(true)
+        }
+
+        fun an_auth_repo_returns_auth_token_on_get_person_invitation() {
+            given(mockAuthRepository.getPersonInvitation()).willReturn(
+                    Flowable.just(Result(AuthToken("A", "R"), null)))
+        }
+
+        fun an_experience() {
+            experienceA = Experience(id = "1", title = "A", description = "", picture = null)
+        }
+
+        fun another_experience() {
+            experienceB = Experience(id = "2", title = "B", description = "", picture = null)
+        }
+
+        fun an_experience_repo_that_returns_both_on_my_experiences_flowable() {
+            given(mockRepository.exploreExperiencesFlowable())
+                    .willReturn(Flowable.just(Result<List<Experience>>(
+                            arrayListOf(experienceA, experienceB), null)))
+        }
+
+        fun an_experience_repo_that_returns_exception() {
+            given(mockRepository.exploreExperiencesFlowable())
+                    .willReturn(Flowable.just(Result<List<Experience>>(null, Exception())))
+        }
+
+        fun create_presenter() {
+            presenter.create()
+        }
+
+        fun retry_clicked() {
+            presenter.onRetryClick()
+        }
+
+        fun experience_click(experienceId: String) {
+            presenter.onExperienceClick(experienceId)
+        }
+
+        fun should_call_auth_repo_has_person_credentials() {
+            then(mockAuthRepository).should().hasPersonCredentials()
+        }
+
+        fun should_call_auth_repo_get_person_invitation() {
+            then(mockAuthRepository).should().getPersonInvitation()
+        }
+
+        fun should_show_view_loader() {
+            then(mockView).should().showLoader()
+        }
+
+        fun should_show_received_experiences() {
+            then(mockView).should().showExperienceList(arrayListOf(experienceA, experienceB))
+        }
+
+        fun should_hide_view_loader() {
+            then(mockView).should().hideLoader()
+        }
+
+        fun should_show_view_retry() {
+            then(mockView).should().showRetry()
+        }
+
+        fun should_hide_view_retry() {
+            then(mockView).should().hideRetry()
+        }
+
+        fun should_call_repo_refresh_experiences() {
+            then(mockRepository).should().refreshExperiences()
+        }
+
+        fun should_navigate_to_experience(experienceId: String) {
+            then(mockView).should().navigateToExperience(experienceId)
+        }
+
+        infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)
+        infix fun whenn(func: ScenarioMaker.() -> Unit) = apply(func)
+        infix fun then(func: ScenarioMaker.() -> Unit) = apply(func)
+        fun a_test_observable() {
+            testObservable = PublishSubject.create<Result<List<Experience>>>()
+            assertFalse(testObservable.hasObservers())
+        }
+
+        fun an_experience_repo_that_returns_test_observable() {
+            given(mockRepository.exploreExperiencesFlowable())
+                    .willReturn(testObservable.toFlowable(BackpressureStrategy.LATEST))
+        }
+
+        fun destroy_presenter() {
+            presenter.destroy()
+        }
+
+        fun should_unsubscribe_observable() {
+            assertFalse(testObservable.hasObservers())
+        }
     }
 }
