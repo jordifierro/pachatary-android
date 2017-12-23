@@ -1,7 +1,5 @@
 package com.abidria.presentation.experience.show
 
-import com.abidria.data.auth.AuthRepository
-import com.abidria.data.auth.AuthToken
 import com.abidria.data.common.Result
 import com.abidria.data.experience.Experience
 import com.abidria.data.experience.ExperienceRepository
@@ -20,28 +18,8 @@ import org.mockito.MockitoAnnotations
 class SavedPresenterTest {
 
     @Test
-    fun test_create_asks_experiences_and_ask_invitation_if_not_has_credentials() {
+    fun test_create_asks_experiences_and_shows() {
         given {
-            an_auth_repo_has_no_credentials()
-            an_auth_repo_returns_auth_token_on_get_person_invitation()
-            an_experience()
-            another_experience()
-            an_experience_repo_that_returns_both_on_my_experiences_flowable()
-        } whenn {
-            create_presenter()
-        } then {
-            should_call_auth_repo_has_person_credentials()
-            should_call_auth_repo_get_person_invitation()
-            should_show_view_loader()
-            should_show_received_experiences()
-            should_hide_view_loader()
-        }
-    }
-
-    @Test
-    fun test_create_asks_experiences_and_shows_if_already_has_credentials() {
-        given {
-            an_auth_repo_has_credentials()
             an_experience()
             another_experience()
             an_experience_repo_that_returns_both_on_my_experiences_flowable()
@@ -57,7 +35,6 @@ class SavedPresenterTest {
     @Test
     fun test_create_when_response_error_shows_retry() {
         given {
-            an_auth_repo_has_credentials()
             an_experience_repo_that_returns_exception()
         } whenn {
             create_presenter()
@@ -94,7 +71,6 @@ class SavedPresenterTest {
     @Test
     fun test_unsubscribe_on_destroy() {
         given {
-            an_auth_repo_has_credentials()
             a_test_observable()
             an_experience_repo_that_returns_test_observable()
         } whenn {
@@ -112,7 +88,6 @@ class SavedPresenterTest {
         lateinit var presenter: SavedPresenter
         @Mock lateinit var mockView: SavedView
         @Mock lateinit var mockRepository: ExperienceRepository
-        @Mock lateinit var mockAuthRepository: AuthRepository
         lateinit var experienceA: Experience
         lateinit var experienceB: Experience
         lateinit var testObservable: PublishSubject<Result<List<Experience>>>
@@ -120,26 +95,13 @@ class SavedPresenterTest {
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
             val testSchedulerProvider = SchedulerProvider(Schedulers.trampoline(), Schedulers.trampoline())
-            presenter = SavedPresenter(mockRepository, mockAuthRepository, testSchedulerProvider)
+            presenter = SavedPresenter(mockRepository, testSchedulerProvider)
             presenter.view = mockView
 
             return this
         }
 
         fun nothing() {}
-
-        fun an_auth_repo_has_no_credentials() {
-            given(mockAuthRepository.hasPersonCredentials()).willReturn(false)
-        }
-
-        fun an_auth_repo_has_credentials() {
-            given(mockAuthRepository.hasPersonCredentials()).willReturn(true)
-        }
-
-        fun an_auth_repo_returns_auth_token_on_get_person_invitation() {
-            given(mockAuthRepository.getPersonInvitation()).willReturn(
-                    Flowable.just(Result(AuthToken("A", "R"), null)))
-        }
 
         fun an_experience() {
             experienceA = Experience(id = "1", title = "A", description = "", picture = null)
@@ -172,14 +134,6 @@ class SavedPresenterTest {
             presenter.onExperienceClick(experienceId)
         }
 
-        fun should_call_auth_repo_has_person_credentials() {
-            then(mockAuthRepository).should().hasPersonCredentials()
-        }
-
-        fun should_call_auth_repo_get_person_invitation() {
-            then(mockAuthRepository).should().getPersonInvitation()
-        }
-
         fun should_show_view_loader() {
             then(mockView).should().showLoader()
         }
@@ -208,9 +162,6 @@ class SavedPresenterTest {
             then(mockView).should().navigateToExperience(experienceId)
         }
 
-        infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)
-        infix fun whenn(func: ScenarioMaker.() -> Unit) = apply(func)
-        infix fun then(func: ScenarioMaker.() -> Unit) = apply(func)
         fun a_test_observable() {
             testObservable = PublishSubject.create<Result<List<Experience>>>()
             assertFalse(testObservable.hasObservers())
@@ -228,5 +179,9 @@ class SavedPresenterTest {
         fun should_unsubscribe_observable() {
             assertFalse(testObservable.hasObservers())
         }
+
+        infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)
+        infix fun whenn(func: ScenarioMaker.() -> Unit) = apply(func)
+        infix fun then(func: ScenarioMaker.() -> Unit) = apply(func)
     }
 }

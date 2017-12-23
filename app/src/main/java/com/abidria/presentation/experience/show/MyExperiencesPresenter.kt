@@ -3,16 +3,13 @@ package com.abidria.presentation.experience.show
 import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.OnLifecycleEvent
-import com.abidria.data.auth.AuthRepository
 import com.abidria.data.experience.ExperienceRepository
 import com.abidria.presentation.common.injection.scheduler.SchedulerProvider
 import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
 class MyExperiencesPresenter @Inject constructor(private val repository: ExperienceRepository,
-                                                 private val authRepository: AuthRepository,
-                                                 private val schedulerProvider: SchedulerProvider)
-                                                                                                : LifecycleObserver {
+                                                 private val schedulerProvider: SchedulerProvider) : LifecycleObserver {
 
     lateinit var view: MyExperiencesView
 
@@ -20,8 +17,7 @@ class MyExperiencesPresenter @Inject constructor(private val repository: Experie
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun create() {
-        if (authRepository.hasPersonCredentials()) connectToExperiences()
-        else getPersonInvitation()
+        connectToExperiences()
     }
 
     fun onRetryClick() {
@@ -32,13 +28,6 @@ class MyExperiencesPresenter @Inject constructor(private val repository: Experie
 
     fun onExperienceClick(experienceId: String) {
         view.navigateToExperience(experienceId)
-    }
-
-    private fun getPersonInvitation() {
-        authRepository.getPersonInvitation()
-                .subscribeOn(schedulerProvider.subscriber())
-                .observeOn(schedulerProvider.observer())
-                .subscribe { connectToExperiences() }
     }
 
     private fun connectToExperiences() {
