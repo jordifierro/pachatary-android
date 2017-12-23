@@ -10,6 +10,7 @@ import com.abidria.presentation.common.edition.SelectLocationActivity
 import com.abidria.presentation.experience.edition.EditExperienceActivity
 import com.abidria.presentation.experience.show.ExploreFragment
 import com.abidria.presentation.experience.show.MyExperiencesFragment
+import com.abidria.presentation.experience.show.SavedFragment
 import com.abidria.presentation.scene.show.SceneDetailActivity
 import dagger.Component
 import javax.inject.Singleton
@@ -28,4 +29,5 @@ interface ApplicationComponent {
     fun inject(editExperienceActivity: EditExperienceActivity)
     fun inject(exploreFragment: ExploreFragment)
     fun inject(myExperiencesFragment: MyExperiencesFragment)
+    fun inject(savedFragment: SavedFragment)
 }

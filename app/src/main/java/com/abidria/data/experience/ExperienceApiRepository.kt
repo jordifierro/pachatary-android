@@ -31,6 +31,12 @@ class ExperienceApiRepository (retrofit: Retrofit, @Named("io") val scheduler: S
                             { it.map { it.toDomain(isMine = true) } }))
                     .subscribeOn(scheduler)
 
+    fun savedExperiencesFlowable(): Flowable<Result<List<Experience>>> =
+            experienceApi.savedExperiences()
+                    .compose<Result<List<Experience>>>(ParseNetworkResultTransformer(
+                            { it.map { it.toDomain(isSaved = true) } }))
+                    .subscribeOn(scheduler)
+
     fun createExperience(experience: Experience): Flowable<Result<Experience>> =
             experienceApi.createExperience(title = experience.title, description = experience.description)
                     .compose(ParseNetworkResultTransformer({ it.toDomain() }))

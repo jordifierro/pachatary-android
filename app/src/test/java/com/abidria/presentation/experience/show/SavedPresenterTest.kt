@@ -11,15 +11,13 @@ import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.Test
 import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.then
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 
-class MyExperiencesPresenterTest {
+class SavedPresenterTest {
 
     @Test
     fun test_create_asks_experiences_and_ask_invitation_if_not_has_credentials() {
@@ -94,17 +92,6 @@ class MyExperiencesPresenterTest {
     }
 
     @Test
-    fun test_create_new_experience_button_click() {
-        given {
-            nothing()
-        } whenn {
-            on_create_experience_click()
-        } then {
-            should_navigate_to_create_experience()
-        }
-    }
-
-    @Test
     fun test_unsubscribe_on_destroy() {
         given {
             an_auth_repo_has_credentials()
@@ -122,8 +109,8 @@ class MyExperiencesPresenterTest {
 
     class ScenarioMaker {
 
-        lateinit var presenter: MyExperiencesPresenter
-        @Mock lateinit var mockView: MyExperiencesView
+        lateinit var presenter: SavedPresenter
+        @Mock lateinit var mockView: SavedView
         @Mock lateinit var mockRepository: ExperienceRepository
         @Mock lateinit var mockAuthRepository: AuthRepository
         lateinit var experienceA: Experience
@@ -133,7 +120,7 @@ class MyExperiencesPresenterTest {
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
             val testSchedulerProvider = SchedulerProvider(Schedulers.trampoline(), Schedulers.trampoline())
-            presenter = MyExperiencesPresenter(mockRepository, mockAuthRepository, testSchedulerProvider)
+            presenter = SavedPresenter(mockRepository, mockAuthRepository, testSchedulerProvider)
             presenter.view = mockView
 
             return this
@@ -163,12 +150,13 @@ class MyExperiencesPresenterTest {
         }
 
         fun an_experience_repo_that_returns_both_on_my_experiences_flowable() {
-            given(mockRepository.myExperiencesFlowable())
-                    .willReturn(Flowable.just(Result<List<Experience>>(arrayListOf(experienceA, experienceB), null)))
+            given(mockRepository.savedExperiencesFlowable())
+                    .willReturn(Flowable.just(Result<List<Experience>>(
+                            arrayListOf(experienceA, experienceB), null)))
         }
 
         fun an_experience_repo_that_returns_exception() {
-            given(mockRepository.myExperiencesFlowable())
+            given(mockRepository.savedExperiencesFlowable())
                     .willReturn(Flowable.just(Result<List<Experience>>(null, Exception())))
         }
 
@@ -178,10 +166,6 @@ class MyExperiencesPresenterTest {
 
         fun retry_clicked() {
             presenter.onRetryClick()
-        }
-
-        fun on_create_experience_click() {
-            presenter.onCreateExperienceClick()
         }
 
         fun experience_click(experienceId: String) {
@@ -217,15 +201,11 @@ class MyExperiencesPresenterTest {
         }
 
         fun should_call_repo_refresh_experiences() {
-            then(mockRepository).should().refreshMyExperiences()
+            then(mockRepository).should().refreshSavedExperiences()
         }
 
         fun should_navigate_to_experience(experienceId: String) {
             then(mockView).should().navigateToExperience(experienceId)
-        }
-
-        fun should_navigate_to_create_experience() {
-            then(mockView).should().navigateToCreateExperience()
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)
@@ -237,7 +217,8 @@ class MyExperiencesPresenterTest {
         }
 
         fun an_experience_repo_that_returns_test_observable() {
-            given(mockRepository.myExperiencesFlowable()).willReturn(testObservable.toFlowable(BackpressureStrategy.LATEST))
+            given(mockRepository.savedExperiencesFlowable())
+                    .willReturn(testObservable.toFlowable(BackpressureStrategy.LATEST))
         }
 
         fun destroy_presenter() {

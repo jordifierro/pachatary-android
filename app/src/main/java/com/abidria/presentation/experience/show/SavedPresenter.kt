@@ -9,12 +9,11 @@ import com.abidria.presentation.common.injection.scheduler.SchedulerProvider
 import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
-class MyExperiencesPresenter @Inject constructor(private val repository: ExperienceRepository,
-                                                 private val authRepository: AuthRepository,
-                                                 private val schedulerProvider: SchedulerProvider)
-                                                                                                : LifecycleObserver {
+class SavedPresenter @Inject constructor(private val repository: ExperienceRepository,
+                                         private val authRepository: AuthRepository,
+                                         private val schedulerProvider: SchedulerProvider) : LifecycleObserver {
 
-    lateinit var view: MyExperiencesView
+    lateinit var view: SavedView
 
     private var experiencesDisposable: Disposable? = null
 
@@ -27,7 +26,7 @@ class MyExperiencesPresenter @Inject constructor(private val repository: Experie
     fun onRetryClick() {
         view.hideRetry()
         view.showLoader()
-        repository.refreshMyExperiences()
+        repository.refreshSavedExperiences()
     }
 
     fun onExperienceClick(experienceId: String) {
@@ -43,7 +42,7 @@ class MyExperiencesPresenter @Inject constructor(private val repository: Experie
 
     private fun connectToExperiences() {
         view.showLoader()
-        experiencesDisposable = repository.myExperiencesFlowable()
+        experiencesDisposable = repository.savedExperiencesFlowable()
                                           .subscribeOn(schedulerProvider.subscriber())
                                           .observeOn(schedulerProvider.observer())
                                           .subscribe({ view.hideLoader()
@@ -53,9 +52,5 @@ class MyExperiencesPresenter @Inject constructor(private val repository: Experie
 
     fun destroy() {
         experiencesDisposable?.dispose()
-    }
-
-    fun onCreateExperienceClick() {
-        view.navigateToCreateExperience()
     }
 }

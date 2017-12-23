@@ -10,6 +10,7 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
     private var experiencesStream: ResultStreamFactory.ResultStream<Experience>? = null
     private var exploreExperiencesFlowable: Flowable<Result<List<Experience>>>? = null
     private var myExperiencesFlowable: Flowable<Result<List<Experience>>>? = null
+    private var savedExperiencesFlowable: Flowable<Result<List<Experience>>>? = null
 
     private fun experiencesFlowable(): ResultStreamFactory.ResultStream<Experience> {
         if (experiencesStream == null) experiencesStream = experienceStreamFactory.create()
@@ -19,7 +20,7 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
     fun exploreExperiencesFlowable() : Flowable<Result<List<Experience>>> {
         if (exploreExperiencesFlowable == null) {
             exploreExperiencesFlowable = experiencesFlowable().resultFlowable
-                    .map { Result(it.data!!.filter { !it.isMine }, null) }
+                    .map { Result(it.data!!.filter { !it.isMine && !it.isSaved }, null) }
             refreshExperiences()
         }
         return exploreExperiencesFlowable!!
@@ -27,7 +28,7 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
 
     fun refreshExperiences() {
         apiRepository.exploreExperiencesFlowable().subscribe {
-            experiencesStream!!.removeAllThatObserver.onNext({ experience: Experience -> !experience.isMine })
+            experiencesStream!!.removeAllThatObserver.onNext({ !it.isMine && !it.isSaved })
             experiencesStream!!.addOrUpdateObserver.onNext(it) }
     }
 
@@ -43,6 +44,21 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
     fun refreshMyExperiences() {
         apiRepository.myExperiencesFlowable().subscribe {
             experiencesStream!!.removeAllThatObserver.onNext({ experience: Experience -> experience.isMine })
+            experiencesStream!!.addOrUpdateObserver.onNext(it) }
+    }
+
+    fun savedExperiencesFlowable() : Flowable<Result<List<Experience>>> {
+        if (savedExperiencesFlowable == null) {
+            savedExperiencesFlowable = experiencesFlowable().resultFlowable
+                    .map { Result(it.data!!.filter { it.isSaved }, null) }
+            refreshSavedExperiences()
+        }
+        return savedExperiencesFlowable!!
+    }
+
+    fun refreshSavedExperiences() {
+        apiRepository.savedExperiencesFlowable().subscribe {
+            experiencesStream!!.removeAllThatObserver.onNext({ experience: Experience -> experience.isSaved })
             experiencesStream!!.addOrUpdateObserver.onNext(it) }
     }
 

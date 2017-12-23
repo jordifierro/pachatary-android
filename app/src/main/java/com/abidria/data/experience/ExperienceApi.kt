@@ -6,19 +6,22 @@ import retrofit2.http.*
 
 interface ExperienceApi {
 
-    @GET("/exploreExperiences/?mine=false")
+    @GET("/experiences/?mine=false")
     fun exploreExperiences() : Flowable<Result<List<ExperienceMapper>>>
 
-    @GET("/exploreExperiences/?mine=true")
+    @GET("/experiences/?mine=true")
     fun myExperiences() : Flowable<Result<List<ExperienceMapper>>>
 
+    @GET("/experiences/?saved=true")
+    fun savedExperiences() : Flowable<Result<List<ExperienceMapper>>>
+
     @FormUrlEncoded
-    @POST("/exploreExperiences/")
+    @POST("/experiences/")
     fun createExperience(@Field("title") title: String,
                          @Field("description") description: String) : Flowable<Result<ExperienceMapper>>
 
     @FormUrlEncoded
-    @PATCH("/exploreExperiences/{id}")
+    @PATCH("/experiences/{id}")
     fun editExperience(@Path("id") id: String,
                        @Field("title") title: String,
                        @Field("description") description: String): Flowable<Result<ExperienceMapper>>

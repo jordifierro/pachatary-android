@@ -26,7 +26,7 @@ class ExperienceApiRepositoryTest {
             my_experiences_are_requested()
         } then {
             request_should_get_experiences(mine = true)
-            response_should_experience_list()
+            response_should_experience_list(isMine = true)
         }
     }
 
@@ -37,8 +37,20 @@ class ExperienceApiRepositoryTest {
         } whenn {
             explore_experiences_are_requested()
         } then {
-            request_should_get_experiences(mine = false)
+            request_should_get_experiences()
             response_should_experience_list()
+        }
+    }
+
+    @Test
+    fun test_get_saved_experiences() {
+        given {
+            a_web_server_that_returns_get_experiences()
+        } whenn {
+            saved_experiences_are_requested()
+        } then {
+            request_should_get_experiences(saved = true)
+            response_should_experience_list(isSaved = true)
         }
     }
 
@@ -117,6 +129,11 @@ class ExperienceApiRepositoryTest {
             testListSubscriber.awaitCount(1)
         }
 
+        fun saved_experiences_are_requested() {
+            repository.savedExperiencesFlowable().subscribeOn(Schedulers.trampoline()).subscribe(testListSubscriber)
+            testListSubscriber.awaitCount(1)
+        }
+
         fun experience_is_created() {
             repository.createExperience(experience).subscribe(testSubscriber)
             testSubscriber.awaitCount(1)
@@ -127,17 +144,18 @@ class ExperienceApiRepositoryTest {
             testSubscriber.awaitCount(1)
         }
 
-        fun request_should_get_experiences(mine: Boolean) {
+        fun request_should_get_experiences(mine: Boolean = false, saved: Boolean = false) {
             val request = mockWebServer.takeRequest()
-            if (mine) assertEquals("/exploreExperiences/?mine=true", request.getPath())
-            else assertEquals("/exploreExperiences/?mine=false", request.getPath())
+            if (saved) assertEquals("/experiences/?saved=true", request.getPath())
+            else if (mine) assertEquals("/experiences/?mine=true", request.getPath())
+            else assertEquals("/experiences/?mine=false", request.getPath())
             assertEquals("GET", request.getMethod())
             assertEquals("", request.getBody().readUtf8())
         }
 
         fun request_should_post_experience_attrs() {
             val request = mockWebServer.takeRequest()
-            assertEquals("/exploreExperiences/", request.getPath())
+            assertEquals("/experiences/", request.getPath())
             assertEquals("POST", request.getMethod())
             assertEquals("title=T&description=desc",
                     request.getBody().readUtf8())
@@ -145,12 +163,12 @@ class ExperienceApiRepositoryTest {
 
         fun request_should_patch_experience_attrs() {
             val request = mockWebServer.takeRequest()
-            assertEquals("/exploreExperiences/1", request.getPath())
+            assertEquals("/experiences/1", request.getPath())
             assertEquals("PATCH", request.getMethod())
             assertEquals("title=T&description=desc", request.getBody().readUtf8())
         }
 
-        fun response_should_experience_list() {
+        fun response_should_experience_list(isMine: Boolean = false, isSaved: Boolean = false) {
             val result = testListSubscriber.events.get(0).get(0) as Result<*>
             val experiences = result.data as List<*>
 
@@ -161,11 +179,15 @@ class ExperienceApiRepositoryTest {
             assertEquals("https://experiences/8c29c4735.small.jpg", experience.picture!!.smallUrl)
             assertEquals("https://experiences/8c29c4735.medium.jpg", experience.picture!!.mediumUrl)
             assertEquals("https://experiences/8c29c4735.large.jpg", experience.picture!!.largeUrl)
+            assertEquals(isMine, experience.isMine)
+            assertEquals(isSaved, experience.isSaved)
 
             val secondExperience = experiences[1] as Experience
             assertEquals("3", secondExperience.id)
             assertEquals("Magic Castle of Lost Swamps", secondExperience.title)
             assertEquals("Don't try to go there!", secondExperience.description)
+            assertEquals(isMine, experience.isMine)
+            assertEquals(isSaved, experience.isSaved)
             assertNull(secondExperience.picture)
         }
 

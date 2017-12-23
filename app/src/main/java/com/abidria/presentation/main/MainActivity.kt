@@ -8,13 +8,15 @@ import android.support.v7.app.AppCompatActivity
 import com.abidria.R
 import com.abidria.presentation.experience.show.ExploreFragment
 import com.abidria.presentation.experience.show.MyExperiencesFragment
+import com.abidria.presentation.experience.show.SavedFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
     val fragmentManager = getSupportFragmentManager()
-    lateinit var exploreFragment: ExploreFragment
     lateinit var myExperiencesFragment: MyExperiencesFragment
+    lateinit var savedFragment: SavedFragment
+    lateinit var exploreFragment: ExploreFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +35,9 @@ class MainActivity : AppCompatActivity() {
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_saved -> {
+                if (!this::savedFragment.isInitialized)
+                    savedFragment = SavedFragment.newInstance()
+                navigateToFragment(savedFragment)
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_explore -> {
