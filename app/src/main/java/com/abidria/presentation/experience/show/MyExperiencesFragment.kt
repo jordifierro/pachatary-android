@@ -1,7 +1,10 @@
 package com.abidria.presentation.experience.show
 
-import android.arch.lifecycle.LifecycleOwner
+import android.os.Build
 import android.os.Bundle
+import android.support.design.widget.FloatingActionButton
+import android.support.v4.app.Fragment
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -13,12 +16,11 @@ import android.widget.TextView
 import com.abidria.R
 import com.abidria.data.experience.Experience
 import com.abidria.presentation.common.AbidriaApplication
-import com.abidria.presentation.common.LifecycleFragment
 import com.abidria.presentation.experience.edition.CreateExperienceActivity
 import com.squareup.picasso.Picasso
 import javax.inject.Inject
 
-class MyExperiencesFragment : LifecycleFragment(), MyExperiencesView {
+class MyExperiencesFragment : Fragment(), MyExperiencesView {
 
     companion object {
         fun newInstance(): MyExperiencesFragment {
@@ -33,6 +35,14 @@ class MyExperiencesFragment : LifecycleFragment(), MyExperiencesView {
     lateinit var recyclerView: RecyclerView
     lateinit var progressBar: ProgressBar
     lateinit var retryIcon: ImageView
+    lateinit var createExperienceButton: FloatingActionButton
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        AbidriaApplication.injector.inject(this)
+        presenter.view = this
+    }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -43,11 +53,17 @@ class MyExperiencesFragment : LifecycleFragment(), MyExperiencesView {
         retryIcon.setOnClickListener { presenter.onRetryClick() }
         recyclerView = view.findViewById<RecyclerView>(R.id.experiences_recyclerview)
         recyclerView.layoutManager = GridLayoutManager(activity, 2)
+        createExperienceButton = view.findViewById<FloatingActionButton>(R.id.create_new_experience_button)
+        createExperienceButton.setOnClickListener { presenter.onCreateExperienceClick() }
 
-        AbidriaApplication.injector.inject(this)
-        presenter.view = this
-        lifecycle.addObserver(presenter)
+        presenter.create()
+
         return view
+    }
+
+    override fun onResume() {
+        super.onResume()
+        presenter.resume()
     }
 
     override fun showLoader() {
@@ -78,6 +94,21 @@ class MyExperiencesFragment : LifecycleFragment(), MyExperiencesView {
     override fun navigateToCreateExperience() {
         startActivity(CreateExperienceActivity.newIntent(context = activity))
     }
+
+    override fun showRegisterDialog() {
+        val builder: AlertDialog.Builder
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            builder = AlertDialog.Builder(context, android.R.style.Theme_Material_Dialog_Alert)
+        else builder = AlertDialog.Builder(context)
+        builder.setTitle(R.string.dialog_title_mine_register)
+                .setMessage(R.string.dialog_question_mine_register)
+                .setPositiveButton(android.R.string.yes, { _, _ -> presenter.onProceedToRegister() })
+                .setNegativeButton(android.R.string.no, { _, _ -> presenter.onDontProceedToRegister() })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show()
+    }
+
+    override fun navigateToRegister() { }
 
     class ExperiencesListAdapter(val inflater: LayoutInflater, val experienceList: List<Experience>,
                                  val onClick: (String) -> Unit) : RecyclerView.Adapter<ExperienceViewHolder>() {

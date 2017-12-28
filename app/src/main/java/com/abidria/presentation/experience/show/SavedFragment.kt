@@ -1,6 +1,7 @@
 package com.abidria.presentation.experience.show
 
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -12,12 +13,10 @@ import android.widget.TextView
 import com.abidria.R
 import com.abidria.data.experience.Experience
 import com.abidria.presentation.common.AbidriaApplication
-import com.abidria.presentation.common.LifecycleFragment
-import com.abidria.presentation.experience.edition.CreateExperienceActivity
 import com.squareup.picasso.Picasso
 import javax.inject.Inject
 
-class SavedFragment : LifecycleFragment(), SavedView {
+class SavedFragment : Fragment(), SavedView {
 
     companion object {
         fun newInstance(): SavedFragment {
@@ -33,6 +32,13 @@ class SavedFragment : LifecycleFragment(), SavedView {
     lateinit var progressBar: ProgressBar
     lateinit var retryIcon: ImageView
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        AbidriaApplication.injector.inject(this)
+        presenter.view = this
+    }
+
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val view = inflater!!.inflate(R.layout.fragment_saved, container, false)
@@ -43,9 +49,8 @@ class SavedFragment : LifecycleFragment(), SavedView {
         recyclerView = view.findViewById<RecyclerView>(R.id.experiences_recyclerview)
         recyclerView.layoutManager = GridLayoutManager(activity, 2)
 
-        AbidriaApplication.injector.inject(this)
-        presenter.view = this
-        lifecycle.addObserver(presenter)
+        presenter.create()
+
         return view
     }
 

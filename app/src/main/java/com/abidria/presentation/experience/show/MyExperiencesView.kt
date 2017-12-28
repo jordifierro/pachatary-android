@@ -8,6 +8,8 @@ interface MyExperiencesView : LoaderView {
     fun showRetry()
     fun hideRetry()
     fun showExperienceList(experienceList: List<Experience>)
+    fun showRegisterDialog()
     fun navigateToExperience(experienceId: String)
     fun navigateToCreateExperience()
+    fun navigateToRegister()
 }

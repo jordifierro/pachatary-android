@@ -1,8 +1,6 @@
 package com.abidria.presentation.experience.show
 
-import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleObserver
-import android.arch.lifecycle.OnLifecycleEvent
 import com.abidria.data.experience.ExperienceRepository
 import com.abidria.presentation.common.injection.scheduler.SchedulerProvider
 import io.reactivex.disposables.Disposable
@@ -15,7 +13,6 @@ class SavedPresenter @Inject constructor(private val repository: ExperienceRepos
 
     private var experiencesDisposable: Disposable? = null
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun create() {
         connectToExperiences()
     }

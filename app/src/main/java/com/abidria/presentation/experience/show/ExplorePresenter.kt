@@ -15,7 +15,6 @@ class ExplorePresenter @Inject constructor(private val repository: ExperienceRep
 
     private var experiencesDisposable: Disposable? = null
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun create() {
         connectToExperiences()
     }
