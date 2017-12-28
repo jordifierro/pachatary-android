@@ -1,25 +1,18 @@
 package com.abidria.data.auth
 
 import com.abidria.data.common.Result
-import com.google.gson.FieldNamingPolicy
-import com.google.gson.GsonBuilder
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
 import junit.framework.Assert.*
-import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
 import org.junit.Test
 import org.mockito.BDDMockito
 import org.mockito.Mockito.mock
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
 
 class AuthRepositoryTest {
 
     @Test
-    fun has_person_credentials_returns_true() {
+    fun test_has_person_credentials_returns_true() {
         given {
             an_auth_storage_repository_that_returns_an_auth_token()
         } whenn {
@@ -30,7 +23,7 @@ class AuthRepositoryTest {
     }
 
     @Test
-    fun has_not_person_credentials_returns_false() {
+    fun test_has_not_person_credentials_returns_false() {
         given {
             an_auth_storage_repository_that_raises_no_logged_exception()
         } whenn {
@@ -41,7 +34,42 @@ class AuthRepositoryTest {
     }
 
     @Test
-    fun get_person_invitation_returns_flowable_and_saves_auth_token() {
+    fun test_can_create_content_returns_false_if_no_person_info() {
+        given {
+            an_auth_api_that_raises_no_person_info_on_get_person_info()
+        } whenn {
+            can_create_content()
+        } then {
+            should_return_false()
+        }
+    }
+
+    @Test
+    fun test_can_create_content_returns_false_if_person_is_email_confirmed_false() {
+        given {
+            a_person_with_is_email_confirmed_false()
+            an_auth_api_that_returns_that_person_on_get_person()
+        } whenn {
+            can_create_content()
+        } then {
+            should_return_false()
+        }
+    }
+
+    @Test
+    fun test_can_create_content_returns_true_if_person_is_email_confirmed_true() {
+        given {
+            a_person_with_is_email_confirmed_true()
+            an_auth_api_that_returns_that_person_on_get_person()
+        } whenn {
+            can_create_content()
+        } then {
+            should_return_true()
+        }
+    }
+
+    @Test
+    fun test_get_person_invitation_returns_flowable_and_saves_auth_token() {
         given {
             an_auth_api_that_returns_a_flowable_with_auth_token()
         } whenn {
@@ -52,6 +80,17 @@ class AuthRepositoryTest {
         }
     }
 
+    @Test
+    fun test_save_person_call_storage_repo_set_person() {
+        given {
+            a_person_with_is_email_confirmed_true()
+        } whenn {
+            save_that_person()
+        } then {
+            should_call_storage_repo_set_person_with_that_person()
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
@@ -59,8 +98,10 @@ class AuthRepositoryTest {
         val authApiRepository = mock(AuthApiRepository::class.java)
         val repository = AuthRepository(authStorageRepository, authApiRepository)
         var hasCredentialsResult = false
+        var canCreateContentResult = false
         val testAuthTokenSubscriber = TestSubscriber<Result<AuthToken>>()
         lateinit var authToken: AuthToken
+        lateinit var person: Person
 
         fun an_auth_storage_repository_that_returns_an_auth_token() {
             val authToken = AuthToken(accessToken = "A", refreshToken = "R")
@@ -99,6 +140,43 @@ class AuthRepositoryTest {
 
         fun should_save_auth_token_on_auth_storage_repository() {
             BDDMockito.then(authStorageRepository).should().setPersonCredentials(authToken)
+        }
+
+        fun an_auth_api_that_raises_no_person_info_on_get_person_info() {
+            BDDMockito.given(authStorageRepository.getPerson())
+                    .willThrow(NoPersonInfoException("Person has not started register process"))
+        }
+
+        fun a_person_with_is_email_confirmed_false() {
+            person = Person(isRegistered = true, username = "usr", email = "e@m.c", isEmailConfirmed = false)
+        }
+
+        fun a_person_with_is_email_confirmed_true() {
+            person = Person(isRegistered = true, username = "usr", email = "e@m.c", isEmailConfirmed = true)
+        }
+
+        fun an_auth_api_that_returns_that_person_on_get_person() {
+            BDDMockito.given(authStorageRepository.getPerson()).willReturn(person)
+        }
+
+        fun can_create_content() {
+            canCreateContentResult = repository.canPersonCreateContent()
+        }
+
+        fun save_that_person() {
+            repository.savePerson(person)
+        }
+
+        fun should_return_false() {
+            assertFalse(canCreateContentResult)
+        }
+
+        fun should_return_true() {
+            assertTrue(canCreateContentResult)
+        }
+
+        fun should_call_storage_repo_set_person_with_that_person() {
+            BDDMockito.then(authStorageRepository).should().setPerson(person)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = apply(func)

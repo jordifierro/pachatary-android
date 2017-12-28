@@ -18,4 +18,16 @@ class AuthRepository(val authStorageRepository: AuthStorageRepository, val authA
         return authApiRepository.getPersonInvitation()
                 .doOnNext { authStorageRepository.setPersonCredentials(it.data!!) }
     }
+
+    fun savePerson(person: Person) {
+        authStorageRepository.setPerson(person)
+    }
+
+    fun canPersonCreateContent(): Boolean {
+        try {
+            return authStorageRepository.getPerson().isEmailConfirmed
+        } catch (e: NoPersonInfoException) {
+            return false
+        }
+    }
 }

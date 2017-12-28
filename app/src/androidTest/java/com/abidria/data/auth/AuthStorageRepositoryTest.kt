@@ -33,10 +33,33 @@ class AuthStorageRepositoryTest() {
         }
     }
 
+    @Test
+    fun test_get_and_save_person() {
+        given {
+            a_person()
+        } whenn {
+            save_that_person()
+        } then {
+            get_should_receive_that_person()
+        }
+    }
+
+    @Test
+    fun test_get_person_when_no_person() {
+        given {
+            nothing()
+        } whenn {
+            get_person()
+        } then {
+            should_raise_no_person_info_exception()
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
         lateinit var authToken: AuthToken
+        lateinit var person: Person
         val authStorageRepository = AuthStorageRepository(InstrumentationRegistry.getTargetContext())
         lateinit var exception: Exception
 
@@ -46,8 +69,16 @@ class AuthStorageRepositoryTest() {
             authToken = AuthToken("AT", "RT")
         }
 
+        fun a_person() {
+            person = Person(isRegistered = true, username = "usr.nm", email = "mail@test.com", isEmailConfirmed = false)
+        }
+
         fun save_that_auth_token() {
             authStorageRepository.setPersonCredentials(authToken)
+        }
+
+        fun save_that_person() {
+            authStorageRepository.setPerson(person)
         }
 
         fun get_auth_token() {
@@ -58,12 +89,28 @@ class AuthStorageRepositoryTest() {
             }
         }
 
+        fun get_person() {
+            try {
+                authStorageRepository.getPerson()
+            } catch (e: NoPersonInfoException) {
+                exception = e
+            }
+        }
+
         fun get_should_receive_that_token() {
             Assert.assertEquals(authStorageRepository.getPersonCredentials(), authToken)
         }
 
+        fun get_should_receive_that_person() {
+            Assert.assertEquals(authStorageRepository.getPerson(), person)
+        }
+
         fun should_raise_no_logged_exception() {
             assert(exception is NoLoggedException)
+        }
+
+        fun should_raise_no_person_info_exception() {
+            assert(exception is NoPersonInfoException)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = apply(func)
