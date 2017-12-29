@@ -62,6 +62,10 @@
             android:name=".presentation.experience.edition.EditExperienceActivity"
             android:label="@string/title_activity_edit_experience"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".presentation.register.RegisterActivity"
+            android:label="@string/title_register_activity"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

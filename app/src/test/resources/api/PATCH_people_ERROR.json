@@ -1,0 +1,7 @@
+{
+    "error": {
+        "source": "username",
+        "code": "not_allowed",
+        "message": "Username not allowed"
+    }
+}

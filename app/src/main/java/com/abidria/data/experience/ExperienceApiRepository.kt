@@ -5,7 +5,7 @@ import android.net.Uri
 import android.util.Log
 import com.abidria.BuildConfig
 import com.abidria.data.auth.AuthHttpInterceptor
-import com.abidria.data.common.ParseNetworkResultTransformer
+import com.abidria.data.common.ParseSuccessResultTransformer
 import com.abidria.data.common.Result
 import com.abidria.data.picture.Picture
 import io.reactivex.Flowable
@@ -22,28 +22,28 @@ class ExperienceApiRepository (retrofit: Retrofit, @Named("io") val scheduler: S
 
     fun exploreExperiencesFlowable(): Flowable<Result<List<Experience>>> =
             experienceApi.exploreExperiences()
-                .compose<Result<List<Experience>>>(ParseNetworkResultTransformer({ it.map { it.toDomain() } }))
+                .compose<Result<List<Experience>>>(ParseSuccessResultTransformer({ it.map { it.toDomain() } }))
                 .subscribeOn(scheduler)
 
     fun myExperiencesFlowable(): Flowable<Result<List<Experience>>> =
             experienceApi.myExperiences()
-                    .compose<Result<List<Experience>>>(ParseNetworkResultTransformer(
+                    .compose<Result<List<Experience>>>(ParseSuccessResultTransformer(
                             { it.map { it.toDomain(isMine = true) } }))
                     .subscribeOn(scheduler)
 
     fun savedExperiencesFlowable(): Flowable<Result<List<Experience>>> =
             experienceApi.savedExperiences()
-                    .compose<Result<List<Experience>>>(ParseNetworkResultTransformer(
+                    .compose<Result<List<Experience>>>(ParseSuccessResultTransformer(
                             { it.map { it.toDomain(isSaved = true) } }))
                     .subscribeOn(scheduler)
 
     fun createExperience(experience: Experience): Flowable<Result<Experience>> =
             experienceApi.createExperience(title = experience.title, description = experience.description)
-                    .compose(ParseNetworkResultTransformer({ it.toDomain() }))
+                    .compose(ParseSuccessResultTransformer({ it.toDomain() }))
 
     fun editExperience(experience: Experience): Flowable<Result<Experience>> =
             experienceApi.editExperience(experience.id, experience.title, experience.description)
-                    .compose(ParseNetworkResultTransformer({ it.toDomain() }))
+                    .compose(ParseSuccessResultTransformer({ it.toDomain() }))
 
     fun uploadExperiencePicture(experienceId: String, croppedImageUriString: String,
                                 delegate: (resultExperience: Result<Experience>) -> Unit) {

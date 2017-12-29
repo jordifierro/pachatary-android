@@ -17,6 +17,7 @@ import com.abidria.R
 import com.abidria.data.experience.Experience
 import com.abidria.presentation.common.AbidriaApplication
 import com.abidria.presentation.experience.edition.CreateExperienceActivity
+import com.abidria.presentation.register.RegisterActivity
 import com.squareup.picasso.Picasso
 import javax.inject.Inject
 
@@ -108,7 +109,9 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
                 .show()
     }
 
-    override fun navigateToRegister() { }
+    override fun navigateToRegister() {
+        startActivity(RegisterActivity.newIntent(context = activity))
+    }
 
     class ExperiencesListAdapter(val inflater: LayoutInflater, val experienceList: List<Experience>,
                                  val onClick: (String) -> Unit) : RecyclerView.Adapter<ExperienceViewHolder>() {

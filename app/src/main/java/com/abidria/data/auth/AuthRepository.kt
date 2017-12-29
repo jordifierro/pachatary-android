@@ -30,4 +30,7 @@ class AuthRepository(val authStorageRepository: AuthStorageRepository, val authA
             return false
         }
     }
+
+    fun register(username: String, email: String) =
+        authApiRepository.register(username, email).doOnNext { if (it.isSuccess()) savePerson(it.data!!) }
 }

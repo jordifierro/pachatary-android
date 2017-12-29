@@ -41,4 +41,9 @@
         Do you want to proceed?</string>
     <string name="title_saved">Saved</string>
     <string name="title_explore">Explore</string>
+
+    <string name="title_register_activity">Register</string>
+    <string name="edit_regsiter_username">Username:</string>
+    <string name="edit_register_email">Email:</string>
+    <string name="edit_register_done_button">Done</string>
 </resources>

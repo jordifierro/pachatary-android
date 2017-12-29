@@ -91,6 +91,38 @@ class AuthRepositoryTest {
         }
     }
 
+    @Test
+    fun test_register_returns_api_register_return_and_saves_person_on_storage_repo() {
+        given {
+            a_username()
+            an_email()
+            a_person()
+            an_auth_api_that_returns_a_flowable_with_that_person()
+        } whenn {
+            register_person()
+        } then {
+            should_call_api_register_with_username_and_email()
+            should_receive_person()
+            should_call_storage_repo_to_save_person()
+        }
+    }
+
+    @Test
+    fun test_register_returns_error_without_trying_to_save_it() {
+        given {
+            a_username()
+            an_email()
+            a_result_error()
+            an_auth_api_that_returns_a_flowable_with_that_result_error()
+        } whenn {
+            register_person()
+        } then {
+            should_call_api_register_with_username_and_email()
+            should_receive_error_result()
+            should_not_call_storage_repo_to_save_person()
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
@@ -100,8 +132,37 @@ class AuthRepositoryTest {
         var hasCredentialsResult = false
         var canCreateContentResult = false
         val testAuthTokenSubscriber = TestSubscriber<Result<AuthToken>>()
+        val testPersonSubscriber = TestSubscriber<Result<Person>>()
         lateinit var authToken: AuthToken
         lateinit var person: Person
+        var username = ""
+        var email = ""
+        var resultError: Result<Person>? = null
+
+        fun a_username() {
+            username = "usr.nm"
+        }
+
+        fun an_email() {
+            email = "e@m.c"
+        }
+
+        fun a_person() {
+            person = Person(isRegistered = true, username = "srnm", email = "test@m.c", isEmailConfirmed = false)
+        }
+
+        fun a_result_error() {
+            resultError = Result(null, ClientException(source = "s", code = "c", message = "m"))
+        }
+
+        fun an_auth_api_that_returns_a_flowable_with_that_person() {
+            BDDMockito.given(authApiRepository.register(username, email))
+                    .willReturn(Flowable.just(Result(person, null)))
+        }
+
+        fun an_auth_api_that_returns_a_flowable_with_that_result_error() {
+            BDDMockito.given(authApiRepository.register(username, email)).willReturn(Flowable.just(resultError))
+        }
 
         fun an_auth_storage_repository_that_returns_an_auth_token() {
             val authToken = AuthToken(accessToken = "A", refreshToken = "R")
@@ -124,6 +185,12 @@ class AuthRepositoryTest {
 
         fun get_person_invitation() {
             repository.getPersonInvitation().subscribeOn(Schedulers.trampoline()).subscribe(testAuthTokenSubscriber)
+        }
+
+        fun register_person() {
+            repository.register(username = username, email = email)
+                    .subscribeOn(Schedulers.trampoline()).subscribe(testPersonSubscriber)
+            testPersonSubscriber.awaitCount(1)
         }
 
         fun result_is_true() {
@@ -177,6 +244,26 @@ class AuthRepositoryTest {
 
         fun should_call_storage_repo_set_person_with_that_person() {
             BDDMockito.then(authStorageRepository).should().setPerson(person)
+        }
+
+        fun should_call_api_register_with_username_and_email() {
+            BDDMockito.then(authApiRepository).should().register(username = username, email = email)
+        }
+
+        fun should_receive_person() {
+            testPersonSubscriber.assertResult(Result(person, null))
+        }
+
+        fun should_call_storage_repo_to_save_person() {
+            BDDMockito.then(authStorageRepository).should().setPerson(person)
+        }
+
+        fun should_receive_error_result() {
+            testPersonSubscriber.assertResult(resultError)
+        }
+
+        fun should_not_call_storage_repo_to_save_person() {
+            BDDMockito.then(authStorageRepository).shouldHaveZeroInteractions()
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = apply(func)
