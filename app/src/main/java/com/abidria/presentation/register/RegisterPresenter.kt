@@ -11,10 +11,14 @@ class RegisterPresenter @Inject constructor(private val authRepository: AuthRepo
     lateinit var view: RegisterView
 
     fun doneButtonClick() {
+        view.showLoader()
+        view.blockDoneButton(true)
         authRepository.register(view.getUsername(), view.getEmail())
                 .subscribeOn(schedulerProvider.subscriber())
                 .observeOn(schedulerProvider.observer())
                 .subscribe({
+                    view.hideLoader()
+                    view.blockDoneButton(false)
                     if (it.isSuccess()) {
                         view.showMessage("Successfully registered!\n Check your email to finalize the process")
                         view.finish()

@@ -104,6 +104,7 @@ class ExperienceRepositoryTest {
 
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().start(func)
 
+    @Suppress("UNCHECKED_CAST")
     class ScenarioMaker {
         lateinit var repository: ExperienceRepository
         @Mock lateinit var mockApiRepository: ExperienceApiRepository
@@ -241,7 +242,7 @@ class ExperienceRepositoryTest {
             val testSubscriber = TestSubscriber<Result<List<Experience>>>()
             experiencesFlowableResult.subscribeOn(Schedulers.trampoline()).subscribe(testSubscriber)
             testSubscriber.awaitCount(1)
-            val result = testSubscriber.events.get(0).get(0) as Result<List<Experience>>
+            val result = testSubscriber.events.get(0).get(0) as Result<*>
             assertEquals(result, Result(listOf(experienceC, experienceD), null))
         }
 

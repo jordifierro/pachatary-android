@@ -44,9 +44,10 @@ class RegisterActivity : AppCompatActivity(), RegisterView {
         setContentView(R.layout.activity_register)
         setSupportActionBar(toolbar)
 
-        usernameEditText = findViewById<EditText>(R.id.register_edit_username_edittext)
-        emailEditText = findViewById<EditText>(R.id.register_edit_email_edittext)
-        doneButton = findViewById<Button>(R.id.register_done_button)
+        progressBar = findViewById(R.id.register_progressbar)
+        usernameEditText = findViewById(R.id.register_edit_username_edittext)
+        emailEditText = findViewById(R.id.register_edit_email_edittext)
+        doneButton = findViewById(R.id.register_done_button)
         doneButton.setOnClickListener { presenter.doneButtonClick() }
 
         AbidriaApplication.injector.inject(this)
@@ -60,6 +61,10 @@ class RegisterActivity : AppCompatActivity(), RegisterView {
 
     override fun hideLoader() {
         progressBar.visibility = View.INVISIBLE
+    }
+
+    override fun blockDoneButton(block: Boolean) {
+        doneButton.isEnabled = !block
     }
 
     override fun getUsername() = usernameEditText.editableText.toString()

@@ -25,7 +25,10 @@ class RegisterPresenterTest {
         } whenn {
             done_button_is_clicked()
         } then {
+            should_show_view_loader()
+            should_block_done_button()
             should_call_repo_register_with_username_and_email()
+            should_hide_view_loader()
             should_show_success_message_and_finish_view()
         }
     }
@@ -40,7 +43,11 @@ class RegisterPresenterTest {
         } whenn {
             done_button_is_clicked()
         } then {
+            should_show_view_loader()
+            should_block_done_button()
             error_should_be_shown()
+            should_hide_view_loader()
+            should_unblock_done_button()
         }
     }
 
@@ -104,6 +111,22 @@ class RegisterPresenterTest {
 
         fun error_should_be_shown() {
             BDDMockito.then(mockView).should().showMessage(clientError!!.message)
+        }
+
+        fun should_show_view_loader() {
+            BDDMockito.then(mockView).should().showLoader()
+        }
+
+        fun should_hide_view_loader() {
+            BDDMockito.then(mockView).should().hideLoader()
+        }
+
+        fun should_block_done_button() {
+            BDDMockito.then(mockView).should().blockDoneButton(true)
+        }
+
+        fun should_unblock_done_button() {
+            BDDMockito.then(mockView).should().blockDoneButton(false)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

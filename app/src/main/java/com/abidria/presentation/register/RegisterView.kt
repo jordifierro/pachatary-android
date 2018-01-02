@@ -8,4 +8,5 @@ interface RegisterView : LoaderView {
     fun getEmail(): String
     fun showMessage(message: String)
     fun finish()
+    fun blockDoneButton(block: Boolean)
 }
