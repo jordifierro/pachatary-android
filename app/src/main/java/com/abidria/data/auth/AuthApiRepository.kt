@@ -20,4 +20,10 @@ class AuthApiRepository (retrofit: Retrofit, val clientSecretKey: String) {
                 .compose(ParseNetworkResultTransformer({ it.toDomain() },
                                                        { ClientExceptionMapper(it).toError() }))
     }
+
+    fun confirmEmail(confirmationToken: String): Flowable<Result<Person>> {
+        return authApi.confirmEmail(confirmationToken = confirmationToken)
+                .compose(ParseNetworkResultTransformer({ it.toDomain() },
+                        { ClientExceptionMapper(it).toError() }))
+    }
 }

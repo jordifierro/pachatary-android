@@ -4,7 +4,8 @@ import com.abidria.data.common.Result
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
-import junit.framework.Assert.*
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.BDDMockito
 import org.mockito.Mockito.mock
@@ -123,6 +124,36 @@ class AuthRepositoryTest {
         }
     }
 
+    @Test
+    fun test_confirm_email_returns_api_confirm_email_return_and_saves_person_on_storage_repo() {
+        given {
+            a_confirmation_token()
+            a_person()
+            an_auth_api_that_returns_a_flowable_with_that_person_on_confirm_email()
+        } whenn {
+            confirm_email_person()
+        } then {
+            should_call_api_confirm_email_with_confirmation_token()
+            should_receive_person()
+            should_call_storage_repo_to_save_person()
+        }
+    }
+
+    @Test
+    fun test_confirm_email_returns_error_without_trying_to_save_it() {
+        given {
+            a_confirmation_token()
+            a_result_error()
+            an_auth_api_that_returns_a_flowable_with_that_result_error_on_confirm_email()
+        } whenn {
+            confirm_email_person()
+        } then {
+            should_call_api_confirm_email_with_confirmation_token()
+            should_receive_error_result()
+            should_not_call_storage_repo_to_save_person()
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
@@ -137,6 +168,7 @@ class AuthRepositoryTest {
         lateinit var person: Person
         var username = ""
         var email = ""
+        var confirmationToken = ""
         var resultError: Result<Person>? = null
 
         fun a_username() {
@@ -145,6 +177,10 @@ class AuthRepositoryTest {
 
         fun an_email() {
             email = "e@m.c"
+        }
+
+        fun a_confirmation_token() {
+            confirmationToken = "ASDF"
         }
 
         fun a_person() {
@@ -162,6 +198,15 @@ class AuthRepositoryTest {
 
         fun an_auth_api_that_returns_a_flowable_with_that_result_error() {
             BDDMockito.given(authApiRepository.register(username, email)).willReturn(Flowable.just(resultError))
+        }
+
+        fun an_auth_api_that_returns_a_flowable_with_that_person_on_confirm_email() {
+            BDDMockito.given(authApiRepository.confirmEmail(confirmationToken))
+                    .willReturn(Flowable.just(Result(person, null)))
+        }
+
+        fun an_auth_api_that_returns_a_flowable_with_that_result_error_on_confirm_email() {
+            BDDMockito.given(authApiRepository.confirmEmail(confirmationToken)).willReturn(Flowable.just(resultError))
         }
 
         fun an_auth_storage_repository_that_returns_an_auth_token() {
@@ -189,6 +234,12 @@ class AuthRepositoryTest {
 
         fun register_person() {
             repository.register(username = username, email = email)
+                    .subscribeOn(Schedulers.trampoline()).subscribe(testPersonSubscriber)
+            testPersonSubscriber.awaitCount(1)
+        }
+
+        fun confirm_email_person() {
+            repository.confirmEmail(confirmationToken = confirmationToken)
                     .subscribeOn(Schedulers.trampoline()).subscribe(testPersonSubscriber)
             testPersonSubscriber.awaitCount(1)
         }
@@ -264,6 +315,10 @@ class AuthRepositoryTest {
 
         fun should_not_call_storage_repo_to_save_person() {
             BDDMockito.then(authStorageRepository).shouldHaveZeroInteractions()
+        }
+
+        fun should_call_api_confirm_email_with_confirmation_token() {
+            BDDMockito.then(authApiRepository).should().confirmEmail(confirmationToken)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = apply(func)

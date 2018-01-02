@@ -12,6 +12,7 @@ import com.abidria.presentation.experience.show.ExploreFragment
 import com.abidria.presentation.experience.show.MyExperiencesFragment
 import com.abidria.presentation.experience.show.SavedFragment
 import com.abidria.presentation.main.MainActivity
+import com.abidria.presentation.register.ConfirmEmailActivity
 import com.abidria.presentation.register.RegisterActivity
 import com.abidria.presentation.scene.show.SceneDetailActivity
 import dagger.Component
@@ -34,4 +35,5 @@ interface ApplicationComponent {
     fun inject(savedFragment: SavedFragment)
     fun inject(mainActivity: MainActivity)
     fun inject(registerActivity: RegisterActivity)
+    fun inject(confirmEmailActivity: ConfirmEmailActivity)
 }

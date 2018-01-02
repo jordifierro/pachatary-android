@@ -1,10 +1,11 @@
 package com.abidria.data.auth
 
-import junit.framework.Assert.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 import org.mockito.BDDMockito
 import org.mockito.Mockito.mock

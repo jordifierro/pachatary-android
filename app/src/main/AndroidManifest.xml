@@ -20,7 +20,8 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".presentation.main.MainActivity"
-            android:label="@string/title_activity_main">
+            android:label="@string/title_activity_main"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -66,6 +67,18 @@
             android:name=".presentation.register.RegisterActivity"
             android:label="@string/title_register_activity"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".presentation.register.ConfirmEmailActivity"
+            android:label="@string/title_confirm_email_activity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter android:label="@string/filter_view_confirm_email_activity">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Accepts URIs that begin with "https://abidria.com -->
+                <data android:scheme="https"
+                      android:host="abidria.com" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

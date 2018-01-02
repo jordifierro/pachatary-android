@@ -1,0 +1,7 @@
+{
+    "error": {
+        "source": "confirmation_token",
+        "code": "invalid",
+        "message": "Invalid confirmation token"
+    }
+}

@@ -18,4 +18,8 @@ interface AuthApi {
     @PATCH("/people/me")
     fun register(@Field("username") username: String,
                  @Field("email") email: String): Flowable<Result<PersonMapper>>
+
+    @FormUrlEncoded
+    @POST("/people/me/email-confirmation")
+    fun confirmEmail(@Field("confirmation_token")confirmationToken: String): Flowable<Result<PersonMapper>>
 }

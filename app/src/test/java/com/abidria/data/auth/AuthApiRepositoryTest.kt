@@ -55,6 +55,32 @@ class AuthApiRepositoryTest {
         }
     }
 
+    @Test
+    fun test_on_confirm_email_parses_person() {
+        given {
+            a_confirmation_token()
+            a_web_server_that_returns_person_response_200_when_post_email_confirmation()
+        } whenn {
+            confirm_email_person()
+        } then {
+            request_should_post_email_confirmation_with_confirmation_token()
+            response_should_be_person()
+        }
+    }
+
+    @Test
+    fun test_on_confirm_email_client_exception_returns_result_with_error() {
+        given {
+            a_confirmation_token()
+            a_web_server_that_returns_error_response_422_invalid_entity_when_post_email_confirmation()
+        } whenn {
+            confirm_email_person()
+        } then {
+            request_should_post_email_confirmation_with_confirmation_token()
+            response_should_be_invalid_confirmation_token_error()
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
@@ -72,6 +98,7 @@ class AuthApiRepositoryTest {
         val testRegisterSubscriber = TestSubscriber<Result<Person>>()
         var username = ""
         var email = ""
+        var confirmationToken = ""
 
         fun a_username() {
             username = "user.nm"
@@ -79,6 +106,10 @@ class AuthApiRepositoryTest {
 
         fun an_email() {
             email = "e@m.c"
+        }
+
+        fun a_confirmation_token() {
+            confirmationToken = "BASD"
         }
 
         fun a_web_server_that_returns_get_people_credentials_response_200() {
@@ -91,9 +122,21 @@ class AuthApiRepositoryTest {
                     AuthApiRepository::class.java.getResource("/api/PATCH_people.json").readText()))
         }
 
+        fun a_web_server_that_returns_person_response_200_when_post_email_confirmation() {
+            mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(
+                    AuthApiRepository::class.java.getResource(
+                            "/api/POST_people_me_email_confirmation.json").readText()))
+        }
+
         fun a_web_server_that_returns_error_response_422_invalid_entity_when_patch_people() {
             mockWebServer.enqueue(MockResponse().setResponseCode(422).setBody(
                     AuthApiRepository::class.java.getResource("/api/PATCH_people_ERROR.json").readText()))
+        }
+
+        fun a_web_server_that_returns_error_response_422_invalid_entity_when_post_email_confirmation() {
+            mockWebServer.enqueue(MockResponse().setResponseCode(422).setBody(
+                    AuthApiRepository::class.java.getResource(
+                            "/api/POST_people_me_email_confirmation_ERROR.json").readText()))
         }
 
         fun get_person_invitation() {
@@ -103,6 +146,12 @@ class AuthApiRepositoryTest {
 
         fun register_person() {
             repository.register(username = username, email = email)
+                    .subscribeOn(Schedulers.trampoline()).subscribe(testRegisterSubscriber)
+            testRegisterSubscriber.awaitCount(1)
+        }
+
+        fun confirm_email_person() {
+            repository.confirmEmail(confirmationToken = confirmationToken)
                     .subscribeOn(Schedulers.trampoline()).subscribe(testRegisterSubscriber)
             testRegisterSubscriber.awaitCount(1)
         }
@@ -122,6 +171,14 @@ class AuthApiRepositoryTest {
             assertEquals(formParams, request.getBody().readUtf8())
         }
 
+        fun request_should_post_email_confirmation_with_confirmation_token() {
+            val request = mockWebServer.takeRequest()
+            assertEquals("/people/me/email-confirmation", request.getPath())
+            assertEquals("POST", request.getMethod())
+            val formParams = "confirmation_token=" + confirmationToken
+            assertEquals(formParams, request.getBody().readUtf8())
+        }
+
         fun response_should_be_auth_token() {
             testAuthTokenSubscriber.assertResult(
                     Result(AuthToken("868a2b9a", "9017c7e7"), null))
@@ -138,6 +195,13 @@ class AuthApiRepositoryTest {
             testRegisterSubscriber.assertResult(Result(null,
                     error = ClientException(source = "username", code = "not_allowed",
                                             message = "Username not allowed"))
+            )
+        }
+
+        fun response_should_be_invalid_confirmation_token_error() {
+            testRegisterSubscriber.assertResult(Result(null,
+                    error = ClientException(source = "confirmation_token", code = "invalid",
+                            message = "Invalid confirmation token"))
             )
         }
 
