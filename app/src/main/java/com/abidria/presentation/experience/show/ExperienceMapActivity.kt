@@ -3,10 +3,13 @@ package com.abidria.presentation.experience.show
 import android.arch.lifecycle.LifecycleRegistry
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.ProgressBar
+import android.widget.Toast
 import com.abidria.BuildConfig
 import com.abidria.R
 import com.abidria.data.scene.Scene
@@ -15,6 +18,7 @@ import com.abidria.presentation.experience.edition.EditExperienceActivity
 import com.abidria.presentation.scene.edition.CreateSceneActivity
 import com.abidria.presentation.scene.show.SceneDetailActivity
 import com.getbase.floatingactionbutton.FloatingActionButton
+import com.getbase.floatingactionbutton.FloatingActionsMenu
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
@@ -40,6 +44,9 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView {
     lateinit var progressBar: ProgressBar
     lateinit var createSceneButton: FloatingActionButton
     lateinit var editExperienceButton: FloatingActionButton
+    lateinit var saveExperienceButton: android.support.design.widget.FloatingActionButton
+    lateinit var unsaveExperienceButton: android.support.design.widget.FloatingActionButton
+    lateinit var editExperienceButtonMenu: FloatingActionsMenu
 
     val mapLoadedReplaySubject: ReplaySubject<Any> = ReplaySubject.create()
 
@@ -63,13 +70,18 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView {
         setContentView(R.layout.activity_experience_map)
         setSupportActionBar(toolbar)
 
-        progressBar = findViewById<ProgressBar>(R.id.scenes_progressbar)
-        mapView = findViewById<MapView>(R.id.mapView)
+        progressBar = findViewById(R.id.scenes_progressbar)
+        mapView = findViewById(R.id.mapView)
         mapView.onCreate(savedInstanceState)
-        createSceneButton = findViewById<FloatingActionButton>(R.id.create_new_scene_button)
+        createSceneButton = findViewById(R.id.create_new_scene_button)
         createSceneButton.setOnClickListener { presenter.onCreateSceneClick() }
-        editExperienceButton = findViewById<FloatingActionButton>(R.id.edit_experience_button)
+        saveExperienceButton = findViewById(R.id.save_experience_button)
+        saveExperienceButton.setOnClickListener { presenter.onSaveExperienceClick() }
+        unsaveExperienceButton = findViewById(R.id.unsave_experience_button)
+        unsaveExperienceButton.setOnClickListener { presenter.onUnsaveExperienceClick() }
+        editExperienceButton = findViewById(R.id.edit_experience_button)
         editExperienceButton.setOnClickListener { presenter.onEditExperienceClick() }
+        editExperienceButtonMenu = findViewById(R.id.edit_experience_button_menu)
 
         AbidriaApplication.injector.inject(this)
         presenter.setView(this, intent.getStringExtra(EXPERIENCE_ID))
@@ -131,6 +143,42 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView {
 
     override fun navigateToCreateScene(experienceId: String) {
         startActivity(CreateSceneActivity.newIntent(context = this, experienceId = experienceId))
+    }
+
+    override fun showEditButton() {
+        editExperienceButtonMenu.visibility = View.VISIBLE
+        saveExperienceButton.visibility = View.INVISIBLE
+        unsaveExperienceButton.visibility = View.INVISIBLE
+    }
+
+    override fun showSaveButton(isSaved: Boolean) {
+        editExperienceButtonMenu.visibility = View.INVISIBLE
+        if (isSaved) {
+            unsaveExperienceButton.visibility = View.VISIBLE
+            saveExperienceButton.visibility = View.INVISIBLE
+        }
+        else {
+            saveExperienceButton.visibility = View.VISIBLE
+            unsaveExperienceButton.visibility = View.INVISIBLE
+        }
+    }
+
+    override fun showUnsaveDialog() {
+        val builder: AlertDialog.Builder
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            builder = AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+        else builder = AlertDialog.Builder(this)
+        builder.setTitle(R.string.dialog_title_unsave_experience)
+                .setMessage(R.string.dialog_question_unsave_experience)
+                .setPositiveButton(android.R.string.yes, { _, _ -> presenter.onConfirmUnsaveExperience() })
+                .setNegativeButton(android.R.string.no, { _, _ -> presenter.onCancelUnsaveExperience() })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show()
+    }
+
+    override fun showSavedMessage() {
+        val message = this.resources.getString(R.string.message_experience_saved)
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
     override fun showLoader() {

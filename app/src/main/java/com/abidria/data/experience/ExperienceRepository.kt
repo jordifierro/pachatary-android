@@ -3,8 +3,11 @@ package com.abidria.data.experience
 import com.abidria.data.common.Result
 import com.abidria.data.common.ResultStreamFactory
 import io.reactivex.Flowable
+import io.reactivex.Scheduler
+import javax.inject.Named
 
 class ExperienceRepository(val apiRepository: ExperienceApiRepository,
+                           @Named("io") val scheduler: Scheduler,
                            val experienceStreamFactory: ResultStreamFactory<Experience>) {
 
     private var experiencesStream: ResultStreamFactory.ResultStream<Experience>? = null
@@ -58,7 +61,8 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
 
     fun refreshSavedExperiences() {
         apiRepository.savedExperiencesFlowable().subscribe {
-            experiencesStream!!.removeAllThatObserver.onNext({ experience: Experience -> experience.isSaved })
+            experiencesStream!!.removeAllThatObserver.onNext(
+                    { experience: Experience -> experience.isSaved })
             experiencesStream!!.addOrUpdateObserver.onNext(it) }
     }
 
@@ -81,4 +85,16 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
     internal val emitThroughAddOrUpdate =
             { resultExperience: Result<Experience> ->
                 experiencesStream!!.addOrUpdateObserver.onNext(Result(listOf(resultExperience.data!!), null)) }
+
+    fun saveExperience(experienceId: String, save: Boolean) {
+        experienceFlowable(experienceId).map {
+            val updatedExperience = Experience(id = it.data!!.id, title = it.data.title,
+                    description = it.data.description, picture = it.data.picture,
+                    isMine = it.data.isMine, isSaved = save)
+            Result(listOf(updatedExperience), null) }
+                                        .subscribeOn(scheduler)
+                                        .take(1)
+                                        .subscribe({ experiencesStream!!.addOrUpdateObserver.onNext(it) })
+        apiRepository.saveExperience(save = save, experienceId = experienceId).subscribeOn(scheduler).subscribe()
+    }
 }

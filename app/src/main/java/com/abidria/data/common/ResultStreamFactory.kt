@@ -1,6 +1,5 @@
 package com.abidria.data.common
 
-import com.abidria.data.experience.Experience
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Observer

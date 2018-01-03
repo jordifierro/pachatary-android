@@ -37,9 +37,9 @@ class ExperienceMapPresenterTest {
     }
 
     @Test
-    fun testCreateGetsExperienceAndSetsTitle() {
+    fun testCreateGetsExperienceSetsTitleAndShowEditButtonWhenExperienceIsMine() {
         given {
-            an_experience()
+            a_mine_experience()
             experience_repo_with_that_experience()
             repository_with_no_scenes()
             map_not_loaded()
@@ -47,6 +47,37 @@ class ExperienceMapPresenterTest {
             presenter_is_created()
         } then {
             view_should_show_experience_title()
+            view_should_show_edit_button()
+        }
+    }
+
+    @Test
+    fun testCreateGetsExperienceSetsTitleAndShowUnsaveButtonWhenExperienceIsSaved() {
+        given {
+            a_saved_experience()
+            experience_repo_with_that_experience()
+            repository_with_no_scenes()
+            map_not_loaded()
+        } whenn {
+            presenter_is_created()
+        } then {
+            view_should_show_experience_title()
+            view_should_show_unsave_button()
+        }
+    }
+
+    @Test
+    fun testCreateGetsExperienceSetsTitleAndShowSaveButtonWhenExperienceIsUnsaved() {
+        given {
+            an_unsaved_experience()
+            experience_repo_with_that_experience()
+            repository_with_no_scenes()
+            map_not_loaded()
+        } whenn {
+            presenter_is_created()
+        } then {
+            view_should_show_experience_title()
+            view_should_show_save_button()
         }
     }
 
@@ -101,6 +132,50 @@ class ExperienceMapPresenterTest {
         }
     }
 
+    @Test
+    fun test_on_save_experience_click_call_api_repo_save_and_shows_saved_message() {
+        given {
+            nothing()
+        } whenn {
+            on_save_experience_clicked()
+        } then {
+            should_call_api_repo_save_with_experience_id()
+            should_make_view_show_saved_message()
+        }
+    }
+
+    @Test
+    fun test_on_unsave_experience_click_shows_confirm_dialog() {
+        given {
+            nothing()
+        } whenn {
+            on_unsave_experience_clicked()
+        } then {
+            should_show_confirm_dialog()
+        }
+    }
+
+    @Test
+    fun test_on_unsave_experience_confirm_call_api_unsave() {
+        given {
+            nothing()
+        } whenn {
+            on_unsave_experience_confirmation()
+        } then {
+            should_call_api_repo_unsave_experience()
+        }
+    }
+
+    @Test
+    fun test_on_unsave_experience_cancel_does_nothing() {
+        given {
+            nothing()
+        } whenn {
+            on_unsave_experience_cancel()
+        } then {
+            nothing()
+        }
+    }
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
@@ -160,6 +235,18 @@ class ExperienceMapPresenterTest {
             experienceA = Experience(id = "1", title = "A", description = "", picture = null)
         }
 
+        fun a_mine_experience() {
+            experienceA = Experience(id = "1", title = "A", description = "", picture = null, isMine = true)
+        }
+
+        fun a_saved_experience() {
+            experienceA = Experience(id = "1", title = "A", description = "", picture = null, isSaved = true)
+        }
+
+        fun an_unsaved_experience() {
+            experienceA = Experience(id = "1", title = "A", description = "", picture = null)
+        }
+
         fun experience_repo_with_that_experience() {
             BDDMockito.given(mockExperienceRepository.experienceFlowable(experienceId = "5"))
                     .willReturn(Flowable.just(Result(experienceA, null)))
@@ -195,6 +282,22 @@ class ExperienceMapPresenterTest {
 
         fun edit_experience_button_is_clicked() {
             presenter.onEditExperienceClick()
+        }
+
+        fun on_save_experience_clicked() {
+            presenter.onSaveExperienceClick()
+        }
+
+        fun on_unsave_experience_clicked() {
+            presenter.onUnsaveExperienceClick()
+        }
+
+        fun on_unsave_experience_confirmation() {
+            presenter.onConfirmUnsaveExperience()
+        }
+
+        fun on_unsave_experience_cancel() {
+            presenter.onCancelUnsaveExperience()
         }
 
         fun view_should_show_loader() {
@@ -235,6 +338,34 @@ class ExperienceMapPresenterTest {
 
         fun view_should_navigate_to_edit_experience_with_experience_id() {
             BDDMockito.then(mockView).should().navigateToEditExperience(experienceId)
+        }
+
+        fun view_should_show_edit_button() {
+            BDDMockito.then(mockView).should().showEditButton()
+        }
+
+        fun view_should_show_unsave_button() {
+            BDDMockito.then(mockView).should().showSaveButton(true)
+        }
+
+        fun view_should_show_save_button() {
+            BDDMockito.then(mockView).should().showSaveButton(false)
+        }
+
+        fun should_call_api_repo_save_with_experience_id() {
+            BDDMockito.then(mockExperienceRepository).should().saveExperience(experienceId, true)
+        }
+
+        fun should_make_view_show_saved_message() {
+            BDDMockito.then(mockView).should().showSavedMessage()
+        }
+
+        fun should_show_confirm_dialog() {
+            BDDMockito.then(mockView).should().showUnsaveDialog()
+        }
+
+        fun should_call_api_repo_unsave_experience() {
+            BDDMockito.then(mockExperienceRepository).should().saveExperience(experienceId, false)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity(), MainView {
         lifecycle.addObserver(presenter)
 
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
-        navigation.selectedItemId = R.id.navigation_explore
+        navigation.selectedItemId = R.id.navigation_saved
     }
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->

@@ -12,4 +12,8 @@ interface ExperienceMapView : LoaderView {
     fun navigateToScene(experienceId: String, sceneId: String)
     fun navigateToCreateScene(experienceId: String)
     fun navigateToEditExperience(experienceId: String)
+    fun showEditButton()
+    fun showSaveButton(isSaved: Boolean)
+    fun showUnsaveDialog()
+    fun showSavedMessage()
 }

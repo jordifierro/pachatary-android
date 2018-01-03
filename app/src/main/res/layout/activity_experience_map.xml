@@ -24,18 +24,38 @@
 
     <include layout="@layout/content_experience_map" />
 
-    <com.getbase.floatingactionbutton.FloatingActionsMenu
-        android:id="@+id/multiple_actions"
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/save_experience_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        app:srcCompat="@drawable/ic_star_black_24dp"
+        android:tint="@color/grey"
+        app:backgroundTint="@color/white"
+        android:visibility="invisible"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/unsave_experience_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        app:srcCompat="@drawable/ic_star_black_24dp"
+        android:tint="@color/black"
+        app:fab_colorNormal="@color/colorAccent"
+        android:visibility="invisible"/>
+
+    <com.getbase.floatingactionbutton.FloatingActionsMenu
+        android:id="@+id/edit_experience_button_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         fab:fab_addButtonColorNormal="@color/colorAccent"
         fab:fab_addButtonColorPressed="@color/white"
         fab:fab_addButtonPlusIconColor="@color/black"
-        android:layout_margin="@dimen/fab_margin">
+        android:layout_margin="@dimen/fab_margin"
+        android:visibility="invisible">
 
         <com.getbase.floatingactionbutton.FloatingActionButton
             android:id="@+id/create_new_scene_button"

@@ -2,9 +2,11 @@ package com.abidria.data.experience
 
 import com.abidria.data.common.Result
 import com.abidria.data.common.ResultStreamFactory
+import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.PublishSubject
 import io.reactivex.subscribers.TestSubscriber
 import org.junit.Assert.*
 import org.junit.Test
@@ -99,7 +101,34 @@ class ExperienceRepositoryTest {
         } then {
             delegate_param_should_emit_experience_through_add_or_update_observer()
         }
+    }
 
+    @Test
+    fun test_save_marks_experience_as_saved_and_calls_api_repo() {
+        given {
+            an_experience()
+            an_experiences_stream_factory_that_returns_stream_with_experience()
+            an_api_repo_that_returns_an_api_flowable_on_save_experience()
+        } whenn {
+            experience_is_saved()
+        } then {
+            experience_marked_as_saved_should_be_emitted_through_add_or_update()
+            api_flowable_save_should_be_subscribed()
+        }
+    }
+
+    @Test
+    fun test_unsave_marks_experience_as_unsaved_and_calls_api_repo() {
+        given {
+            a_saved_experience()
+            an_experiences_stream_factory_that_returns_stream_with_experience()
+            an_api_repo_that_returns_an_api_flowable_on_unsave_experience()
+        } whenn {
+            experience_is_unsaved()
+        } then {
+            experience_marked_as_unsaved_should_be_emitted_through_add_or_update()
+            api_flowable_unsave_should_be_subscribed()
+        }
     }
 
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().start(func)
@@ -118,6 +147,7 @@ class ExperienceRepositoryTest {
         lateinit var apiExperiencesFlowable: Flowable<Result<List<Experience>>>
         lateinit var experiencesFlowableResult: Flowable<Result<List<Experience>>>
         lateinit var experienceFlowableResult: Flowable<Result<Experience>>
+        lateinit var saveExperienceFlowable: PublishSubject<Result<Void>>
         lateinit var createdExperienceFlowableResult: Flowable<Result<Experience>>
         lateinit var experienceA: Experience
         lateinit var experienceB: Experience
@@ -128,7 +158,7 @@ class ExperienceRepositoryTest {
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
-            repository = ExperienceRepository(mockApiRepository, mockExperiencesStreamFactory)
+            repository = ExperienceRepository(mockApiRepository, Schedulers.trampoline(), mockExperiencesStreamFactory)
 
             return this
         }
@@ -139,6 +169,10 @@ class ExperienceRepositoryTest {
 
         fun an_experience() {
             experience = Experience(id = "", title = "Title", description = "some desc.", picture = null)
+        }
+
+        fun a_saved_experience() {
+            experience = Experience(id = "", title = "Title", description = "desc.", picture = null, isSaved = true)
         }
 
         fun a_cropped_image_uri_string() {
@@ -175,6 +209,15 @@ class ExperienceRepositoryTest {
                     ResultStreamFactory.ResultStream(addOrUpdateObserver, removeAllThatObserver, experiencesFlowable))
         }
 
+        fun an_experiences_stream_factory_that_returns_stream_with_experience() {
+            addOrUpdateObserver = TestObserver.create()
+            addOrUpdateObserver.onSubscribe(addOrUpdateObserver)
+            removeAllThatObserver = TestObserver.create()
+            experiencesFlowable = Flowable.just(Result(listOf(experience), null))
+            BDDMockito.given(mockExperiencesStreamFactory.create()).willReturn(
+                    ResultStreamFactory.ResultStream(addOrUpdateObserver, removeAllThatObserver, experiencesFlowable))
+        }
+
         fun an_experiences_stream_factory_that_returns_stream_with_several_experiences() {
             val experienceA = Experience(id = "1", title = "T", description = "desc", picture = null)
             val experienceB = Experience(id = "2", title = "T", description = "desc", picture = null)
@@ -204,6 +247,18 @@ class ExperienceRepositoryTest {
             apiExperiencesFlowable = Flowable.just(Result(listOf(experience), null))
 
             BDDMockito.given(mockApiRepository.savedExperiencesFlowable()).willReturn(apiExperiencesFlowable)
+        }
+
+        fun an_api_repo_that_returns_an_api_flowable_on_save_experience() {
+            saveExperienceFlowable = PublishSubject.create()
+            BDDMockito.given(mockApiRepository.saveExperience(save = true, experienceId = experience.id))
+                    .willReturn(saveExperienceFlowable.toFlowable(BackpressureStrategy.LATEST))
+        }
+
+        fun an_api_repo_that_returns_an_api_flowable_on_unsave_experience() {
+            saveExperienceFlowable = PublishSubject.create()
+            BDDMockito.given(mockApiRepository.saveExperience(save = false, experienceId = experience.id))
+                    .willReturn(saveExperienceFlowable.toFlowable(BackpressureStrategy.LATEST))
         }
 
         fun my_experiences_flowable_is_called() {
@@ -236,6 +291,14 @@ class ExperienceRepositoryTest {
 
         fun upload_experience_picture_is_called() {
             repository.uploadExperiencePicture(experienceId, croppedImageUriString)
+        }
+
+        fun experience_is_saved() {
+            repository.saveExperience(experienceId = experience.id, save = true)
+        }
+
+        fun experience_is_unsaved() {
+            repository.saveExperience(experienceId = experience.id, save = false)
         }
 
         fun should_return_flowable_with_two_mine_experiences() {
@@ -315,6 +378,32 @@ class ExperienceRepositoryTest {
             createdExperienceFlowableResult.subscribeOn(Schedulers.trampoline()).subscribe()
             addOrUpdateObserver.onComplete()
             addOrUpdateObserver.assertResult(Result(listOf(experience), null))
+        }
+
+        fun experience_marked_as_saved_should_be_emitted_through_add_or_update() {
+            val experienceWithSavedTrue = Experience(id = experience.id, title = experience.title,
+                    description = experience.description, picture = experience.picture, isMine = experience.isMine,
+                    isSaved = true)
+            addOrUpdateObserver.onComplete()
+            addOrUpdateObserver.assertResult(Result(listOf(experienceWithSavedTrue), null))
+        }
+
+        fun experience_marked_as_unsaved_should_be_emitted_through_add_or_update() {
+            val experienceWithSavedFalse = Experience(id = experience.id, title = experience.title,
+                    description = experience.description, picture = experience.picture, isMine = experience.isMine,
+                    isSaved = false)
+            addOrUpdateObserver.onComplete()
+            addOrUpdateObserver.assertResult(Result(listOf(experienceWithSavedFalse), null))
+        }
+
+        fun api_flowable_save_should_be_subscribed() {
+            BDDMockito.then(mockApiRepository).should().saveExperience(save = true, experienceId = experience.id)
+            assertTrue(saveExperienceFlowable.hasObservers())
+        }
+
+        fun api_flowable_unsave_should_be_subscribed() {
+            BDDMockito.then(mockApiRepository).should().saveExperience(save = false, experienceId = experience.id)
+            assertTrue(saveExperienceFlowable.hasObservers())
         }
 
         infix fun start(func: ScenarioMaker.() -> Unit) = buildScenario().given(func)

@@ -43,10 +43,10 @@ class SavedFragment : Fragment(), SavedView {
                               savedInstanceState: Bundle?): View? {
         val view = inflater!!.inflate(R.layout.fragment_saved, container, false)
 
-        progressBar = view.findViewById<ProgressBar>(R.id.experiences_progressbar)
-        retryIcon = view.findViewById<ImageView>(R.id.experiences_retry)
+        progressBar = view.findViewById(R.id.experiences_progressbar)
+        retryIcon = view.findViewById(R.id.experiences_retry)
         retryIcon.setOnClickListener { presenter.onRetryClick() }
-        recyclerView = view.findViewById<RecyclerView>(R.id.experiences_recyclerview)
+        recyclerView = view.findViewById(R.id.experiences_recyclerview)
         recyclerView.layoutManager = GridLayoutManager(activity, 2)
 
         presenter.create()
@@ -102,8 +102,8 @@ class SavedFragment : Fragment(), SavedView {
         lateinit var experienceId: String
 
         init {
-            titleView = view.findViewById<TextView>(R.id.experience_title)
-            pictureView = view.findViewById<ImageView>(R.id.experience_picture)
+            titleView = view.findViewById(R.id.experience_title)
+            pictureView = view.findViewById(R.id.experience_picture)
             view.setOnClickListener(this)
         }
 

@@ -30,25 +30,14 @@ class ExperienceMapPresenter @Inject constructor(private val repository: SceneRe
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun create() {
-        setExperienceTitle()
-        setScenesOnMap()
+        connectToExperience()
+        connectToScenes()
     }
 
-    private fun setExperienceTitle() {
-        experienceDisposable = experienceRepository.experienceFlowable(experienceId)
-                                                   .subscribeOn(schedulerProvider.subscriber())
-                                                   .observeOn(schedulerProvider.observer())
-                                                   .subscribe({ if (it.isSuccess()) view.setTitle(it.data!!.title)})
-    }
-
-    private fun setScenesOnMap() {
-        view.showLoader()
-        scenesDisposable = Flowable.combineLatest(
-                                        mapLoadedFlowable(),
-                                        scenesFlowable(),
-                                        BiFunction { _: Any, scenesResult: Result<List<Scene>> -> scenesResult })
-                                   .subscribe({ view.showScenesOnMap(it.data!!)
-                                                view.hideLoader() })
+    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+    fun destroy() {
+        experienceDisposable?.dispose()
+        scenesDisposable?.dispose()
     }
 
     fun onSceneClick(sceneId: String) {
@@ -59,6 +48,46 @@ class ExperienceMapPresenter @Inject constructor(private val repository: SceneRe
         view.navigateToCreateScene(this.experienceId)
     }
 
+    fun onSaveExperienceClick() {
+        experienceRepository.saveExperience(experienceId = experienceId, save = true)
+        view.showSavedMessage()
+    }
+
+    fun onUnsaveExperienceClick() {
+        view.showUnsaveDialog()
+    }
+
+    fun onEditExperienceClick() {
+        view.navigateToEditExperience(experienceId)
+    }
+
+    fun onConfirmUnsaveExperience() {
+        experienceRepository.saveExperience(experienceId = experienceId, save = false)
+    }
+
+    fun onCancelUnsaveExperience() {}
+
+    private fun connectToExperience() {
+        experienceDisposable = experienceRepository.experienceFlowable(experienceId)
+                .subscribeOn(schedulerProvider.subscriber())
+                .observeOn(schedulerProvider.observer())
+                .subscribe({ if (it.isSuccess()) {
+                    view.setTitle(it.data!!.title)
+                    if (it.data.isMine) view.showEditButton()
+                    else view.showSaveButton(isSaved = it.data.isSaved)
+                }})
+    }
+
+    private fun connectToScenes() {
+        view.showLoader()
+        scenesDisposable = Flowable.combineLatest(
+                mapLoadedFlowable(),
+                scenesFlowable(),
+                BiFunction { _: Any, scenesResult: Result<List<Scene>> -> scenesResult })
+                .subscribe({ view.showScenesOnMap(it.data!!)
+                    view.hideLoader() })
+    }
+
     private fun mapLoadedFlowable() = view.mapLoadedFlowable()
                                           .subscribeOn(schedulerProvider.subscriber())
                                           .observeOn(schedulerProvider.observer())
@@ -66,13 +95,4 @@ class ExperienceMapPresenter @Inject constructor(private val repository: SceneRe
     private fun scenesFlowable() = repository.scenesFlowable(experienceId)
                                              .subscribeOn(schedulerProvider.subscriber())
                                              .observeOn(schedulerProvider.observer())
-
-    fun destroy() {
-        experienceDisposable?.dispose()
-        scenesDisposable?.dispose()
-    }
-
-    fun onEditExperienceClick() {
-        view.navigateToEditExperience(experienceId)
-    }
 }

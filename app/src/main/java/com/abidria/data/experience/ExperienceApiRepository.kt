@@ -5,6 +5,7 @@ import android.net.Uri
 import android.util.Log
 import com.abidria.BuildConfig
 import com.abidria.data.auth.AuthHttpInterceptor
+import com.abidria.data.common.ParseSuccessEmptyBodyResultTransformer
 import com.abidria.data.common.ParseSuccessResultTransformer
 import com.abidria.data.common.Result
 import com.abidria.data.picture.Picture
@@ -44,6 +45,13 @@ class ExperienceApiRepository (retrofit: Retrofit, @Named("io") val scheduler: S
     fun editExperience(experience: Experience): Flowable<Result<Experience>> =
             experienceApi.editExperience(experience.id, experience.title, experience.description)
                     .compose(ParseSuccessResultTransformer({ it.toDomain() }))
+
+    fun saveExperience(save: Boolean, experienceId: String): Flowable<Result<Void>> {
+        if (save) return experienceApi.saveExperience(experienceId)
+                .compose(ParseSuccessEmptyBodyResultTransformer())
+        else return experienceApi.unsaveExperience(experienceId)
+                    .compose(ParseSuccessEmptyBodyResultTransformer())
+    }
 
     fun uploadExperiencePicture(experienceId: String, croppedImageUriString: String,
                                 delegate: (resultExperience: Result<Experience>) -> Unit) {

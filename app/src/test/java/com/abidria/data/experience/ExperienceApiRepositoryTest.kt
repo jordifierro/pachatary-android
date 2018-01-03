@@ -80,12 +80,39 @@ class ExperienceApiRepositoryTest {
         }
     }
 
+    @Test
+    fun test_save_experience() {
+        given {
+            an_experience()
+            a_web_server_that_returns_201()
+        } whenn {
+            experience_is_saved()
+        } then {
+            request_should_post_experience_id_save()
+            response_should_parse_empty_body()
+        }
+    }
+
+    @Test
+    fun test_unsave_experience() {
+        given {
+            an_experience()
+            a_web_server_that_returns_204()
+        } whenn {
+            experience_is_unsaved()
+        } then {
+            request_should_delete_experience_id_save()
+            response_should_parse_empty_body()
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
 
         val testListSubscriber = TestSubscriber<Result<List<Experience>>>()
         val testSubscriber = TestSubscriber<Result<Experience>>()
+        val testEmptySubscriber = TestSubscriber<Result<Void>>()
         val mockContext = mock(Context::class.java)
         val mockAuthHttpInterceptor = mock(AuthHttpInterceptor::class.java)
         val mockWebServer = MockWebServer()
@@ -119,6 +146,14 @@ class ExperienceApiRepositoryTest {
                     ExperienceApiRepositoryTest::class.java.getResource("/api/PATCH_experience_id.json").readText()))
         }
 
+        fun a_web_server_that_returns_201() {
+            mockWebServer.enqueue(MockResponse().setResponseCode(201).setBody(""))
+        }
+
+        fun a_web_server_that_returns_204() {
+            mockWebServer.enqueue(MockResponse().setResponseCode(204).setBody(""))
+        }
+
         fun my_experiences_are_requested() {
             repository.myExperiencesFlowable().subscribeOn(Schedulers.trampoline()).subscribe(testListSubscriber)
             testListSubscriber.awaitCount(1)
@@ -144,6 +179,16 @@ class ExperienceApiRepositoryTest {
             testSubscriber.awaitCount(1)
         }
 
+        fun experience_is_saved() {
+            repository.saveExperience(save = true, experienceId = experience.id).subscribe(testEmptySubscriber)
+            testEmptySubscriber.awaitCount(1)
+        }
+
+        fun experience_is_unsaved() {
+            repository.saveExperience(save = false, experienceId = experience.id).subscribe(testEmptySubscriber)
+            testEmptySubscriber.awaitCount(1)
+        }
+
         fun request_should_get_experiences(mine: Boolean = false, saved: Boolean = false) {
             val request = mockWebServer.takeRequest()
             if (saved) assertEquals("/experiences/?saved=true", request.getPath())
@@ -166,6 +211,20 @@ class ExperienceApiRepositoryTest {
             assertEquals("/experiences/1", request.getPath())
             assertEquals("PATCH", request.getMethod())
             assertEquals("title=T&description=desc", request.getBody().readUtf8())
+        }
+
+        fun request_should_post_experience_id_save() {
+            val request = mockWebServer.takeRequest()
+            assertEquals("/experiences/" + experience.id + "/save/", request.getPath())
+            assertEquals("POST", request.getMethod())
+            assertEquals("", request.getBody().readUtf8())
+        }
+
+        fun request_should_delete_experience_id_save() {
+            val request = mockWebServer.takeRequest()
+            assertEquals("/experiences/" + experience.id + "/save/", request.getPath())
+            assertEquals("DELETE", request.getMethod())
+            assertEquals("", request.getBody().readUtf8())
         }
 
         fun response_should_experience_list(isMine: Boolean = false, isSaved: Boolean = false) {
@@ -201,6 +260,11 @@ class ExperienceApiRepositoryTest {
             assertEquals("https://experiences/00df.small.jpeg", receivedExperience.picture!!.smallUrl)
             assertEquals("https://experiences/00df.medium.jpeg", receivedExperience.picture!!.mediumUrl)
             assertEquals("https://experiences/00df.large.jpeg", receivedExperience.picture!!.largeUrl)
+        }
+
+        fun response_should_parse_empty_body() {
+            val receivedResult = testEmptySubscriber.events.get(0).get(0) as Result<*>
+            assertEquals(Result(null, null), receivedResult)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = apply(func)

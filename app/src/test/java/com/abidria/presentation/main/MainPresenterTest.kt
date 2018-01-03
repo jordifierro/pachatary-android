@@ -30,7 +30,7 @@ class MainPresenterTest {
             should_call_auth_repo_has_person_credentials()
             should_hide_view_loader()
             should_show_view_tabs()
-            should_show_explore_view()
+            should_show_saved_view()
         }
     }
 
@@ -49,7 +49,7 @@ class MainPresenterTest {
 
             should_hide_view_loader()
             should_show_view_tabs()
-            should_show_explore_view()
+            should_show_saved_view()
         }
     }
 
@@ -135,8 +135,8 @@ class MainPresenterTest {
             BDDMockito.then(mockView).should().showTabs(true)
         }
 
-        fun should_show_explore_view() {
-            BDDMockito.then(mockView).should().showView(MainView.ExperiencesViewType.EXPLORE)
+        fun should_show_saved_view() {
+            BDDMockito.then(mockView).should().showView(MainView.ExperiencesViewType.SAVED)
         }
 
         fun should_hide_view_tabs() {

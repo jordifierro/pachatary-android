@@ -34,7 +34,7 @@ class MainPresenter @Inject constructor(private val authRepository: AuthReposito
     private fun goToInitTab() {
         view.hideLoader()
         view.showTabs(true)
-        view.showView(MainView.ExperiencesViewType.EXPLORE)
+        view.showView(MainView.ExperiencesViewType.SAVED)
     }
 
     fun onTabClick(viewType: MainView.ExperiencesViewType) {

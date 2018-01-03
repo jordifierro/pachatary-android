@@ -25,4 +25,10 @@ interface ExperienceApi {
     fun editExperience(@Path("id") id: String,
                        @Field("title") title: String,
                        @Field("description") description: String): Flowable<Result<ExperienceMapper>>
+
+    @POST("/experiences/{id}/save/")
+    fun saveExperience(@Path("id") experienceId: String): Flowable<Result<Void>>
+
+    @DELETE("/experiences/{id}/save/")
+    fun unsaveExperience(@Path("id") experienceId: String): Flowable<Result<Void>>
 }
