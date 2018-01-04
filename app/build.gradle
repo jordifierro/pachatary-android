@@ -27,11 +27,14 @@ android {
             buildConfigField 'int', 'MAX_IMAGE_SIZE', "1600"
         }
         debug {
+            resValue 'string', 'app_name', 'Abidria develop'
+            applicationIdSuffix '.develop'
             buildConfigField 'String', 'API_URL', '"' + appProperties['devApiUrl'] + '"'
             buildConfigField 'String', 'MAPBOX_ACCESS_TOKEN', '"' + appProperties['devMapboxAccessToken'] + '"'
             buildConfigField 'String', 'CLIENT_SECRET_KEY', '"' + appProperties['devClientSecretKey'] + '"'
         }
         release {
+            resValue 'string', 'app_name', 'Abidria'
             buildConfigField 'String', 'API_URL', '"' + appProperties['apiUrl'] + '"'
             buildConfigField 'String', 'MAPBOX_ACCESS_TOKEN', '"' + appProperties['mapboxAccessToken'] + '"'
             buildConfigField 'String', 'CLIENT_SECRET_KEY', '"' + appProperties['clientSecretKey'] + '"'
