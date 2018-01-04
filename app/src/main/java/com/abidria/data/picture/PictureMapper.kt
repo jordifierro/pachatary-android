@@ -1,6 +1,8 @@
 package com.abidria.data.picture
 
-data class PictureMapper(val smallUrl: String, val mediumUrl: String, val largeUrl: String) {
+import com.abidria.data.common.ToDomainMapper
 
-    fun toDomain() = Picture(smallUrl = this.smallUrl, mediumUrl = this.mediumUrl, largeUrl = this.largeUrl)
+data class PictureMapper(val smallUrl: String, val mediumUrl: String, val largeUrl: String) : ToDomainMapper<Picture> {
+
+    override fun toDomain() = Picture(smallUrl = this.smallUrl, mediumUrl = this.mediumUrl, largeUrl = this.largeUrl)
 }

@@ -26,7 +26,7 @@ class ExperienceApiRepositoryTest {
             my_experiences_are_requested()
         } then {
             request_should_get_experiences(mine = true)
-            response_should_experience_list(isMine = true)
+            response_should_experience_list()
         }
     }
 
@@ -50,7 +50,7 @@ class ExperienceApiRepositoryTest {
             saved_experiences_are_requested()
         } then {
             request_should_get_experiences(saved = true)
-            response_should_experience_list(isSaved = true)
+            response_should_experience_list()
         }
     }
 
@@ -227,7 +227,7 @@ class ExperienceApiRepositoryTest {
             assertEquals("", request.getBody().readUtf8())
         }
 
-        fun response_should_experience_list(isMine: Boolean = false, isSaved: Boolean = false) {
+        fun response_should_experience_list() {
             val result = testListSubscriber.events.get(0).get(0) as Result<*>
             val experiences = result.data as List<*>
 
@@ -238,15 +238,15 @@ class ExperienceApiRepositoryTest {
             assertEquals("https://experiences/8c29c4735.small.jpg", experience.picture!!.smallUrl)
             assertEquals("https://experiences/8c29c4735.medium.jpg", experience.picture!!.mediumUrl)
             assertEquals("https://experiences/8c29c4735.large.jpg", experience.picture!!.largeUrl)
-            assertEquals(isMine, experience.isMine)
-            assertEquals(isSaved, experience.isSaved)
+            assertEquals(true, experience.isMine)
+            assertEquals(false, experience.isSaved)
 
             val secondExperience = experiences[1] as Experience
             assertEquals("3", secondExperience.id)
             assertEquals("Magic Castle of Lost Swamps", secondExperience.title)
             assertEquals("Don't try to go there!", secondExperience.description)
-            assertEquals(isMine, experience.isMine)
-            assertEquals(isSaved, experience.isSaved)
+            assertEquals(false, secondExperience.isMine)
+            assertEquals(true, secondExperience.isSaved)
             assertNull(secondExperience.picture)
         }
 

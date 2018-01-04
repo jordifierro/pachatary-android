@@ -5,7 +5,7 @@ import android.net.Uri
 import android.util.Log
 import com.abidria.BuildConfig
 import com.abidria.data.auth.AuthHttpInterceptor
-import com.abidria.data.common.ParseSuccessResultTransformer
+import com.abidria.data.common.NetworkParserFactory
 import com.abidria.data.common.Result
 import com.abidria.data.picture.Picture
 import io.reactivex.BackpressureStrategy
@@ -27,18 +27,18 @@ class SceneApiRepository(retrofit: Retrofit, @Named("io") val scheduler: Schedul
         PublishSubject.create<Any>().startWith(Any())
                             .flatMap { sceneApi.scenes(experienceId).subscribeOn(scheduler).toObservable() }
                             .toFlowable(BackpressureStrategy.LATEST)
-                            .compose<Result<List<Scene>>>(ParseSuccessResultTransformer({ it.map { it.toDomain() } }))
+                            .compose(NetworkParserFactory.getListTransformer())
 
     fun createScene(scene: Scene): Flowable<Result<Scene>> =
         sceneApi.createScene(title = scene.title, description = scene.description,
                              latitude = scene.latitude, longitude = scene.longitude,
                              experienceId = scene.experienceId)
-                .compose(ParseSuccessResultTransformer({ it.toDomain() }))
+                .compose(NetworkParserFactory.getTransformer())
 
     fun editScene(scene: Scene): Flowable<Result<Scene>> =
         sceneApi.editScene(scene.id, scene.title, scene.description,
                            scene.latitude, scene.longitude, scene.experienceId)
-                .compose(ParseSuccessResultTransformer({ it.toDomain() }))
+                .compose(NetworkParserFactory.getTransformer())
 
     fun uploadScenePicture(sceneId: String, croppedImageUriString: String,
                            delegate: (resultScene: Result<Scene>) -> Unit) {

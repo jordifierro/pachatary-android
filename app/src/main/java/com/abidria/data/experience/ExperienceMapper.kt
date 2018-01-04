@@ -1,11 +1,12 @@
 package com.abidria.data.experience
 
+import com.abidria.data.common.ToDomainMapper
 import com.abidria.data.picture.PictureMapper
-import com.abidria.data.scene.SceneMapper
 
-data class ExperienceMapper(val id: String, val title: String, val description: String, val picture: PictureMapper?) {
+data class ExperienceMapper(val id: String, val title: String, val description: String, val picture: PictureMapper?,
+                            val isMine: Boolean, val isSaved: Boolean)
+    : ToDomainMapper<Experience> {
 
-    fun toDomain(isMine: Boolean = false, isSaved: Boolean = false): Experience =
-            Experience(id = this.id, title = this.title, description = this.description,
-                    picture = this.picture?.toDomain(), isMine = isMine, isSaved = isSaved)
+    override fun toDomain() = Experience(id = this.id, title = this.title, description = this.description,
+                    picture = this.picture?.toDomain(), isMine = this.isMine, isSaved = this.isSaved)
 }

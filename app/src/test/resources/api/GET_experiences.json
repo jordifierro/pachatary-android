@@ -7,12 +7,16 @@
             "small_url": "https://experiences/8c29c4735.small.jpg",
             "medium_url": "https://experiences/8c29c4735.medium.jpg",
             "large_url": "https://experiences/8c29c4735.large.jpg"
-        }
+        },
+        "is_mine": true,
+        "is_saved": false
     },
     {
         "id": "3",
         "title": "Magic Castle of Lost Swamps",
         "description": "Don't try to go there!",
-        "picture": null
+        "picture": null,
+        "is_mine": false,
+        "is_saved": true
     }
 ]

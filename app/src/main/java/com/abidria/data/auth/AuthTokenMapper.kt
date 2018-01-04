@@ -1,6 +1,8 @@
 package com.abidria.data.auth
 
-data class AuthTokenMapper(val accessToken: String, val refreshToken: String) {
+import com.abidria.data.common.ToDomainMapper
 
-    fun toDomain() = AuthToken(accessToken = this.accessToken, refreshToken = this.refreshToken)
+data class AuthTokenMapper(val accessToken: String, val refreshToken: String) : ToDomainMapper<AuthToken> {
+
+    override fun toDomain() = AuthToken(accessToken = this.accessToken, refreshToken = this.refreshToken)
 }

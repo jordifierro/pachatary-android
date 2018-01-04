@@ -5,8 +5,7 @@ import android.net.Uri
 import android.util.Log
 import com.abidria.BuildConfig
 import com.abidria.data.auth.AuthHttpInterceptor
-import com.abidria.data.common.ParseSuccessEmptyBodyResultTransformer
-import com.abidria.data.common.ParseSuccessResultTransformer
+import com.abidria.data.common.NetworkParserFactory
 import com.abidria.data.common.Result
 import com.abidria.data.picture.Picture
 import io.reactivex.Flowable
@@ -23,34 +22,32 @@ class ExperienceApiRepository (retrofit: Retrofit, @Named("io") val scheduler: S
 
     fun exploreExperiencesFlowable(): Flowable<Result<List<Experience>>> =
             experienceApi.exploreExperiences()
-                .compose<Result<List<Experience>>>(ParseSuccessResultTransformer({ it.map { it.toDomain() } }))
+                .compose(NetworkParserFactory.getListTransformer())
                 .subscribeOn(scheduler)
 
     fun myExperiencesFlowable(): Flowable<Result<List<Experience>>> =
             experienceApi.myExperiences()
-                    .compose<Result<List<Experience>>>(ParseSuccessResultTransformer(
-                            { it.map { it.toDomain(isMine = true) } }))
+                    .compose(NetworkParserFactory.getListTransformer())
                     .subscribeOn(scheduler)
 
     fun savedExperiencesFlowable(): Flowable<Result<List<Experience>>> =
             experienceApi.savedExperiences()
-                    .compose<Result<List<Experience>>>(ParseSuccessResultTransformer(
-                            { it.map { it.toDomain(isSaved = true) } }))
+                    .compose(NetworkParserFactory.getListTransformer())
                     .subscribeOn(scheduler)
 
     fun createExperience(experience: Experience): Flowable<Result<Experience>> =
             experienceApi.createExperience(title = experience.title, description = experience.description)
-                    .compose(ParseSuccessResultTransformer({ it.toDomain() }))
+                    .compose(NetworkParserFactory.getTransformer())
 
     fun editExperience(experience: Experience): Flowable<Result<Experience>> =
             experienceApi.editExperience(experience.id, experience.title, experience.description)
-                    .compose(ParseSuccessResultTransformer({ it.toDomain() }))
+                    .compose(NetworkParserFactory.getTransformer())
 
     fun saveExperience(save: Boolean, experienceId: String): Flowable<Result<Void>> {
         if (save) return experienceApi.saveExperience(experienceId)
-                .compose(ParseSuccessEmptyBodyResultTransformer())
+                    .compose(NetworkParserFactory.getVoidTransformer())
         else return experienceApi.unsaveExperience(experienceId)
-                    .compose(ParseSuccessEmptyBodyResultTransformer())
+                    .compose(NetworkParserFactory.getVoidTransformer())
     }
 
     fun uploadExperiencePicture(experienceId: String, croppedImageUriString: String,
