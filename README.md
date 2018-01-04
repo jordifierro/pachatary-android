@@ -17,11 +17,12 @@ Application is (and will be) under construction.
 There are already some screens.
 Here is a quick documentation about them:
 
-#### ExperienceListActivity
-![ExperienceListActivity](https://s3-eu-west-1.amazonaws.com/abidria/static/experience-list-screenshot.jpg)
+#### MainActivity
+![ExperienceListActivity](https://s3-eu-west-1.amazonaws.com/abidria/static/main-activity-screenshot.jpg)
 
 This is the screen that appears when you open the app.
-It shows exploreExperiences (title and picture) in a scrollable list.
+There are three section tabs: mine, saved and explore.
+All of them show experiences (title and picture) in a scrollable list.
 When an item is clicked,
 it navigates to the selected experience map view.
 
@@ -35,6 +36,8 @@ over a visual map, provided by [Mapbox](https://www.mapbox.com/).
 It places a marker over the exact position of each scene
 and when it is clicked shows a bubble with the scene title.
 When a bubble is tapped, app navigates to show its scene detail.
+There is a button to save or unsaved the experience.
+If experience is mine, edit button appears instead of save one.
 
 #### SceneDetailActivity
 ![SceneDetailActivity](https://s3-eu-west-1.amazonaws.com/abidria/static/scene-detail-screenshot.jpg)
@@ -44,7 +47,7 @@ picture, title and description.
 Scroll (with a cool parallax effect) is enabled
 to allow full text read.
 
-#### CreateSceneActivity and EditSceneActivity
+#### Create(Scene/Experience)Activity and Edit(Scene/Experience)Activity
 
 This screens are used to handle the scene and experience creation and edition form flow
 (that are almost the same).
@@ -103,6 +106,15 @@ All classes follow dependency injection pattern (with Dagger2).
 
 100% Kotlin!
 
+### Authentication
+
+When the app starts, checks if the user has credentials stored locally.
+If not, it calls the api to create a guest person instance and get credentials.
+To create content, person needs to be also registered and confirm the email.
+There is a RegisterActivity and ConfirmEmailActivity that does that and
+saves person info locally.
+All api calls are authenticated using `HttpAuthInterceptor`.
+
 ## Setup
 
 Follow these instructions to start working locally on the project:
@@ -125,8 +137,9 @@ cp app/app.properties.sample app/app.properties
 ```bash
 ./gradlew test
 ```
-* Fill `app.properties`: `devApiUrl` with your local server url
+* Fill `app.properties`: `apiUrl` with your local server url
 and get a [Mapbox](https://www.mapbox.com/) account
-to get your own `mapboxAccessToken` (same for `dev-`).
+to get your own `mapboxAccessToken`,
+`clientSecretKey` must be agreed with server and also set in properties (same for `dev-`).
 
 * You are ready to run the application on your device!
