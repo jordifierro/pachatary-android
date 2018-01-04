@@ -12,8 +12,6 @@ import com.squareup.picasso.Picasso
 import net.gotev.uploadservice.UploadService
 import net.gotev.uploadservice.okhttp.OkHttpStack
 
-
-
 class AbidriaApplication : Application() {
 
     companion object {
@@ -28,11 +26,11 @@ class AbidriaApplication : Application() {
                                                 .dataModule(DataModule())
                                              .build()
 
-        Stetho.initializeWithDefaults(this);
+        if (BuildConfig.DEBUG) Stetho.initializeWithDefaults(this);
 
         val picassoBuilder = Picasso.Builder(this)
         picassoBuilder.downloader(OkHttp3Downloader(this, Long.MAX_VALUE))
-        picassoBuilder.indicatorsEnabled(true)
+        if (BuildConfig.DEBUG) picassoBuilder.indicatorsEnabled(true)
         Picasso.setSingletonInstance(picassoBuilder.build())
 
         UploadService.NAMESPACE = BuildConfig.APPLICATION_ID
