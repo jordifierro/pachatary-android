@@ -84,12 +84,16 @@ class ExperienceMapPresenterTest {
     @Test
     fun testNavigatesToSceneOnSceneClick() {
         given {
-            an_experience()
+            a_mine_experience()
+            experience_repo_with_that_experience()
+            repository_with_no_scenes()
+            map_not_loaded()
             an_scene()
         } whenn {
+            presenter_is_created()
             this_scene_is_clicked()
         } then {
-            view_should_navigate_to_that_scene_with_experience_id()
+            view_should_navigate_to_that_scene_with_experience_id_and_is_mine_true()
         }
     }
 
@@ -316,8 +320,9 @@ class ExperienceMapPresenterTest {
             BDDMockito.then(mockView).should().setTitle(title = experienceA!!.title)
         }
 
-        fun view_should_navigate_to_that_scene_with_experience_id() {
-            BDDMockito.then(mockView).should().navigateToScene(experienceId = experienceId, sceneId = sceneA!!.id)
+        fun view_should_navigate_to_that_scene_with_experience_id_and_is_mine_true() {
+            BDDMockito.then(mockView).should()
+                    .navigateToScene(experienceId = experienceId, isExperienceMine = true, sceneId = sceneA!!.id)
         }
 
         fun view_should_navigate_to_create_scene_with_experience_id() {

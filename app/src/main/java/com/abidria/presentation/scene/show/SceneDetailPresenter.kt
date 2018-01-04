@@ -14,17 +14,22 @@ class SceneDetailPresenter @Inject constructor(private val repository: SceneRepo
     lateinit var view: SceneDetailView
     lateinit var experienceId: String
     lateinit var sceneId: String
+    var isMine = false
 
     private var sceneDisposable: Disposable? = null
 
-    fun setView(view: SceneDetailView, experienceId: String, sceneId: String) {
+    fun setView(view: SceneDetailView, experienceId: String, sceneId: String, isMine: Boolean) {
         this.view = view
         this.experienceId = experienceId
         this.sceneId = sceneId
+        this.isMine = isMine
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun create() {
+        if (isMine) view.showEditButton()
+        else view.hideEditButton()
+
         sceneDisposable = repository.sceneFlowable(experienceId = experienceId, sceneId = sceneId)
                                     .subscribeOn(schedulerProvider.subscriber())
                                     .observeOn(schedulerProvider.observer())

@@ -6,4 +6,6 @@ interface SceneDetailView {
 
     fun showScene(scene: Scene)
     fun navigateToEditScene(sceneId: String, experienceId: String)
+    fun showEditButton()
+    fun hideEditButton()
 }

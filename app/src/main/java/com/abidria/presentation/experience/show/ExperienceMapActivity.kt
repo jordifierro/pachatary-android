@@ -133,8 +133,9 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView {
         supportActionBar?.title = title
     }
 
-    override fun navigateToScene(experienceId: String, sceneId: String) {
-        startActivity(SceneDetailActivity.newIntent(context = this, experienceId = experienceId, sceneId = sceneId))
+    override fun navigateToScene(experienceId: String, isExperienceMine: Boolean, sceneId: String) {
+        startActivity(SceneDetailActivity.newIntent(context = this, experienceId = experienceId,
+                                                    sceneId = sceneId, isMine = isExperienceMine))
     }
 
     override fun navigateToEditExperience(experienceId: String) {

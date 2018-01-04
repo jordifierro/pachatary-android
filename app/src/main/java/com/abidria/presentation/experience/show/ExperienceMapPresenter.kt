@@ -19,6 +19,7 @@ class ExperienceMapPresenter @Inject constructor(private val repository: SceneRe
 
     lateinit var view: ExperienceMapView
     lateinit var experienceId: String
+    var isExperienceMine = false
 
     private var experienceDisposable: Disposable? = null
     private var scenesDisposable: Disposable? = null
@@ -41,7 +42,7 @@ class ExperienceMapPresenter @Inject constructor(private val repository: SceneRe
     }
 
     fun onSceneClick(sceneId: String) {
-        view.navigateToScene(experienceId = experienceId, sceneId = sceneId)
+        view.navigateToScene(experienceId = experienceId, isExperienceMine = isExperienceMine, sceneId = sceneId)
     }
 
     fun onCreateSceneClick() {
@@ -72,7 +73,8 @@ class ExperienceMapPresenter @Inject constructor(private val repository: SceneRe
                 .subscribeOn(schedulerProvider.subscriber())
                 .observeOn(schedulerProvider.observer())
                 .subscribe({ if (it.isSuccess()) {
-                    view.setTitle(it.data!!.title)
+                    isExperienceMine = it.data!!.isMine
+                    view.setTitle(it.data.title)
                     if (it.data.isMine) view.showEditButton()
                     else view.showSaveButton(isSaved = it.data.isSaved)
                 }})
