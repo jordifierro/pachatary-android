@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.abidria">
+    package="com.pachatary">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -11,7 +11,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application
-        android:name=".presentation.common.AbidriaApplication"
+        android:name="com.pachatary.presentation.common.PachataryApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -19,7 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".presentation.main.MainActivity"
+            android:name="com.pachatary.presentation.main.MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop">
             <intent-filter>
@@ -28,23 +28,23 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".presentation.experience.show.ExperienceMapActivity"
+            android:name="com.pachatary.presentation.experience.show.ExperienceMapActivity"
             android:label="@string/title_activity_experience_map"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".presentation.scene.show.SceneDetailActivity"
+            android:name="com.pachatary.presentation.scene.show.SceneDetailActivity"
             android:label="@string/title_activity_scene_detail"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".presentation.scene.edition.CreateSceneActivity"
+            android:name="com.pachatary.presentation.scene.edition.CreateSceneActivity"
             android:label="@string/title_activity_create_scene"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.abidria.presentation.common.edition.EditTitleAndDescriptionActivity"
+            android:name="com.pachatary.presentation.common.edition.EditTitleAndDescriptionActivity"
             android:label="@string/title_activity_edit_title_and_description"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.abidria.presentation.common.edition.SelectLocationActivity"
+            android:name="com.pachatary.presentation.common.edition.SelectLocationActivity"
             android:label="@string/title_activity_select_location"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
@@ -52,31 +52,31 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
-            android:name=".presentation.scene.edition.EditSceneActivity"
+            android:name="com.pachatary.presentation.scene.edition.EditSceneActivity"
             android:label="@string/title_activity_edit_scene"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".presentation.experience.edition.CreateExperienceActivity"
+            android:name="com.pachatary.presentation.experience.edition.CreateExperienceActivity"
             android:label="@string/title_activity_create_experience"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".presentation.experience.edition.EditExperienceActivity"
+            android:name="com.pachatary.presentation.experience.edition.EditExperienceActivity"
             android:label="@string/title_activity_edit_experience"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".presentation.register.RegisterActivity"
+            android:name="com.pachatary.presentation.register.RegisterActivity"
             android:label="@string/title_register_activity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".presentation.register.ConfirmEmailActivity"
+        <activity android:name="com.pachatary.presentation.register.ConfirmEmailActivity"
             android:label="@string/title_confirm_email_activity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter android:label="@string/filter_view_confirm_email_activity">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <!-- Accepts URIs that begin with "https://abidria.com -->
+                <!-- Accepts URIs that begin with "https://pachatary.com -->
                 <data android:scheme="https"
-                      android:host="abidria.com" />
+                      android:host="pachatary.com" />
             </intent-filter>
         </activity>
     </application>

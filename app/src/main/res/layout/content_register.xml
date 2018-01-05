@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/edit_title_and_description"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.abidria.presentation.register.RegisterActivity"
+    tools:context="com.pachatary.presentation.register.RegisterActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:showIn="@layout/activity_register">

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.abidria.presentation.scene.show.SceneDetailActivity">
+    tools:context="com.pachatary.presentation.scene.show.SceneDetailActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/scene_appbarlayout"
@@ -24,7 +24,7 @@
             android:fitsSystemWindows="true"
             app:expandedTitleTextAppearance="@style/TextAppearance.AppCompat.Subhead">
 
-            <com.abidria.presentation.common.view.SquareImageView
+            <com.pachatary.presentation.common.view.SquareImageView
                 android:id="@+id/scenes_image"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

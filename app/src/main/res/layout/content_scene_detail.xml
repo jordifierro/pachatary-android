@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.abidria.presentation.scene.show.SceneDetailActivity"
+    tools:context="com.pachatary.presentation.scene.show.SceneDetailActivity"
     tools:showIn="@layout/activity_scene_detail">
 
     <LinearLayout

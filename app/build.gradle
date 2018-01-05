@@ -14,7 +14,7 @@ android {
     compileSdkVersion 26
     buildToolsVersion '26.0.2'
     defaultConfig {
-        applicationId 'com.abidria'
+        applicationId 'com.pachatary'
         minSdkVersion 15
         targetSdkVersion 26
         versionCode 1
@@ -27,14 +27,14 @@ android {
             buildConfigField 'int', 'MAX_IMAGE_SIZE', "1600"
         }
         debug {
-            resValue 'string', 'app_name', 'Abidria develop'
+            resValue 'string', 'app_name', 'Pachatary develop'
             applicationIdSuffix '.develop'
             buildConfigField 'String', 'API_URL', '"' + appProperties['devApiUrl'] + '"'
             buildConfigField 'String', 'MAPBOX_ACCESS_TOKEN', '"' + appProperties['devMapboxAccessToken'] + '"'
             buildConfigField 'String', 'CLIENT_SECRET_KEY', '"' + appProperties['devClientSecretKey'] + '"'
         }
         release {
-            resValue 'string', 'app_name', 'Abidria'
+            resValue 'string', 'app_name', 'Pachatary'
             buildConfigField 'String', 'API_URL', '"' + appProperties['apiUrl'] + '"'
             buildConfigField 'String', 'MAPBOX_ACCESS_TOKEN', '"' + appProperties['mapboxAccessToken'] + '"'
             buildConfigField 'String', 'CLIENT_SECRET_KEY', '"' + appProperties['clientSecretKey'] + '"'

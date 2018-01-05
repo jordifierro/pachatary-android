@@ -1,6 +1,6 @@
-# Abidria Android App
+# Pachatary Android App
 This repo contains the Android application
-code for Abidria project.
+code for Pachatary project.
 This simple app aims to be a reference
 to discover interesting places
 and also to record our past exploreExperiences,
@@ -18,7 +18,7 @@ There are already some screens.
 Here is a quick documentation about them:
 
 #### MainActivity
-![ExperienceListActivity](https://s3-eu-west-1.amazonaws.com/abidria/static/main-activity-screenshot.jpg)
+![ExperienceListActivity](https://s3-eu-west-1.amazonaws.com/pachatary/static/main-activity-screenshot.jpg)
 
 This is the screen that appears when you open the app.
 There are three section tabs: mine, saved and explore.
@@ -28,7 +28,7 @@ it navigates to the selected experience map view.
 
 
 #### ExperienceMapActivity
-![ExperienceMapActivity](https://s3-eu-west-1.amazonaws.com/abidria/static/experience-map-screenshot.jpg)
+![ExperienceMapActivity](https://s3-eu-west-1.amazonaws.com/pachatary/static/experience-map-screenshot.jpg)
 
 This screen shows the scenes from the selected experience
 (navigation toolbar shows its title)
@@ -40,7 +40,7 @@ There is a button to save or unsaved the experience.
 If experience is mine, edit button appears instead of save one.
 
 #### SceneDetailActivity
-![SceneDetailActivity](https://s3-eu-west-1.amazonaws.com/abidria/static/scene-detail-screenshot.jpg)
+![SceneDetailActivity](https://s3-eu-west-1.amazonaws.com/pachatary/static/scene-detail-screenshot.jpg)
 
 Finally, this screen shows the selected scene detail:
 picture, title and description.
@@ -56,13 +56,13 @@ or ask user if wants to modify the scene/experience picture.
 Here are the form screens:
 
 ##### EditTitleAndDescriptionActivity
-![SceneDetailActivity](https://s3-eu-west-1.amazonaws.com/abidria/static/edit-title-and-description-screenshot.jpg)
+![SceneDetailActivity](https://s3-eu-west-1.amazonaws.com/pachatary/static/edit-title-and-description-screenshot.jpg)
 
 This screen simply lets the user introduce a title and description.
 Title has to be between 1 and 30 chars.
 
 ##### SelectLocationActivity
-![SceneDetailActivity](https://s3-eu-west-1.amazonaws.com/abidria/static/select-location-screenshot.jpg)
+![SceneDetailActivity](https://s3-eu-west-1.amazonaws.com/pachatary/static/select-location-screenshot.jpg)
 
 This activity shows a map to allow user select a location (only for scenes).
 It starts with the last known user location to make the process faster.
@@ -121,13 +121,13 @@ Follow these instructions to start working locally on the project:
 
 First of all, you must run api server locally.
 Code and setup instructions can be found in this other repo:
-[abidria-api](https://github.com/jordifierro/abidria-api).
+[pachatary-api](https://github.com/jordifierro/pachatary-api).
 
 Once server is working, we must:
 
 * Download code cloning this repo:
 ```bash
-git clone https://github.com/jordifierro/abidria-android.git
+git clone https://github.com/jordifierro/pachatary-android.git
 ```
 * Copy `app.properties.sample` file to `app.properties`:
 ```bash
