@@ -1,7 +1,11 @@
 devApiUrl=
+devHttpsDeeplinkHost=
+devAppDeeplinkHost=
 devMapboxAccessToken=
 devClientSecretKey=
 
 apiUrl=
+httpsDeeplinkHost=
+appDeeplinkHost=
 mapboxAccessToken=
 clientSecretKey=
