@@ -41,7 +41,7 @@
             android:id="@+id/edit_title_and_description_description_edittext"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textCapSentences"/>
+            android:inputType="textMultiLine|textCapSentences" />
 
     </LinearLayout>
 
