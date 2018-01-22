@@ -89,7 +89,7 @@ class SavedFragment : Fragment(), SavedView {
         override fun getItemCount(): Int = experienceList.size
 
         override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ExperienceViewHolder {
-            return ExperienceViewHolder(inflater.inflate(R.layout.experiences_list_item,
+            return ExperienceViewHolder(inflater.inflate(R.layout.item_experiences_list,
                                         parent, false), onClick)
         }
     }

@@ -47,7 +47,7 @@ class ExploreFragment : Fragment(), ExploreView {
         retryIcon = view.findViewById<ImageView>(R.id.experiences_retry)
         retryIcon.setOnClickListener { presenter.onRetryClick() }
         recyclerView = view.findViewById<RecyclerView>(R.id.experiences_recyclerview)
-        recyclerView.layoutManager = GridLayoutManager(activity, 2)
+        recyclerView.layoutManager = GridLayoutManager(activity, 1)
 
         presenter.create()
         return view
@@ -88,7 +88,7 @@ class ExploreFragment : Fragment(), ExploreView {
         override fun getItemCount(): Int = experienceList.size
 
         override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ExperienceViewHolder {
-            return ExperienceViewHolder(inflater.inflate(R.layout.experiences_list_item,
+            return ExperienceViewHolder(inflater.inflate(R.layout.item_full_experiences_list,
                                         parent, false), onClick)
         }
     }
@@ -97,11 +97,13 @@ class ExploreFragment : Fragment(), ExploreView {
         : RecyclerView.ViewHolder(view), View.OnClickListener {
 
         private val titleView: TextView
+        private val descriptionView: TextView
         private val pictureView: ImageView
         lateinit var experienceId: String
 
         init {
             titleView = view.findViewById<TextView>(R.id.experience_title)
+            descriptionView = view.findViewById<TextView>(R.id.experience_description)
             pictureView = view.findViewById<ImageView>(R.id.experience_picture)
             view.setOnClickListener(this)
         }
@@ -109,8 +111,9 @@ class ExploreFragment : Fragment(), ExploreView {
         fun bind(experience: Experience) {
             this.experienceId = experience.id
             titleView.text = experience.title
+            descriptionView.text = experience.description
             Picasso.with(pictureView.context)
-                    .load(experience.picture?.smallUrl)
+                    .load(experience.picture?.mediumUrl)
                     .into(pictureView)
         }
 
