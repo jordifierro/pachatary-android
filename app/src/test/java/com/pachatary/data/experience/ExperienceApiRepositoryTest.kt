@@ -133,17 +133,18 @@ class ExperienceApiRepositoryTest {
         }
 
         fun an_experience() {
-            experience = Experience(id = "1", title = "T", description = "desc", picture = null)
+            experience = Experience(id = "1", title = "T", description = "desc",
+                                    picture = null, author_username = "usr.nm")
         }
 
         fun a_web_server_that_returns_post_experiences() {
             mockWebServer.enqueue(MockResponse().setResponseCode(201).setBody(
-                    ExperienceApiRepositoryTest::class.java.getResource("/api/POST_experiences.json").readText()))
+                ExperienceApiRepositoryTest::class.java.getResource("/api/POST_experiences.json").readText()))
         }
 
         fun a_web_server_that_returns_patch_experiences() {
             mockWebServer.enqueue(MockResponse().setResponseCode(201).setBody(
-                    ExperienceApiRepositoryTest::class.java.getResource("/api/PATCH_experience_id.json").readText()))
+                ExperienceApiRepositoryTest::class.java.getResource("/api/PATCH_experience_id.json").readText()))
         }
 
         fun a_web_server_that_returns_201() {
@@ -240,6 +241,7 @@ class ExperienceApiRepositoryTest {
             assertEquals("https://experiences/8c29c4735.large.jpg", experience.picture!!.largeUrl)
             assertEquals(true, experience.isMine)
             assertEquals(false, experience.isSaved)
+            assertEquals("usr.nm", experience.author_username)
 
             val secondExperience = experiences[1] as Experience
             assertEquals("3", secondExperience.id)
@@ -248,6 +250,8 @@ class ExperienceApiRepositoryTest {
             assertEquals(false, secondExperience.isMine)
             assertEquals(true, secondExperience.isSaved)
             assertNull(secondExperience.picture)
+            assertEquals("other.nm", secondExperience.author_username)
+
         }
 
         fun response_should_parse_experience() {

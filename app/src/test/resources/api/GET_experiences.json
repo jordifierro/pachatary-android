@@ -9,7 +9,9 @@
             "large_url": "https://experiences/8c29c4735.large.jpg"
         },
         "is_mine": true,
-        "is_saved": false
+        "is_saved": false,
+        "author_id": "3",
+        "author_username": "usr.nm"
     },
     {
         "id": "3",
@@ -17,6 +19,8 @@
         "description": "Don't try to go there!",
         "picture": null,
         "is_mine": false,
-        "is_saved": true
+        "is_saved": true,
+        "author_id": "4",
+        "author_username": "other.nm"
     }
 ]

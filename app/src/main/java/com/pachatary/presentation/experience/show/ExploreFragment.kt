@@ -97,12 +97,14 @@ class ExploreFragment : Fragment(), ExploreView {
         : RecyclerView.ViewHolder(view), View.OnClickListener {
 
         private val titleView: TextView
+        private val authorView: TextView
         private val descriptionView: TextView
         private val pictureView: ImageView
         lateinit var experienceId: String
 
         init {
             titleView = view.findViewById<TextView>(R.id.experience_title)
+            authorView = view.findViewById<TextView>(R.id.experience_author)
             descriptionView = view.findViewById<TextView>(R.id.experience_description)
             pictureView = view.findViewById<ImageView>(R.id.experience_picture)
             view.setOnClickListener(this)
@@ -111,6 +113,7 @@ class ExploreFragment : Fragment(), ExploreView {
         fun bind(experience: Experience) {
             this.experienceId = experience.id
             titleView.text = experience.title
+            authorView.text = "by " + experience.author_username
             descriptionView.text = experience.description
             Picasso.with(pictureView.context)
                     .load(experience.picture?.mediumUrl)

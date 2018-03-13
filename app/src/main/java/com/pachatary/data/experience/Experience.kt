@@ -5,4 +5,5 @@ import com.pachatary.data.picture.Picture
 
 data class Experience(override val id: String, val title: String,
                       val description: String, val picture: Picture?,
-                      val isMine: Boolean = false, val isSaved: Boolean = false) : Identifiable
+                      val isMine: Boolean = false, val isSaved: Boolean = false,
+                      val author_username: String = "") : Identifiable
