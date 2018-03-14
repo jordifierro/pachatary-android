@@ -16,7 +16,6 @@ import com.pachatary.data.scene.Scene
 import com.pachatary.presentation.common.PachataryApplication
 import com.pachatary.presentation.experience.edition.EditExperienceActivity
 import com.pachatary.presentation.scene.edition.CreateSceneActivity
-import com.pachatary.presentation.scene.show.SceneDetailActivity
 import com.getbase.floatingactionbutton.FloatingActionButton
 import com.getbase.floatingactionbutton.FloatingActionsMenu
 import com.mapbox.mapboxsdk.Mapbox
@@ -26,6 +25,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
+import com.pachatary.presentation.scene.show.SceneListActivity
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.subjects.ReplaySubject
@@ -134,8 +134,8 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView {
     }
 
     override fun navigateToScene(experienceId: String, isExperienceMine: Boolean, sceneId: String) {
-        startActivity(SceneDetailActivity.newIntent(context = this, experienceId = experienceId,
-                                                    sceneId = sceneId, isMine = isExperienceMine))
+        startActivity(SceneListActivity.newIntent(context = this, experienceId = experienceId,
+                                                   selectedSceneId = sceneId, isMine = isExperienceMine))
     }
 
     override fun navigateToEditExperience(experienceId: String) {

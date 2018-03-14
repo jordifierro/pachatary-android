@@ -15,6 +15,7 @@ import com.pachatary.presentation.main.MainActivity
 import com.pachatary.presentation.register.ConfirmEmailActivity
 import com.pachatary.presentation.register.RegisterActivity
 import com.pachatary.presentation.scene.show.SceneDetailActivity
+import com.pachatary.presentation.scene.show.SceneListActivity
 import dagger.Component
 import javax.inject.Singleton
 
@@ -36,4 +37,5 @@ interface ApplicationComponent {
     fun inject(mainActivity: MainActivity)
     fun inject(registerActivity: RegisterActivity)
     fun inject(confirmEmailActivity: ConfirmEmailActivity)
+    fun inject(sceneListActivity: SceneListActivity)
 }
