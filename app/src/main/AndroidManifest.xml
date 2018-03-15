@@ -32,10 +32,6 @@
             android:label="@string/title_activity_experience_map"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.pachatary.presentation.scene.show.SceneDetailActivity"
-            android:label="@string/title_activity_scene_detail"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
             android:name="com.pachatary.presentation.scene.edition.CreateSceneActivity"
             android:label="@string/title_activity_create_scene"
             android:theme="@style/AppTheme.NoActionBar" />

@@ -12,7 +12,6 @@
     <string name="dialog_title_unsave_experience">Unsave experience</string>
     <string name="dialog_question_unsave_experience">Are you sure you want to unsave this experience?</string>
     <string name="message_experience_saved">Experience saved!</string>
-    <string name="title_activity_scene_detail" />
     <string name="title_activity_create_scene">Create scene</string>
     <string name="fab_title_add_scene">Add new scene</string>
     <string name="title_activity_create_experience">Create experience</string>

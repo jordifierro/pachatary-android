@@ -1,12 +1,9 @@
 package com.pachatary.presentation.common.injection
 
 import com.pachatary.data.common.injection.DataModule
-import com.pachatary.presentation.scene.show.ExperienceMapActivity
-import com.pachatary.presentation.experience.edition.CreateExperienceActivity
-import com.pachatary.presentation.scene.edition.CreateSceneActivity
-import com.pachatary.presentation.scene.edition.EditSceneActivity
 import com.pachatary.presentation.common.edition.EditTitleAndDescriptionActivity
 import com.pachatary.presentation.common.edition.SelectLocationActivity
+import com.pachatary.presentation.experience.edition.CreateExperienceActivity
 import com.pachatary.presentation.experience.edition.EditExperienceActivity
 import com.pachatary.presentation.experience.show.ExploreFragment
 import com.pachatary.presentation.experience.show.MyExperiencesFragment
@@ -14,7 +11,9 @@ import com.pachatary.presentation.experience.show.SavedFragment
 import com.pachatary.presentation.main.MainActivity
 import com.pachatary.presentation.register.ConfirmEmailActivity
 import com.pachatary.presentation.register.RegisterActivity
-import com.pachatary.presentation.scene.show.SceneDetailActivity
+import com.pachatary.presentation.scene.edition.CreateSceneActivity
+import com.pachatary.presentation.scene.edition.EditSceneActivity
+import com.pachatary.presentation.scene.show.ExperienceMapActivity
 import com.pachatary.presentation.scene.show.SceneListActivity
 import dagger.Component
 import javax.inject.Singleton
@@ -24,7 +23,6 @@ import javax.inject.Singleton
 interface ApplicationComponent {
 
     fun inject(experienceMapActivity: ExperienceMapActivity)
-    fun inject(sceneDetailActivity: SceneDetailActivity)
     fun inject(editTitleAndDescriptionActivity: EditTitleAndDescriptionActivity)
     fun inject(selectLocationActivity: SelectLocationActivity)
     fun inject(createSceneActivity: CreateSceneActivity)
