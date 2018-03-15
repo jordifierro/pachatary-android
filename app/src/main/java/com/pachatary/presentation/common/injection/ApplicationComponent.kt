@@ -1,7 +1,7 @@
 package com.pachatary.presentation.common.injection
 
 import com.pachatary.data.common.injection.DataModule
-import com.pachatary.presentation.experience.show.ExperienceMapActivity
+import com.pachatary.presentation.scene.show.ExperienceMapActivity
 import com.pachatary.presentation.experience.edition.CreateExperienceActivity
 import com.pachatary.presentation.scene.edition.CreateSceneActivity
 import com.pachatary.presentation.scene.edition.EditSceneActivity

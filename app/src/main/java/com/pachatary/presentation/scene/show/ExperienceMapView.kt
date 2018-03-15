@@ -1,4 +1,4 @@
-package com.pachatary.presentation.experience.show
+package com.pachatary.presentation.scene.show
 
 import com.pachatary.data.scene.Scene
 import com.pachatary.presentation.common.view.LoaderView

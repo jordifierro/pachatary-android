@@ -5,7 +5,7 @@
     xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.pachatary.presentation.experience.show.ExperienceMapActivity">
+    tools:context="com.pachatary.presentation.scene.show.ExperienceMapActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"

@@ -28,7 +28,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.pachatary.presentation.experience.show.ExperienceMapActivity"
+            android:name="com.pachatary.presentation.scene.show.ExperienceMapActivity"
             android:label="@string/title_activity_experience_map"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity

@@ -1,4 +1,4 @@
-package com.pachatary.presentation.experience.show
+package com.pachatary.presentation.scene.show
 
 import android.arch.lifecycle.LifecycleRegistry
 import android.content.Context
@@ -25,7 +25,6 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
-import com.pachatary.presentation.scene.show.SceneListActivity
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.subjects.ReplaySubject

@@ -13,6 +13,7 @@ import android.widget.TextView
 import com.pachatary.R
 import com.pachatary.data.experience.Experience
 import com.pachatary.presentation.common.PachataryApplication
+import com.pachatary.presentation.scene.show.ExperienceMapActivity
 import com.squareup.picasso.Picasso
 import javax.inject.Inject
 

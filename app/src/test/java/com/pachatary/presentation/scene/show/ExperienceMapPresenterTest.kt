@@ -1,4 +1,4 @@
-package com.pachatary.presentation.experience.show
+package com.pachatary.presentation.scene.show
 
 import com.pachatary.data.common.Result
 import com.pachatary.data.experience.Experience

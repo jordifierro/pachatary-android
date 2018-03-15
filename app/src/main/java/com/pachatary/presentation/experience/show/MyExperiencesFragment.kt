@@ -18,6 +18,7 @@ import com.pachatary.data.experience.Experience
 import com.pachatary.presentation.common.PachataryApplication
 import com.pachatary.presentation.experience.edition.CreateExperienceActivity
 import com.pachatary.presentation.register.RegisterActivity
+import com.pachatary.presentation.scene.show.ExperienceMapActivity
 import com.squareup.picasso.Picasso
 import javax.inject.Inject
 
