@@ -39,13 +39,12 @@ When a bubble is tapped, app navigates to show its scene detail.
 There is a button to save or unsaved the experience.
 If experience is mine, edit button appears instead of save one.
 
-#### SceneDetailActivity
-![SceneDetailActivity](https://s3-eu-west-1.amazonaws.com/pachatary/static/scene-detail-screenshot.jpg)
+#### SceneListActivity
+![SceneListActivity](https://s3-eu-west-1.amazonaws.com/pachatary/static/scene-list-screenshot.jpg)
 
 Finally, this screen shows the selected scene detail:
 picture, title and description.
-Scroll (with a cool parallax effect) is enabled
-to allow full text read.
+Scroll allows user to view other scene details and also experience detail on top.
 
 #### Create(Scene/Experience)Activity and Edit(Scene/Experience)Activity
 
@@ -56,13 +55,13 @@ or ask user if wants to modify the scene/experience picture.
 Here are the form screens:
 
 ##### EditTitleAndDescriptionActivity
-![SceneDetailActivity](https://s3-eu-west-1.amazonaws.com/pachatary/static/edit-title-and-description-screenshot.jpg)
+![EditTitleAndDescriptionActivity](https://s3-eu-west-1.amazonaws.com/pachatary/static/edit-title-and-description-screenshot.jpg)
 
 This screen simply lets the user introduce a title and description.
 Title has to be between 1 and 30 chars.
 
 ##### SelectLocationActivity
-![SceneDetailActivity](https://s3-eu-west-1.amazonaws.com/pachatary/static/select-location-screenshot.jpg)
+![SelectLocationActivity](https://s3-eu-west-1.amazonaws.com/pachatary/static/select-location-screenshot.jpg)
 
 This activity shows a map to allow user select a location (only for scenes).
 It starts with the last known user location to make the process faster.
