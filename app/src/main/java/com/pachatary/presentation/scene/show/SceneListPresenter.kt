@@ -51,4 +51,12 @@ class SceneListPresenter @Inject constructor(private val repository: SceneReposi
         experienceDisposable?.dispose()
         scenesDisposable?.dispose()
     }
+
+    fun onEditExperienceClick(experienceId: String) {
+        view.navigateToEditExperience(experienceId)
+    }
+
+    fun onEditSceneClick(sceneId: String) {
+        view.navigateToEditScene(sceneId, experienceId)
+    }
 }

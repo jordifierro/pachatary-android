@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -21,8 +22,9 @@ import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_scene_list.*
 import javax.inject.Inject
 import android.support.v7.widget.LinearSmoothScroller
-
-
+import com.pachatary.presentation.experience.edition.EditExperienceActivity
+import com.pachatary.presentation.experience.edition.EditExperienceActivity_MembersInjector
+import com.pachatary.presentation.scene.edition.EditSceneActivity
 
 
 class SceneListActivity : AppCompatActivity(), SceneListView {
@@ -67,15 +69,24 @@ class SceneListActivity : AppCompatActivity(), SceneListView {
     override fun showExperienceScenesAndScrollToSelected(experience: Experience, scenes: List<Scene>,
                                                          selectedSceneId: String) {
         supportActionBar?.title = experience.title
-        recyclerView.adapter = ExperienceSceneListAdapter(layoutInflater, experience, scenes)
+        recyclerView.adapter = ExperienceSceneListAdapter(layoutInflater, experience.isMine,
+                                                          experience, scenes, presenter)
         (recyclerView.adapter!! as ExperienceSceneListAdapter).scrollToSceneId(selectedSceneId)
     }
 
+    override fun navigateToEditScene(sceneId: String, experienceId: String) {
+        startActivity(EditSceneActivity.newIntent(this, experienceId, sceneId))
+    }
+
+    override fun navigateToEditExperience(experienceId: String) {
+        startActivity(EditExperienceActivity.newIntent(this, experienceId))
+    }
 
     override fun getLifecycle(): LifecycleRegistry = registry
 
-    class ExperienceSceneListAdapter(val inflater: LayoutInflater, val experience: Experience,
-                                     val sceneList: List<Scene>) : RecyclerView.Adapter<ExperienceSceneViewHolder>() {
+    class ExperienceSceneListAdapter(val inflater: LayoutInflater, val isMine: Boolean, val experience: Experience,
+                                     val sceneList: List<Scene>, val presenter: SceneListPresenter)
+        : RecyclerView.Adapter<ExperienceSceneViewHolder>() {
 
         lateinit var recyclerView: RecyclerView
 
@@ -87,7 +98,8 @@ class SceneListActivity : AppCompatActivity(), SceneListView {
         override fun getItemCount() = sceneList.size + 1
 
         override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int) =
-            ExperienceSceneViewHolder(inflater.inflate(R.layout.item_experience_scene_list, parent, false))
+            ExperienceSceneViewHolder(inflater.inflate(R.layout.item_experience_scene_list, parent, false),
+                    isMine, { presenter.onEditExperienceClick(it) }, {presenter.onEditSceneClick(it) })
 
         override fun onAttachedToRecyclerView(recyclerView: RecyclerView?) {
             super.onAttachedToRecyclerView(recyclerView)
@@ -109,21 +121,26 @@ class SceneListActivity : AppCompatActivity(), SceneListView {
         }
     }
 
-    class ExperienceSceneViewHolder(view: View)
+    class ExperienceSceneViewHolder(view: View, isMine: Boolean,
+                                    val onEditExperienceClick: (String) -> Unit,
+                                    val onEditSceneClick: (String) -> Unit)
         : RecyclerView.ViewHolder(view), View.OnClickListener {
 
         private val titleView: TextView
         private val descriptionView: TextView
         private val pictureView: ImageView
+        private val editButton: FloatingActionButton
         private var isScene = true
         lateinit var experienceId: String
         lateinit var sceneId: String
 
         init {
-            titleView = view.findViewById<TextView>(R.id.title)
-            descriptionView = view.findViewById<TextView>(R.id.description)
-            pictureView = view.findViewById<ImageView>(R.id.picture)
-            view.setOnClickListener(this)
+            titleView = view.findViewById(R.id.title)
+            descriptionView = view.findViewById(R.id.description)
+            pictureView = view.findViewById(R.id.picture)
+            editButton = view.findViewById(R.id.edit_button)
+            if (isMine) editButton.visibility = View.VISIBLE
+            else editButton.visibility = View.INVISIBLE
         }
 
         fun bind(experience: Experience) {
@@ -131,6 +148,7 @@ class SceneListActivity : AppCompatActivity(), SceneListView {
             this.experienceId = experience.id
             titleView.text = experience.title
             descriptionView.text = experience.description
+            editButton.setOnClickListener { onEditButtonClick() }
             Picasso.with(pictureView.context)
                     .load(experience.picture?.mediumUrl)
                     .into(pictureView)
@@ -138,14 +156,20 @@ class SceneListActivity : AppCompatActivity(), SceneListView {
 
         fun bind(scene: Scene) {
             this.isScene = true
-            this.experienceId = scene.id
+            this.sceneId = scene.id
             titleView.text = scene.title
             descriptionView.text = scene.description
+            editButton.setOnClickListener { onEditButtonClick() }
             Picasso.with(pictureView.context)
                     .load(scene.picture?.mediumUrl)
                     .into(pictureView)
         }
 
         override fun onClick(view: View?) {}
+
+        private fun onEditButtonClick() {
+            if (isScene) onEditSceneClick(sceneId)
+            else onEditExperienceClick(experienceId)
+        }
     }
 }
