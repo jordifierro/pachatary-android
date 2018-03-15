@@ -58,10 +58,6 @@ class ExperienceMapPresenter @Inject constructor(private val repository: SceneRe
         view.showUnsaveDialog()
     }
 
-    fun onEditExperienceClick() {
-        view.navigateToEditExperience(experienceId)
-    }
-
     fun onConfirmUnsaveExperience() {
         experienceRepository.saveExperience(experienceId = experienceId, save = false)
     }

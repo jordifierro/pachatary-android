@@ -97,7 +97,6 @@ dependencies {
     implementation 'net.gotev:uploadservice:3.4'
     implementation 'net.gotev:uploadservice-okhttp:3.4'
     implementation 'com.google.android.gms:play-services-location:11.8.0'
-    implementation 'com.getbase:floatingactionbutton:1.10.1'
 }
 
 apply plugin: 'com.google.gms.google-services'

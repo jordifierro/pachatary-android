@@ -5,19 +5,12 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.Toast
-import com.pachatary.BuildConfig
-import com.pachatary.R
-import com.pachatary.data.scene.Scene
-import com.pachatary.presentation.common.PachataryApplication
-import com.pachatary.presentation.experience.edition.EditExperienceActivity
-import com.pachatary.presentation.scene.edition.CreateSceneActivity
-import com.getbase.floatingactionbutton.FloatingActionButton
-import com.getbase.floatingactionbutton.FloatingActionsMenu
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
@@ -25,6 +18,11 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
+import com.pachatary.BuildConfig
+import com.pachatary.R
+import com.pachatary.data.scene.Scene
+import com.pachatary.presentation.common.PachataryApplication
+import com.pachatary.presentation.scene.edition.CreateSceneActivity
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.subjects.ReplaySubject
@@ -42,10 +40,8 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView {
     lateinit var mapboxMap: MapboxMap
     lateinit var progressBar: ProgressBar
     lateinit var createSceneButton: FloatingActionButton
-    lateinit var editExperienceButton: FloatingActionButton
-    lateinit var saveExperienceButton: android.support.design.widget.FloatingActionButton
-    lateinit var unsaveExperienceButton: android.support.design.widget.FloatingActionButton
-    lateinit var editExperienceButtonMenu: FloatingActionsMenu
+    lateinit var saveExperienceButton: FloatingActionButton
+    lateinit var unsaveExperienceButton: FloatingActionButton
 
     val mapLoadedReplaySubject: ReplaySubject<Any> = ReplaySubject.create()
 
@@ -78,9 +74,6 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView {
         saveExperienceButton.setOnClickListener { presenter.onSaveExperienceClick() }
         unsaveExperienceButton = findViewById(R.id.unsave_experience_button)
         unsaveExperienceButton.setOnClickListener { presenter.onUnsaveExperienceClick() }
-        editExperienceButton = findViewById(R.id.edit_experience_button)
-        editExperienceButton.setOnClickListener { presenter.onEditExperienceClick() }
-        editExperienceButtonMenu = findViewById(R.id.edit_experience_button_menu)
 
         PachataryApplication.injector.inject(this)
         presenter.setView(this, intent.getStringExtra(EXPERIENCE_ID))
@@ -137,22 +130,18 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView {
                                                    selectedSceneId = sceneId, isMine = isExperienceMine))
     }
 
-    override fun navigateToEditExperience(experienceId: String) {
-        startActivity(EditExperienceActivity.newIntent(context = this, experienceId = experienceId))
-    }
-
     override fun navigateToCreateScene(experienceId: String) {
         startActivity(CreateSceneActivity.newIntent(context = this, experienceId = experienceId))
     }
 
     override fun showEditButton() {
-        editExperienceButtonMenu.visibility = View.VISIBLE
+        createSceneButton.visibility = View.VISIBLE
         saveExperienceButton.visibility = View.INVISIBLE
         unsaveExperienceButton.visibility = View.INVISIBLE
     }
 
     override fun showSaveButton(isSaved: Boolean) {
-        editExperienceButtonMenu.visibility = View.INVISIBLE
+        createSceneButton.visibility = View.INVISIBLE
         if (isSaved) {
             unsaveExperienceButton.visibility = View.VISIBLE
             saveExperienceButton.visibility = View.INVISIBLE
