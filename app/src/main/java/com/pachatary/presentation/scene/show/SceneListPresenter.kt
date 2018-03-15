@@ -43,7 +43,8 @@ class SceneListPresenter @Inject constructor(private val repository: SceneReposi
                                                                             { rE, rS -> Pair(rE.data!!, rS.data!!)})
                 .subscribeOn(schedulerProvider.subscriber())
                 .observeOn(schedulerProvider.observer())
-                .subscribe({ view.showExperienceScenesAndScrollToSelected(it.first, it.second, this.selectedSceneId) })
+                .subscribe({ view.showExperienceScenesAndScrollToSelectedIfFirstTime(
+                                            it.first, it.second, this.selectedSceneId) })
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)

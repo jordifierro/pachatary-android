@@ -8,6 +8,7 @@ import android.os.Handler
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.LinearSmoothScroller
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -18,13 +19,11 @@ import com.pachatary.R
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.scene.Scene
 import com.pachatary.presentation.common.PachataryApplication
+import com.pachatary.presentation.experience.edition.EditExperienceActivity
+import com.pachatary.presentation.scene.edition.EditSceneActivity
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_scene_list.*
 import javax.inject.Inject
-import android.support.v7.widget.LinearSmoothScroller
-import com.pachatary.presentation.experience.edition.EditExperienceActivity
-import com.pachatary.presentation.experience.edition.EditExperienceActivity_MembersInjector
-import com.pachatary.presentation.scene.edition.EditSceneActivity
 
 
 class SceneListActivity : AppCompatActivity(), SceneListView {
@@ -33,6 +32,7 @@ class SceneListActivity : AppCompatActivity(), SceneListView {
     lateinit var presenter: SceneListPresenter
 
     lateinit var recyclerView: RecyclerView
+    private var firstTime = true
 
     val registry: LifecycleRegistry = LifecycleRegistry(this)
 
@@ -66,12 +66,16 @@ class SceneListActivity : AppCompatActivity(), SceneListView {
         registry.addObserver(presenter)
     }
 
-    override fun showExperienceScenesAndScrollToSelected(experience: Experience, scenes: List<Scene>,
+    override fun showExperienceScenesAndScrollToSelectedIfFirstTime(experience: Experience, scenes: List<Scene>,
                                                          selectedSceneId: String) {
         supportActionBar?.title = experience.title
-        recyclerView.adapter = ExperienceSceneListAdapter(layoutInflater, experience.isMine,
-                                                          experience, scenes, presenter)
-        (recyclerView.adapter!! as ExperienceSceneListAdapter).scrollToSceneId(selectedSceneId)
+        if (firstTime) {
+            recyclerView.adapter =
+                    ExperienceSceneListAdapter(layoutInflater, experience.isMine, experience, scenes, presenter)
+            (recyclerView.adapter!! as ExperienceSceneListAdapter).scrollToSceneId(selectedSceneId)
+            firstTime = false
+        }
+        else (recyclerView.adapter!! as ExperienceSceneListAdapter).setExperienceAndScenes(experience, scenes)
     }
 
     override fun navigateToEditScene(sceneId: String, experienceId: String) {
@@ -84,8 +88,8 @@ class SceneListActivity : AppCompatActivity(), SceneListView {
 
     override fun getLifecycle(): LifecycleRegistry = registry
 
-    class ExperienceSceneListAdapter(val inflater: LayoutInflater, val isMine: Boolean, val experience: Experience,
-                                     val sceneList: List<Scene>, val presenter: SceneListPresenter)
+    class ExperienceSceneListAdapter(val inflater: LayoutInflater, val isMine: Boolean, var experience: Experience,
+                                     var sceneList: List<Scene>, val presenter: SceneListPresenter)
         : RecyclerView.Adapter<ExperienceSceneViewHolder>() {
 
         lateinit var recyclerView: RecyclerView
@@ -118,6 +122,12 @@ class SceneListActivity : AppCompatActivity(), SceneListView {
                 try { this.recyclerView.layoutManager.startSmoothScroll(smoothScroller) }
                 catch (e: Exception) {}
             }, 100)
+        }
+
+        fun setExperienceAndScenes(experience: Experience, scenes: List<Scene>) {
+            this.experience = experience
+            this.sceneList = scenes
+            notifyDataSetChanged()
         }
     }
 

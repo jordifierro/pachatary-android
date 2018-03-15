@@ -149,7 +149,7 @@ class SceneListPresenterTest {
 
         fun should_show_experience_scenes_and_scroll_to_scene() {
             BDDMockito.then(mockView).should()
-                    .showExperienceScenesAndScrollToSelected(experience, arrayListOf(scene), this.sceneId)
+                    .showExperienceScenesAndScrollToSelectedIfFirstTime(experience, arrayListOf(scene), this.sceneId)
         }
 
         fun observable_should_have_observers() {
