@@ -39,6 +39,40 @@ class SceneListPresenterTest {
     }
 
     @Test
+    fun test_presenter_navigates_to_edit_experience() {
+        given {
+            an_experience_id()
+            an_scene_id()
+            an_experience()
+            an_scene()
+            an_scene_repo_that_returns_that_scene()
+            an_experience_repo_that_returns_that_experience()
+        } whenn {
+            presenter_set_view_and_create_with_experience_and_scene_id()
+            presenter_on_edit_experience_click("99")
+        } then {
+            should_navigate_to_edit_experience("99")
+        }
+    }
+
+    @Test
+    fun test_presenter_navigates_to_edit_scene() {
+        given {
+            an_experience_id()
+            an_scene_id()
+            an_experience()
+            an_scene()
+            an_scene_repo_that_returns_that_scene()
+            an_experience_repo_that_returns_that_experience()
+        } whenn {
+            presenter_set_view_and_create_with_experience_and_scene_id()
+            presenter_on_edit_scene_click("76")
+        } then {
+            should_navigate_to_edit_scene("76")
+        }
+    }
+
+    @Test
     fun test_unsubscribe_on_destroy() {
         given {
             an_experience_id()
@@ -139,6 +173,14 @@ class SceneListPresenterTest {
             presenter.destroy()
         }
 
+        fun presenter_on_edit_experience_click(experienceId: String) {
+            presenter.onEditExperienceClick(experienceId)
+        }
+
+        fun presenter_on_edit_scene_click(sceneId: String) {
+            presenter.onEditSceneClick(sceneId)
+        }
+
         fun should_call_scene_repo_get_scenes_with_experience_id() {
             BDDMockito.then(mockRepository).should().scenesFlowable(this.experienceId)
         }
@@ -160,6 +202,14 @@ class SceneListPresenterTest {
         fun observable_should_have_no_observers() {
             assertFalse(testScenesObservable.hasObservers())
             assertFalse(testExperienceObservable.hasObservers())
+        }
+
+        fun should_navigate_to_edit_experience(experienceId: String) {
+            BDDMockito.then(mockView).should().navigateToEditExperience(experienceId)
+        }
+
+        fun should_navigate_to_edit_scene(sceneId: String) {
+            BDDMockito.then(mockView).should().navigateToEditScene(sceneId, this.experienceId)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)
