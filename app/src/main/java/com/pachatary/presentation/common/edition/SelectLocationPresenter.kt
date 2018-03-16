@@ -3,9 +3,10 @@ package com.pachatary.presentation.common.edition
 import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.OnLifecycleEvent
+import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
 import javax.inject.Inject
 
-class SelectLocationPresenter @Inject constructor(): LifecycleObserver {
+class SelectLocationPresenter @Inject constructor(val schedulerProvider: SchedulerProvider) : LifecycleObserver {
 
     enum class LocationType {
         UNKNWON, APROX, SPECIFIC
@@ -40,5 +41,12 @@ class SelectLocationPresenter @Inject constructor(): LifecycleObserver {
 
     fun doneButtonClick() {
         view.finishWith(latitude = view.latitude(), longitude = view.longitude())
+    }
+
+    fun searchButtonClick(searchText: String) {
+        view.geocodeAddress(searchText)
+                .observeOn(schedulerProvider.observer())
+                .subscribeOn(schedulerProvider.subscriber())
+                .subscribe { view.moveMapToPoint(it.first, it.second) }
     }
 }

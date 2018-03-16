@@ -1,5 +1,9 @@
 package com.pachatary.presentation.common.edition
 
+import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
+import io.reactivex.Flowable
+import io.reactivex.Scheduler
+import io.reactivex.schedulers.Schedulers
 import org.junit.Test
 import org.mockito.BDDMockito
 import org.mockito.Mock
@@ -57,6 +61,23 @@ class SelectLocationPresenterTest {
         }
     }
 
+    @Test
+    fun test_when_search_location_button_clicked_subscribe_to_geocoder() {
+        given {
+            an_unknown_initial_location()
+            presenter_initialized_with_this_location()
+            a_latitude()
+            a_longitude()
+            an_address()
+            an_observable_that_returns_that_latitude_and_longitude_when_geocoder_called_with_that_address()
+        } whenn {
+            search_button_is_clicked_with_that_address()
+        } then {
+            geocoder_should_be_called_with_that_address()
+            view_should_move_map_to_that_latitude_and_longitude_point()
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
@@ -67,10 +88,12 @@ class SelectLocationPresenterTest {
         var initialLocationType = SelectLocationPresenter.LocationType.UNKNWON
         var latitude = 0.0
         var longitude = 0.0
+        var address = ""
+        lateinit var geocoderFlowable: Flowable<Pair<Double, Double>>
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
-            presenter = SelectLocationPresenter()
+            presenter = SelectLocationPresenter(SchedulerProvider(Schedulers.trampoline(), Schedulers.trampoline()))
 
             return this
         }
@@ -99,8 +122,17 @@ class SelectLocationPresenterTest {
             initialLongitude -3.2
         }
 
+        fun an_observable_that_returns_that_latitude_and_longitude_when_geocoder_called_with_that_address() {
+            geocoderFlowable = Flowable.just(Pair(latitude, longitude))
+            BDDMockito.given(mockView.geocodeAddress(address)).willReturn(geocoderFlowable)
+        }
+
+        fun an_address() {
+            address = "My point address, 123"
+        }
+
         fun presenter_initialized_with_this_location() {
-            presenter = SelectLocationPresenter()
+            presenter = SelectLocationPresenter(SchedulerProvider(Schedulers.trampoline(), Schedulers.trampoline()))
             presenter.setViewAndInitialLocation(mockView, initialLatitude, initialLongitude, initialLocationType)
         }
 
@@ -112,6 +144,10 @@ class SelectLocationPresenterTest {
             BDDMockito.given(mockView.latitude()).willReturn(latitude)
             BDDMockito.given(mockView.longitude()).willReturn(longitude)
             presenter.doneButtonClick()
+        }
+
+        fun search_button_is_clicked_with_that_address() {
+            presenter.searchButtonClick(address)
         }
 
         fun finish_should_be_called_with_latitude_and_longitude() {
@@ -131,6 +167,14 @@ class SelectLocationPresenterTest {
         fun presenter_should_set_view_initial_location_with_near_zoom_level() {
             BDDMockito.then(mockView).should().setInitialLocation(initialLatitude, initialLongitude,
                                                                   SelectLocationView.ZoomLevel.NEAR)
+        }
+
+        fun geocoder_should_be_called_with_that_address() {
+            BDDMockito.then(mockView).should().geocodeAddress(address)
+        }
+
+        fun view_should_move_map_to_that_latitude_and_longitude_point() {
+            BDDMockito.then(mockView).should().moveMapToPoint(latitude, longitude)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

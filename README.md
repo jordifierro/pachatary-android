@@ -65,6 +65,7 @@ Title has to be between 1 and 30 chars.
 
 This activity shows a map to allow user select a location (only for scenes).
 It starts with the last known user location to make the process faster.
+The search bar allows user to move map point to certain address.
 
 ##### PickImageActivity
 ![PickImageActivity](https://raw.githubusercontent.com/zhihu/Matisse/master/image/screenshot_zhihu.png)

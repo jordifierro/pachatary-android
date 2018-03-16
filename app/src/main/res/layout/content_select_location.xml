@@ -16,6 +16,28 @@
         android:layout_height="match_parent"
         mapbox:mapbox_styleUrl="mapbox://styles/mapbox/streets-v10"/>
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:layout_alignParentTop="true">
+
+        <EditText
+            android:id="@+id/select_location_search_edittext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/select_location_search_button" />
+
+        <Button
+            android:id="@+id/select_location_search_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:text="SEARCH" />
+
+    </RelativeLayout>
+
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
