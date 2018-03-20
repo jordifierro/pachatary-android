@@ -20,18 +20,15 @@ import javax.inject.Inject
 class ExploreFragment : Fragment(), ExploreView {
 
     companion object {
-        fun newInstance(): ExploreFragment {
-            val experiencesMineFragment = ExploreFragment()
-            return experiencesMineFragment
-        }
+        fun newInstance() = ExploreFragment()
     }
 
     @Inject
     lateinit var presenter: ExplorePresenter
 
-    lateinit var recyclerView: RecyclerView
-    lateinit var progressBar: ProgressBar
-    lateinit var retryIcon: ImageView
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var progressBar: ProgressBar
+    private lateinit var retryIcon: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,14 +37,14 @@ class ExploreFragment : Fragment(), ExploreView {
         presenter.view = this
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val view = inflater!!.inflate(R.layout.fragment_explore, container, false)
+        val view = inflater.inflate(R.layout.fragment_explore, container, false)
 
-        progressBar = view.findViewById<ProgressBar>(R.id.experiences_progressbar)
-        retryIcon = view.findViewById<ImageView>(R.id.experiences_retry)
+        progressBar = view.findViewById(R.id.experiences_progressbar)
+        retryIcon = view.findViewById(R.id.experiences_retry)
         retryIcon.setOnClickListener { presenter.onRetryClick() }
-        recyclerView = view.findViewById<RecyclerView>(R.id.experiences_recyclerview)
+        recyclerView = view.findViewById(R.id.experiences_recyclerview)
         recyclerView.layoutManager = GridLayoutManager(activity, 1)
 
         presenter.create()
@@ -76,38 +73,36 @@ class ExploreFragment : Fragment(), ExploreView {
     }
 
     override fun navigateToExperience(experienceId: String) {
-        startActivity(ExperienceMapActivity.newIntent(activity, experienceId))
+        startActivity(ExperienceMapActivity.newIntent(activity!!.applicationContext, experienceId))
     }
 
-    class ExperiencesListAdapter(val inflater: LayoutInflater, val experienceList: List<Experience>,
-                                 val onClick: (String) -> Unit) : RecyclerView.Adapter<ExperienceViewHolder>() {
+    class ExperiencesListAdapter(private val inflater: LayoutInflater,
+                                 private val experienceList: List<Experience>,
+                                 val onClick: (String) -> Unit)
+                                                    : RecyclerView.Adapter<ExperienceViewHolder>() {
 
-        override fun onBindViewHolder(holder: ExperienceViewHolder?, position: Int) {
-            holder?.bind(experienceList[position])
+        override fun onBindViewHolder(holder: ExperienceViewHolder, position: Int) {
+            holder.bind(experienceList[position])
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExperienceViewHolder {
+            return ExperienceViewHolder(inflater.inflate(R.layout.item_full_experiences_list,
+                    parent, false), onClick)
         }
 
         override fun getItemCount(): Int = experienceList.size
-
-        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ExperienceViewHolder {
-            return ExperienceViewHolder(inflater.inflate(R.layout.item_full_experiences_list,
-                                        parent, false), onClick)
-        }
     }
 
     class ExperienceViewHolder(view: View, val onClick: (String) -> Unit)
         : RecyclerView.ViewHolder(view), View.OnClickListener {
 
-        private val titleView: TextView
-        private val authorView: TextView
-        private val descriptionView: TextView
-        private val pictureView: ImageView
+        private val titleView: TextView = view.findViewById(R.id.experience_title)
+        private val authorView: TextView = view.findViewById(R.id.experience_author)
+        private val descriptionView: TextView = view.findViewById(R.id.experience_description)
+        private val pictureView: ImageView = view.findViewById(R.id.experience_picture)
         lateinit var experienceId: String
 
         init {
-            titleView = view.findViewById<TextView>(R.id.experience_title)
-            authorView = view.findViewById<TextView>(R.id.experience_author)
-            descriptionView = view.findViewById<TextView>(R.id.experience_description)
-            pictureView = view.findViewById<ImageView>(R.id.experience_picture)
             view.setOnClickListener(this)
         }
 

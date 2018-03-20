@@ -20,18 +20,15 @@ import javax.inject.Inject
 class SavedFragment : Fragment(), SavedView {
 
     companion object {
-        fun newInstance(): SavedFragment {
-            val experiencesMineFragment = SavedFragment()
-            return experiencesMineFragment
-        }
+        fun newInstance() = SavedFragment()
     }
 
     @Inject
     lateinit var presenter: SavedPresenter
 
-    lateinit var recyclerView: RecyclerView
-    lateinit var progressBar: ProgressBar
-    lateinit var retryIcon: ImageView
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var progressBar: ProgressBar
+    private lateinit var retryIcon: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,9 +37,9 @@ class SavedFragment : Fragment(), SavedView {
         presenter.view = this
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val view = inflater!!.inflate(R.layout.fragment_saved, container, false)
+        val view = inflater.inflate(R.layout.fragment_saved, container, false)
 
         progressBar = view.findViewById(R.id.experiences_progressbar)
         retryIcon = view.findViewById(R.id.experiences_retry)
@@ -77,19 +74,21 @@ class SavedFragment : Fragment(), SavedView {
     }
 
     override fun navigateToExperience(experienceId: String) {
-        startActivity(ExperienceMapActivity.newIntent(activity, experienceId))
+        startActivity(ExperienceMapActivity.newIntent(activity!!.applicationContext, experienceId))
     }
 
-    class ExperiencesListAdapter(val inflater: LayoutInflater, val experienceList: List<Experience>,
-                                 val onClick: (String) -> Unit) : RecyclerView.Adapter<ExperienceViewHolder>() {
+    class ExperiencesListAdapter(private val inflater: LayoutInflater,
+                                 private val experienceList: List<Experience>,
+                                 val onClick: (String) -> Unit)
+                                                    : RecyclerView.Adapter<ExperienceViewHolder>() {
 
-        override fun onBindViewHolder(holder: ExperienceViewHolder?, position: Int) {
-            holder?.bind(experienceList[position])
+        override fun onBindViewHolder(holder: ExperienceViewHolder, position: Int) {
+            holder.bind(experienceList[position])
         }
 
         override fun getItemCount(): Int = experienceList.size
 
-        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ExperienceViewHolder {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExperienceViewHolder {
             return ExperienceViewHolder(inflater.inflate(R.layout.item_experiences_list,
                                         parent, false), onClick)
         }
@@ -98,13 +97,11 @@ class SavedFragment : Fragment(), SavedView {
     class ExperienceViewHolder(view: View, val onClick: (String) -> Unit)
         : RecyclerView.ViewHolder(view), View.OnClickListener {
 
-        private val titleView: TextView
-        private val pictureView: ImageView
+        private val titleView: TextView = view.findViewById(R.id.experience_title)
+        private val pictureView: ImageView = view.findViewById(R.id.experience_picture)
         lateinit var experienceId: String
 
         init {
-            titleView = view.findViewById(R.id.experience_title)
-            pictureView = view.findViewById(R.id.experience_picture)
             view.setOnClickListener(this)
         }
 

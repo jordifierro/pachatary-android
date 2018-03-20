@@ -25,19 +25,16 @@ import javax.inject.Inject
 class MyExperiencesFragment : Fragment(), MyExperiencesView {
 
     companion object {
-        fun newInstance(): MyExperiencesFragment {
-            val experiencesMineFragment = MyExperiencesFragment()
-            return experiencesMineFragment
-        }
+        fun newInstance() = MyExperiencesFragment()
     }
 
     @Inject
     lateinit var presenter: MyExperiencesPresenter
 
-    lateinit var recyclerView: RecyclerView
-    lateinit var progressBar: ProgressBar
-    lateinit var retryIcon: ImageView
-    lateinit var createExperienceButton: FloatingActionButton
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var progressBar: ProgressBar
+    private lateinit var retryIcon: ImageView
+    private lateinit var createExperienceButton: FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,16 +43,16 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
         presenter.view = this
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val view = inflater!!.inflate(R.layout.fragment_my_experiences, container, false)
+        val view = inflater.inflate(R.layout.fragment_my_experiences, container, false)
 
-        progressBar = view.findViewById<ProgressBar>(R.id.experiences_progressbar)
-        retryIcon = view.findViewById<ImageView>(R.id.experiences_retry)
+        progressBar = view.findViewById(R.id.experiences_progressbar)
+        retryIcon = view.findViewById(R.id.experiences_retry)
         retryIcon.setOnClickListener { presenter.onRetryClick() }
-        recyclerView = view.findViewById<RecyclerView>(R.id.experiences_recyclerview)
+        recyclerView = view.findViewById(R.id.experiences_recyclerview)
         recyclerView.layoutManager = GridLayoutManager(activity, 2)
-        createExperienceButton = view.findViewById<FloatingActionButton>(R.id.create_new_experience_button)
+        createExperienceButton = view.findViewById(R.id.create_new_experience_button)
         createExperienceButton.setOnClickListener { presenter.onCreateExperienceClick() }
 
         presenter.create()
@@ -90,18 +87,17 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
     }
 
     override fun navigateToExperience(experienceId: String) {
-        startActivity(ExperienceMapActivity.newIntent(activity, experienceId))
+        startActivity(ExperienceMapActivity.newIntent(activity!!.applicationContext, experienceId))
     }
 
     override fun navigateToCreateExperience() {
-        startActivity(CreateExperienceActivity.newIntent(context = activity))
+        startActivity(CreateExperienceActivity.newIntent(context = activity!!.applicationContext))
     }
 
     override fun showRegisterDialog() {
-        val builder: AlertDialog.Builder
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            builder = AlertDialog.Builder(context, android.R.style.Theme_Material_Dialog_Alert)
-        else builder = AlertDialog.Builder(context)
+        val builder: AlertDialog.Builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            AlertDialog.Builder(context!!, android.R.style.Theme_Material_Dialog_Alert)
+        else AlertDialog.Builder(context!!)
         builder.setTitle(R.string.dialog_title_mine_register)
                 .setMessage(R.string.dialog_question_mine_register)
                 .setPositiveButton(android.R.string.yes, { _, _ -> presenter.onProceedToRegister() })
@@ -111,34 +107,33 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
     }
 
     override fun navigateToRegister() {
-        startActivity(RegisterActivity.newIntent(context = activity))
+        startActivity(RegisterActivity.newIntent(context = activity!!.applicationContext))
     }
 
-    class ExperiencesListAdapter(val inflater: LayoutInflater, val experienceList: List<Experience>,
-                                 val onClick: (String) -> Unit) : RecyclerView.Adapter<ExperienceViewHolder>() {
+    class ExperiencesListAdapter(private val inflater: LayoutInflater,
+                                 private val experienceList: List<Experience>,
+                                 val onClick: (String) -> Unit)
+                                                    : RecyclerView.Adapter<ExperienceViewHolder>() {
+        override fun onBindViewHolder(holder: ExperienceViewHolder, position: Int) {
+            holder.bind(experienceList[position])
+        }
 
-        override fun onBindViewHolder(holder: ExperienceViewHolder?, position: Int) {
-            holder?.bind(experienceList[position])
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExperienceViewHolder {
+            return ExperienceViewHolder(inflater.inflate(R.layout.item_experiences_list,
+                    parent, false), onClick)
         }
 
         override fun getItemCount(): Int = experienceList.size
-
-        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ExperienceViewHolder {
-            return ExperienceViewHolder(inflater.inflate(R.layout.item_experiences_list,
-                                        parent, false), onClick)
-        }
     }
 
     class ExperienceViewHolder(view: View, val onClick: (String) -> Unit)
         : RecyclerView.ViewHolder(view), View.OnClickListener {
 
-        private val titleView: TextView
-        private val pictureView: ImageView
+        private val titleView: TextView = view.findViewById(R.id.experience_title)
+        private val pictureView: ImageView = view.findViewById(R.id.experience_picture)
         lateinit var experienceId: String
 
         init {
-            titleView = view.findViewById<TextView>(R.id.experience_title)
-            pictureView = view.findViewById<ImageView>(R.id.experience_picture)
             view.setOnClickListener(this)
         }
 
