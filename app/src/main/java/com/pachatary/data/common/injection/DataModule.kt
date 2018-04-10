@@ -16,6 +16,8 @@ import com.pachatary.data.scene.SceneRepository
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
+import com.pachatary.data.common.NewResultStreamFactory
+import com.pachatary.data.experience.NewExperienceRepository
 import dagger.Module
 import dagger.Provides
 import io.reactivex.Scheduler
@@ -69,9 +71,19 @@ class DataModule {
 
     @Provides
     @Singleton
+    fun provideNewExperienceStreamFactory() = NewResultStreamFactory<Experience>()
+
+    @Provides
+    @Singleton
     fun provideExperienceRepository(apiRepository: ExperienceApiRepository, @Named("io") scheduler: Scheduler,
                                     experienceStreamFactory: ResultStreamFactory<Experience>): ExperienceRepository =
             ExperienceRepository(apiRepository, scheduler, experienceStreamFactory)
+
+    @Provides
+    @Singleton
+    fun provideNewExperienceRepository(apiRepository: ExperienceApiRepository, @Named("io") scheduler: Scheduler,
+                                       experienceStreamFactory: NewResultStreamFactory<Experience>): NewExperienceRepository =
+            NewExperienceRepository(apiRepository, scheduler, experienceStreamFactory)
 
     @Provides
     @Singleton

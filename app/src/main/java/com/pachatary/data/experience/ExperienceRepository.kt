@@ -23,7 +23,7 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
     fun exploreExperiencesFlowable() : Flowable<Result<List<Experience>>> {
         if (exploreExperiencesFlowable == null) {
             exploreExperiencesFlowable = experiencesFlowable().resultFlowable
-                    .map { Result(it.data!!.filter { !it.isMine && !it.isSaved }, null) }
+                    .map { Result(it.data!!.filter { !it.isMine && !it.isSaved }) }
             refreshExperiences()
         }
         return exploreExperiencesFlowable!!
@@ -38,7 +38,7 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
     fun myExperiencesFlowable() : Flowable<Result<List<Experience>>> {
         if (myExperiencesFlowable == null) {
             myExperiencesFlowable = experiencesFlowable().resultFlowable
-                    .map { Result(it.data!!.filter { it.isMine }, null) }
+                    .map { Result(it.data!!.filter { it.isMine }) }
             refreshMyExperiences()
         }
         return myExperiencesFlowable!!
@@ -53,7 +53,7 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
     fun savedExperiencesFlowable() : Flowable<Result<List<Experience>>> {
         if (savedExperiencesFlowable == null) {
             savedExperiencesFlowable = experiencesFlowable().resultFlowable
-                    .map { Result(it.data!!.filter { it.isSaved }, null) }
+                    .map { Result(it.data!!.filter { it.isSaved }) }
             refreshSavedExperiences()
         }
         return savedExperiencesFlowable!!
@@ -84,14 +84,14 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
 
     internal val emitThroughAddOrUpdate =
             { resultExperience: Result<Experience> ->
-                experiencesStream!!.addOrUpdateObserver.onNext(Result(listOf(resultExperience.data!!), null)) }
+                experiencesStream!!.addOrUpdateObserver.onNext(Result(listOf(resultExperience.data!!))) }
 
     fun saveExperience(experienceId: String, save: Boolean) {
         experienceFlowable(experienceId).map {
             val updatedExperience = Experience(id = it.data!!.id, title = it.data.title,
                     description = it.data.description, picture = it.data.picture,
                     isMine = it.data.isMine, isSaved = save)
-            Result(listOf(updatedExperience), null) }
+            Result(listOf(updatedExperience)) }
                                         .subscribeOn(scheduler)
                                         .take(1)
                                         .subscribe({ experiencesStream!!.addOrUpdateObserver.onNext(it) })

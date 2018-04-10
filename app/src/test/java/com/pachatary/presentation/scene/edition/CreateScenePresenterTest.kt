@@ -226,7 +226,7 @@ class CreateScenePresenterTest {
             a_created_scene()
 
             BDDMockito.given(mockRepository.createScene(scene = sentCreatedScene!!))
-                    .willReturn(Flowable.just(Result<Scene>(receivedCreatedScene!!, null)))
+                    .willReturn(Flowable.just(Result<Scene>(receivedCreatedScene!!)))
         }
 
         fun presenter_is_created() {

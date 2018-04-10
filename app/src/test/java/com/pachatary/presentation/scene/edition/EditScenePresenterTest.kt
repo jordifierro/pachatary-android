@@ -227,12 +227,12 @@ class EditScenePresenterTest {
             an_edited_scene()
 
             BDDMockito.given(mockRepository.editScene(scene = sentEditedScene))
-                    .willReturn(Flowable.just(Result<Scene>(receivedEditedScene!!, null)))
+                    .willReturn(Flowable.just(Result<Scene>(receivedEditedScene!!)))
         }
 
         fun an_scene_repository_that_returns_scene() {
             BDDMockito.given(mockRepository.sceneFlowable(experienceId, sceneId))
-                    .willReturn(Flowable.just(Result(scene, null)))
+                    .willReturn(Flowable.just(Result(scene)))
         }
 
         fun presenter_is_created() {

@@ -209,7 +209,7 @@ class ExperienceMapPresenterTest {
 
         fun repository_with_those_two_scenes() {
             BDDMockito.given(mockRepository.scenesFlowable(experienceId = "5"))
-                    .willReturn(Flowable.just(Result(Arrays.asList(sceneA!!, sceneB!!), null)))
+                    .willReturn(Flowable.just(Result(Arrays.asList(sceneA!!, sceneB!!))))
         }
 
         fun repository_with_no_scenes() {
@@ -242,7 +242,7 @@ class ExperienceMapPresenterTest {
 
         fun experience_repo_with_that_experience() {
             BDDMockito.given(mockExperienceRepository.experienceFlowable(experienceId = "5"))
-                    .willReturn(Flowable.just(Result(experienceA, null)))
+                    .willReturn(Flowable.just(Result(experienceA)))
         }
 
         fun experience_repo_with_no_experiences() {

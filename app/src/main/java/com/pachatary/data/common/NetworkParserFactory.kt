@@ -27,7 +27,7 @@ class NetworkParserFactory {
                                 else Result<T>(data = null,
                                                error = errorMapper.invoke(it.response()!!.errorBody()!!.string()))
                             } else if (!emptyBody) Result(data = it.response()!!.body()!!.toDomain(), error = null)
-                            else Result<T>(null, null)
+                            else Result<T>(null)
                         }
                         .retry(2)
     }
@@ -46,7 +46,7 @@ class NetworkParserFactory {
                                                      error = errorMapper.invoke(it.response()!!.errorBody()!!.string()))
                             } else if (!emptyBody)
                                 Result(data = it.response()!!.body()!!.map { it.toDomain()!! }, error = null)
-                            else Result<List<T>>(null, null)
+                            else Result<List<T>>(null)
                         }
                         .retry(2)
     }
@@ -58,7 +58,7 @@ class NetworkParserFactory {
                             if (it.isError()) throw it.error()!!
                             else if (it.response()!!.isSuccessful.not())
                                 throw Exception(it.response()!!.errorBody()!!.string())
-                            else Result<Void>(null, null)
+                            else Result<Void>(null)
                         }
                         .retry(2)
     }

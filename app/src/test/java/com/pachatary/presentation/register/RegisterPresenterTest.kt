@@ -85,12 +85,12 @@ class RegisterPresenterTest {
         fun an_auth_repo_that_returns_a_flowable_with_a_person() {
             BDDMockito.given(mockAuthRepo.register(username, email))
                     .willReturn(Flowable.just(Result(
-                            Person(true, "u", "e", false), null)))
+                            Person(true, "u", "e", false))))
         }
 
         fun an_auth_repo_that_returns_a_flowable_with_that_error() {
             BDDMockito.given(mockAuthRepo.register(username, email))
-                    .willReturn(Flowable.just(Result<Person>(null, clientError)))
+                    .willReturn(Flowable.just(Result<Person>(null, error = clientError)))
         }
 
         fun done_button_is_clicked() {

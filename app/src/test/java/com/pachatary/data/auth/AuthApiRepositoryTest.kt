@@ -181,13 +181,13 @@ class AuthApiRepositoryTest {
 
         fun response_should_be_auth_token() {
             testAuthTokenSubscriber.assertResult(
-                    Result(AuthToken("868a2b9a", "9017c7e7"), null))
+                    Result(AuthToken("868a2b9a", "9017c7e7")))
         }
 
         fun response_should_be_person() {
             testRegisterSubscriber.assertResult(
                     Result(Person(isRegistered = true, username = "user.name",
-                                  email = "test@mail.com", isEmailConfirmed = false), null)
+                                  email = "test@mail.com", isEmailConfirmed = false))
             )
         }
 

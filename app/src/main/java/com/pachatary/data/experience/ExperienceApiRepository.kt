@@ -68,7 +68,7 @@ class ExperienceApiRepository (retrofit: Retrofit, @Named("io") val scheduler: S
                         override fun onCompleted(context: Context, uploadInfo: UploadInfo,
                                                  serverResponse: ServerResponse) {
                             val jsonExperience = JSONObject(serverResponse.bodyAsString)
-                            delegate(Result(parseExperienceJson(jsonExperience), null))
+                            delegate(Result(parseExperienceJson(jsonExperience)))
                         }
                     })
                     .startUpload()

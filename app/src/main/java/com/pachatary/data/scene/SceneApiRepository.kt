@@ -58,7 +58,7 @@ class SceneApiRepository(retrofit: Retrofit, @Named("io") val scheduler: Schedul
                         override fun onCompleted(context: Context, uploadInfo: UploadInfo,
                                                  serverResponse: ServerResponse) {
                             val jsonScene = JSONObject(serverResponse.bodyAsString)
-                            delegate(Result(parseSceneJson(jsonScene), null))
+                            delegate(Result(parseSceneJson(jsonScene)))
                         }
                     })
                     .startUpload()

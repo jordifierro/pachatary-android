@@ -20,7 +20,7 @@ class ResultStreamFactory<T> where T : Identifiable {
                         .map { filterOperation: (T) -> Boolean -> Function<Result<List<T>>, Result<List<T>>>
                                 { previousTResult ->
                                     val newExperiencesAfterRemove = previousTResult.data!!.filterNot(filterOperation)
-                                    Result(newExperiencesAfterRemove, null)
+                                    Result(newExperiencesAfterRemove)
                                 } },
                 addOrUpdateSubject.toFlowable(BackpressureStrategy.LATEST)
                         .map { newTListResult -> Function<Result<List<T>>, Result<List<T>>>
@@ -31,12 +31,11 @@ class ResultStreamFactory<T> where T : Identifiable {
                                             newList = newList.map { scene -> if (scene.id == t.id) t else scene }
                                         else newList = newList.union(listOf(t)).toList()
                                     }
-                                    Result(newList, null)
+                                    newTListResult.builder().data(newList).build()
                                 }
                              }
                         )
-                        .scan(Result(listOf<T>(), null), { oldValue, func -> func.apply(oldValue) })
-                        .skip(1)
+                        .scan(Result(listOf<T>()), { oldValue, func -> func.apply(oldValue) })
                         .replay(1)
                         .autoConnect()
         return ResultStream(addOrUpdateSubject, removeAllThatSubject, resultFlowable)

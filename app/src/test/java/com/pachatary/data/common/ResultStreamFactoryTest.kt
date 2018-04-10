@@ -107,7 +107,7 @@ class ResultStreamFactoryTest {
         }
 
         fun a_list_of_scenes_is_emitted_through_add_list_observer() {
-            stream.addOrUpdateObserver.onNext(Result(oldScenes, null))
+            stream.addOrUpdateObserver.onNext(Result(oldScenes))
         }
 
         fun a_function_that_filter_non_2_id_is_emitted_through_remove_all_that_obsever() {
@@ -115,15 +115,15 @@ class ResultStreamFactoryTest {
         }
 
         fun new_scene_is_emitted_through_add_or_update() {
-            stream.addOrUpdateObserver.onNext(Result(listOf(newScene), null))
+            stream.addOrUpdateObserver.onNext(Result(listOf(newScene)))
         }
 
         fun modified_scene_is_emitted_through_add_or_update() {
-            stream.addOrUpdateObserver.onNext(Result(listOf(updatedScene), null))
+            stream.addOrUpdateObserver.onNext(Result(listOf(updatedScene)))
         }
 
         fun a_new_list_is_emitted_through_add_list_observer() {
-            stream.addOrUpdateObserver.onNext(Result(newScenes, null))
+            stream.addOrUpdateObserver.onNext(Result(newScenes))
         }
 
         fun another_observer_subscribes_to_flowable() {
@@ -171,7 +171,7 @@ class ResultStreamFactoryTest {
             testSubscriber.awaitCount(2)
 
             val secondResult = testSubscriber.events.get(0).get(1) as Result<*>
-            assertEquals(Result(listOf(secondScene), null), secondResult)
+            assertEquals(Result(listOf(secondScene)), secondResult)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

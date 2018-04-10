@@ -99,7 +99,7 @@ class MainPresenterTest {
 
         fun an_auth_repo_returns_auth_token_on_get_person_invitation() {
             given(mockAuthRepository.getPersonInvitation()).willReturn(
-                    Flowable.just(Result(AuthToken("A", "R"), null)))
+                    Flowable.just(Result(AuthToken("A", "R"))))
         }
 
         fun create_presenter() {

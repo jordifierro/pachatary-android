@@ -181,20 +181,20 @@ class SceneRepositoryTest {
                                latitude = 1.0, longitude = -2.3, experienceId = "3", picture = null)
             addOrUpdateObserver = TestObserver.create()
             removeAllThatObserver = TestObserver.create()
-            scenesFlowable = Flowable.just(Result(listOf(sceneA, sceneB), null))
+            scenesFlowable = Flowable.just(Result(listOf(sceneA, sceneB)))
             BDDMockito.given(mockScenesStreamFactory.create()).willReturn(
                     ResultStreamFactory.ResultStream(addOrUpdateObserver, removeAllThatObserver, scenesFlowable))
         }
 
         fun an_api_repo_that_returns_scenes_flowable_with_an_scene() {
             scene = Scene("2", "T", "d", null, 0.0, 0.0, "1")
-            apiScenesFlowable = Flowable.just(Result(listOf(scene), null))
+            apiScenesFlowable = Flowable.just(Result(listOf(scene)))
 
             BDDMockito.given(mockApiRepository.scenesRequestFlowable(experienceId)).willReturn(apiScenesFlowable)
         }
 
         fun an_api_repo_that_returns_created_scene() {
-            val createdSceneFlowable = Flowable.just(Result(scene, null))
+            val createdSceneFlowable = Flowable.just(Result(scene))
             BDDMockito.given(mockApiRepository.createScene(scene)).willReturn(createdSceneFlowable)
         }
 
@@ -227,7 +227,7 @@ class SceneRepositoryTest {
         }
 
         fun delegate_is_called_with_scene() {
-            repository.emitThroughAddOrUpdate.invoke(Result(scene, null))
+            repository.emitThroughAddOrUpdate.invoke(Result(scene))
         }
 
         fun should_return_flowable_created_by_factory() {
@@ -236,7 +236,7 @@ class SceneRepositoryTest {
 
         fun should_connect_api_scenes_flowable_on_next_to_replace_all_scenes_observer() {
             addOrUpdateObserver.onComplete()
-            addOrUpdateObserver.assertResult(Result(listOf(scene), null))
+            addOrUpdateObserver.assertResult(Result(listOf(scene)))
         }
 
         fun first_result_should_be_first_scenes_flowable() {
@@ -267,7 +267,7 @@ class SceneRepositoryTest {
         fun should_emit_created_scene_through_add_or_update_scenes_observer() {
             createdSceneFlowableResult.subscribeOn(Schedulers.trampoline()).subscribe()
             addOrUpdateObserver.onComplete()
-            addOrUpdateObserver.assertResult(Result(listOf(scene), null), Result(listOf(scene), null))
+            addOrUpdateObserver.assertResult(Result(listOf(scene)), Result(listOf(scene)))
         }
 
         fun should_call_api_upload_scene_picture_with_scene_id_and_image_uri_string() {
@@ -277,7 +277,7 @@ class SceneRepositoryTest {
 
         fun delegate_param_should_emit_scene_through_add_or_update_observer() {
             addOrUpdateObserver.onComplete()
-            addOrUpdateObserver.assertResult(Result(listOf(scene), null), Result(listOf(scene), null))
+            addOrUpdateObserver.assertResult(Result(listOf(scene)), Result(listOf(scene)))
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

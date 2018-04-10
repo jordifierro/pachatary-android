@@ -114,12 +114,12 @@ class ExplorePresenterTest {
         fun an_experience_repo_that_returns_both_on_my_experiences_flowable() {
             given(mockRepository.exploreExperiencesFlowable())
                     .willReturn(Flowable.just(Result<List<Experience>>(
-                            arrayListOf(experienceA, experienceB), null)))
+                            arrayListOf(experienceA, experienceB))))
         }
 
         fun an_experience_repo_that_returns_exception() {
             given(mockRepository.exploreExperiencesFlowable())
-                    .willReturn(Flowable.just(Result<List<Experience>>(null, Exception())))
+                    .willReturn(Flowable.just(Result<List<Experience>>(null, error = Exception())))
         }
 
         fun create_presenter() {

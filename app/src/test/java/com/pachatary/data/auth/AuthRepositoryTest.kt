@@ -188,12 +188,12 @@ class AuthRepositoryTest {
         }
 
         fun a_result_error() {
-            resultError = Result(null, ClientException(source = "s", code = "c", message = "m"))
+            resultError = Result(null, error = ClientException(source = "s", code = "c", message = "m"))
         }
 
         fun an_auth_api_that_returns_a_flowable_with_that_person() {
             BDDMockito.given(authApiRepository.register(username, email))
-                    .willReturn(Flowable.just(Result(person, null)))
+                    .willReturn(Flowable.just(Result(person)))
         }
 
         fun an_auth_api_that_returns_a_flowable_with_that_result_error() {
@@ -202,7 +202,7 @@ class AuthRepositoryTest {
 
         fun an_auth_api_that_returns_a_flowable_with_that_person_on_confirm_email() {
             BDDMockito.given(authApiRepository.confirmEmail(confirmationToken))
-                    .willReturn(Flowable.just(Result(person, null)))
+                    .willReturn(Flowable.just(Result(person)))
         }
 
         fun an_auth_api_that_returns_a_flowable_with_that_result_error_on_confirm_email() {
@@ -221,7 +221,7 @@ class AuthRepositoryTest {
         fun an_auth_api_that_returns_a_flowable_with_auth_token() {
             authToken = AuthToken("A", "R")
             BDDMockito.given(authApiRepository.getPersonInvitation()).willReturn(
-                    Flowable.just(Result(authToken, null)))
+                    Flowable.just(Result(authToken)))
         }
 
         fun has_person_credentials() {
@@ -253,7 +253,7 @@ class AuthRepositoryTest {
         }
 
         fun should_return_auth_token_flowable() {
-            testAuthTokenSubscriber.assertResult(Result(authToken, null))
+            testAuthTokenSubscriber.assertResult(Result(authToken))
         }
 
         fun should_save_auth_token_on_auth_storage_repository() {
@@ -302,7 +302,7 @@ class AuthRepositoryTest {
         }
 
         fun should_receive_person() {
-            testPersonSubscriber.assertResult(Result(person, null))
+            testPersonSubscriber.assertResult(Result(person))
         }
 
         fun should_call_storage_repo_to_save_person() {

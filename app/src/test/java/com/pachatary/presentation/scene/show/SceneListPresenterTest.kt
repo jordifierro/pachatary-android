@@ -155,12 +155,12 @@ class SceneListPresenterTest {
 
         fun an_scene_repo_that_returns_that_scene() {
             given(mockRepository.scenesFlowable(experienceId = experienceId))
-                    .willReturn(Flowable.just(Result<List<Scene>>(arrayListOf(scene), null)))
+                    .willReturn(Flowable.just(Result<List<Scene>>(arrayListOf(scene))))
         }
 
         fun an_experience_repo_that_returns_that_experience() {
             given(mockExperienceRepository.experienceFlowable(experienceId = experienceId))
-                    .willReturn(Flowable.just(Result(experience, null)))
+                    .willReturn(Flowable.just(Result(experience)))
         }
 
         fun presenter_set_view_and_create_with_experience_and_scene_id() {

@@ -177,12 +177,12 @@ class EditExperiencePresenterTest {
             an_edited_experience()
 
             BDDMockito.given(mockRepository.editExperience(experience = sentEditedExperience))
-                    .willReturn(Flowable.just(Result<Experience>(receivedEditedExperience!!, null)))
+                    .willReturn(Flowable.just(Result<Experience>(receivedEditedExperience!!)))
         }
 
         fun an_experience_repository_that_returns_experience() {
             BDDMockito.given(mockRepository.experienceFlowable(experienceId))
-                    .willReturn(Flowable.just(Result(experience, null)))
+                    .willReturn(Flowable.just(Result(experience)))
         }
 
         fun presenter_is_created() {

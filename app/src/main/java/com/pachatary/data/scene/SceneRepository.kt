@@ -34,5 +34,5 @@ class SceneRepository(val apiRepository: SceneApiRepository, val streamFactory: 
 
     internal val emitThroughAddOrUpdate = { resultScene: Result<Scene> ->
         scenesStreamHashMap.get(resultScene.data!!.experienceId)!!.addOrUpdateObserver.onNext(
-                Result(listOf(resultScene.data), null)) }
+                Result(listOf(resultScene.data))) }
 }

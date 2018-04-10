@@ -268,7 +268,7 @@ class ExperienceApiRepositoryTest {
 
         fun response_should_parse_empty_body() {
             val receivedResult = testEmptySubscriber.events.get(0).get(0) as Result<*>
-            assertEquals(Result(null, null), receivedResult)
+            assertEquals(Result(null), receivedResult)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = apply(func)
