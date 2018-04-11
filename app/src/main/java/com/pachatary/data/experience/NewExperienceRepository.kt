@@ -7,9 +7,9 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Scheduler
 import io.reactivex.functions.BiFunction
+import io.reactivex.functions.Function
 import io.reactivex.functions.Function3
 import io.reactivex.subjects.PublishSubject
-import java.util.*
 import javax.inject.Named
 
 class NewExperienceRepository(val apiRepository: ExperienceApiRepository,
@@ -34,28 +34,33 @@ class NewExperienceRepository(val apiRepository: ExperienceApiRepository,
     init {
         for (kind in Kind.values()) {
             actionsSubject(kind).toFlowable(BackpressureStrategy.LATEST)
-                    .withLatestFrom(resultStream(kind).resultFlowable,
-                            BiFunction<Action, Result<List<Experience>>,
-                                    Pair<Action, Result<List<Experience>>>>
-                            { action, result -> Pair(action, result) })
-                    .subscribe({ if (it.first == Action.GET_FIRSTS) {
-                        if (!it.second.isInProgress() &&
-                                (it.second.hasNotBeenInitialized() || it.second.isError())) {
-                            resultStream(kind).modifyResultObserver.onNext(
-                                    { Result(listOf(), inProgress = true) })
-                            apiCallFlowable(kind)
-                                .subscribe({ apiResult ->
-                                    resultStream(kind).modifyResultObserver.onNext(
-                                        { apiResult.builder().lastEvent(Event.GET_FIRSTS).build() })
-                                })
-                        }
+                .withLatestFrom(resultStream(kind).resultFlowable,
+                        BiFunction<Action, Result<List<Experience>>,
+                                Pair<Action, Result<List<Experience>>>>
+                        { action, result -> Pair(action, result) })
+                .subscribe({ if (it.first == Action.GET_FIRSTS) {
+                    if (!it.second.isInProgress() &&
+                            (it.second.hasNotBeenInitialized() || it.second.isError())) {
+                        resultStream(kind).modifyResultObserver.onNext(
+                                Function { Result(listOf(), inProgress = true) })
+                        apiCallFlowable(kind)
+                            .subscribe({ apiResult ->
+                                resultStream(kind).modifyResultObserver.onNext(
+                                    Function { apiResult.builder()
+                                                        .lastEvent(Event.GET_FIRSTS)
+                                                        .build() })
+                            })
                     }
-                    })
+                }
+                })
         }
     }
 
     fun experiencesFlowable(kind: Kind): Flowable<Result<List<Experience>>> {
-        return resultStream(kind).resultFlowable
+        var result = resultStream(kind).resultFlowable
+        if (kind == Kind.SAVED)
+            result = result.map { it.builder().data(it.data?.filter { it.isSaved }).build() }
+        return result
     }
 
     fun getFirstExperiences(kind: Kind) {
@@ -73,21 +78,36 @@ class NewExperienceRepository(val apiRepository: ExperienceApiRepository,
                         datas = datas.union(b.data!!)
                         datas = datas.union(c.data!!)
                         Result(datas.toList()) })
+                    .filter { !(it.data?.find { it.id == experienceId } == null) }
                     .map { Result(it.data?.first { it.id == experienceId }) }
 
     fun createExperience(experience: Experience): Flowable<Result<Experience>> {
         return apiRepository.createExperience(experience)
+                .doOnNext({ resultStream(Kind.MINE).addOrUpdateObserver.onNext(listOf(it.data!!)) })
     }
 
     fun editExperience(experience: Experience): Flowable<Result<Experience>> {
         return apiRepository.editExperience(experience)
+                .doOnNext({ resultStream(Kind.MINE).addOrUpdateObserver.onNext(listOf(it.data!!)) })
     }
 
     fun uploadExperiencePicture(experienceId: String, croppedImageUriString: String) {
-        apiRepository.uploadExperiencePicture(experienceId, croppedImageUriString, {})
+        apiRepository.uploadExperiencePicture(experienceId, croppedImageUriString,
+                { resultStream(Kind.MINE).addOrUpdateObserver.onNext(listOf(it.data!!)) })
     }
 
     fun saveExperience(experienceId: String, save: Boolean) {
+        val ignore = experienceFlowable(experienceId).map {
+                    val updatedExperience = Experience(id = it.data!!.id, title = it.data.title,
+                            description = it.data.description, picture = it.data.picture,
+                            isMine = it.data.isMine, isSaved = save)
+                    listOf(updatedExperience) }
+                .subscribeOn(scheduler)
+                .take(1)
+                .subscribe({ updatedExperienceList ->
+                    resultStream(Kind.EXPLORE).updateObserver.onNext(updatedExperienceList)
+                    resultStream(Kind.SAVED).addOrUpdateObserver.onNext(updatedExperienceList)
+                })
         apiRepository.saveExperience(save = save, experienceId = experienceId).subscribe()
     }
 
