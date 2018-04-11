@@ -1,12 +1,12 @@
 package com.pachatary.presentation.experience.show
 
 import android.arch.lifecycle.LifecycleObserver
-import com.pachatary.data.experience.ExperienceRepository
+import com.pachatary.data.experience.NewExperienceRepository
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
 import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
-class SavedPresenter @Inject constructor(private val repository: ExperienceRepository,
+class SavedPresenter @Inject constructor(private val repository: NewExperienceRepository,
                                          private val schedulerProvider: SchedulerProvider) : LifecycleObserver {
 
     lateinit var view: SavedView
@@ -18,9 +18,7 @@ class SavedPresenter @Inject constructor(private val repository: ExperienceRepos
     }
 
     fun onRetryClick() {
-        view.hideRetry()
-        view.showLoader()
-        repository.refreshSavedExperiences()
+        repository.getFirstExperiences(NewExperienceRepository.Kind.SAVED)
     }
 
     fun onExperienceClick(experienceId: String) {
@@ -28,13 +26,19 @@ class SavedPresenter @Inject constructor(private val repository: ExperienceRepos
     }
 
     private fun connectToExperiences() {
-        view.showLoader()
-        experiencesDisposable = repository.savedExperiencesFlowable()
+        experiencesDisposable = repository.experiencesFlowable(NewExperienceRepository.Kind.SAVED)
                                           .subscribeOn(schedulerProvider.subscriber())
                                           .observeOn(schedulerProvider.observer())
-                                          .subscribe({ view.hideLoader()
-                                                       if (it.isSuccess()) view.showExperienceList(it.data!!)
-                                                       else view.showRetry() })
+                                          .subscribe({  if (it.isInProgress()) view.showLoader()
+                                                        else view.hideLoader()
+
+                                                        if (it.isError()) view.showRetry()
+                                                        else view.hideRetry()
+
+                                                        if (it.isSuccess())
+                                                            view.showExperienceList(it.data!!)
+                                          })
+        repository.getFirstExperiences(NewExperienceRepository.Kind.SAVED)
     }
 
     fun destroy() {

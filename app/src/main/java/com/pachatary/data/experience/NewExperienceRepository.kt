@@ -7,7 +7,9 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Scheduler
 import io.reactivex.functions.BiFunction
+import io.reactivex.functions.Function3
 import io.reactivex.subjects.PublishSubject
+import java.util.*
 import javax.inject.Named
 
 class NewExperienceRepository(val apiRepository: ExperienceApiRepository,
@@ -30,27 +32,63 @@ class NewExperienceRepository(val apiRepository: ExperienceApiRepository,
     val exploreActionsSubject = PublishSubject.create<Action>()
 
     init {
-        actionsSubject(Kind.MINE).toFlowable(BackpressureStrategy.LATEST)
-                .withLatestFrom(resultStream(Kind.MINE).resultFlowable,
-                     BiFunction<Action, Result<List<Experience>>,
-                                Pair<Action, Result<List<Experience>>>>
-                        { action, result -> Pair(action, result) })
-                .subscribe({
-                    if (it.first == Action.GET_FIRSTS && it.second.hasNotBeenInitialized()) {
-                        resultStream(Kind.MINE).modifyResultObserver.onNext(
-                                { Result(listOf(), inProgress = true) })
-                        apiCallFlowable(Kind.MINE)
+        for (kind in Kind.values()) {
+            actionsSubject(kind).toFlowable(BackpressureStrategy.LATEST)
+                    .withLatestFrom(resultStream(kind).resultFlowable,
+                            BiFunction<Action, Result<List<Experience>>,
+                                    Pair<Action, Result<List<Experience>>>>
+                            { action, result -> Pair(action, result) })
+                    .subscribe({ if (it.first == Action.GET_FIRSTS) {
+                        if (!it.second.isInProgress() &&
+                                (it.second.hasNotBeenInitialized() || it.second.isError())) {
+                            resultStream(kind).modifyResultObserver.onNext(
+                                    { Result(listOf(), inProgress = true) })
+                            apiCallFlowable(kind)
                                 .subscribe({ apiResult ->
-                                    resultStream(Kind.MINE).modifyResultObserver.onNext(
+                                    resultStream(kind).modifyResultObserver.onNext(
                                         { apiResult.builder().lastEvent(Event.GET_FIRSTS).build() })
                                 })
+                        }
                     }
-                })
+                    })
+        }
     }
 
     fun experiencesFlowable(kind: Kind): Flowable<Result<List<Experience>>> {
-        actionsSubject(kind).onNext(Action.GET_FIRSTS)
         return resultStream(kind).resultFlowable
+    }
+
+    fun getFirstExperiences(kind: Kind) {
+        actionsSubject(kind).onNext(Action.GET_FIRSTS)
+    }
+
+    fun experienceFlowable(experienceId: String): Flowable<Result<Experience>> =
+            Flowable.combineLatest(resultStream(Kind.MINE).resultFlowable,
+                                   resultStream(Kind.SAVED).resultFlowable,
+                                   resultStream(Kind.EXPLORE).resultFlowable,
+                    Function3 { a: Result<List<Experience>>,
+                                b: Result<List<Experience>>, c: Result<List<Experience>> ->
+                        var datas = setOf<Experience>()
+                        datas = datas.union(a.data!!)
+                        datas = datas.union(b.data!!)
+                        datas = datas.union(c.data!!)
+                        Result(datas.toList()) })
+                    .map { Result(it.data?.first { it.id == experienceId }) }
+
+    fun createExperience(experience: Experience): Flowable<Result<Experience>> {
+        return apiRepository.createExperience(experience)
+    }
+
+    fun editExperience(experience: Experience): Flowable<Result<Experience>> {
+        return apiRepository.editExperience(experience)
+    }
+
+    fun uploadExperiencePicture(experienceId: String, croppedImageUriString: String) {
+        apiRepository.uploadExperiencePicture(experienceId, croppedImageUriString, {})
+    }
+
+    fun saveExperience(experienceId: String, save: Boolean) {
+        apiRepository.saveExperience(save = save, experienceId = experienceId).subscribe()
     }
 
     private fun actionsSubject(kind: Kind): PublishSubject<Action> {

@@ -1,8 +1,5 @@
 package com.pachatary.data.common
 
-import com.pachatary.data.experience.NewExperienceRepository
-import java.nio.file.WatchEvent
-
 enum class Event {
     NONE, GET_FIRSTS, PAGINATE, REFRESH
 }

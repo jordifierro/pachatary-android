@@ -38,16 +38,20 @@ class ExperienceApiRepository (retrofit: Retrofit, @Named("io") val scheduler: S
     fun createExperience(experience: Experience): Flowable<Result<Experience>> =
             experienceApi.createExperience(title = experience.title, description = experience.description)
                     .compose(NetworkParserFactory.getTransformer())
+                    .subscribeOn(scheduler)
 
     fun editExperience(experience: Experience): Flowable<Result<Experience>> =
             experienceApi.editExperience(experience.id, experience.title, experience.description)
                     .compose(NetworkParserFactory.getTransformer())
+                    .subscribeOn(scheduler)
 
     fun saveExperience(save: Boolean, experienceId: String): Flowable<Result<Void>> {
         if (save) return experienceApi.saveExperience(experienceId)
                     .compose(NetworkParserFactory.getVoidTransformer())
+                    .subscribeOn(scheduler)
         else return experienceApi.unsaveExperience(experienceId)
                     .compose(NetworkParserFactory.getVoidTransformer())
+                    .subscribeOn(scheduler)
     }
 
     fun uploadExperiencePicture(experienceId: String, croppedImageUriString: String,

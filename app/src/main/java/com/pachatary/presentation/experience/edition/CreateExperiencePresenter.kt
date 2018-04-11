@@ -5,10 +5,11 @@ import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.OnLifecycleEvent
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.experience.ExperienceRepository
+import com.pachatary.data.experience.NewExperienceRepository
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
 import javax.inject.Inject
 
-class CreateExperiencePresenter @Inject constructor(private val experienceRepository: ExperienceRepository,
+class CreateExperiencePresenter @Inject constructor(private val experienceRepository: NewExperienceRepository,
                                                     private val schedulerProvider: SchedulerProvider): LifecycleObserver {
 
     lateinit var view: CreateExperienceView

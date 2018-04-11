@@ -29,8 +29,7 @@ class MyExperiencesPresenter @Inject constructor(private val newExperiencesRepos
     }
 
     fun onRetryClick() {
-        view.hideRetry()
-        view.showLoader()
+        newExperiencesRepository.getFirstExperiences(NewExperienceRepository.Kind.MINE)
     }
 
     fun onExperienceClick(experienceId: String) {
@@ -38,17 +37,20 @@ class MyExperiencesPresenter @Inject constructor(private val newExperiencesRepos
     }
 
     private fun connectToExperiences() {
-        experiencesDisposable = newExperiencesRepository.experiencesFlowable(NewExperienceRepository.Kind.MINE)
-                                          .subscribeOn(schedulerProvider.subscriber())
-                                          .observeOn(schedulerProvider.observer())
-                                          .subscribe({
-                                              if (it.isSuccess()) {
-                                                          view.hideLoader()
-                                                          if (it.isSuccess()) view.showExperienceList(it.data!!)
-                                                      } else if (it.isInProgress()) {
-                                                          view.showLoader()
-                                                      } else if (it.isError()) view.showRetry()
-                                          })
+        experiencesDisposable =
+                newExperiencesRepository.experiencesFlowable(NewExperienceRepository.Kind.MINE)
+                                        .subscribeOn(schedulerProvider.subscriber())
+                                        .observeOn(schedulerProvider.observer())
+                                        .subscribe({  if (it.isInProgress()) view.showLoader()
+                                                      else view.hideLoader()
+
+                                                      if (it.isError()) view.showRetry()
+                                                      else view.hideRetry()
+
+                                                      if (it.isSuccess())
+                                                          view.showExperienceList(it.data!!)
+                                                   })
+        newExperiencesRepository.getFirstExperiences(NewExperienceRepository.Kind.MINE)
     }
 
     fun destroy() {
