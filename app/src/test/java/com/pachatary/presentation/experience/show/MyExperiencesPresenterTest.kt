@@ -40,9 +40,22 @@ class MyExperiencesPresenterTest {
         } whenn {
             create_presenter()
         } then {
-            should_show_view_loader()
+            should_call_repo_get_firsts_experiences()
             should_show_received_experiences()
             should_hide_view_loader()
+        }
+    }
+
+    @Test
+    fun test_when_result_in_progress_shows_loader_if_can_create_content() {
+        given {
+            an_auth_repo_that_returns_true_on_can_create_content()
+            an_experience_repo_that_returns_in_progress()
+        } whenn {
+            create_presenter()
+        } then {
+            should_show_view_loader()
+            should_hide_view_retry()
         }
     }
 
@@ -56,7 +69,7 @@ class MyExperiencesPresenterTest {
         } whenn {
             resume_presenter()
         } then {
-            should_show_view_loader()
+            should_call_repo_get_firsts_experiences()
             should_show_received_experiences()
             should_hide_view_loader()
         }
@@ -83,16 +96,16 @@ class MyExperiencesPresenterTest {
         } whenn {
             create_presenter()
         } then {
-            should_show_view_loader()
+            should_call_repo_get_firsts_experiences()
             should_call_repo_my_experience_flowable()
             should_show_received_experiences()
             should_hide_view_loader()
+            should_hide_view_retry()
         } whenn {
             resume_presenter()
         } then {
             should_do_nothing()
         }
-
     }
 
     @Test
@@ -115,9 +128,7 @@ class MyExperiencesPresenterTest {
         } whenn {
             retry_clicked()
         } then {
-            should_hide_view_retry()
-            should_show_view_loader()
-            should_call_repo_refresh_experiences()
+            should_call_repo_get_firsts_experiences()
         }
     }
 
@@ -221,13 +232,19 @@ class MyExperiencesPresenterTest {
         }
 
         fun an_experience_repo_that_returns_both_on_my_experiences_flowable() {
-            given(mockExperiencesRepository.experiencesFlowable()).willReturn(Flowable.just(
+            given(mockExperiencesRepository.experiencesFlowable(NewExperienceRepository.Kind.MINE))
+                    .willReturn(Flowable.just(
                             Result<List<Experience>>(arrayListOf(experienceA, experienceB))))
         }
 
         fun an_experience_repo_that_returns_exception() {
-            given(mockExperiencesRepository.experiencesFlowable())
+            given(mockExperiencesRepository.experiencesFlowable(NewExperienceRepository.Kind.MINE))
                     .willReturn(Flowable.just(Result<List<Experience>>(null, error = Exception())))
+        }
+
+        fun an_experience_repo_that_returns_in_progress() {
+            given(mockExperiencesRepository.experiencesFlowable(NewExperienceRepository.Kind.MINE))
+                    .willReturn(Flowable.just(Result<List<Experience>>(null, inProgress = true)))
         }
 
         fun an_auth_repo_that_returns_true_on_can_create_content() {
@@ -286,8 +303,9 @@ class MyExperiencesPresenterTest {
             then(mockView).should().hideRetry()
         }
 
-        fun should_call_repo_refresh_experiences() {
-            //then(mockExperiencesRepository).should().refreshMyExperiences()
+        fun should_call_repo_get_firsts_experiences() {
+            then(mockExperiencesRepository).should()
+                    .getFirstExperiences(NewExperienceRepository.Kind.MINE)
         }
 
         fun should_navigate_to_experience(experienceId: String) {
@@ -304,7 +322,7 @@ class MyExperiencesPresenterTest {
         }
 
         fun an_experience_repo_that_returns_test_observable() {
-            given(mockExperiencesRepository.experiencesFlowable())
+            given(mockExperiencesRepository.experiencesFlowable(NewExperienceRepository.Kind.MINE))
                     .willReturn(testObservable.toFlowable(BackpressureStrategy.LATEST))
         }
 
@@ -326,7 +344,8 @@ class MyExperiencesPresenterTest {
         }
 
         fun should_call_repo_my_experience_flowable() {
-            BDDMockito.then(mockExperiencesRepository).should().experiencesFlowable()
+            BDDMockito.then(mockExperiencesRepository).should()
+                    .experiencesFlowable(NewExperienceRepository.Kind.MINE)
         }
 
         fun should_navigate_to_register() {

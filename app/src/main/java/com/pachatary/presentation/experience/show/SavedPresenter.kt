@@ -3,11 +3,13 @@ package com.pachatary.presentation.experience.show
 import android.arch.lifecycle.LifecycleObserver
 import com.pachatary.data.experience.NewExperienceRepository
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
+import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import javax.inject.Inject
+import javax.inject.Named
 
 class SavedPresenter @Inject constructor(private val repository: NewExperienceRepository,
-                                         private val schedulerProvider: SchedulerProvider) : LifecycleObserver {
+                                         @Named("main") val scheduler: Scheduler) : LifecycleObserver {
 
     lateinit var view: SavedView
 
@@ -27,8 +29,7 @@ class SavedPresenter @Inject constructor(private val repository: NewExperienceRe
 
     private fun connectToExperiences() {
         experiencesDisposable = repository.experiencesFlowable(NewExperienceRepository.Kind.SAVED)
-                                          .subscribeOn(schedulerProvider.subscriber())
-                                          .observeOn(schedulerProvider.observer())
+                                          .observeOn(scheduler)
                                           .subscribe({  if (it.isInProgress()) view.showLoader()
                                                         else view.hideLoader()
 

@@ -36,6 +36,7 @@ class ResultStreamFactory<T> where T : Identifiable {
                              }
                         )
                         .scan(Result(listOf<T>()), { oldValue, func -> func.apply(oldValue) })
+                        .skip(1)
                         .replay(1)
                         .autoConnect()
         return ResultStream(addOrUpdateSubject, removeAllThatSubject, resultFlowable)

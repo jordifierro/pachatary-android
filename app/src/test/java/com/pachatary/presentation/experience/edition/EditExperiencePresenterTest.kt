@@ -2,7 +2,7 @@ package com.pachatary.presentation.experience.edition
 
 import com.pachatary.data.common.Result
 import com.pachatary.data.experience.Experience
-import com.pachatary.data.experience.ExperienceRepository
+import com.pachatary.data.experience.NewExperienceRepository
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
@@ -126,7 +126,7 @@ class EditExperiencePresenterTest {
     class ScenarioMaker {
         private lateinit var presenter: EditExperiencePresenter
         @Mock private lateinit var mockView: EditExperienceView
-        @Mock lateinit var mockRepository: ExperienceRepository
+        @Mock lateinit var mockRepository: NewExperienceRepository
         val experienceId = "4"
         lateinit var experience: Experience
         var userTitle = ""

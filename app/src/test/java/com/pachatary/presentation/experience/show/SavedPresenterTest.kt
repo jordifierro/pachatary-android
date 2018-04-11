@@ -2,15 +2,14 @@ package com.pachatary.presentation.experience.show
 
 import com.pachatary.data.common.Result
 import com.pachatary.data.experience.Experience
-import com.pachatary.data.experience.ExperienceRepository
-import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
+import com.pachatary.data.experience.NewExperienceRepository
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import org.junit.Assert.assertFalse
 import org.junit.Test
-import org.mockito.BDDMockito.given
+import org.mockito.BDDMockito
 import org.mockito.BDDMockito.then
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
@@ -18,7 +17,30 @@ import org.mockito.MockitoAnnotations
 class SavedPresenterTest {
 
     @Test
-    fun test_create_asks_experiences_and_shows() {
+    fun test_create_asks_firsts_experiences() {
+        given {
+            an_experience_repo_that_returns_in_progress()
+        } whenn {
+            create_presenter()
+        } then {
+            should_call_repo_get_firsts_experiences()
+        }
+    }
+
+    @Test
+    fun test_when_result_in_progress_shows_loader() {
+        given {
+            an_experience_repo_that_returns_in_progress()
+        } whenn {
+            create_presenter()
+        } then {
+            should_show_view_loader()
+            should_hide_view_retry()
+        }
+    }
+
+    @Test
+    fun test_when_result_success_shows_data() {
         given {
             an_experience()
             another_experience()
@@ -26,10 +48,11 @@ class SavedPresenterTest {
         } whenn {
             create_presenter()
         } then {
-            should_show_view_loader()
-            should_show_received_experiences()
             should_hide_view_loader()
+            should_hide_view_retry()
+            should_show_received_experiences()
         }
+
     }
 
     @Test
@@ -45,15 +68,13 @@ class SavedPresenterTest {
     }
 
     @Test
-    fun test_on_retry_click_retrive_experiences_and_shows_them() {
+    fun test_on_retry_click_calls_get_firsts_experiences_again() {
         given {
             nothing()
         } whenn {
             retry_clicked()
         } then {
-            should_hide_view_retry()
-            should_show_view_loader()
-            should_call_repo_refresh_experiences()
+            should_call_repo_get_firsts_experiences()
         }
     }
 
@@ -87,15 +108,14 @@ class SavedPresenterTest {
 
         lateinit var presenter: SavedPresenter
         @Mock lateinit var mockView: SavedView
-        @Mock lateinit var mockRepository: ExperienceRepository
+        @Mock lateinit var mockRepository: NewExperienceRepository
         lateinit var experienceA: Experience
         lateinit var experienceB: Experience
         lateinit var testObservable: PublishSubject<Result<List<Experience>>>
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
-            val testSchedulerProvider = SchedulerProvider(Schedulers.trampoline(), Schedulers.trampoline())
-            presenter = SavedPresenter(mockRepository, testSchedulerProvider)
+            presenter = SavedPresenter(mockRepository, Schedulers.trampoline())
             presenter.view = mockView
 
             return this
@@ -111,14 +131,19 @@ class SavedPresenterTest {
             experienceB = Experience(id = "2", title = "B", description = "", picture = null)
         }
 
+        fun an_experience_repo_that_returns_in_progress() {
+            BDDMockito.given(mockRepository.experiencesFlowable(NewExperienceRepository.Kind.SAVED))
+                    .willReturn(Flowable.just(Result<List<Experience>>(null, inProgress = true)))
+        }
+
         fun an_experience_repo_that_returns_both_on_my_experiences_flowable() {
-            given(mockRepository.savedExperiencesFlowable())
+            BDDMockito.given(mockRepository.experiencesFlowable(NewExperienceRepository.Kind.SAVED))
                     .willReturn(Flowable.just(Result<List<Experience>>(
                             arrayListOf(experienceA, experienceB))))
         }
 
         fun an_experience_repo_that_returns_exception() {
-            given(mockRepository.savedExperiencesFlowable())
+            BDDMockito.given(mockRepository.experiencesFlowable(NewExperienceRepository.Kind.SAVED))
                     .willReturn(Flowable.just(Result<List<Experience>>(null, error = Exception())))
         }
 
@@ -154,8 +179,8 @@ class SavedPresenterTest {
             then(mockView).should().hideRetry()
         }
 
-        fun should_call_repo_refresh_experiences() {
-            then(mockRepository).should().refreshSavedExperiences()
+        fun should_call_repo_get_firsts_experiences() {
+            then(mockRepository).should().getFirstExperiences(NewExperienceRepository.Kind.SAVED)
         }
 
         fun should_navigate_to_experience(experienceId: String) {
@@ -168,7 +193,7 @@ class SavedPresenterTest {
         }
 
         fun an_experience_repo_that_returns_test_observable() {
-            given(mockRepository.savedExperiencesFlowable())
+            BDDMockito.given(mockRepository.experiencesFlowable(NewExperienceRepository.Kind.SAVED))
                     .willReturn(testObservable.toFlowable(BackpressureStrategy.LATEST))
         }
 
