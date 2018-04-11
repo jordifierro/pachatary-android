@@ -41,14 +41,11 @@ class NewExperienceRepository(val apiRepository: ExperienceApiRepository,
                 .subscribe({ if (it.first == Action.GET_FIRSTS) {
                     if (!it.second.isInProgress() &&
                             (it.second.hasNotBeenInitialized() || it.second.isError())) {
-                        resultStream(kind).modifyResultObserver.onNext(
-                                Function { Result(listOf(), inProgress = true) })
-                        apiCallFlowable(kind)
-                            .subscribe({ apiResult ->
-                                resultStream(kind).modifyResultObserver.onNext(
-                                    Function { apiResult.builder()
-                                                        .lastEvent(Event.GET_FIRSTS)
-                                                        .build() })
+                        resultStream(kind).replaceResultObserver.onNext(
+                                Result(listOf(), inProgress = true))
+                        apiCallFlowable(kind).subscribe({ apiResult ->
+                                resultStream(kind).replaceResultObserver.onNext(
+                                    apiResult.builder().lastEvent(Event.GET_FIRSTS).build())
                             })
                     }
                 }
@@ -78,7 +75,6 @@ class NewExperienceRepository(val apiRepository: ExperienceApiRepository,
                         datas = datas.union(b.data!!)
                         datas = datas.union(c.data!!)
                         Result(datas.toList()) })
-                    .filter { !(it.data?.find { it.id == experienceId } == null) }
                     .map { Result(it.data?.first { it.id == experienceId }) }
 
     fun createExperience(experience: Experience): Flowable<Result<Experience>> {
@@ -97,7 +93,7 @@ class NewExperienceRepository(val apiRepository: ExperienceApiRepository,
     }
 
     fun saveExperience(experienceId: String, save: Boolean) {
-        val ignore = experienceFlowable(experienceId).map {
+        val disposable = experienceFlowable(experienceId).map {
                     val updatedExperience = Experience(id = it.data!!.id, title = it.data.title,
                             description = it.data.description, picture = it.data.picture,
                             isMine = it.data.isMine, isSaved = save)
