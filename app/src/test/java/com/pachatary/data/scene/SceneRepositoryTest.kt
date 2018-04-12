@@ -1,7 +1,7 @@
 package com.pachatary.data.scene
 
+import com.pachatary.data.common.NewResultStreamFactory
 import com.pachatary.data.common.Result
-import com.pachatary.data.common.ResultStreamFactory
 import io.reactivex.Flowable
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
@@ -108,18 +108,20 @@ class SceneRepositoryTest {
     class ScenarioMaker {
         lateinit var repository: SceneRepository
         @Mock lateinit var mockApiRepository: SceneApiRepository
-        @Mock lateinit var mockScenesStreamFactory: ResultStreamFactory<Scene>
+        @Mock lateinit var mockScenesStreamFactory: NewResultStreamFactory<Scene>
         var experienceId = ""
         var secondExperienceId = ""
         var sceneId = ""
         var croppedImageUriString = ""
         lateinit var scene: Scene
         lateinit var scenesFlowable: Flowable<Result<List<Scene>>>
-        lateinit var addOrUpdateObserver: TestObserver<Result<List<Scene>>>
-        lateinit var removeAllThatObserver: TestObserver<(Scene) -> Boolean>
+        lateinit var addOrUpdateObserver: TestObserver<List<Scene>>
+        lateinit var updateObserver: TestObserver<List<Scene>>
+        lateinit var replaceResultObserver: TestObserver<Result<List<Scene>>>
         lateinit var secondScenesFlowable: Flowable<Result<List<Scene>>>
-        lateinit var secondAddOrUpdateObserver: TestObserver<Result<List<Scene>>>
-        lateinit var secondRemoveAllThatObserver: TestObserver<(Scene) -> Boolean>
+        lateinit var secondAddOrUpdateObserver: TestObserver<List<Scene>>
+        lateinit var secondUpdateObserver: TestObserver<List<Scene>>
+        lateinit var secondReplaceResultObserver: TestObserver<Result<List<Scene>>>
         lateinit var apiScenesFlowable: Flowable<Result<List<Scene>>>
         lateinit var scenesFlowableResult: Flowable<Result<List<Scene>>>
         lateinit var secondScenesFlowableResult: Flowable<Result<List<Scene>>>
@@ -158,20 +160,23 @@ class SceneRepositoryTest {
         fun an_scenes_stream_factory_that_returns_stream() {
             addOrUpdateObserver = TestObserver.create()
             addOrUpdateObserver.onSubscribe(addOrUpdateObserver)
-            removeAllThatObserver = TestObserver.create()
+            updateObserver = TestObserver.create()
+            replaceResultObserver = TestObserver.create()
             scenesFlowable = Flowable.never()
             BDDMockito.given(mockScenesStreamFactory.create()).willReturn(
-                    ResultStreamFactory.ResultStream(addOrUpdateObserver, removeAllThatObserver, scenesFlowable))
+                    NewResultStreamFactory.ResultStream(replaceResultObserver, addOrUpdateObserver,
+                                                        updateObserver, scenesFlowable))
         }
 
         fun an_scenes_stream_factory_that_returns_another_stream_when_called_again() {
             secondAddOrUpdateObserver = TestObserver.create()
             secondAddOrUpdateObserver.onSubscribe(addOrUpdateObserver)
-            secondRemoveAllThatObserver = TestObserver.create()
+            secondUpdateObserver = TestObserver.create()
+            secondReplaceResultObserver = TestObserver.create()
             secondScenesFlowable = Flowable.never()
             BDDMockito.given(mockScenesStreamFactory.create()).willReturn(
-                    ResultStreamFactory.ResultStream(secondAddOrUpdateObserver,
-                                                     secondRemoveAllThatObserver, secondScenesFlowable))
+                    NewResultStreamFactory.ResultStream(secondReplaceResultObserver,
+                            secondAddOrUpdateObserver, secondUpdateObserver, secondScenesFlowable))
         }
 
         fun an_scenes_stream_factory_that_returns_stream_with_several_scenes() {
@@ -180,10 +185,12 @@ class SceneRepositoryTest {
             val sceneB = Scene(id = "2", title = "T", description = "desc",
                                latitude = 1.0, longitude = -2.3, experienceId = "3", picture = null)
             addOrUpdateObserver = TestObserver.create()
-            removeAllThatObserver = TestObserver.create()
+            updateObserver = TestObserver.create()
+            replaceResultObserver = TestObserver.create()
             scenesFlowable = Flowable.just(Result(listOf(sceneA, sceneB)))
             BDDMockito.given(mockScenesStreamFactory.create()).willReturn(
-                    ResultStreamFactory.ResultStream(addOrUpdateObserver, removeAllThatObserver, scenesFlowable))
+                    NewResultStreamFactory.ResultStream(replaceResultObserver, addOrUpdateObserver,
+                            updateObserver, scenesFlowable))
         }
 
         fun an_api_repo_that_returns_scenes_flowable_with_an_scene() {
@@ -236,7 +243,7 @@ class SceneRepositoryTest {
 
         fun should_connect_api_scenes_flowable_on_next_to_replace_all_scenes_observer() {
             addOrUpdateObserver.onComplete()
-            addOrUpdateObserver.assertResult(Result(listOf(scene)))
+            addOrUpdateObserver.assertResult(listOf(scene))
         }
 
         fun first_result_should_be_first_scenes_flowable() {
@@ -267,7 +274,7 @@ class SceneRepositoryTest {
         fun should_emit_created_scene_through_add_or_update_scenes_observer() {
             createdSceneFlowableResult.subscribeOn(Schedulers.trampoline()).subscribe()
             addOrUpdateObserver.onComplete()
-            addOrUpdateObserver.assertResult(Result(listOf(scene)), Result(listOf(scene)))
+            addOrUpdateObserver.assertResult(listOf(scene), listOf(scene))
         }
 
         fun should_call_api_upload_scene_picture_with_scene_id_and_image_uri_string() {
@@ -277,7 +284,7 @@ class SceneRepositoryTest {
 
         fun delegate_param_should_emit_scene_through_add_or_update_observer() {
             addOrUpdateObserver.onComplete()
-            addOrUpdateObserver.assertResult(Result(listOf(scene)), Result(listOf(scene)))
+            addOrUpdateObserver.assertResult(listOf(scene), listOf(scene))
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

@@ -97,8 +97,12 @@ class DataModule {
 
     @Provides
     @Singleton
+    fun provideNewScenesStreamFactory() = NewResultStreamFactory<Scene>()
+
+    @Provides
+    @Singleton
     fun provideSceneRepository(apiRepository: SceneApiRepository,
-                               sceneStreamFactory: ResultStreamFactory<Scene>): SceneRepository =
+                               sceneStreamFactory: NewResultStreamFactory<Scene>): SceneRepository =
             SceneRepository(apiRepository, sceneStreamFactory)
 
     @Provides

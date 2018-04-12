@@ -1,18 +1,19 @@
 package com.pachatary.data.scene
 
+import com.pachatary.data.common.NewResultStreamFactory
 import com.pachatary.data.common.Result
-import com.pachatary.data.common.ResultStreamFactory
 import io.reactivex.Flowable
 
-class SceneRepository(val apiRepository: SceneApiRepository, val streamFactory: ResultStreamFactory<Scene>) {
+class SceneRepository(val apiRepository: SceneApiRepository, val streamFactory: NewResultStreamFactory<Scene>) {
 
-    private val scenesStreamHashMap: HashMap<String, ResultStreamFactory.ResultStream<Scene>> = HashMap()
+    private val scenesStreamHashMap: HashMap<String, NewResultStreamFactory.ResultStream<Scene>> = HashMap()
 
     fun scenesFlowable(experienceId: String): Flowable<Result<List<Scene>>> {
         if (scenesStreamHashMap.get(experienceId) == null) {
             val streams = streamFactory.create()
             scenesStreamHashMap.put(experienceId, streams)
-            apiRepository.scenesRequestFlowable(experienceId).subscribe({ streams.addOrUpdateObserver.onNext(it) })
+            apiRepository.scenesRequestFlowable(experienceId)
+                    .subscribe({ streams.addOrUpdateObserver.onNext(it.data!!) })
         }
         return scenesStreamHashMap.get(experienceId)!!.resultFlowable
     }
@@ -34,5 +35,5 @@ class SceneRepository(val apiRepository: SceneApiRepository, val streamFactory: 
 
     internal val emitThroughAddOrUpdate = { resultScene: Result<Scene> ->
         scenesStreamHashMap.get(resultScene.data!!.experienceId)!!.addOrUpdateObserver.onNext(
-                Result(listOf(resultScene.data))) }
+                listOf(resultScene.data)) }
 }
