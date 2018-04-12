@@ -83,7 +83,7 @@ class DataModule {
     @Singleton
     fun provideNewExperienceRepository(apiRepository: ExperienceApiRepository, @Named("io") scheduler: Scheduler,
                                        experienceStreamFactory: NewResultStreamFactory<Experience>): NewExperienceRepository =
-            NewExperienceRepository(apiRepository, scheduler, experienceStreamFactory)
+            NewExperienceRepository(apiRepository, experienceStreamFactory)
 
     @Provides
     @Singleton

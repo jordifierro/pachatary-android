@@ -5,15 +5,11 @@ import com.pachatary.data.common.NewResultStreamFactory
 import com.pachatary.data.common.Result
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
-import io.reactivex.Scheduler
 import io.reactivex.functions.BiFunction
-import io.reactivex.functions.Function
 import io.reactivex.functions.Function3
 import io.reactivex.subjects.PublishSubject
-import javax.inject.Named
 
 class NewExperienceRepository(val apiRepository: ExperienceApiRepository,
-                              @Named("io") val scheduler: Scheduler,
                               resultStreamFactory: NewResultStreamFactory<Experience>) {
 
     enum class Kind {
@@ -98,7 +94,6 @@ class NewExperienceRepository(val apiRepository: ExperienceApiRepository,
                             description = it.data.description, picture = it.data.picture,
                             isMine = it.data.isMine, isSaved = save)
                     listOf(updatedExperience) }
-                .subscribeOn(scheduler)
                 .take(1)
                 .subscribe({ updatedExperienceList ->
                     resultStream(Kind.EXPLORE).updateObserver.onNext(updatedExperienceList)
