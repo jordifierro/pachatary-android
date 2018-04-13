@@ -21,42 +21,36 @@ class NewExperienceRepository(val apiRepository: ExperienceApiRepository,
         repoSwitch.getExperienceFlowable(experienceId)
 
     fun createExperience(experience: Experience): Flowable<Result<Experience>> {
-        return apiRepository.createExperience(experience)
-                .doOnNext({ repoSwitch.modifyResult(ExperienceRepoSwitch.Kind.MINE,
-                                ExperienceRepoSwitch.Modification.ADD_OR_UPDATE_LIST,
-                                list = listOf(it.data!!)) })
+        return apiRepository.createExperience(experience).doOnNext(addOrUpdateExperienceToMine)
     }
 
     fun editExperience(experience: Experience): Flowable<Result<Experience>> {
-        return apiRepository.editExperience(experience)
-                .doOnNext({ repoSwitch.modifyResult(ExperienceRepoSwitch.Kind.MINE,
-                                ExperienceRepoSwitch.Modification.ADD_OR_UPDATE_LIST,
-                                list = listOf(it.data!!)) })
+        return apiRepository.editExperience(experience).doOnNext(addOrUpdateExperienceToMine)
     }
 
     fun uploadExperiencePicture(experienceId: String, croppedImageUriString: String) {
-        apiRepository.uploadExperiencePicture(experienceId, croppedImageUriString,
-                { repoSwitch.modifyResult(ExperienceRepoSwitch.Kind.MINE,
-                        ExperienceRepoSwitch.Modification.ADD_OR_UPDATE_LIST,
-                        list = listOf(it.data!!)) })
+        apiRepository.uploadExperiencePicture(
+                experienceId, croppedImageUriString, addOrUpdateExperienceToMine)
     }
 
     fun saveExperience(experienceId: String, save: Boolean) {
-        val disposable = experienceFlowable(experienceId).map {
-            val updatedExperience = Experience(id = it.data!!.id, title = it.data.title,
-                    description = it.data.description, picture = it.data.picture,
-                    isMine = it.data.isMine, isSaved = save)
-            listOf(updatedExperience)
-        }
+        val disposable = experienceFlowable(experienceId)
+                .map { listOf(it.data!!.builder().isSaved(save).build()) }
                 .take(1)
-                .subscribe({ updatedExperienceList ->
-                    repoSwitch.modifyResult(ExperienceRepoSwitch.Kind.EXPLORE,
-                            ExperienceRepoSwitch.Modification.UPDATE_LIST,
-                            list = updatedExperienceList)
-                    repoSwitch.modifyResult(ExperienceRepoSwitch.Kind.SAVED,
-                            ExperienceRepoSwitch.Modification.ADD_OR_UPDATE_LIST,
-                            list = updatedExperienceList)
-                })
+                .subscribe(addOrUpdateToSavedAndUpdateToExploreExperiences)
         apiRepository.saveExperience(save = save, experienceId = experienceId).subscribe()
     }
+
+    internal val addOrUpdateExperienceToMine =
+        { experienceResult: Result<Experience> ->
+            repoSwitch.modifyResult(ExperienceRepoSwitch.Kind.MINE,
+                ExperienceRepoSwitch.Modification.ADD_OR_UPDATE_LIST,
+                list = listOf(experienceResult.data!!)) }
+
+    private val addOrUpdateToSavedAndUpdateToExploreExperiences =
+        { experiencesList: List<Experience> ->
+            repoSwitch.modifyResult(ExperienceRepoSwitch.Kind.EXPLORE,
+                ExperienceRepoSwitch.Modification.UPDATE_LIST, list = experiencesList)
+            repoSwitch.modifyResult(ExperienceRepoSwitch.Kind.SAVED,
+                ExperienceRepoSwitch.Modification.ADD_OR_UPDATE_LIST, list = experiencesList) }
 }
