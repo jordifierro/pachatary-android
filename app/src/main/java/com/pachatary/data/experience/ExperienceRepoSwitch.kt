@@ -5,8 +5,7 @@ import com.pachatary.data.common.Result
 import io.reactivex.Flowable
 import io.reactivex.functions.Function3
 
-class ExperienceRepoSwitch(apiRepository: ExperienceApiRepository,
-                           resultStreamFactory: NewResultStreamFactory<Experience>,
+class ExperienceRepoSwitch(resultStreamFactory: NewResultStreamFactory<Experience>,
                            actionStreamFactory: ExperienceActionStreamFactory) {
 
     enum class Modification {
@@ -17,12 +16,13 @@ class ExperienceRepoSwitch(apiRepository: ExperienceApiRepository,
         MINE, SAVED, EXPLORE
     }
 
-    private val mineResultStream = resultStreamFactory.create()
+    val mineResultStream = resultStreamFactory.create()
     private val savedResultStream = resultStreamFactory.create()
     private val exploreResultStream = resultStreamFactory.create()
-    private val mineActionSubject = actionStreamFactory.create(mineResultStream, Kind.MINE)
-    private val savedActionSubject = actionStreamFactory.create(savedResultStream, Kind.SAVED)
-    private val exploreActionSubject = actionStreamFactory.create(exploreResultStream, Kind.EXPLORE)
+    private val mineActionObserver = actionStreamFactory.create(mineResultStream, Kind.MINE)
+    private val savedActionObserver = actionStreamFactory.create(savedResultStream, Kind.SAVED)
+    private val exploreActionObserver =
+            actionStreamFactory.create(exploreResultStream, Kind.EXPLORE)
 
     fun getResultFlowable(kind: Kind) =
             when(kind) {
@@ -55,9 +55,9 @@ class ExperienceRepoSwitch(apiRepository: ExperienceApiRepository,
 
     fun executeAction(kind: Kind, action: ExperienceActionStreamFactory.Action) {
         when (kind) {
-            Kind.MINE -> mineActionSubject.onNext(action)
-            Kind.SAVED -> savedActionSubject.onNext(action)
-            Kind.EXPLORE -> exploreActionSubject.onNext(action)
+            Kind.MINE -> mineActionObserver.onNext(action)
+            Kind.SAVED -> savedActionObserver.onNext(action)
+            Kind.EXPLORE -> exploreActionObserver.onNext(action)
         }
     }
 
