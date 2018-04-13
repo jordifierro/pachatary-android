@@ -1,16 +1,14 @@
 package com.pachatary.data.experience
 
-import com.pachatary.data.common.Event
 import com.pachatary.data.common.NewResultStreamFactory
 import com.pachatary.data.common.Result
-import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
-import io.reactivex.functions.BiFunction
+import io.reactivex.Observer
 import io.reactivex.functions.Function3
-import io.reactivex.subjects.PublishSubject
 
 class NewExperienceRepository(val apiRepository: ExperienceApiRepository,
-                              resultStreamFactory: NewResultStreamFactory<Experience>) {
+                              resultStreamFactory: NewResultStreamFactory<Experience>,
+                              actionStreamFactory: ActionStreamFactory) {
 
     enum class Kind {
         MINE, SAVED, EXPLORE
@@ -21,33 +19,11 @@ class NewExperienceRepository(val apiRepository: ExperienceApiRepository,
     }
 
     private var mineResultStream = resultStreamFactory.create()
-    val mineActionsSubject = PublishSubject.create<Action>()
+    val mineActionsSubject = actionStreamFactory.create(mineResultStream, apiRepository, Kind.MINE)
     private var savedResultStream = resultStreamFactory.create()
-    val savedActionsSubject = PublishSubject.create<Action>()
+    val savedActionsSubject = actionStreamFactory.create(savedResultStream, apiRepository, Kind.SAVED)
     private var exploreResultStream = resultStreamFactory.create()
-    val exploreActionsSubject = PublishSubject.create<Action>()
-
-    init {
-        for (kind in Kind.values()) {
-            actionsSubject(kind).toFlowable(BackpressureStrategy.LATEST)
-                .withLatestFrom(resultStream(kind).resultFlowable,
-                        BiFunction<Action, Result<List<Experience>>,
-                                Pair<Action, Result<List<Experience>>>>
-                        { action, result -> Pair(action, result) })
-                .subscribe({ if (it.first == Action.GET_FIRSTS) {
-                    if (!it.second.isInProgress() &&
-                            (it.second.hasNotBeenInitialized() || it.second.isError())) {
-                        resultStream(kind).replaceResultObserver.onNext(
-                                Result(listOf(), inProgress = true))
-                        apiCallFlowable(kind).subscribe({ apiResult ->
-                                resultStream(kind).replaceResultObserver.onNext(
-                                    apiResult.builder().lastEvent(Event.GET_FIRSTS).build())
-                            })
-                    }
-                }
-                })
-        }
-    }
+    val exploreActionsSubject = actionStreamFactory.create(exploreResultStream, apiRepository, Kind.EXPLORE)
 
     fun experiencesFlowable(kind: Kind): Flowable<Result<List<Experience>>> {
         var result = resultStream(kind).resultFlowable
@@ -89,7 +65,7 @@ class NewExperienceRepository(val apiRepository: ExperienceApiRepository,
     }
 
     fun saveExperience(experienceId: String, save: Boolean) {
-        val disposable = experienceFlowable(experienceId).map {
+        experienceFlowable(experienceId).map {
                     val updatedExperience = Experience(id = it.data!!.id, title = it.data.title,
                             description = it.data.description, picture = it.data.picture,
                             isMine = it.data.isMine, isSaved = save)
@@ -102,7 +78,7 @@ class NewExperienceRepository(val apiRepository: ExperienceApiRepository,
         apiRepository.saveExperience(save = save, experienceId = experienceId).subscribe()
     }
 
-    private fun actionsSubject(kind: Kind): PublishSubject<Action> {
+    private fun actionsSubject(kind: Kind): Observer<Action> {
         when (kind) {
             Kind.MINE -> return mineActionsSubject
             Kind.SAVED -> return savedActionsSubject
@@ -115,14 +91,6 @@ class NewExperienceRepository(val apiRepository: ExperienceApiRepository,
             Kind.MINE -> return mineResultStream
             Kind.SAVED -> return savedResultStream
             Kind.EXPLORE -> return exploreResultStream
-        }
-    }
-
-    private fun apiCallFlowable(kind: Kind): Flowable<Result<List<Experience>>> {
-        when (kind) {
-            Kind.MINE -> return apiRepository.myExperiencesFlowable()
-            Kind.SAVED -> return apiRepository.savedExperiencesFlowable()
-            Kind.EXPLORE -> return apiRepository.exploreExperiencesFlowable()
         }
     }
 }

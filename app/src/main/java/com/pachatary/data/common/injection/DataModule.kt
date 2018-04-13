@@ -7,9 +7,6 @@ import com.pachatary.data.auth.AuthHttpInterceptor
 import com.pachatary.data.auth.AuthRepository
 import com.pachatary.data.auth.AuthStorageRepository
 import com.pachatary.data.common.ResultStreamFactory
-import com.pachatary.data.experience.Experience
-import com.pachatary.data.experience.ExperienceApiRepository
-import com.pachatary.data.experience.ExperienceRepository
 import com.pachatary.data.scene.Scene
 import com.pachatary.data.scene.SceneApiRepository
 import com.pachatary.data.scene.SceneRepository
@@ -17,7 +14,7 @@ import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import com.pachatary.data.common.NewResultStreamFactory
-import com.pachatary.data.experience.NewExperienceRepository
+import com.pachatary.data.experience.*
 import dagger.Module
 import dagger.Provides
 import io.reactivex.Scheduler
@@ -75,6 +72,10 @@ class DataModule {
 
     @Provides
     @Singleton
+    fun provideActionStreamFactory() = ActionStreamFactory()
+
+    @Provides
+    @Singleton
     fun provideExperienceRepository(apiRepository: ExperienceApiRepository, @Named("io") scheduler: Scheduler,
                                     experienceStreamFactory: ResultStreamFactory<Experience>): ExperienceRepository =
             ExperienceRepository(apiRepository, scheduler, experienceStreamFactory)
@@ -82,8 +83,9 @@ class DataModule {
     @Provides
     @Singleton
     fun provideNewExperienceRepository(apiRepository: ExperienceApiRepository, @Named("io") scheduler: Scheduler,
-                                       experienceStreamFactory: NewResultStreamFactory<Experience>): NewExperienceRepository =
-            NewExperienceRepository(apiRepository, experienceStreamFactory)
+                                       experienceStreamFactory: NewResultStreamFactory<Experience>,
+                                       actionStreamFactory: ActionStreamFactory): NewExperienceRepository =
+            NewExperienceRepository(apiRepository, experienceStreamFactory, actionStreamFactory)
 
     @Provides
     @Singleton
