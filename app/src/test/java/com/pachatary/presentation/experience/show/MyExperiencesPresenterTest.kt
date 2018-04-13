@@ -3,6 +3,7 @@ package com.pachatary.presentation.experience.show
 import com.pachatary.data.auth.AuthRepository
 import com.pachatary.data.common.Result
 import com.pachatary.data.experience.Experience
+import com.pachatary.data.experience.ExperienceRepoSwitch
 import com.pachatary.data.experience.NewExperienceRepository
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
 import io.reactivex.BackpressureStrategy
@@ -232,18 +233,18 @@ class MyExperiencesPresenterTest {
         }
 
         fun an_experience_repo_that_returns_both_on_my_experiences_flowable() {
-            given(mockExperiencesRepository.experiencesFlowable(NewExperienceRepository.Kind.MINE))
+            given(mockExperiencesRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.MINE))
                     .willReturn(Flowable.just(
                             Result<List<Experience>>(arrayListOf(experienceA, experienceB))))
         }
 
         fun an_experience_repo_that_returns_exception() {
-            given(mockExperiencesRepository.experiencesFlowable(NewExperienceRepository.Kind.MINE))
+            given(mockExperiencesRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.MINE))
                     .willReturn(Flowable.just(Result<List<Experience>>(null, error = Exception())))
         }
 
         fun an_experience_repo_that_returns_in_progress() {
-            given(mockExperiencesRepository.experiencesFlowable(NewExperienceRepository.Kind.MINE))
+            given(mockExperiencesRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.MINE))
                     .willReturn(Flowable.just(Result<List<Experience>>(null, inProgress = true)))
         }
 
@@ -305,7 +306,7 @@ class MyExperiencesPresenterTest {
 
         fun should_call_repo_get_firsts_experiences() {
             then(mockExperiencesRepository).should()
-                    .getFirstExperiences(NewExperienceRepository.Kind.MINE)
+                    .getFirstExperiences(ExperienceRepoSwitch.Kind.MINE)
         }
 
         fun should_navigate_to_experience(experienceId: String) {
@@ -322,7 +323,7 @@ class MyExperiencesPresenterTest {
         }
 
         fun an_experience_repo_that_returns_test_observable() {
-            given(mockExperiencesRepository.experiencesFlowable(NewExperienceRepository.Kind.MINE))
+            given(mockExperiencesRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.MINE))
                     .willReturn(testObservable.toFlowable(BackpressureStrategy.LATEST))
         }
 
@@ -345,7 +346,7 @@ class MyExperiencesPresenterTest {
 
         fun should_call_repo_my_experience_flowable() {
             BDDMockito.then(mockExperiencesRepository).should()
-                    .experiencesFlowable(NewExperienceRepository.Kind.MINE)
+                    .experiencesFlowable(ExperienceRepoSwitch.Kind.MINE)
         }
 
         fun should_navigate_to_register() {

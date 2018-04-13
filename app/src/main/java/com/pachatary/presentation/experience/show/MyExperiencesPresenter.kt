@@ -4,6 +4,7 @@ import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.OnLifecycleEvent
 import com.pachatary.data.auth.AuthRepository
+import com.pachatary.data.experience.ExperienceRepoSwitch
 import com.pachatary.data.experience.NewExperienceRepository
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
 import io.reactivex.disposables.Disposable
@@ -29,7 +30,7 @@ class MyExperiencesPresenter @Inject constructor(private val newExperiencesRepos
     }
 
     fun onRetryClick() {
-        newExperiencesRepository.getFirstExperiences(NewExperienceRepository.Kind.MINE)
+        newExperiencesRepository.getFirstExperiences(ExperienceRepoSwitch.Kind.MINE)
     }
 
     fun onExperienceClick(experienceId: String) {
@@ -38,7 +39,7 @@ class MyExperiencesPresenter @Inject constructor(private val newExperiencesRepos
 
     private fun connectToExperiences() {
         experiencesDisposable =
-                newExperiencesRepository.experiencesFlowable(NewExperienceRepository.Kind.MINE)
+                newExperiencesRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.MINE)
                                         .subscribeOn(schedulerProvider.subscriber())
                                         .observeOn(schedulerProvider.observer())
                                         .subscribe({  if (it.isInProgress()) view.showLoader()
@@ -50,7 +51,7 @@ class MyExperiencesPresenter @Inject constructor(private val newExperiencesRepos
                                                       if (it.isSuccess())
                                                           view.showExperienceList(it.data!!)
                                                    })
-        newExperiencesRepository.getFirstExperiences(NewExperienceRepository.Kind.MINE)
+        newExperiencesRepository.getFirstExperiences(ExperienceRepoSwitch.Kind.MINE)
     }
 
     fun destroy() {

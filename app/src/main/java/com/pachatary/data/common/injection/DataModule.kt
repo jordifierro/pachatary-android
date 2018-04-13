@@ -36,19 +36,21 @@ class DataModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(authHttpInterceptor: AuthHttpInterceptor): OkHttpClient = OkHttpClient.Builder()
-                                                          .addNetworkInterceptor(StethoInterceptor())
-                                                          .addInterceptor(authHttpInterceptor)
-                                                          .build()
+    fun provideOkHttpClient(authHttpInterceptor: AuthHttpInterceptor) =
+            OkHttpClient.Builder()
+                  .addNetworkInterceptor(StethoInterceptor())
+                  .addInterceptor(authHttpInterceptor)
+                  .build()
 
     @Provides
     @Singleton
     fun provideGsonConverter(): Converter.Factory = GsonConverterFactory.create(
-            GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES) .create())
+            GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                         .create())
 
     @Provides
     @Singleton
-    fun provideRetrofit(okHttpClient: OkHttpClient, gsonConverterFactory: Converter.Factory): Retrofit =
+    fun provideRetrofit(okHttpClient: OkHttpClient, gsonConverterFactory: Converter.Factory) =
             Retrofit.Builder()
                     .baseUrl(BuildConfig.API_URL)
                     .addConverterFactory(gsonConverterFactory)
@@ -58,8 +60,8 @@ class DataModule {
 
     @Provides
     @Singleton
-    fun provideExperienceApiRepository(retrofit: Retrofit, @Named("io") scheduler: Scheduler, context: Context,
-                                       authHttpInterceptor: AuthHttpInterceptor): ExperienceApiRepository =
+    fun provideExperienceApiRepository(retrofit: Retrofit, @Named("io") scheduler: Scheduler,
+                                       context: Context, authHttpInterceptor: AuthHttpInterceptor) =
             ExperienceApiRepository(retrofit, scheduler, context, authHttpInterceptor)
 
     @Provides
@@ -72,25 +74,32 @@ class DataModule {
 
     @Provides
     @Singleton
-    fun provideActionStreamFactory() = ActionStreamFactory()
+    fun provideActionStreamFactory() = ExperienceActionStreamFactory()
 
     @Provides
     @Singleton
-    fun provideExperienceRepository(apiRepository: ExperienceApiRepository, @Named("io") scheduler: Scheduler,
-                                    experienceStreamFactory: ResultStreamFactory<Experience>): ExperienceRepository =
+    fun provideExperienceRepository(apiRepository: ExperienceApiRepository,
+                                    @Named("io") scheduler: Scheduler,
+                                    experienceStreamFactory: ResultStreamFactory<Experience>) =
             ExperienceRepository(apiRepository, scheduler, experienceStreamFactory)
 
     @Provides
     @Singleton
-    fun provideNewExperienceRepository(apiRepository: ExperienceApiRepository, @Named("io") scheduler: Scheduler,
-                                       experienceStreamFactory: NewResultStreamFactory<Experience>,
-                                       actionStreamFactory: ActionStreamFactory): NewExperienceRepository =
-            NewExperienceRepository(apiRepository, experienceStreamFactory, actionStreamFactory)
+    fun provideExperienceRepoSwitch(apiRepository: ExperienceApiRepository,
+                                    experienceStreamFactory: NewResultStreamFactory<Experience>,
+                                    actionStreamFactory: ExperienceActionStreamFactory) =
+            ExperienceRepoSwitch(apiRepository, experienceStreamFactory, actionStreamFactory)
+
+    @Provides
+    @Singleton
+    fun provideNewExperienceRepository(apiRepository: ExperienceApiRepository,
+                                       experienceRepoSwitch: ExperienceRepoSwitch) =
+            NewExperienceRepository(apiRepository, experienceRepoSwitch)
 
     @Provides
     @Singleton
     fun provideSceneApiRepository(retrofit: Retrofit, @Named("io") scheduler: Scheduler,
-                                  context: Context, authHttpInterceptor: AuthHttpInterceptor): SceneApiRepository =
+                                  context: Context, authHttpInterceptor: AuthHttpInterceptor) =
             SceneApiRepository(retrofit, scheduler, context, authHttpInterceptor)
 
     @Provides
@@ -113,7 +122,8 @@ class DataModule {
 
     @Provides
     @Singleton
-    fun provideAuthApiRepository(retrofit: Retrofit) = AuthApiRepository(retrofit, BuildConfig.CLIENT_SECRET_KEY)
+    fun provideAuthApiRepository(retrofit: Retrofit) =
+            AuthApiRepository(retrofit, BuildConfig.CLIENT_SECRET_KEY)
 
     @Provides
     @Singleton

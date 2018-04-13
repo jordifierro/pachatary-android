@@ -1,8 +1,8 @@
 package com.pachatary.presentation.experience.show
 
 import android.arch.lifecycle.LifecycleObserver
+import com.pachatary.data.experience.ExperienceRepoSwitch
 import com.pachatary.data.experience.NewExperienceRepository
-import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import javax.inject.Inject
@@ -20,7 +20,7 @@ class SavedPresenter @Inject constructor(private val repository: NewExperienceRe
     }
 
     fun onRetryClick() {
-        repository.getFirstExperiences(NewExperienceRepository.Kind.SAVED)
+        repository.getFirstExperiences(ExperienceRepoSwitch.Kind.SAVED)
     }
 
     fun onExperienceClick(experienceId: String) {
@@ -28,7 +28,7 @@ class SavedPresenter @Inject constructor(private val repository: NewExperienceRe
     }
 
     private fun connectToExperiences() {
-        experiencesDisposable = repository.experiencesFlowable(NewExperienceRepository.Kind.SAVED)
+        experiencesDisposable = repository.experiencesFlowable(ExperienceRepoSwitch.Kind.SAVED)
                                           .observeOn(scheduler)
                                           .subscribe({  if (it.isInProgress()) view.showLoader()
                                                         else view.hideLoader()
@@ -39,7 +39,7 @@ class SavedPresenter @Inject constructor(private val repository: NewExperienceRe
                                                         if (it.isSuccess())
                                                             view.showExperienceList(it.data!!)
                                           })
-        repository.getFirstExperiences(NewExperienceRepository.Kind.SAVED)
+        repository.getFirstExperiences(ExperienceRepoSwitch.Kind.SAVED)
     }
 
     fun destroy() {
