@@ -18,14 +18,11 @@ class ExperienceRepoSwitch(apiRepository: ExperienceApiRepository,
     }
 
     private val mineResultStream = resultStreamFactory.create()
-    private val mineActionsSubject = actionStreamFactory.create(mineResultStream,
-            apiRepository, Kind.MINE)
     private val savedResultStream = resultStreamFactory.create()
-    private val savedActionsSubject = actionStreamFactory.create(savedResultStream,
-            apiRepository, Kind.SAVED)
     private val exploreResultStream = resultStreamFactory.create()
-    private val exploreActionsSubject = actionStreamFactory.create(exploreResultStream,
-            apiRepository, Kind.EXPLORE)
+    private val mineActionSubject = actionStreamFactory.create(mineResultStream, Kind.MINE)
+    private val savedActionSubject = actionStreamFactory.create(savedResultStream, Kind.SAVED)
+    private val exploreActionSubject = actionStreamFactory.create(exploreResultStream, Kind.EXPLORE)
 
     fun getResultFlowable(kind: Kind) =
             when(kind) {
@@ -58,9 +55,9 @@ class ExperienceRepoSwitch(apiRepository: ExperienceApiRepository,
 
     fun executeAction(kind: Kind, action: ExperienceActionStreamFactory.Action) {
         when (kind) {
-            Kind.MINE -> mineActionsSubject.onNext(action)
-            Kind.SAVED -> savedActionsSubject.onNext(action)
-            Kind.EXPLORE -> exploreActionsSubject.onNext(action)
+            Kind.MINE -> mineActionSubject.onNext(action)
+            Kind.SAVED -> savedActionSubject.onNext(action)
+            Kind.EXPLORE -> exploreActionSubject.onNext(action)
         }
     }
 

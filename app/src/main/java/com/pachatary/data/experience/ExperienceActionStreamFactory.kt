@@ -9,14 +9,13 @@ import io.reactivex.Observer
 import io.reactivex.functions.BiFunction
 import io.reactivex.subjects.PublishSubject
 
-class ExperienceActionStreamFactory {
+class ExperienceActionStreamFactory(val apiRepository: ExperienceApiRepository) {
 
     enum class Action {
         GET_FIRSTS, PAGINATE, REFRESH
     }
 
     fun create(resultStream: NewResultStreamFactory.ResultStream<Experience>,
-               apiRepository: ExperienceApiRepository,
                kind: ExperienceRepoSwitch.Kind): Observer<Action> {
         val actionsSubject = PublishSubject.create<Action>()
         val disposable = actionsSubject.toFlowable(BackpressureStrategy.LATEST)

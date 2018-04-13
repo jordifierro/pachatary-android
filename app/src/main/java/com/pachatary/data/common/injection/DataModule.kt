@@ -74,7 +74,8 @@ class DataModule {
 
     @Provides
     @Singleton
-    fun provideActionStreamFactory() = ExperienceActionStreamFactory()
+    fun provideActionStreamFactory(apiRepository: ExperienceApiRepository) =
+            ExperienceActionStreamFactory(apiRepository)
 
     @Provides
     @Singleton
