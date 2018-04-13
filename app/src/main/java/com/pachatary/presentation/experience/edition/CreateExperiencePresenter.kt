@@ -4,7 +4,6 @@ import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.OnLifecycleEvent
 import com.pachatary.data.experience.Experience
-import com.pachatary.data.experience.ExperienceRepository
 import com.pachatary.data.experience.NewExperienceRepository
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
 import javax.inject.Inject

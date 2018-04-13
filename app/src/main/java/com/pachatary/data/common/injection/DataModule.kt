@@ -1,20 +1,19 @@
 package com.pachatary.data.common.injection
 
 import android.content.Context
+import com.facebook.stetho.okhttp3.StethoInterceptor
+import com.google.gson.FieldNamingPolicy
+import com.google.gson.GsonBuilder
 import com.pachatary.BuildConfig
 import com.pachatary.data.auth.AuthApiRepository
 import com.pachatary.data.auth.AuthHttpInterceptor
 import com.pachatary.data.auth.AuthRepository
 import com.pachatary.data.auth.AuthStorageRepository
-import com.pachatary.data.common.ResultStreamFactory
+import com.pachatary.data.common.NewResultStreamFactory
+import com.pachatary.data.experience.*
 import com.pachatary.data.scene.Scene
 import com.pachatary.data.scene.SceneApiRepository
 import com.pachatary.data.scene.SceneRepository
-import com.facebook.stetho.okhttp3.StethoInterceptor
-import com.google.gson.FieldNamingPolicy
-import com.google.gson.GsonBuilder
-import com.pachatary.data.common.NewResultStreamFactory
-import com.pachatary.data.experience.*
 import dagger.Module
 import dagger.Provides
 import io.reactivex.Scheduler
@@ -66,23 +65,12 @@ class DataModule {
 
     @Provides
     @Singleton
-    fun provideExperienceStreamFactory() = ResultStreamFactory<Experience>()
-
-    @Provides
-    @Singleton
     fun provideNewExperienceStreamFactory() = NewResultStreamFactory<Experience>()
 
     @Provides
     @Singleton
     fun provideActionStreamFactory(apiRepository: ExperienceApiRepository) =
             ExperienceActionStreamFactory(apiRepository)
-
-    @Provides
-    @Singleton
-    fun provideExperienceRepository(apiRepository: ExperienceApiRepository,
-                                    @Named("io") scheduler: Scheduler,
-                                    experienceStreamFactory: ResultStreamFactory<Experience>) =
-            ExperienceRepository(apiRepository, scheduler, experienceStreamFactory)
 
     @Provides
     @Singleton
@@ -101,10 +89,6 @@ class DataModule {
     fun provideSceneApiRepository(retrofit: Retrofit, @Named("io") scheduler: Scheduler,
                                   context: Context, authHttpInterceptor: AuthHttpInterceptor) =
             SceneApiRepository(retrofit, scheduler, context, authHttpInterceptor)
-
-    @Provides
-    @Singleton
-    fun provideScenesStreamFactory() = ResultStreamFactory<Scene>()
 
     @Provides
     @Singleton
