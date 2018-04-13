@@ -12,7 +12,7 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 
 
-class NewExperienceRepositoryTest {
+class ExperienceRepositoryTest {
 
     @Test
     fun test_experiences_flowable_returns_result_flowable_from_switcher_for_mine_and_explore() {
@@ -120,7 +120,7 @@ class NewExperienceRepositoryTest {
 
     @Suppress("UNCHECKED_CAST")
     class ScenarioMaker {
-        lateinit var repository: NewExperienceRepository
+        lateinit var repository: ExperienceRepository
         @Mock lateinit var mockApiRepository: ExperienceApiRepository
         @Mock lateinit var mockExperiencesRepoSwitch: ExperienceRepoSwitch
         lateinit var experiencesFlowable: Flowable<Result<List<Experience>>>
@@ -138,7 +138,7 @@ class NewExperienceRepositoryTest {
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
-            repository = NewExperienceRepository(mockApiRepository, mockExperiencesRepoSwitch)
+            repository = ExperienceRepository(mockApiRepository, mockExperiencesRepoSwitch)
 
             return this
         }

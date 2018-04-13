@@ -1,6 +1,6 @@
 package com.pachatary.data.scene
 
-import com.pachatary.data.common.NewResultStreamFactory
+import com.pachatary.data.common.ResultStreamFactory
 import com.pachatary.data.common.Result
 import io.reactivex.Flowable
 import io.reactivex.observers.TestObserver
@@ -108,7 +108,7 @@ class SceneRepositoryTest {
     class ScenarioMaker {
         lateinit var repository: SceneRepository
         @Mock lateinit var mockApiRepository: SceneApiRepository
-        @Mock lateinit var mockScenesStreamFactory: NewResultStreamFactory<Scene>
+        @Mock lateinit var mockScenesStreamFactory: ResultStreamFactory<Scene>
         var experienceId = ""
         var secondExperienceId = ""
         var sceneId = ""
@@ -164,7 +164,7 @@ class SceneRepositoryTest {
             replaceResultObserver = TestObserver.create()
             scenesFlowable = Flowable.never()
             BDDMockito.given(mockScenesStreamFactory.create()).willReturn(
-                    NewResultStreamFactory.ResultStream(replaceResultObserver, addOrUpdateObserver,
+                    ResultStreamFactory.ResultStream(replaceResultObserver, addOrUpdateObserver,
                                                         updateObserver, scenesFlowable))
         }
 
@@ -175,7 +175,7 @@ class SceneRepositoryTest {
             secondReplaceResultObserver = TestObserver.create()
             secondScenesFlowable = Flowable.never()
             BDDMockito.given(mockScenesStreamFactory.create()).willReturn(
-                    NewResultStreamFactory.ResultStream(secondReplaceResultObserver,
+                    ResultStreamFactory.ResultStream(secondReplaceResultObserver,
                             secondAddOrUpdateObserver, secondUpdateObserver, secondScenesFlowable))
         }
 
@@ -189,7 +189,7 @@ class SceneRepositoryTest {
             replaceResultObserver = TestObserver.create()
             scenesFlowable = Flowable.just(Result(listOf(sceneA, sceneB)))
             BDDMockito.given(mockScenesStreamFactory.create()).willReturn(
-                    NewResultStreamFactory.ResultStream(replaceResultObserver, addOrUpdateObserver,
+                    ResultStreamFactory.ResultStream(replaceResultObserver, addOrUpdateObserver,
                             updateObserver, scenesFlowable))
         }
 

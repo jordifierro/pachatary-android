@@ -3,8 +3,8 @@ package com.pachatary.data.experience
 import com.pachatary.data.common.Result
 import io.reactivex.Flowable
 
-class NewExperienceRepository(val apiRepository: ExperienceApiRepository,
-                              val repoSwitch: ExperienceRepoSwitch) {
+class ExperienceRepository(val apiRepository: ExperienceApiRepository,
+                           val repoSwitch: ExperienceRepoSwitch) {
 
     fun experiencesFlowable(kind: ExperienceRepoSwitch.Kind): Flowable<Result<List<Experience>>> {
         var result = repoSwitch.getResultFlowable(kind)

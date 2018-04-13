@@ -3,7 +3,7 @@ package com.pachatary.presentation.experience.show
 import com.pachatary.data.common.Result
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.experience.ExperienceRepoSwitch
-import com.pachatary.data.experience.NewExperienceRepository
+import com.pachatary.data.experience.ExperienceRepository
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
@@ -109,7 +109,7 @@ class SavedPresenterTest {
 
         lateinit var presenter: SavedPresenter
         @Mock lateinit var mockView: SavedView
-        @Mock lateinit var mockRepository: NewExperienceRepository
+        @Mock lateinit var mockRepository: ExperienceRepository
         lateinit var experienceA: Experience
         lateinit var experienceB: Experience
         lateinit var testObservable: PublishSubject<Result<List<Experience>>>

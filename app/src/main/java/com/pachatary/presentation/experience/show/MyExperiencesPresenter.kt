@@ -5,12 +5,12 @@ import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.OnLifecycleEvent
 import com.pachatary.data.auth.AuthRepository
 import com.pachatary.data.experience.ExperienceRepoSwitch
-import com.pachatary.data.experience.NewExperienceRepository
+import com.pachatary.data.experience.ExperienceRepository
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
 import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
-class MyExperiencesPresenter @Inject constructor(private val newExperiencesRepository: NewExperienceRepository,
+class MyExperiencesPresenter @Inject constructor(private val experiencesRepository: ExperienceRepository,
                                                  private val authRepository: AuthRepository,
                                                  private val schedulerProvider: SchedulerProvider) : LifecycleObserver {
 
@@ -30,7 +30,7 @@ class MyExperiencesPresenter @Inject constructor(private val newExperiencesRepos
     }
 
     fun onRetryClick() {
-        newExperiencesRepository.getFirstExperiences(ExperienceRepoSwitch.Kind.MINE)
+        experiencesRepository.getFirstExperiences(ExperienceRepoSwitch.Kind.MINE)
     }
 
     fun onExperienceClick(experienceId: String) {
@@ -39,7 +39,7 @@ class MyExperiencesPresenter @Inject constructor(private val newExperiencesRepos
 
     private fun connectToExperiences() {
         experiencesDisposable =
-                newExperiencesRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.MINE)
+                experiencesRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.MINE)
                                         .subscribeOn(schedulerProvider.subscriber())
                                         .observeOn(schedulerProvider.observer())
                                         .subscribe({  if (it.isInProgress()) view.showLoader()
@@ -51,7 +51,7 @@ class MyExperiencesPresenter @Inject constructor(private val newExperiencesRepos
                                                       if (it.isSuccess())
                                                           view.showExperienceList(it.data!!)
                                                    })
-        newExperiencesRepository.getFirstExperiences(ExperienceRepoSwitch.Kind.MINE)
+        experiencesRepository.getFirstExperiences(ExperienceRepoSwitch.Kind.MINE)
     }
 
     fun destroy() {

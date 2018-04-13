@@ -6,7 +6,7 @@ import io.reactivex.Observer
 import io.reactivex.functions.Function
 import io.reactivex.subjects.PublishSubject
 
-class NewResultStreamFactory<T> where T : Identifiable {
+class ResultStreamFactory<T> where T : Identifiable {
 
     data class ResultStream<T>(
             val replaceResultObserver: Observer<Result<List<T>>>,

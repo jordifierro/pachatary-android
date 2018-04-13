@@ -1,11 +1,11 @@
 package com.pachatary.data.experience
 
-import com.pachatary.data.common.NewResultStreamFactory
+import com.pachatary.data.common.ResultStreamFactory
 import com.pachatary.data.common.Result
 import io.reactivex.Flowable
 import io.reactivex.functions.Function3
 
-class ExperienceRepoSwitch(resultStreamFactory: NewResultStreamFactory<Experience>,
+class ExperienceRepoSwitch(resultStreamFactory: ResultStreamFactory<Experience>,
                            actionStreamFactory: ExperienceActionStreamFactory) {
 
     enum class Modification {

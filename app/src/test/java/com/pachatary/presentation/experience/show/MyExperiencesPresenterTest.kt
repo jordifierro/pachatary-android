@@ -4,7 +4,7 @@ import com.pachatary.data.auth.AuthRepository
 import com.pachatary.data.common.Result
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.experience.ExperienceRepoSwitch
-import com.pachatary.data.experience.NewExperienceRepository
+import com.pachatary.data.experience.ExperienceRepository
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -207,7 +207,7 @@ class MyExperiencesPresenterTest {
 
         lateinit var presenter: MyExperiencesPresenter
         @Mock lateinit var mockView: MyExperiencesView
-        @Mock lateinit var mockExperiencesRepository: NewExperienceRepository
+        @Mock lateinit var mockExperiencesRepository: ExperienceRepository
         @Mock lateinit var mockAuthRepository: AuthRepository
         lateinit var experienceA: Experience
         lateinit var experienceB: Experience

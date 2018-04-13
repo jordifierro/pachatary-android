@@ -1,7 +1,7 @@
 package com.pachatary.data.experience
 
 import com.pachatary.data.common.Event
-import com.pachatary.data.common.NewResultStreamFactory
+import com.pachatary.data.common.ResultStreamFactory
 import com.pachatary.data.common.Result
 import io.reactivex.Flowable
 import io.reactivex.Observer
@@ -71,7 +71,7 @@ class ExperienceActionStreamFactoryTest {
         lateinit var actionStreamFactory: ExperienceActionStreamFactory
         lateinit var actionStreamObserver: Observer<ExperienceActionStreamFactory.Action>
         var kind = ExperienceRepoSwitch.Kind.MINE
-        lateinit var resultStream: NewResultStreamFactory.ResultStream<Experience>
+        lateinit var resultStream: ResultStreamFactory.ResultStream<Experience>
         lateinit var resultFlowable: Flowable<Result<List<Experience>>>
         val addOrUpdateObserver = TestObserver.create<List<Experience>>()
         val updateObserver = TestObserver.create<List<Experience>>()
@@ -121,7 +121,7 @@ class ExperienceActionStreamFactoryTest {
         }
 
         fun create_action_stream() {
-            resultStream = NewResultStreamFactory.ResultStream(replaceResultObserver,
+            resultStream = ResultStreamFactory.ResultStream(replaceResultObserver,
                     addOrUpdateObserver, updateObserver, resultFlowable)
             actionStreamObserver = actionStreamFactory.create(resultStream, kind)
         }

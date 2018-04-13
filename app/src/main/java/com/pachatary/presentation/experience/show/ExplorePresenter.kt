@@ -2,12 +2,12 @@ package com.pachatary.presentation.experience.show
 
 import android.arch.lifecycle.LifecycleObserver
 import com.pachatary.data.experience.ExperienceRepoSwitch
-import com.pachatary.data.experience.NewExperienceRepository
+import com.pachatary.data.experience.ExperienceRepository
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
 import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
-class ExplorePresenter @Inject constructor(private val repository: NewExperienceRepository,
+class ExplorePresenter @Inject constructor(private val repository: ExperienceRepository,
                                            private val schedulerProvider: SchedulerProvider) : LifecycleObserver {
 
     lateinit var view: ExploreView

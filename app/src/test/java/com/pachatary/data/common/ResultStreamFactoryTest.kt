@@ -6,7 +6,7 @@ import io.reactivex.subscribers.TestSubscriber
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class NewResultStreamFactoryTest {
+class ResultStreamFactoryTest {
 
     @Test
     fun test_stream_emits_automatically_result_with_none_last_event() {
@@ -76,7 +76,7 @@ class NewResultStreamFactoryTest {
         lateinit var updatedScene: Scene
         lateinit var oldScenes: List<Scene>
         lateinit var newScenes: List<Scene>
-        lateinit var stream: NewResultStreamFactory.ResultStream<Scene>
+        lateinit var stream: ResultStreamFactory.ResultStream<Scene>
         val testSubscriber: TestSubscriber<Result<List<Scene>>> = TestSubscriber.create()
         val secondTestSubscriber: TestSubscriber<Result<List<Scene>>> = TestSubscriber.create()
 
@@ -102,7 +102,7 @@ class NewResultStreamFactoryTest {
         fun nothing() {}
 
         fun a_created_stream() {
-            stream = NewResultStreamFactory<Scene>().create()
+            stream = ResultStreamFactory<Scene>().create()
             stream.resultFlowable.subscribeOn(Schedulers.trampoline()).subscribe(testSubscriber)
         }
 

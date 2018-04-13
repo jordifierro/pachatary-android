@@ -2,7 +2,7 @@ package com.pachatary.presentation.scene.show
 
 import com.pachatary.data.common.Result
 import com.pachatary.data.experience.Experience
-import com.pachatary.data.experience.NewExperienceRepository
+import com.pachatary.data.experience.ExperienceRepository
 import com.pachatary.data.scene.Scene
 import com.pachatary.data.scene.SceneRepository
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
@@ -100,7 +100,7 @@ class SceneListPresenterTest {
         lateinit var presenter: SceneListPresenter
         @Mock lateinit var mockView: SceneListView
         @Mock lateinit var mockRepository: SceneRepository
-        @Mock lateinit var mockExperienceRepository: NewExperienceRepository
+        @Mock lateinit var mockExperienceRepository: ExperienceRepository
         lateinit var sceneId: String
         lateinit var experienceId: String
         lateinit var scene: Scene

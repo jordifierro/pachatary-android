@@ -2,7 +2,7 @@ package com.pachatary.presentation.scene.show
 
 import com.pachatary.data.common.Result
 import com.pachatary.data.experience.Experience
-import com.pachatary.data.experience.NewExperienceRepository
+import com.pachatary.data.experience.ExperienceRepository
 import com.pachatary.data.scene.Scene
 import com.pachatary.data.scene.SceneRepository
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
@@ -175,7 +175,7 @@ class ExperienceMapPresenterTest {
         private lateinit var presenter: ExperienceMapPresenter
         @Mock private lateinit var mockView: ExperienceMapView
         @Mock lateinit var mockRepository: SceneRepository
-        @Mock lateinit var mockExperienceRepository: NewExperienceRepository
+        @Mock lateinit var mockExperienceRepository: ExperienceRepository
         val experienceId = "5"
         var sceneA: Scene? = null
         var sceneB: Scene? = null

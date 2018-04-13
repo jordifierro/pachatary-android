@@ -5,7 +5,7 @@ import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.OnLifecycleEvent
 import com.pachatary.data.common.Result
 import com.pachatary.data.experience.Experience
-import com.pachatary.data.experience.NewExperienceRepository
+import com.pachatary.data.experience.ExperienceRepository
 import com.pachatary.data.scene.Scene
 import com.pachatary.data.scene.SceneRepository
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
@@ -15,7 +15,7 @@ import io.reactivex.functions.BiFunction
 import javax.inject.Inject
 
 class SceneListPresenter @Inject constructor(private val repository: SceneRepository,
-                                             private val experienceRepository: NewExperienceRepository,
+                                             private val experienceRepository: ExperienceRepository,
                                              private val schedulerProvider: SchedulerProvider) : LifecycleObserver {
 
     lateinit var view: SceneListView

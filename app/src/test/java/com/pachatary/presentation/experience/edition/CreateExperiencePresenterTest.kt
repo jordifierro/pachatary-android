@@ -2,7 +2,7 @@ package com.pachatary.presentation.experience.edition
 
 import com.pachatary.data.common.Result
 import com.pachatary.data.experience.Experience
-import com.pachatary.data.experience.NewExperienceRepository
+import com.pachatary.data.experience.ExperienceRepository
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
@@ -105,7 +105,7 @@ class CreateExperiencePresenterTest {
     class ScenarioMaker {
         private lateinit var presenter: CreateExperiencePresenter
         @Mock private lateinit var mockView: CreateExperienceView
-        @Mock lateinit var mockRepository: NewExperienceRepository
+        @Mock lateinit var mockRepository: ExperienceRepository
         var title = ""
         var description = ""
         var image = ""

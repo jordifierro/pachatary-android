@@ -9,7 +9,7 @@ import com.pachatary.data.auth.AuthApiRepository
 import com.pachatary.data.auth.AuthHttpInterceptor
 import com.pachatary.data.auth.AuthRepository
 import com.pachatary.data.auth.AuthStorageRepository
-import com.pachatary.data.common.NewResultStreamFactory
+import com.pachatary.data.common.ResultStreamFactory
 import com.pachatary.data.experience.*
 import com.pachatary.data.scene.Scene
 import com.pachatary.data.scene.SceneApiRepository
@@ -65,7 +65,7 @@ class DataModule {
 
     @Provides
     @Singleton
-    fun provideNewExperienceStreamFactory() = NewResultStreamFactory<Experience>()
+    fun provideExperienceStreamFactory() = ResultStreamFactory<Experience>()
 
     @Provides
     @Singleton
@@ -74,15 +74,15 @@ class DataModule {
 
     @Provides
     @Singleton
-    fun provideExperienceRepoSwitch(experienceStreamFactory: NewResultStreamFactory<Experience>,
+    fun provideExperienceRepoSwitch(experienceStreamFactory: ResultStreamFactory<Experience>,
                                     actionStreamFactory: ExperienceActionStreamFactory) =
             ExperienceRepoSwitch(experienceStreamFactory, actionStreamFactory)
 
     @Provides
     @Singleton
-    fun provideNewExperienceRepository(apiRepository: ExperienceApiRepository,
-                                       experienceRepoSwitch: ExperienceRepoSwitch) =
-            NewExperienceRepository(apiRepository, experienceRepoSwitch)
+    fun provideExperienceRepository(apiRepository: ExperienceApiRepository,
+                                    experienceRepoSwitch: ExperienceRepoSwitch) =
+            ExperienceRepository(apiRepository, experienceRepoSwitch)
 
     @Provides
     @Singleton
@@ -92,12 +92,12 @@ class DataModule {
 
     @Provides
     @Singleton
-    fun provideNewScenesStreamFactory() = NewResultStreamFactory<Scene>()
+    fun provideScenesStreamFactory() = ResultStreamFactory<Scene>()
 
     @Provides
     @Singleton
     fun provideSceneRepository(apiRepository: SceneApiRepository,
-                               sceneStreamFactory: NewResultStreamFactory<Scene>): SceneRepository =
+                               sceneStreamFactory: ResultStreamFactory<Scene>): SceneRepository =
             SceneRepository(apiRepository, sceneStreamFactory)
 
     @Provides

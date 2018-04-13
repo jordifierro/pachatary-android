@@ -1,6 +1,6 @@
 package com.pachatary.data.experience
 
-import com.pachatary.data.common.NewResultStreamFactory
+import com.pachatary.data.common.ResultStreamFactory
 import com.pachatary.data.common.Result
 import io.reactivex.Flowable
 import io.reactivex.observers.TestObserver
@@ -112,7 +112,7 @@ class ExperienceRepoSwitchTest {
 
     @Suppress("UNCHECKED_CAST")
     class ScenarioMaker {
-        @Mock lateinit var resultStreamFactory: NewResultStreamFactory<Experience>
+        @Mock lateinit var resultStreamFactory: ResultStreamFactory<Experience>
         @Mock lateinit var actionStreamFactory: ExperienceActionStreamFactory
         lateinit var switch: ExperienceRepoSwitch
 
@@ -120,21 +120,21 @@ class ExperienceRepoSwitchTest {
         val updateMineObserver = TestObserver.create<List<Experience>>()
         val replaceResultMineObserver = TestObserver.create<Result<List<Experience>>>()
         var resultMineFlowable = Flowable.empty<Result<List<Experience>>>()
-        var resultMineStream = NewResultStreamFactory.ResultStream(replaceResultMineObserver,
+        var resultMineStream = ResultStreamFactory.ResultStream(replaceResultMineObserver,
                 addOrUpdateMineObserver, updateMineObserver, resultMineFlowable)
 
         val addOrUpdateSavedObserver = TestObserver.create<List<Experience>>()
         val updateSavedObserver = TestObserver.create<List<Experience>>()
         val replaceResultSavedObserver = TestObserver.create<Result<List<Experience>>>()
         var resultSavedFlowable = Flowable.empty<Result<List<Experience>>>()
-        var resultSavedStream = NewResultStreamFactory.ResultStream(replaceResultSavedObserver,
+        var resultSavedStream = ResultStreamFactory.ResultStream(replaceResultSavedObserver,
                 addOrUpdateSavedObserver, updateSavedObserver, resultSavedFlowable)
 
         val addOrUpdateExploreObserver = TestObserver.create<List<Experience>>()
         val updateExploreObserver = TestObserver.create<List<Experience>>()
         val replaceResultExploreObserver = TestObserver.create<Result<List<Experience>>>()
         var resultExploreFlowable = Flowable.empty<Result<List<Experience>>>()
-        var resultExploreStream = NewResultStreamFactory.ResultStream(replaceResultExploreObserver,
+        var resultExploreStream = ResultStreamFactory.ResultStream(replaceResultExploreObserver,
                 addOrUpdateExploreObserver, updateExploreObserver, resultExploreFlowable)
 
         val testMineActionObserver = TestObserver.create<ExperienceActionStreamFactory.Action>()
@@ -157,11 +157,11 @@ class ExperienceRepoSwitchTest {
         }
 
         fun initialize_switch() {
-            resultMineStream = NewResultStreamFactory.ResultStream(replaceResultMineObserver,
+            resultMineStream = ResultStreamFactory.ResultStream(replaceResultMineObserver,
                     addOrUpdateMineObserver, updateMineObserver, resultMineFlowable)
-            resultSavedStream = NewResultStreamFactory.ResultStream(replaceResultSavedObserver,
+            resultSavedStream = ResultStreamFactory.ResultStream(replaceResultSavedObserver,
                     addOrUpdateSavedObserver, updateSavedObserver, resultSavedFlowable)
-            resultExploreStream = NewResultStreamFactory.ResultStream(replaceResultExploreObserver,
+            resultExploreStream = ResultStreamFactory.ResultStream(replaceResultExploreObserver,
                     addOrUpdateExploreObserver, updateExploreObserver, resultExploreFlowable)
             BDDMockito.given(resultStreamFactory.create())
                     .willReturn(resultMineStream)

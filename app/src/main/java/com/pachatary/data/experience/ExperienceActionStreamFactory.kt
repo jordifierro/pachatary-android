@@ -1,7 +1,7 @@
 package com.pachatary.data.experience
 
 import com.pachatary.data.common.Event
-import com.pachatary.data.common.NewResultStreamFactory
+import com.pachatary.data.common.ResultStreamFactory
 import com.pachatary.data.common.Result
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -15,7 +15,7 @@ class ExperienceActionStreamFactory(val apiRepository: ExperienceApiRepository) 
         GET_FIRSTS, PAGINATE, REFRESH
     }
 
-    fun create(resultStream: NewResultStreamFactory.ResultStream<Experience>,
+    fun create(resultStream: ResultStreamFactory.ResultStream<Experience>,
                kind: ExperienceRepoSwitch.Kind): Observer<Action> {
         val actionsSubject = PublishSubject.create<Action>()
         val disposable = actionsSubject.toFlowable(BackpressureStrategy.LATEST)

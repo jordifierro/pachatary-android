@@ -1,12 +1,12 @@
 package com.pachatary.data.scene
 
-import com.pachatary.data.common.NewResultStreamFactory
+import com.pachatary.data.common.ResultStreamFactory
 import com.pachatary.data.common.Result
 import io.reactivex.Flowable
 
-class SceneRepository(val apiRepository: SceneApiRepository, val streamFactory: NewResultStreamFactory<Scene>) {
+class SceneRepository(val apiRepository: SceneApiRepository, val streamFactory: ResultStreamFactory<Scene>) {
 
-    private val scenesStreamHashMap: HashMap<String, NewResultStreamFactory.ResultStream<Scene>> = HashMap()
+    private val scenesStreamHashMap: HashMap<String, ResultStreamFactory.ResultStream<Scene>> = HashMap()
 
     fun scenesFlowable(experienceId: String): Flowable<Result<List<Scene>>> {
         if (scenesStreamHashMap.get(experienceId) == null) {
