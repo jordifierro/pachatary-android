@@ -9,7 +9,7 @@ import com.pachatary.data.auth.AuthApiRepository
 import com.pachatary.data.auth.AuthHttpInterceptor
 import com.pachatary.data.auth.AuthRepository
 import com.pachatary.data.auth.AuthStorageRepository
-import com.pachatary.data.common.ResultStreamFactory
+import com.pachatary.data.common.ResultCacheFactory
 import com.pachatary.data.experience.*
 import com.pachatary.data.scene.Scene
 import com.pachatary.data.scene.SceneApiRepository
@@ -65,7 +65,7 @@ class DataModule {
 
     @Provides
     @Singleton
-    fun provideExperienceStreamFactory() = ResultStreamFactory<Experience>()
+    fun provideExperienceCacheFactory() = ResultCacheFactory<Experience>()
 
     @Provides
     @Singleton
@@ -74,9 +74,9 @@ class DataModule {
 
     @Provides
     @Singleton
-    fun provideExperienceRepoSwitch(experienceStreamFactory: ResultStreamFactory<Experience>,
+    fun provideExperienceRepoSwitch(experienceCacheFactory: ResultCacheFactory<Experience>,
                                     actionStreamFactory: ExperienceActionStreamFactory) =
-            ExperienceRepoSwitch(experienceStreamFactory, actionStreamFactory)
+            ExperienceRepoSwitch(experienceCacheFactory, actionStreamFactory)
 
     @Provides
     @Singleton
@@ -92,13 +92,13 @@ class DataModule {
 
     @Provides
     @Singleton
-    fun provideScenesStreamFactory() = ResultStreamFactory<Scene>()
+    fun provideScenesCacheFactory() = ResultCacheFactory<Scene>()
 
     @Provides
     @Singleton
     fun provideSceneRepository(apiRepository: SceneApiRepository,
-                               sceneStreamFactory: ResultStreamFactory<Scene>): SceneRepository =
-            SceneRepository(apiRepository, sceneStreamFactory)
+                               sceneCacheFactory: ResultCacheFactory<Scene>): SceneRepository =
+            SceneRepository(apiRepository, sceneCacheFactory)
 
     @Provides
     @Singleton

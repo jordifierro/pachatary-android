@@ -6,7 +6,7 @@ import io.reactivex.subscribers.TestSubscriber
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class ResultStreamFactoryTest {
+class ResultCacheFactoryTest {
 
     @Test
     fun test_stream_emits_automatically_result_with_none_last_event() {
@@ -76,7 +76,7 @@ class ResultStreamFactoryTest {
         lateinit var updatedScene: Scene
         lateinit var oldScenes: List<Scene>
         lateinit var newScenes: List<Scene>
-        lateinit var stream: ResultStreamFactory.ResultStream<Scene>
+        lateinit var cache: ResultCacheFactory.ResultCache<Scene>
         val testSubscriber: TestSubscriber<Result<List<Scene>>> = TestSubscriber.create()
         val secondTestSubscriber: TestSubscriber<Result<List<Scene>>> = TestSubscriber.create()
 
@@ -102,32 +102,32 @@ class ResultStreamFactoryTest {
         fun nothing() {}
 
         fun a_created_stream() {
-            stream = ResultStreamFactory<Scene>().create()
-            stream.resultFlowable.subscribeOn(Schedulers.trampoline()).subscribe(testSubscriber)
+            cache = ResultCacheFactory<Scene>().create()
+            cache.resultFlowable.subscribeOn(Schedulers.trampoline()).subscribe(testSubscriber)
         }
 
         fun a_list_of_scenes_is_emitted_through_add_list_observer() {
-            stream.addOrUpdateObserver.onNext(oldScenes)
+            cache.addOrUpdateObserver.onNext(oldScenes)
         }
 
         fun new_scene_is_emitted_through_add_or_update() {
-            stream.addOrUpdateObserver.onNext(listOf(newScene))
+            cache.addOrUpdateObserver.onNext(listOf(newScene))
         }
 
         fun modified_scene_is_emitted_through_add_or_update() {
-            stream.addOrUpdateObserver.onNext(listOf(updatedScene))
+            cache.addOrUpdateObserver.onNext(listOf(updatedScene))
         }
 
         fun a_new_list_is_emitted_through_add_list_observer() {
-            stream.addOrUpdateObserver.onNext(newScenes)
+            cache.addOrUpdateObserver.onNext(newScenes)
         }
 
         fun a_new_list_is_emitted_through_replace() {
-            stream.replaceResultObserver.onNext(Result(newScenes))
+            cache.replaceResultObserver.onNext(Result(newScenes))
         }
 
         fun another_observer_subscribes_to_flowable() {
-            stream.resultFlowable
+            cache.resultFlowable
                     .subscribeOn(Schedulers.trampoline()).subscribe(secondTestSubscriber)
         }
 

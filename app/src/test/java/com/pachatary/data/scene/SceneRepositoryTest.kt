@@ -1,6 +1,6 @@
 package com.pachatary.data.scene
 
-import com.pachatary.data.common.ResultStreamFactory
+import com.pachatary.data.common.ResultCacheFactory
 import com.pachatary.data.common.Result
 import io.reactivex.Flowable
 import io.reactivex.observers.TestObserver
@@ -108,7 +108,7 @@ class SceneRepositoryTest {
     class ScenarioMaker {
         lateinit var repository: SceneRepository
         @Mock lateinit var mockApiRepository: SceneApiRepository
-        @Mock lateinit var mockScenesStreamFactory: ResultStreamFactory<Scene>
+        @Mock lateinit var mockScenesCacheFactory: ResultCacheFactory<Scene>
         var experienceId = ""
         var secondExperienceId = ""
         var sceneId = ""
@@ -131,7 +131,7 @@ class SceneRepositoryTest {
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
-            repository = SceneRepository(mockApiRepository, mockScenesStreamFactory)
+            repository = SceneRepository(mockApiRepository, mockScenesCacheFactory)
 
             return this
         }
@@ -163,8 +163,8 @@ class SceneRepositoryTest {
             updateObserver = TestObserver.create()
             replaceResultObserver = TestObserver.create()
             scenesFlowable = Flowable.never()
-            BDDMockito.given(mockScenesStreamFactory.create()).willReturn(
-                    ResultStreamFactory.ResultStream(replaceResultObserver, addOrUpdateObserver,
+            BDDMockito.given(mockScenesCacheFactory.create()).willReturn(
+                    ResultCacheFactory.ResultCache(replaceResultObserver, addOrUpdateObserver,
                                                         updateObserver, scenesFlowable))
         }
 
@@ -174,8 +174,8 @@ class SceneRepositoryTest {
             secondUpdateObserver = TestObserver.create()
             secondReplaceResultObserver = TestObserver.create()
             secondScenesFlowable = Flowable.never()
-            BDDMockito.given(mockScenesStreamFactory.create()).willReturn(
-                    ResultStreamFactory.ResultStream(secondReplaceResultObserver,
+            BDDMockito.given(mockScenesCacheFactory.create()).willReturn(
+                    ResultCacheFactory.ResultCache(secondReplaceResultObserver,
                             secondAddOrUpdateObserver, secondUpdateObserver, secondScenesFlowable))
         }
 
@@ -188,8 +188,8 @@ class SceneRepositoryTest {
             updateObserver = TestObserver.create()
             replaceResultObserver = TestObserver.create()
             scenesFlowable = Flowable.just(Result(listOf(sceneA, sceneB)))
-            BDDMockito.given(mockScenesStreamFactory.create()).willReturn(
-                    ResultStreamFactory.ResultStream(replaceResultObserver, addOrUpdateObserver,
+            BDDMockito.given(mockScenesCacheFactory.create()).willReturn(
+                    ResultCacheFactory.ResultCache(replaceResultObserver, addOrUpdateObserver,
                             updateObserver, scenesFlowable))
         }
 

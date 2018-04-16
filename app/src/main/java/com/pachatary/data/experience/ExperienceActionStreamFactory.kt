@@ -1,6 +1,6 @@
 package com.pachatary.data.experience
 
-import com.pachatary.data.common.ResultStreamFactory
+import com.pachatary.data.common.ResultCacheFactory
 import com.pachatary.data.common.Result
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -14,11 +14,11 @@ class ExperienceActionStreamFactory(val apiRepository: ExperienceApiRepository) 
         GET_FIRSTS, PAGINATE, REFRESH
     }
 
-    fun create(resultStream: ResultStreamFactory.ResultStream<Experience>,
+    fun create(resultCache: ResultCacheFactory.ResultCache<Experience>,
                kind: ExperienceRepoSwitch.Kind): Observer<Action> {
         val actionsSubject = PublishSubject.create<Action>()
         val disposable = actionsSubject.toFlowable(BackpressureStrategy.LATEST)
-                .withLatestFrom(resultStream.resultFlowable,
+                .withLatestFrom(resultCache.resultFlowable,
                         BiFunction<Action, Result<List<Experience>>,
                                 Pair<Action, Result<List<Experience>>>>
                         { action, result -> Pair(action, result) })
@@ -26,10 +26,10 @@ class ExperienceActionStreamFactory(val apiRepository: ExperienceApiRepository) 
                     if (it.first == Action.GET_FIRSTS) {
                         if (!it.second.isInProgress() &&
                                 (it.second.hasNotBeenInitialized() || it.second.isError())) {
-                            resultStream.replaceResultObserver.onNext(
+                            resultCache.replaceResultObserver.onNext(
                                     Result(listOf(), inProgress = true))
                             apiCallFlowable(apiRepository, kind).subscribe({ apiResult ->
-                                resultStream.replaceResultObserver.onNext(
+                                resultCache.replaceResultObserver.onNext(
                                     apiResult.builder().lastEvent(Result.Event.GET_FIRSTS).build())
                             })
                         }

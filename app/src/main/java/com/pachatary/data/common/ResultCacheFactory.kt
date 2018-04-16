@@ -6,15 +6,15 @@ import io.reactivex.Observer
 import io.reactivex.functions.Function
 import io.reactivex.subjects.PublishSubject
 
-class ResultStreamFactory<T> where T : Identifiable {
+class ResultCacheFactory<T> where T : Identifiable {
 
-    data class ResultStream<T>(
+    data class ResultCache<T>(
             val replaceResultObserver: Observer<Result<List<T>>>,
             val addOrUpdateObserver: Observer<List<T>>,
             val updateObserver: Observer<List<T>>,
             val resultFlowable: Flowable<Result<List<T>>>)
 
-    fun create(): ResultStream<T> {
+    fun create(): ResultCache<T> {
         val replaceResultSubject = PublishSubject.create<Result<List<T>>>()
         val addOrUpdateSubject = PublishSubject.create<List<T>>()
         val updateSubject = PublishSubject.create<List<T>>()
@@ -49,6 +49,6 @@ class ResultStreamFactory<T> where T : Identifiable {
                             { oldValue, func -> func.apply(oldValue) })
                     .replay(1)
                     .autoConnect()
-        return ResultStream(replaceResultSubject, addOrUpdateSubject, updateSubject, resultFlowable)
+        return ResultCache(replaceResultSubject, addOrUpdateSubject, updateSubject, resultFlowable)
     }
 }

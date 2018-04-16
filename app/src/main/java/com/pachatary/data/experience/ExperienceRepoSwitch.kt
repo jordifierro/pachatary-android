@@ -1,11 +1,11 @@
 package com.pachatary.data.experience
 
-import com.pachatary.data.common.ResultStreamFactory
+import com.pachatary.data.common.ResultCacheFactory
 import com.pachatary.data.common.Result
 import io.reactivex.Flowable
 import io.reactivex.functions.Function3
 
-class ExperienceRepoSwitch(resultStreamFactory: ResultStreamFactory<Experience>,
+class ExperienceRepoSwitch(resultCacheFactory: ResultCacheFactory<Experience>,
                            actionStreamFactory: ExperienceActionStreamFactory) {
 
     enum class Modification {
@@ -16,27 +16,27 @@ class ExperienceRepoSwitch(resultStreamFactory: ResultStreamFactory<Experience>,
         MINE, SAVED, EXPLORE
     }
 
-    val mineResultStream = resultStreamFactory.create()
-    private val savedResultStream = resultStreamFactory.create()
-    private val exploreResultStream = resultStreamFactory.create()
-    private val mineActionObserver = actionStreamFactory.create(mineResultStream, Kind.MINE)
-    private val savedActionObserver = actionStreamFactory.create(savedResultStream, Kind.SAVED)
+    val mineResultCache = resultCacheFactory.create()
+    private val savedResultCache = resultCacheFactory.create()
+    private val exploreResultCache = resultCacheFactory.create()
+    private val mineActionObserver = actionStreamFactory.create(mineResultCache, Kind.MINE)
+    private val savedActionObserver = actionStreamFactory.create(savedResultCache, Kind.SAVED)
     private val exploreActionObserver =
-            actionStreamFactory.create(exploreResultStream, Kind.EXPLORE)
+            actionStreamFactory.create(exploreResultCache, Kind.EXPLORE)
 
     fun getResultFlowable(kind: Kind) =
             when(kind) {
-                Kind.MINE -> mineResultStream.resultFlowable
-                Kind.SAVED -> savedResultStream.resultFlowable
-                Kind.EXPLORE -> exploreResultStream.resultFlowable
+                Kind.MINE -> mineResultCache.resultFlowable
+                Kind.SAVED -> savedResultCache.resultFlowable
+                Kind.EXPLORE -> exploreResultCache.resultFlowable
             }
 
     fun modifyResult(kind: Kind, modification: Modification,
                      list: List<Experience>? = null, result: Result<List<Experience>>? = null) {
         when (modification) {
-            Modification.ADD_OR_UPDATE_LIST -> resultStream(kind).addOrUpdateObserver.onNext(list!!)
-            Modification.UPDATE_LIST -> resultStream(kind).updateObserver.onNext(list!!)
-            Modification.REPLACE_RESULT -> resultStream(kind).replaceResultObserver.onNext(result!!)
+            Modification.ADD_OR_UPDATE_LIST -> resultCache(kind).addOrUpdateObserver.onNext(list!!)
+            Modification.UPDATE_LIST -> resultCache(kind).updateObserver.onNext(list!!)
+            Modification.REPLACE_RESULT -> resultCache(kind).replaceResultObserver.onNext(result!!)
         }
     }
 
@@ -61,10 +61,10 @@ class ExperienceRepoSwitch(resultStreamFactory: ResultStreamFactory<Experience>,
         }
     }
 
-    private fun resultStream(kind: Kind) =
+    private fun resultCache(kind: Kind) =
             when(kind) {
-                Kind.MINE -> mineResultStream
-                Kind.SAVED -> savedResultStream
-                Kind.EXPLORE -> exploreResultStream
+                Kind.MINE -> mineResultCache
+                Kind.SAVED -> savedResultCache
+                Kind.EXPLORE -> exploreResultCache
             }
 }
