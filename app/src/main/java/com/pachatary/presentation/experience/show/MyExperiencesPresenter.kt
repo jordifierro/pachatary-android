@@ -4,6 +4,7 @@ import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.OnLifecycleEvent
 import com.pachatary.data.auth.AuthRepository
+import com.pachatary.data.common.Result
 import com.pachatary.data.experience.ExperienceRepoSwitch
 import com.pachatary.data.experience.ExperienceRepository
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
@@ -26,7 +27,8 @@ class MyExperiencesPresenter @Inject constructor(private val experiencesReposito
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun resume() {
-        if (authRepository.canPersonCreateContent() && experiencesDisposable == null) connectToExperiences()
+        if (authRepository.canPersonCreateContent() && experiencesDisposable == null)
+            connectToExperiences()
     }
 
     fun onRetryClick() {
@@ -42,16 +44,35 @@ class MyExperiencesPresenter @Inject constructor(private val experiencesReposito
                 experiencesRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.MINE)
                                         .subscribeOn(schedulerProvider.subscriber())
                                         .observeOn(schedulerProvider.observer())
-                                        .subscribe({  if (it.isInProgress()) view.showLoader()
-                                                      else view.hideLoader()
+                                        .subscribe({
+                                            if (it.isInProgress()) {
+                                                if (it.lastEvent == Result.Event.GET_FIRSTS) {
+                                                    view.showLoader()
+                                                    view.hidePaginationLoader()
+                                                }
+                                                else if (it.lastEvent == Result.Event.PAGINATE) {
+                                                    view.hideLoader()
+                                                    view.showPaginationLoader()
+                                                }
+                                            }
+                                            else {
+                                                view.hideLoader()
+                                                view.hidePaginationLoader()
+                                            }
 
-                                                      if (it.isError()) view.showRetry()
-                                                      else view.hideRetry()
+                                            if (it.isError() &&
+                                                    it.lastEvent == Result.Event.GET_FIRSTS)
+                                                    view.showRetry()
+                                            else view.hideRetry()
 
-                                                      if (it.isSuccess())
-                                                          view.showExperienceList(it.data!!)
-                                                   })
+                                            if (it.isSuccess())
+                                                view.showExperienceList(it.data!!)
+                                        })
         experiencesRepository.getFirstExperiences(ExperienceRepoSwitch.Kind.MINE)
+    }
+
+    fun lastExperienceShown() {
+        experiencesRepository.getMoreExperiences(ExperienceRepoSwitch.Kind.MINE)
     }
 
     fun destroy() {

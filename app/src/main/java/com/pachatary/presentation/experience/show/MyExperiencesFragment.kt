@@ -21,6 +21,9 @@ import com.pachatary.presentation.register.RegisterActivity
 import com.pachatary.presentation.scene.show.ExperienceMapActivity
 import com.squareup.picasso.Picasso
 import javax.inject.Inject
+import android.support.v7.widget.LinearLayoutManager
+
+
 
 class MyExperiencesFragment : Fragment(), MyExperiencesView {
 
@@ -54,8 +57,8 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
         recyclerView.layoutManager = GridLayoutManager(activity, 2)
         createExperienceButton = view.findViewById(R.id.create_new_experience_button)
         createExperienceButton.setOnClickListener { presenter.onCreateExperienceClick() }
-        recyclerView.adapter = ExperiencesListAdapter(layoutInflater, listOf(),
-                { id -> presenter.onExperienceClick(id) })
+        recyclerView.adapter = ExperiencesListAdapter(layoutInflater, listOf(), false,
+                { id -> presenter.onExperienceClick(id) }, { presenter.lastExperienceShown() })
 
         presenter.create()
 
@@ -83,10 +86,21 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
         retryIcon.visibility = View.GONE
     }
 
+    override fun showPaginationLoader() {
+        (recyclerView.adapter as ExperiencesListAdapter).inProgress = true
+        recyclerView.adapter.notifyDataSetChanged()
+    }
+
+    override fun hidePaginationLoader() {
+        (recyclerView.adapter as ExperiencesListAdapter).inProgress = false
+        recyclerView.adapter.notifyDataSetChanged()
+    }
+
     override fun showExperienceList(experienceList: List<Experience>) {
         (recyclerView.adapter as ExperiencesListAdapter).experienceList = experienceList
         recyclerView.adapter.notifyDataSetChanged()
     }
+
 
     override fun navigateToExperience(experienceId: String) {
         startActivity(ExperienceMapActivity.newIntent(activity!!.applicationContext, experienceId))
@@ -114,10 +128,17 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
 
     class ExperiencesListAdapter(private val inflater: LayoutInflater,
                                  var experienceList: List<Experience>,
-                                 val onClick: (String) -> Unit)
+                                 var inProgress: Boolean,
+                                 val onClick: (String) -> Unit,
+                                 val onLastItemShown: () -> Unit)
                                                     : RecyclerView.Adapter<ExperienceViewHolder>() {
         override fun onBindViewHolder(holder: ExperienceViewHolder, position: Int) {
-            holder.bind(experienceList[position])
+            if (inProgress && position == experienceList.size) holder.bindProgressBar()
+            else {
+                val endHasBeenReached = position == experienceList.size - 1
+                if (experienceList.size > 0 && endHasBeenReached) onLastItemShown.invoke()
+                holder.bind(experienceList[position])
+            }
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExperienceViewHolder {
@@ -125,7 +146,10 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
                     parent, false), onClick)
         }
 
-        override fun getItemCount(): Int = experienceList.size
+        override fun getItemCount(): Int {
+            if (inProgress) return experienceList.size + 1
+            return experienceList.size
+        }
     }
 
     class ExperienceViewHolder(view: View, val onClick: (String) -> Unit)
@@ -133,6 +157,7 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
 
         private val titleView: TextView = view.findViewById(R.id.experience_title)
         private val pictureView: ImageView = view.findViewById(R.id.experience_picture)
+        private val progressBar: ProgressBar = view.findViewById(R.id.experience_progressbar)
         lateinit var experienceId: String
 
         init {
@@ -140,11 +165,20 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
         }
 
         fun bind(experience: Experience) {
+            titleView.visibility = View.VISIBLE
+            pictureView.visibility = View.VISIBLE
+            progressBar.visibility = View.INVISIBLE
             this.experienceId = experience.id
             titleView.text = experience.title
             Picasso.with(pictureView.context)
                     .load(experience.picture?.smallUrl)
                     .into(pictureView)
+        }
+
+        fun bindProgressBar() {
+            titleView.visibility = View.INVISIBLE
+            pictureView.visibility = View.INVISIBLE
+            progressBar.visibility = View.VISIBLE
         }
 
         override fun onClick(view: View?) = this.onClick(this.experienceId)

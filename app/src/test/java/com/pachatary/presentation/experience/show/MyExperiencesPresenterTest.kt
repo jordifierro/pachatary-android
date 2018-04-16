@@ -48,14 +48,29 @@ class MyExperiencesPresenterTest {
     }
 
     @Test
-    fun test_when_result_in_progress_shows_loader_if_can_create_content() {
+    fun test_when_result_in_progress_last_event_get_firsts_shows_loader_if_can_create_content() {
         given {
             an_auth_repo_that_returns_true_on_can_create_content()
-            an_experience_repo_that_returns_in_progress()
+            an_experience_repo_that_returns_in_progress(lastEvent = Result.Event.GET_FIRSTS)
         } whenn {
             create_presenter()
         } then {
+            should_hide_view_pagination_loader()
             should_show_view_loader()
+            should_hide_view_retry()
+        }
+    }
+
+    @Test
+    fun test_when_result_in_progress_last_event_paginate_shows_loader_if_can_create_content() {
+        given {
+            an_auth_repo_that_returns_true_on_can_create_content()
+            an_experience_repo_that_returns_in_progress(lastEvent = Result.Event.PAGINATE)
+        } whenn {
+            create_presenter()
+        } then {
+            should_show_view_pagination_loader()
+            should_hide_view_loader()
             should_hide_view_retry()
         }
     }
@@ -102,6 +117,7 @@ class MyExperiencesPresenterTest {
             should_show_received_experiences()
             should_hide_view_loader()
             should_hide_view_retry()
+            should_hide_view_pagination_loader()
         } whenn {
             resume_presenter()
         } then {
@@ -110,15 +126,30 @@ class MyExperiencesPresenterTest {
     }
 
     @Test
-    fun test_create_when_response_error_shows_retry() {
+    fun test_create_when_response_error_shows_retry_if_last_event_is_get_firsts() {
         given {
             an_auth_repo_that_returns_true_on_can_create_content()
-            an_experience_repo_that_returns_exception()
+            an_experience_repo_that_returns_exception(lastEvent = Result.Event.GET_FIRSTS)
         } whenn {
             create_presenter()
         } then {
             should_hide_view_loader()
+            should_hide_view_pagination_loader()
             should_show_view_retry()
+        }
+    }
+
+    @Test
+    fun test_create_when_response_error_hides_loaders_if_last_event_is_paginate() {
+        given {
+            an_auth_repo_that_returns_true_on_can_create_content()
+            an_experience_repo_that_returns_exception(lastEvent = Result.Event.PAGINATE)
+        } whenn {
+            create_presenter()
+        } then {
+            should_hide_view_loader()
+            should_hide_view_retry()
+            should_hide_view_pagination_loader()
         }
     }
 
@@ -201,6 +232,17 @@ class MyExperiencesPresenterTest {
         }
     }
 
+    @Test
+    fun test_last_experience_shown_calls_api_paginate() {
+        given {
+            nothing()
+        } whenn {
+            last_experience_shown()
+        } then {
+            should_call_api_get_more_experiences()
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
@@ -238,14 +280,16 @@ class MyExperiencesPresenterTest {
                             Result<List<Experience>>(arrayListOf(experienceA, experienceB))))
         }
 
-        fun an_experience_repo_that_returns_exception() {
+        fun an_experience_repo_that_returns_exception(lastEvent: Result.Event) {
             given(mockExperiencesRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.MINE))
-                    .willReturn(Flowable.just(Result<List<Experience>>(null, error = Exception())))
+                    .willReturn(Flowable.just(Result<List<Experience>>(null, error = Exception(),
+                            lastEvent = lastEvent)))
         }
 
-        fun an_experience_repo_that_returns_in_progress() {
+        fun an_experience_repo_that_returns_in_progress(lastEvent: Result.Event) {
             given(mockExperiencesRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.MINE))
-                    .willReturn(Flowable.just(Result<List<Experience>>(null, inProgress = true)))
+                    .willReturn(Flowable.just(
+                        Result<List<Experience>>(null, inProgress = true, lastEvent = lastEvent)))
         }
 
         fun an_auth_repo_that_returns_true_on_can_create_content() {
@@ -284,18 +328,34 @@ class MyExperiencesPresenterTest {
             presenter.onDontProceedToRegister()
         }
 
-        fun should_show_view_loader() {
-            then(mockView).should().showLoader()
+        fun last_experience_shown() {
+            presenter.lastExperienceShown()
+        }
+
+        fun should_call_api_get_more_experiences() {
+            then(mockExperiencesRepository).should()
+                    .getMoreExperiences(ExperienceRepoSwitch.Kind.MINE)
         }
 
         fun should_show_received_experiences() {
             then(mockView).should().showExperienceList(arrayListOf(experienceA, experienceB))
         }
 
+        fun should_show_view_loader() {
+            then(mockView).should().showLoader()
+        }
+
         fun should_hide_view_loader() {
             then(mockView).should().hideLoader()
         }
 
+        fun should_show_view_pagination_loader() {
+            then(mockView).should().showPaginationLoader()
+        }
+
+        fun should_hide_view_pagination_loader() {
+            then(mockView).should().hidePaginationLoader()
+        }
         fun should_show_view_retry() {
             then(mockView).should().showRetry()
         }

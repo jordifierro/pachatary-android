@@ -116,6 +116,31 @@ class ExperienceRepositoryTest {
         }
     }
 
+    @Test
+    fun test_get_first_experiences_emits_action_through_switch() {
+        for (kind in ExperienceRepoSwitch.Kind.values()) {
+            given {
+                kind_of_experiences(kind)
+            } whenn {
+                get_first_experiences_is_called()
+            } then {
+                should_call_switch_execute_get_firsts_action()
+            }
+        }
+    }
+
+    fun test_get_more_experiences_emits_paginate_action_through_switch() {
+        for (kind in ExperienceRepoSwitch.Kind.values()) {
+            given {
+                kind_of_experiences(kind)
+            } whenn {
+                get_more_experiences_is_called()
+            } then {
+                should_call_switch_execute_paginate_action()
+            }
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().start(func)
 
     @Suppress("UNCHECKED_CAST")
@@ -220,6 +245,14 @@ class ExperienceRepositoryTest {
             repository.editExperience(experience).subscribe(testExperienceSubscriber)
         }
 
+        fun get_first_experiences_is_called() {
+            repository.getFirstExperiences(kind)
+        }
+
+        fun get_more_experiences_is_called() {
+            repository.getMoreExperiences(kind)
+        }
+
         fun upload_experience_picture_is_called() {
             repository.uploadExperiencePicture(experienceId, croppedImageString)
         }
@@ -302,6 +335,17 @@ class ExperienceRepositoryTest {
         fun should_subscribe_to_publisher_returned_by_api() {
             assertTrue(saveExperiencePublisher.hasObservers())
         }
+
+        fun should_call_switch_execute_get_firsts_action() {
+            BDDMockito.then(mockExperiencesRepoSwitch).should()
+                    .executeAction(kind, ExperienceRequesterFactory.Action.GET_FIRSTS)
+        }
+
+        fun should_call_switch_execute_paginate_action() {
+            BDDMockito.then(mockExperiencesRepoSwitch).should()
+                    .executeAction(kind, ExperienceRequesterFactory.Action.PAGINATE)
+        }
+
 
         infix fun start(func: ScenarioMaker.() -> Unit) = buildScenario().given(func)
         infix fun given(func: ScenarioMaker.() -> Unit) = apply(func)

@@ -35,6 +35,11 @@ class ExperienceApiRepository (retrofit: Retrofit, @Named("io") val scheduler: S
                     .compose(NetworkParserFactory.getPaginatedListTransformer<Experience, ExperienceMapper>())
                     .subscribeOn(scheduler)
 
+    fun paginateExperiences(url: String): Flowable<Result<List<Experience>>> =
+            experienceApi.paginateExperiences(url)
+                    .compose(NetworkParserFactory.getPaginatedListTransformer<Experience, ExperienceMapper>())
+                    .subscribeOn(scheduler)
+
     fun createExperience(experience: Experience): Flowable<Result<Experience>> =
             experienceApi.createExperience(title = experience.title, description = experience.description)
                     .compose(NetworkParserFactory.getTransformer())

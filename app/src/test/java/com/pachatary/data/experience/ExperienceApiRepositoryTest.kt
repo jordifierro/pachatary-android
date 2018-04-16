@@ -55,6 +55,18 @@ class ExperienceApiRepositoryTest {
     }
 
     @Test
+    fun test_paginate_experiences() {
+        given {
+            a_url()
+            a_web_server_that_returns_get_experiences()
+        } whenn {
+            paginate_is_called_with_url()
+        } then {
+            request_should_call_url()
+            response_should_experience_list_and_next_url()
+        }
+    }
+    @Test
     fun test_post_experiences() {
         given {
             an_experience()
@@ -126,6 +138,11 @@ class ExperienceApiRepositoryTest {
                 .build(),
                 Schedulers.trampoline(), mockContext, mockAuthHttpInterceptor)
         lateinit var experience: Experience
+        var url = ""
+
+        fun a_url() {
+            url = "/some-url"
+        }
 
         fun a_web_server_that_returns_get_experiences() {
             mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(
@@ -175,6 +192,12 @@ class ExperienceApiRepositoryTest {
             testSubscriber.awaitCount(1)
         }
 
+        fun paginate_is_called_with_url() {
+            repository.paginateExperiences(mockWebServer.url(url).toString())
+                    .subscribeOn(Schedulers.trampoline()).subscribe(testListSubscriber)
+            testSubscriber.awaitCount(1)
+        }
+
         fun experience_is_edited() {
             repository.editExperience(experience).subscribe(testSubscriber)
             testSubscriber.awaitCount(1)
@@ -188,6 +211,13 @@ class ExperienceApiRepositoryTest {
         fun experience_is_unsaved() {
             repository.saveExperience(save = false, experienceId = experience.id).subscribe(testEmptySubscriber)
             testEmptySubscriber.awaitCount(1)
+        }
+
+        fun request_should_call_url() {
+            val request = mockWebServer.takeRequest()
+            assertEquals(url, request.getPath())
+            assertEquals("GET", request.getMethod())
+            assertEquals("", request.getBody().readUtf8())
         }
 
         fun request_should_get_experiences(mine: Boolean = false, saved: Boolean = false) {

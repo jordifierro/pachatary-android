@@ -10,15 +10,16 @@ data class Result<T>(val data: T?,
         NONE, GET_FIRSTS, PAGINATE, REFRESH
     }
 
-    fun hasNotBeenInitialized() = lastEvent == Event.NONE
+    fun hasBeenInitialized() = lastEvent != Event.NONE
     fun isInProgress() = inProgress
     fun isSuccess() = !isInProgress() && error == null
     fun isError() = !isInProgress() && error != null
+    fun hasMoreElements() = nextUrl != null
 
     fun builder() = Builder(this.data, this.nextUrl, this.lastEvent, this.inProgress, this.error)
 
     class Builder<T>(var data: T?, val nextUrl: String?, var lastEvent: Event,
-                     val inProgress: Boolean, val error: Throwable?) {
+                     var inProgress: Boolean, val error: Throwable?) {
 
         fun data(data: T?): Builder<T> {
             this.data = data
@@ -27,6 +28,11 @@ data class Result<T>(val data: T?,
 
         fun lastEvent(event: Event): Builder<T> {
             this.lastEvent = event
+            return this
+        }
+
+        fun inProgress(progress: Boolean): Builder<T> {
+            this.inProgress = progress
             return this
         }
 

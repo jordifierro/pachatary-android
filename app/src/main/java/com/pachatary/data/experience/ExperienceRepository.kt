@@ -17,6 +17,10 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
         repoSwitch.executeAction(kind, ExperienceRequesterFactory.Action.GET_FIRSTS)
     }
 
+    fun getMoreExperiences(kind: ExperienceRepoSwitch.Kind) {
+        repoSwitch.executeAction(kind, ExperienceRequesterFactory.Action.PAGINATE)
+    }
+
     fun experienceFlowable(experienceId: String): Flowable<Result<Experience>> =
         repoSwitch.getExperienceFlowable(experienceId)
 

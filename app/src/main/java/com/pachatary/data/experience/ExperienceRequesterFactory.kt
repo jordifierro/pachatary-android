@@ -25,7 +25,7 @@ class ExperienceRequesterFactory(val apiRepository: ExperienceApiRepository) {
                 .subscribe({
                     if (it.first == Action.GET_FIRSTS) {
                         if (!it.second.isInProgress() &&
-                                (it.second.hasNotBeenInitialized() || it.second.isError())) {
+                                (!it.second.hasBeenInitialized() || it.second.isError())) {
                             resultCache.replaceResultObserver.onNext(
                                     Result(listOf(), inProgress = true))
                             apiCallFlowable(apiRepository, kind).subscribe({ apiResult ->
@@ -34,12 +34,36 @@ class ExperienceRequesterFactory(val apiRepository: ExperienceApiRepository) {
                             })
                         }
                     }
+                    else if (it.first == Action.PAGINATE) {
+                        if (!it.second.isInProgress() &&
+                                (it.second.isSuccess() && it.second.hasBeenInitialized()) &&
+                                it.second.hasMoreElements()) {
+                            resultCache.replaceResultObserver.onNext(
+                                    it.second.builder().inProgress(true).lastEvent(Result.Event.PAGINATE).build())
+                            apiRepository.paginateExperiences(it.second.nextUrl!!).subscribe({ apiResult ->
+                                val allExperiences = it.second.data!!.union(apiResult.data!!).toList()
+                                resultCache.replaceResultObserver.onNext(
+                                        apiResult.builder().data(allExperiences).lastEvent(Result.Event.PAGINATE).build())
+                            })
+
+                        }
+                    }
                 })
         return actionsSubject
     }
 
     private fun apiCallFlowable(apiRepository: ExperienceApiRepository,
                                 kind: ExperienceRepoSwitch.Kind)
+            : Flowable<Result<List<Experience>>> {
+        when (kind) {
+            ExperienceRepoSwitch.Kind.MINE -> return apiRepository.myExperiencesFlowable()
+            ExperienceRepoSwitch.Kind.SAVED -> return apiRepository.savedExperiencesFlowable()
+            ExperienceRepoSwitch.Kind.EXPLORE -> return apiRepository.exploreExperiencesFlowable()
+        }
+    }
+
+    private fun apiPaginateCallFlowable(apiRepository: ExperienceApiRepository,
+                                        kind: ExperienceRepoSwitch.Kind)
             : Flowable<Result<List<Experience>>> {
         when (kind) {
             ExperienceRepoSwitch.Kind.MINE -> return apiRepository.myExperiencesFlowable()
