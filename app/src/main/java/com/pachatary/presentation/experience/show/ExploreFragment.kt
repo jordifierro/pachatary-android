@@ -46,6 +46,8 @@ class ExploreFragment : Fragment(), ExploreView {
         retryIcon.setOnClickListener { presenter.onRetryClick() }
         recyclerView = view.findViewById(R.id.experiences_recyclerview)
         recyclerView.layoutManager = GridLayoutManager(activity, 1)
+        recyclerView.adapter = ExperiencesListAdapter(layoutInflater, listOf(),
+                { id -> presenter.onExperienceClick(id) })
 
         presenter.create()
         return view
@@ -68,8 +70,8 @@ class ExploreFragment : Fragment(), ExploreView {
     }
 
     override fun showExperienceList(experienceList: List<Experience>) {
-        recyclerView.adapter = ExperiencesListAdapter(layoutInflater, experienceList,
-                { id -> presenter.onExperienceClick(id) })
+        (recyclerView.adapter as ExperiencesListAdapter).experienceList = experienceList
+        recyclerView.adapter.notifyDataSetChanged()
     }
 
     override fun navigateToExperience(experienceId: String) {
@@ -77,7 +79,7 @@ class ExploreFragment : Fragment(), ExploreView {
     }
 
     class ExperiencesListAdapter(private val inflater: LayoutInflater,
-                                 private val experienceList: List<Experience>,
+                                 var experienceList: List<Experience>,
                                  val onClick: (String) -> Unit)
                                                     : RecyclerView.Adapter<ExperienceViewHolder>() {
 

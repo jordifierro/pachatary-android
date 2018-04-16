@@ -54,6 +54,8 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
         recyclerView.layoutManager = GridLayoutManager(activity, 2)
         createExperienceButton = view.findViewById(R.id.create_new_experience_button)
         createExperienceButton.setOnClickListener { presenter.onCreateExperienceClick() }
+        recyclerView.adapter = ExperiencesListAdapter(layoutInflater, listOf(),
+                { id -> presenter.onExperienceClick(id) })
 
         presenter.create()
 
@@ -82,8 +84,8 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
     }
 
     override fun showExperienceList(experienceList: List<Experience>) {
-        recyclerView.adapter = ExperiencesListAdapter(layoutInflater, experienceList,
-                { id -> presenter.onExperienceClick(id) })
+        (recyclerView.adapter as ExperiencesListAdapter).experienceList = experienceList
+        recyclerView.adapter.notifyDataSetChanged()
     }
 
     override fun navigateToExperience(experienceId: String) {
@@ -111,7 +113,7 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
     }
 
     class ExperiencesListAdapter(private val inflater: LayoutInflater,
-                                 private val experienceList: List<Experience>,
+                                 var experienceList: List<Experience>,
                                  val onClick: (String) -> Unit)
                                                     : RecyclerView.Adapter<ExperienceViewHolder>() {
         override fun onBindViewHolder(holder: ExperienceViewHolder, position: Int) {
