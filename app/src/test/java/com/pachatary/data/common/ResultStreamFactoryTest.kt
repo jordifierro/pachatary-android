@@ -160,7 +160,7 @@ class ResultStreamFactoryTest {
             testSubscriber.awaitCount(1)
 
             val result = testSubscriber.events.get(0).get(0) as Result<*>
-            assertEquals(Result<List<Scene>>(listOf(), lastEvent = Event.NONE), result)
+            assertEquals(Result<List<Scene>>(listOf(), lastEvent = Result.Event.NONE), result)
         }
 
         fun this_other_observer_should_received_second_emitted_list() {

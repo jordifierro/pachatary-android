@@ -1,6 +1,5 @@
 package com.pachatary.data.experience
 
-import com.pachatary.data.common.Event
 import com.pachatary.data.common.ResultStreamFactory
 import com.pachatary.data.common.Result
 import io.reactivex.BackpressureStrategy
@@ -31,7 +30,7 @@ class ExperienceActionStreamFactory(val apiRepository: ExperienceApiRepository) 
                                     Result(listOf(), inProgress = true))
                             apiCallFlowable(apiRepository, kind).subscribe({ apiResult ->
                                 resultStream.replaceResultObserver.onNext(
-                                        apiResult.builder().lastEvent(Event.GET_FIRSTS).build())
+                                    apiResult.builder().lastEvent(Result.Event.GET_FIRSTS).build())
                             })
                         }
                     }

@@ -1,5 +1,6 @@
 package com.pachatary.data.experience
 
+import com.pachatary.data.common.PaginatedListMapper
 import io.reactivex.Flowable
 import retrofit2.adapter.rxjava2.Result
 import retrofit2.http.*
@@ -7,13 +8,13 @@ import retrofit2.http.*
 interface ExperienceApi {
 
     @GET("/experiences/?mine=false")
-    fun exploreExperiences() : Flowable<Result<List<ExperienceMapper>>>
+    fun exploreExperiences() : Flowable<Result<PaginatedListMapper<Experience, ExperienceMapper>>>
 
     @GET("/experiences/?mine=true")
-    fun myExperiences() : Flowable<Result<List<ExperienceMapper>>>
+    fun myExperiences() : Flowable<Result<PaginatedListMapper<Experience, ExperienceMapper>>>
 
     @GET("/experiences/?saved=true")
-    fun savedExperiences() : Flowable<Result<List<ExperienceMapper>>>
+    fun savedExperiences() : Flowable<Result<PaginatedListMapper<Experience, ExperienceMapper>>>
 
     @FormUrlEncoded
     @POST("/experiences/")

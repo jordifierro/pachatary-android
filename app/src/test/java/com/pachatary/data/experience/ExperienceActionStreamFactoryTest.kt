@@ -1,6 +1,5 @@
 package com.pachatary.data.experience
 
-import com.pachatary.data.common.Event
 import com.pachatary.data.common.ResultStreamFactory
 import com.pachatary.data.common.Result
 import io.reactivex.Flowable
@@ -96,12 +95,12 @@ class ExperienceActionStreamFactoryTest {
 
         fun a_result_stream_that_return_success_not_initial_result() {
             resultFlowable = Flowable.just(
-                    Result<List<Experience>>(null, lastEvent = Event.GET_FIRSTS))
+                    Result<List<Experience>>(null, lastEvent = Result.Event.GET_FIRSTS))
         }
 
         fun a_result_stream_that_return_initial_result() {
             resultFlowable = Flowable.just(
-                    Result<List<Experience>>(null, lastEvent = Event.NONE))
+                    Result<List<Experience>>(null, lastEvent = Result.Event.NONE))
         }
 
         fun an_api_repo_that_returns_two_experiences() {
@@ -155,8 +154,8 @@ class ExperienceActionStreamFactoryTest {
 
         fun should_replace_result_with_that_two_experiences_and_last_event_get_firsts() {
             val result = replaceResultObserver.events.get(0).get(1) as Result<List<Experience>>
-            assertEquals(Result(listOf(experienceA, experienceB), lastEvent = Event.GET_FIRSTS),
-                         result)
+            assertEquals(Result(listOf(experienceA, experienceB),
+                                lastEvent = Result.Event.GET_FIRSTS), result)
         }
 
         infix fun start(func: ScenarioMaker.() -> Unit) = buildScenario().given(func)

@@ -1,26 +1,29 @@
-[
-    {
-        "id": "2",
-        "title": "Baboon, el tío",
-        "description": "jeje",
-        "picture": {
-            "small_url": "https://experiences/8c29c4735.small.jpg",
-            "medium_url": "https://experiences/8c29c4735.medium.jpg",
-            "large_url": "https://experiences/8c29c4735.large.jpg"
+{
+    "results": [
+        {
+            "id": "2",
+            "title": "Baboon, el tío",
+            "description": "jeje",
+            "picture": {
+                "small_url": "https://experiences/8c29c4735.small.jpg",
+                "medium_url": "https://experiences/8c29c4735.medium.jpg",
+                "large_url": "https://experiences/8c29c4735.large.jpg"
+            },
+            "is_mine": true,
+            "is_saved": false,
+            "author_id": "3",
+            "author_username": "usr.nm"
         },
-        "is_mine": true,
-        "is_saved": false,
-        "author_id": "3",
-        "author_username": "usr.nm"
-    },
-    {
-        "id": "3",
-        "title": "Magic Castle of Lost Swamps",
-        "description": "Don't try to go there!",
-        "picture": null,
-        "is_mine": false,
-        "is_saved": true,
-        "author_id": "4",
-        "author_username": "other.nm"
-    }
-]
+        {
+            "id": "3",
+            "title": "Magic Castle of Lost Swamps",
+            "description": "Don't try to go there!",
+            "picture": null,
+            "is_mine": false,
+            "is_saved": true,
+            "author_id": "4",
+            "author_username": "other.nm"
+        }
+    ],
+    "next_url": "https://next_url"
+}

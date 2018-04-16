@@ -1,22 +1,23 @@
 package com.pachatary.data.common
 
-enum class Event {
-    NONE, GET_FIRSTS, PAGINATE, REFRESH
-}
-
 data class Result<T>(val data: T?,
+                     val nextUrl: String? = null,
                      val lastEvent: Event = Event.NONE,
                      val inProgress: Boolean = false,
                      val error: Throwable? = null) {
+
+    enum class Event {
+        NONE, GET_FIRSTS, PAGINATE, REFRESH
+    }
 
     fun hasNotBeenInitialized() = lastEvent == Event.NONE
     fun isInProgress() = inProgress
     fun isSuccess() = !isInProgress() && error == null
     fun isError() = !isInProgress() && error != null
 
-    fun builder() = Builder(this.data, this.lastEvent, this.inProgress, this.error)
+    fun builder() = Builder(this.data, this.nextUrl, this.lastEvent, this.inProgress, this.error)
 
-    class Builder<T>(var data: T?, var lastEvent: Event,
+    class Builder<T>(var data: T?, val nextUrl: String?, var lastEvent: Event,
                      val inProgress: Boolean, val error: Throwable?) {
 
         fun data(data: T?): Builder<T> {
@@ -29,6 +30,6 @@ data class Result<T>(val data: T?,
             return this
         }
 
-        fun build() = Result(this.data, this.lastEvent, this.inProgress, this.error)
+        fun build() = Result(this.data, this.nextUrl, this.lastEvent, this.inProgress, this.error)
     }
 }

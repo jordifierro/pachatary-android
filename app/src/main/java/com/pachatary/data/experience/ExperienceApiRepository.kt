@@ -22,17 +22,17 @@ class ExperienceApiRepository (retrofit: Retrofit, @Named("io") val scheduler: S
 
     fun exploreExperiencesFlowable(): Flowable<Result<List<Experience>>> =
             experienceApi.exploreExperiences()
-                .compose(NetworkParserFactory.getListTransformer())
+                .compose(NetworkParserFactory.getPaginatedListTransformer<Experience, ExperienceMapper>())
                 .subscribeOn(scheduler)
 
     fun myExperiencesFlowable(): Flowable<Result<List<Experience>>> =
             experienceApi.myExperiences()
-                    .compose(NetworkParserFactory.getListTransformer())
+                    .compose(NetworkParserFactory.getPaginatedListTransformer<Experience, ExperienceMapper>())
                     .subscribeOn(scheduler)
 
     fun savedExperiencesFlowable(): Flowable<Result<List<Experience>>> =
             experienceApi.savedExperiences()
-                    .compose(NetworkParserFactory.getListTransformer())
+                    .compose(NetworkParserFactory.getPaginatedListTransformer<Experience, ExperienceMapper>())
                     .subscribeOn(scheduler)
 
     fun createExperience(experience: Experience): Flowable<Result<Experience>> =

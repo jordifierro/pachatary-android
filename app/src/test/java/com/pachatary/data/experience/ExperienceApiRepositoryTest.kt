@@ -26,7 +26,7 @@ class ExperienceApiRepositoryTest {
             my_experiences_are_requested()
         } then {
             request_should_get_experiences(mine = true)
-            response_should_experience_list()
+            response_should_experience_list_and_next_url()
         }
     }
 
@@ -38,7 +38,7 @@ class ExperienceApiRepositoryTest {
             explore_experiences_are_requested()
         } then {
             request_should_get_experiences()
-            response_should_experience_list()
+            response_should_experience_list_and_next_url()
         }
     }
 
@@ -50,7 +50,7 @@ class ExperienceApiRepositoryTest {
             saved_experiences_are_requested()
         } then {
             request_should_get_experiences(saved = true)
-            response_should_experience_list()
+            response_should_experience_list_and_next_url()
         }
     }
 
@@ -228,7 +228,7 @@ class ExperienceApiRepositoryTest {
             assertEquals("", request.getBody().readUtf8())
         }
 
-        fun response_should_experience_list() {
+        fun response_should_experience_list_and_next_url() {
             val result = testListSubscriber.events.get(0).get(0) as Result<*>
             val experiences = result.data as List<*>
 
@@ -252,6 +252,7 @@ class ExperienceApiRepositoryTest {
             assertNull(secondExperience.picture)
             assertEquals("other.nm", secondExperience.author_username)
 
+            assertEquals("https://next_url", result.nextUrl)
         }
 
         fun response_should_parse_experience() {
