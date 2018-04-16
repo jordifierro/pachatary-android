@@ -7,6 +7,8 @@ interface SavedView : LoaderView {
 
     fun showRetry()
     fun hideRetry()
+    fun showPaginationLoader()
+    fun hidePaginationLoader()
     fun showExperienceList(experienceList: List<Experience>)
     fun navigateToExperience(experienceId: String)
 }

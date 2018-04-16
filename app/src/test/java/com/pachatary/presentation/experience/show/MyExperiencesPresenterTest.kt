@@ -249,16 +249,18 @@ class MyExperiencesPresenterTest {
 
         lateinit var presenter: MyExperiencesPresenter
         @Mock lateinit var mockView: MyExperiencesView
-        @Mock lateinit var mockExperiencesRepository: ExperienceRepository
-        @Mock lateinit var mockAuthRepository: AuthRepository
-        lateinit var experienceA: Experience
-        lateinit var experienceB: Experience
-        lateinit var testObservable: PublishSubject<Result<List<Experience>>>
+        @Mock private lateinit var mockExperiencesRepository: ExperienceRepository
+        @Mock private lateinit var mockAuthRepository: AuthRepository
+        private lateinit var experienceA: Experience
+        private lateinit var experienceB: Experience
+        private lateinit var testObservable: PublishSubject<Result<List<Experience>>>
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
-            val testSchedulerProvider = SchedulerProvider(Schedulers.trampoline(), Schedulers.trampoline())
-            presenter = MyExperiencesPresenter(mockExperiencesRepository, mockAuthRepository, testSchedulerProvider)
+            val testSchedulerProvider =
+                    SchedulerProvider(Schedulers.trampoline(), Schedulers.trampoline())
+            presenter = MyExperiencesPresenter(mockExperiencesRepository,
+                                               mockAuthRepository, testSchedulerProvider)
             presenter.view = mockView
 
             return this
@@ -356,6 +358,7 @@ class MyExperiencesPresenterTest {
         fun should_hide_view_pagination_loader() {
             then(mockView).should().hidePaginationLoader()
         }
+
         fun should_show_view_retry() {
             then(mockView).should().showRetry()
         }

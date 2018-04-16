@@ -12,17 +12,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar
-import android.widget.TextView
 import com.pachatary.R
 import com.pachatary.data.experience.Experience
 import com.pachatary.presentation.common.PachataryApplication
 import com.pachatary.presentation.experience.edition.CreateExperienceActivity
 import com.pachatary.presentation.register.RegisterActivity
 import com.pachatary.presentation.scene.show.ExperienceMapActivity
-import com.squareup.picasso.Picasso
 import javax.inject.Inject
-import android.support.v7.widget.LinearLayoutManager
-
 
 
 class MyExperiencesFragment : Fragment(), MyExperiencesView {
@@ -126,61 +122,4 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
         startActivity(RegisterActivity.newIntent(context = activity!!.applicationContext))
     }
 
-    class ExperiencesListAdapter(private val inflater: LayoutInflater,
-                                 var experienceList: List<Experience>,
-                                 var inProgress: Boolean,
-                                 val onClick: (String) -> Unit,
-                                 val onLastItemShown: () -> Unit)
-                                                    : RecyclerView.Adapter<ExperienceViewHolder>() {
-        override fun onBindViewHolder(holder: ExperienceViewHolder, position: Int) {
-            if (inProgress && position == experienceList.size) holder.bindProgressBar()
-            else {
-                val endHasBeenReached = position == experienceList.size - 1
-                if (experienceList.size > 0 && endHasBeenReached) onLastItemShown.invoke()
-                holder.bind(experienceList[position])
-            }
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExperienceViewHolder {
-            return ExperienceViewHolder(inflater.inflate(R.layout.item_experiences_list,
-                    parent, false), onClick)
-        }
-
-        override fun getItemCount(): Int {
-            if (inProgress) return experienceList.size + 1
-            return experienceList.size
-        }
-    }
-
-    class ExperienceViewHolder(view: View, val onClick: (String) -> Unit)
-        : RecyclerView.ViewHolder(view), View.OnClickListener {
-
-        private val titleView: TextView = view.findViewById(R.id.experience_title)
-        private val pictureView: ImageView = view.findViewById(R.id.experience_picture)
-        private val progressBar: ProgressBar = view.findViewById(R.id.experience_progressbar)
-        lateinit var experienceId: String
-
-        init {
-            view.setOnClickListener(this)
-        }
-
-        fun bind(experience: Experience) {
-            titleView.visibility = View.VISIBLE
-            pictureView.visibility = View.VISIBLE
-            progressBar.visibility = View.INVISIBLE
-            this.experienceId = experience.id
-            titleView.text = experience.title
-            Picasso.with(pictureView.context)
-                    .load(experience.picture?.smallUrl)
-                    .into(pictureView)
-        }
-
-        fun bindProgressBar() {
-            titleView.visibility = View.INVISIBLE
-            pictureView.visibility = View.INVISIBLE
-            progressBar.visibility = View.VISIBLE
-        }
-
-        override fun onClick(view: View?) = this.onClick(this.experienceId)
-    }
 }

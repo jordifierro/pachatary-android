@@ -11,9 +11,10 @@ import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
 import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
-class MyExperiencesPresenter @Inject constructor(private val experiencesRepository: ExperienceRepository,
-                                                 private val authRepository: AuthRepository,
-                                                 private val schedulerProvider: SchedulerProvider) : LifecycleObserver {
+class MyExperiencesPresenter @Inject constructor(
+        private val experiencesRepository: ExperienceRepository,
+        private val authRepository: AuthRepository,
+        private val schedulerProvider: SchedulerProvider) : LifecycleObserver {
 
     lateinit var view: MyExperiencesView
 
