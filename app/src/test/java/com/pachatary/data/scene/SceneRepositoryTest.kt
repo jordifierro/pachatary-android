@@ -17,10 +17,10 @@ import org.mockito.MockitoAnnotations
 class SceneRepositoryTest {
 
     @Test
-    fun test_scenes_flowable_return_stream_flowable_connected_with_api_request() {
+    fun test_scenes_flowable_return_cache_flowable_connected_with_api_request() {
         given {
             an_experience_id()
-            an_scenes_stream_factory_that_returns_stream()
+            an_scenes_cache_factory_that_returns_cache()
             an_api_repo_that_returns_scenes_flowable_with_an_scene()
         } whenn {
             scenes_flowable_is_called_with_experience_id()
@@ -35,8 +35,8 @@ class SceneRepositoryTest {
         given {
             an_experience_id()
             a_second_experience_id()
-            an_scenes_stream_factory_that_returns_stream()
-            an_scenes_stream_factory_that_returns_another_stream_when_called_again()
+            an_scenes_cache_factory_that_returns_cache()
+            an_scenes_cache_factory_that_returns_another_cache_when_called_again()
             an_api_repo_that_returns_scenes_flowable_with_an_scene()
             an_api_repo_that_returns_scenes_flowable_with_an_scene_for_second_experience()
         } whenn {
@@ -55,7 +55,7 @@ class SceneRepositoryTest {
         given {
             an_experience_id()
             an_scene_id()
-            an_scenes_stream_factory_that_returns_stream_with_several_scenes()
+            an_scenes_cache_factory_that_returns_cache_with_several_scenes()
             an_api_repo_that_returns_scenes_flowable_with_an_scene()
         } whenn {
             scene_flowable_is_called_with_experience_and_scene_id()
@@ -69,7 +69,7 @@ class SceneRepositoryTest {
         given {
             an_experience_id()
             an_scene()
-            an_scenes_stream_factory_that_returns_stream()
+            an_scenes_cache_factory_that_returns_cache()
             an_api_repo_that_returns_scenes_flowable_with_an_scene()
             an_api_repo_that_returns_created_scene()
         } whenn {
@@ -88,7 +88,7 @@ class SceneRepositoryTest {
             an_scene_id()
             an_cropped_image_uri_string()
             an_scene()
-            an_scenes_stream_factory_that_returns_stream()
+            an_scenes_cache_factory_that_returns_cache()
             an_api_repo_that_returns_scenes_flowable_with_an_scene()
         } whenn {
             scenes_flowable_is_called_with_experience_id()
@@ -157,7 +157,7 @@ class SceneRepositoryTest {
             croppedImageUriString = "image_uri"
         }
 
-        fun an_scenes_stream_factory_that_returns_stream() {
+        fun an_scenes_cache_factory_that_returns_cache() {
             addOrUpdateObserver = TestObserver.create()
             addOrUpdateObserver.onSubscribe(addOrUpdateObserver)
             updateObserver = TestObserver.create()
@@ -168,7 +168,7 @@ class SceneRepositoryTest {
                                                         updateObserver, scenesFlowable))
         }
 
-        fun an_scenes_stream_factory_that_returns_another_stream_when_called_again() {
+        fun an_scenes_cache_factory_that_returns_another_cache_when_called_again() {
             secondAddOrUpdateObserver = TestObserver.create()
             secondAddOrUpdateObserver.onSubscribe(addOrUpdateObserver)
             secondUpdateObserver = TestObserver.create()
@@ -179,7 +179,7 @@ class SceneRepositoryTest {
                             secondAddOrUpdateObserver, secondUpdateObserver, secondScenesFlowable))
         }
 
-        fun an_scenes_stream_factory_that_returns_stream_with_several_scenes() {
+        fun an_scenes_cache_factory_that_returns_cache_with_several_scenes() {
             val sceneA = Scene(id = "1", title = "T", description = "desc",
                                latitude = 1.0, longitude = -2.3, experienceId = "3", picture = null)
             val sceneB = Scene(id = "2", title = "T", description = "desc",

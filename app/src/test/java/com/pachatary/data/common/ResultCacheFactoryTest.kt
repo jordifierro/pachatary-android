@@ -9,20 +9,20 @@ import org.junit.Test
 class ResultCacheFactoryTest {
 
     @Test
-    fun test_stream_emits_automatically_result_with_none_last_event() {
+    fun test_cache_emits_automatically_result_with_none_last_event() {
         given {
             nothing()
         } whenn {
-            a_created_stream()
+            a_created_cache()
         } then {
             this_other_observer_should_receive_initial_result()
         }
     }
 
     @Test
-    fun test_stream_caches_last_item_emitted() {
+    fun test_cache_caches_last_item_emitted() {
         given {
-            a_created_stream()
+            a_created_cache()
             a_list_of_scenes_is_emitted_through_add_list_observer()
             a_new_list_is_emitted_through_replace()
         } whenn {
@@ -35,7 +35,7 @@ class ResultCacheFactoryTest {
     @Test
     fun test_emit_through_add_or_update_a_new_scene() {
         given {
-            a_created_stream()
+            a_created_cache()
             a_list_of_scenes_is_emitted_through_add_list_observer()
         } whenn {
             new_scene_is_emitted_through_add_or_update()
@@ -47,7 +47,7 @@ class ResultCacheFactoryTest {
     @Test
     fun test_emit_through_add_or_update_an_old_scene_modified() {
         given {
-            a_created_stream()
+            a_created_cache()
             a_list_of_scenes_is_emitted_through_add_list_observer()
         } whenn {
             modified_scene_is_emitted_through_add_or_update()
@@ -59,7 +59,7 @@ class ResultCacheFactoryTest {
     @Test
     fun test_emit_through_add_list_adds_elements() {
         given {
-            a_created_stream()
+            a_created_cache()
             a_list_of_scenes_is_emitted_through_add_list_observer()
         } whenn {
             a_new_list_is_emitted_through_add_list_observer()
@@ -101,7 +101,7 @@ class ResultCacheFactoryTest {
 
         fun nothing() {}
 
-        fun a_created_stream() {
+        fun a_created_cache() {
             cache = ResultCacheFactory<Scene>().create()
             cache.resultFlowable.subscribeOn(Schedulers.trampoline()).subscribe(testSubscriber)
         }

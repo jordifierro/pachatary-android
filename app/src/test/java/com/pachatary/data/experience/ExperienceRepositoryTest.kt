@@ -111,7 +111,7 @@ class ExperienceRepositoryTest {
             save_experience_is_called()
         } then {
             should_call_api_repo_save_experience()
-            should_modify_experience_to_saved_and_update_saved_and_explore_streams()
+            should_modify_experience_to_saved_and_update_saved_and_explore_cache()
             should_subscribe_to_publisher_returned_by_api()
         }
     }
@@ -288,7 +288,7 @@ class ExperienceRepositoryTest {
             BDDMockito.then(mockApiRepository).should().saveExperience(true, experienceId)
         }
 
-        fun should_modify_experience_to_saved_and_update_saved_and_explore_streams() {
+        fun should_modify_experience_to_saved_and_update_saved_and_explore_cache() {
             BDDMockito.then(mockExperiencesRepoSwitch).should()
                     .modifyResult(ExperienceRepoSwitch.Kind.SAVED,
                                   ExperienceRepoSwitch.Modification.ADD_OR_UPDATE_LIST,

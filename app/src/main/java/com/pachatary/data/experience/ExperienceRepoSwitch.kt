@@ -6,7 +6,7 @@ import io.reactivex.Flowable
 import io.reactivex.functions.Function3
 
 class ExperienceRepoSwitch(resultCacheFactory: ResultCacheFactory<Experience>,
-                           actionStreamFactory: ExperienceActionStreamFactory) {
+                           requesterFactory: ExperienceRequesterFactory) {
 
     enum class Modification {
         ADD_OR_UPDATE_LIST, UPDATE_LIST, REPLACE_RESULT
@@ -19,10 +19,10 @@ class ExperienceRepoSwitch(resultCacheFactory: ResultCacheFactory<Experience>,
     val mineResultCache = resultCacheFactory.create()
     private val savedResultCache = resultCacheFactory.create()
     private val exploreResultCache = resultCacheFactory.create()
-    private val mineActionObserver = actionStreamFactory.create(mineResultCache, Kind.MINE)
-    private val savedActionObserver = actionStreamFactory.create(savedResultCache, Kind.SAVED)
+    private val mineActionObserver = requesterFactory.create(mineResultCache, Kind.MINE)
+    private val savedActionObserver = requesterFactory.create(savedResultCache, Kind.SAVED)
     private val exploreActionObserver =
-            actionStreamFactory.create(exploreResultCache, Kind.EXPLORE)
+            requesterFactory.create(exploreResultCache, Kind.EXPLORE)
 
     fun getResultFlowable(kind: Kind) =
             when(kind) {
@@ -53,7 +53,7 @@ class ExperienceRepoSwitch(resultCacheFactory: ResultCacheFactory<Experience>,
                         Result(datas.toList()) })
                     .map { Result(it.data?.first { it.id == experienceId }) }
 
-    fun executeAction(kind: Kind, action: ExperienceActionStreamFactory.Action) {
+    fun executeAction(kind: Kind, action: ExperienceRequesterFactory.Action) {
         when (kind) {
             Kind.MINE -> mineActionObserver.onNext(action)
             Kind.SAVED -> savedActionObserver.onNext(action)

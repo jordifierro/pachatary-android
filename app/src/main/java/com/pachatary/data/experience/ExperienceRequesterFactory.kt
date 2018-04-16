@@ -8,7 +8,7 @@ import io.reactivex.Observer
 import io.reactivex.functions.BiFunction
 import io.reactivex.subjects.PublishSubject
 
-class ExperienceActionStreamFactory(val apiRepository: ExperienceApiRepository) {
+class ExperienceRequesterFactory(val apiRepository: ExperienceApiRepository) {
 
     enum class Action {
         GET_FIRSTS, PAGINATE, REFRESH

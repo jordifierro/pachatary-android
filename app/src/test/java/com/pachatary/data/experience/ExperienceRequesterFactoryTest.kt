@@ -12,16 +12,16 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 
 
-class ExperienceActionStreamFactoryTest {
+class ExperienceRequesterFactoryTest {
 
     @Test
     fun test_get_firsts_does_nothing_when_result_loading() {
         for (kind in ExperienceRepoSwitch.Kind.values()) {
             given {
                 a_kind(kind)
-                a_result_stream_that_return_loading_result()
+                a_result_cache_that_return_loading_result()
             } whenn {
-                create_action_stream()
+                create_requester()
                 emit_get_firsts()
             } then {
                 should_do_nothing()
@@ -34,9 +34,9 @@ class ExperienceActionStreamFactoryTest {
         for (kind in ExperienceRepoSwitch.Kind.values()) {
             given {
                 a_kind(kind)
-                a_result_stream_that_return_success_not_initial_result()
+                a_result_cache_that_return_success_not_initial_result()
             } whenn {
-                create_action_stream()
+                create_requester()
                 emit_get_firsts()
             } then {
                 should_do_nothing()
@@ -49,13 +49,13 @@ class ExperienceActionStreamFactoryTest {
         for (kind in ExperienceRepoSwitch.Kind.values()) {
             given {
                 a_kind(kind)
-                a_result_stream_that_return_initial_result()
+                a_result_cache_that_return_initial_result()
                 an_api_repo_that_returns_two_experiences()
             } whenn {
-                create_action_stream()
+                create_requester()
                 emit_get_firsts()
             } then {
-                should_emit_loading_through_replace_result_stream()
+                should_emit_loading_through_replace_result_cache()
                 should_call_api()
                 should_replace_result_with_that_two_experiences_and_last_event_get_firsts()
             }
@@ -67,8 +67,8 @@ class ExperienceActionStreamFactoryTest {
     @Suppress("UNCHECKED_CAST")
     class ScenarioMaker {
         @Mock lateinit var mockApiRepository: ExperienceApiRepository
-        lateinit var actionStreamFactory: ExperienceActionStreamFactory
-        lateinit var actionStreamObserver: Observer<ExperienceActionStreamFactory.Action>
+        lateinit var requesterFactory: ExperienceRequesterFactory
+        lateinit var requesterObserver: Observer<ExperienceRequesterFactory.Action>
         var kind = ExperienceRepoSwitch.Kind.MINE
         lateinit var resultCache: ResultCacheFactory.ResultCache<Experience>
         lateinit var resultFlowable: Flowable<Result<List<Experience>>>
@@ -80,7 +80,7 @@ class ExperienceActionStreamFactoryTest {
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
-            actionStreamFactory = ExperienceActionStreamFactory(mockApiRepository)
+            requesterFactory = ExperienceRequesterFactory(mockApiRepository)
 
             return this
         }
@@ -89,16 +89,16 @@ class ExperienceActionStreamFactoryTest {
             this.kind = kind
         }
 
-        fun a_result_stream_that_return_loading_result() {
+        fun a_result_cache_that_return_loading_result() {
             resultFlowable = Flowable.just(Result<List<Experience>>(null, inProgress = true))
         }
 
-        fun a_result_stream_that_return_success_not_initial_result() {
+        fun a_result_cache_that_return_success_not_initial_result() {
             resultFlowable = Flowable.just(
                     Result<List<Experience>>(null, lastEvent = Result.Event.GET_FIRSTS))
         }
 
-        fun a_result_stream_that_return_initial_result() {
+        fun a_result_cache_that_return_initial_result() {
             resultFlowable = Flowable.just(
                     Result<List<Experience>>(null, lastEvent = Result.Event.NONE))
         }
@@ -119,14 +119,14 @@ class ExperienceActionStreamFactoryTest {
             }
         }
 
-        fun create_action_stream() {
+        fun create_requester() {
             resultCache = ResultCacheFactory.ResultCache(replaceResultObserver,
                     addOrUpdateObserver, updateObserver, resultFlowable)
-            actionStreamObserver = actionStreamFactory.create(resultCache, kind)
+            requesterObserver = requesterFactory.create(resultCache, kind)
         }
 
         fun emit_get_firsts() {
-            actionStreamObserver.onNext(ExperienceActionStreamFactory.Action.GET_FIRSTS)
+            requesterObserver.onNext(ExperienceRequesterFactory.Action.GET_FIRSTS)
         }
 
         fun should_do_nothing() {
@@ -136,7 +136,7 @@ class ExperienceActionStreamFactoryTest {
             BDDMockito.then(mockApiRepository).shouldHaveZeroInteractions()
         }
 
-        fun should_emit_loading_through_replace_result_stream() {
+        fun should_emit_loading_through_replace_result_cache() {
             val result = replaceResultObserver.events.get(0).get(0) as Result<List<Experience>>
             assertEquals(Result(listOf<Experience>(), inProgress = true), result)
         }

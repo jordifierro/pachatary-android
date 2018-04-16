@@ -78,7 +78,7 @@ class ExperienceRepoSwitchTest {
     }
 
     @Test
-    fun test_get_experience_flowable_joins_three_stream_and_filters_experience_by_id() {
+    fun test_get_experience_flowable_joins_three_caches_and_filters_experience_by_id() {
         given {
             an_experience_id()
             an_experience_with_that_id()
@@ -94,7 +94,7 @@ class ExperienceRepoSwitchTest {
     @Test
     fun test_execute_action_emits_through_appropiate_observer() {
         for (kind in ExperienceRepoSwitch.Kind.values()) {
-            for(action in ExperienceActionStreamFactory.Action.values()) {
+            for(action in ExperienceRequesterFactory.Action.values()) {
                 given {
                     a_kind(kind)
                     an_action(action)
@@ -113,36 +113,36 @@ class ExperienceRepoSwitchTest {
     @Suppress("UNCHECKED_CAST")
     class ScenarioMaker {
         @Mock lateinit var resultCacheFactory: ResultCacheFactory<Experience>
-        @Mock lateinit var actionStreamFactory: ExperienceActionStreamFactory
+        @Mock lateinit var requesterFactory: ExperienceRequesterFactory
         lateinit var switch: ExperienceRepoSwitch
 
         val addOrUpdateMineObserver = TestObserver.create<List<Experience>>()
         val updateMineObserver = TestObserver.create<List<Experience>>()
         val replaceResultMineObserver = TestObserver.create<Result<List<Experience>>>()
         var resultMineFlowable = Flowable.empty<Result<List<Experience>>>()
-        var resultMineStream = ResultCacheFactory.ResultCache(replaceResultMineObserver,
+        var resultMineCache = ResultCacheFactory.ResultCache(replaceResultMineObserver,
                 addOrUpdateMineObserver, updateMineObserver, resultMineFlowable)
 
         val addOrUpdateSavedObserver = TestObserver.create<List<Experience>>()
         val updateSavedObserver = TestObserver.create<List<Experience>>()
         val replaceResultSavedObserver = TestObserver.create<Result<List<Experience>>>()
         var resultSavedFlowable = Flowable.empty<Result<List<Experience>>>()
-        var resultSavedStream = ResultCacheFactory.ResultCache(replaceResultSavedObserver,
+        var resultSavedCache = ResultCacheFactory.ResultCache(replaceResultSavedObserver,
                 addOrUpdateSavedObserver, updateSavedObserver, resultSavedFlowable)
 
         val addOrUpdateExploreObserver = TestObserver.create<List<Experience>>()
         val updateExploreObserver = TestObserver.create<List<Experience>>()
         val replaceResultExploreObserver = TestObserver.create<Result<List<Experience>>>()
         var resultExploreFlowable = Flowable.empty<Result<List<Experience>>>()
-        var resultExploreStream = ResultCacheFactory.ResultCache(replaceResultExploreObserver,
+        var resultExploreCache = ResultCacheFactory.ResultCache(replaceResultExploreObserver,
                 addOrUpdateExploreObserver, updateExploreObserver, resultExploreFlowable)
 
-        val testMineActionObserver = TestObserver.create<ExperienceActionStreamFactory.Action>()
-        val testSavedActionObserver = TestObserver.create<ExperienceActionStreamFactory.Action>()
-        val testExploreActionObserver = TestObserver.create<ExperienceActionStreamFactory.Action>()
+        val testMineActionObserver = TestObserver.create<ExperienceRequesterFactory.Action>()
+        val testSavedActionObserver = TestObserver.create<ExperienceRequesterFactory.Action>()
+        val testExploreActionObserver = TestObserver.create<ExperienceRequesterFactory.Action>()
 
         var kind = ExperienceRepoSwitch.Kind.MINE
-        var action = ExperienceActionStreamFactory.Action.GET_FIRSTS
+        var action = ExperienceRequesterFactory.Action.GET_FIRSTS
         lateinit var resultFlowable: Flowable<Result<List<Experience>>>
         lateinit var experienceList: List<Experience>
         var experiencesResult: Result<List<Experience>>? = null
@@ -157,27 +157,27 @@ class ExperienceRepoSwitchTest {
         }
 
         fun initialize_switch() {
-            resultMineStream = ResultCacheFactory.ResultCache(replaceResultMineObserver,
+            resultMineCache = ResultCacheFactory.ResultCache(replaceResultMineObserver,
                     addOrUpdateMineObserver, updateMineObserver, resultMineFlowable)
-            resultSavedStream = ResultCacheFactory.ResultCache(replaceResultSavedObserver,
+            resultSavedCache = ResultCacheFactory.ResultCache(replaceResultSavedObserver,
                     addOrUpdateSavedObserver, updateSavedObserver, resultSavedFlowable)
-            resultExploreStream = ResultCacheFactory.ResultCache(replaceResultExploreObserver,
+            resultExploreCache = ResultCacheFactory.ResultCache(replaceResultExploreObserver,
                     addOrUpdateExploreObserver, updateExploreObserver, resultExploreFlowable)
             BDDMockito.given(resultCacheFactory.create())
-                    .willReturn(resultMineStream)
-                    .willReturn(resultSavedStream)
-                    .willReturn(resultExploreStream)
+                    .willReturn(resultMineCache)
+                    .willReturn(resultSavedCache)
+                    .willReturn(resultExploreCache)
             BDDMockito.given(
-                    actionStreamFactory.create(resultMineStream, ExperienceRepoSwitch.Kind.MINE))
+                    requesterFactory.create(resultMineCache, ExperienceRepoSwitch.Kind.MINE))
                     .willReturn(testMineActionObserver)
             BDDMockito.given(
-                    actionStreamFactory.create(resultSavedStream, ExperienceRepoSwitch.Kind.SAVED))
+                    requesterFactory.create(resultSavedCache, ExperienceRepoSwitch.Kind.SAVED))
                     .willReturn(testSavedActionObserver)
-            BDDMockito.given(actionStreamFactory.create(resultExploreStream,
+            BDDMockito.given(requesterFactory.create(resultExploreCache,
                     ExperienceRepoSwitch.Kind.EXPLORE))
                     .willReturn(testExploreActionObserver)
 
-            switch = ExperienceRepoSwitch(resultCacheFactory, actionStreamFactory)
+            switch = ExperienceRepoSwitch(resultCacheFactory, requesterFactory)
         }
 
         fun an_experience_id() {
@@ -202,7 +202,7 @@ class ExperienceRepoSwitchTest {
             this.kind = kind
         }
 
-        fun an_action(action: ExperienceActionStreamFactory.Action) {
+        fun an_action(action: ExperienceRequesterFactory.Action) {
             this.action = action
         }
 

@@ -69,14 +69,14 @@ class DataModule {
 
     @Provides
     @Singleton
-    fun provideActionStreamFactory(apiRepository: ExperienceApiRepository) =
-            ExperienceActionStreamFactory(apiRepository)
+    fun provideExperienceRequesterFactory(apiRepository: ExperienceApiRepository) =
+            ExperienceRequesterFactory(apiRepository)
 
     @Provides
     @Singleton
     fun provideExperienceRepoSwitch(experienceCacheFactory: ResultCacheFactory<Experience>,
-                                    actionStreamFactory: ExperienceActionStreamFactory) =
-            ExperienceRepoSwitch(experienceCacheFactory, actionStreamFactory)
+                                    requesterFactory: ExperienceRequesterFactory) =
+            ExperienceRepoSwitch(experienceCacheFactory, requesterFactory)
 
     @Provides
     @Singleton
