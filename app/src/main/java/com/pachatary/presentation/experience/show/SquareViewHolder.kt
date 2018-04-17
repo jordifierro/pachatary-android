@@ -9,7 +9,7 @@ import com.pachatary.R
 import com.pachatary.data.experience.Experience
 import com.squareup.picasso.Picasso
 
-class ExperienceViewHolder(view: View, val onClick: (String) -> Unit)
+class SquareViewHolder(view: View, val onClick: (String) -> Unit)
     : RecyclerView.ViewHolder(view), View.OnClickListener {
 
     private val titleView: TextView = view.findViewById(R.id.experience_title)
@@ -17,9 +17,7 @@ class ExperienceViewHolder(view: View, val onClick: (String) -> Unit)
     private val progressBar: ProgressBar = view.findViewById(R.id.experience_progressbar)
     lateinit var experienceId: String
 
-    init {
-        view.setOnClickListener(this)
-    }
+    init { view.setOnClickListener(this) }
 
     fun bind(experience: Experience) {
         titleView.visibility = View.VISIBLE

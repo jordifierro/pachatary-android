@@ -62,6 +62,89 @@ class ExperienceRequesterFactoryTest {
         }
     }
 
+    @Test
+    fun test_paginate_does_nothing_if_not_there_are_more_elements() {
+        for (kind in ExperienceRepoSwitch.Kind.values()) {
+            given {
+                a_kind(kind)
+                a_result_cache_that_return_result_that_has_no_more_elements()
+            } whenn {
+                create_requester()
+                paginate()
+            } then {
+                should_do_nothing()
+            }
+        }
+    }
+
+    @Test
+    fun test_paginate_does_nothing_if_in_progress() {
+        for (kind in ExperienceRepoSwitch.Kind.values()) {
+            given {
+                a_kind(kind)
+                a_result_cache_that_return_loading_result()
+            } whenn {
+                create_requester()
+                paginate()
+            } then {
+                should_do_nothing()
+            }
+        }
+    }
+
+    @Test
+    fun test_paginate_does_nothing_if_error_getting_firsts() {
+        for (kind in ExperienceRepoSwitch.Kind.values()) {
+            given {
+                a_kind(kind)
+                a_result_cache_that_return_error_getting_firsts()
+            } whenn {
+                create_requester()
+                paginate()
+            } then {
+                should_do_nothing()
+            }
+        }
+    }
+
+    @Test
+    fun test_paginate_emits_in_progress_and_calls_next_url_when_initialized_and_success() {
+        for (kind in ExperienceRepoSwitch.Kind.values()) {
+            given {
+                a_kind(kind)
+                a_next_url()
+                an_api_repo_that_returns_two_experiences_for_that_url_pagination()
+                a_result_cache_that_return_success_last_event_get_firsts_with_next_url()
+            } whenn {
+                create_requester()
+                paginate()
+            } then {
+                should_emit_loading_through_replace_result_cache_with_last_event_paginate()
+                should_call_api_paginate_with_next_url()
+                should_replace_result_with_that_two_experiences_and_last_event_paginate()
+            }
+        }
+    }
+
+    @Test
+    fun test_paginate_emits_in_progress_and_calls_next_url_after_pagination_error() {
+        for (kind in ExperienceRepoSwitch.Kind.values()) {
+            given {
+                a_kind(kind)
+                a_next_url()
+                an_api_repo_that_returns_two_experiences_for_that_url_pagination()
+                a_result_cache_that_return_error_after_pagination_with_next_url()
+            } whenn {
+                create_requester()
+                paginate()
+            } then {
+                should_emit_loading_through_replace_result_cache_with_last_event_paginate()
+                should_call_api_paginate_with_next_url()
+                should_replace_result_with_that_two_experiences_and_last_event_paginate()
+            }
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().start(func)
 
     @Suppress("UNCHECKED_CAST")
@@ -77,6 +160,7 @@ class ExperienceRequesterFactoryTest {
         val replaceResultObserver = TestObserver.create<Result<List<Experience>>>()
         lateinit var experienceA: Experience
         lateinit var experienceB: Experience
+        var nextUrl = ""
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
@@ -87,6 +171,10 @@ class ExperienceRequesterFactoryTest {
 
         fun a_kind(kind: ExperienceRepoSwitch.Kind) {
             this.kind = kind
+        }
+
+        fun a_next_url() {
+            this.nextUrl = "next-url"
         }
 
         fun a_result_cache_that_return_loading_result() {
@@ -101,6 +189,11 @@ class ExperienceRequesterFactoryTest {
         fun a_result_cache_that_return_initial_result() {
             resultFlowable = Flowable.just(
                     Result<List<Experience>>(null, lastEvent = Result.Event.NONE))
+        }
+
+        fun a_result_cache_that_return_error_after_pagination_with_next_url() {
+            resultFlowable = Flowable.just( Result(listOf(), lastEvent = Result.Event.PAGINATE,
+                                                   error = Exception(), nextUrl = nextUrl))
         }
 
         fun an_api_repo_that_returns_two_experiences() {
@@ -119,6 +212,27 @@ class ExperienceRequesterFactoryTest {
             }
         }
 
+        fun an_api_repo_that_returns_two_experiences_for_that_url_pagination() {
+            experienceA = Experience("1", "t", "d", null, true, true, "a")
+            experienceB = Experience("2", "t", "d", null, true, true, "b")
+            BDDMockito.given(mockApiRepository.paginateExperiences(nextUrl))
+                    .willReturn(Flowable.just(Result(listOf(experienceA, experienceB))))
+        }
+
+        fun a_result_cache_that_return_result_that_has_no_more_elements() {
+            resultFlowable = Flowable.just(Result(listOf(), nextUrl = null))
+        }
+
+        fun a_result_cache_that_return_error_getting_firsts() {
+            resultFlowable = Flowable.just(Result(listOf(), error = Exception(),
+                                                  lastEvent = Result.Event.GET_FIRSTS))
+        }
+
+        fun a_result_cache_that_return_success_last_event_get_firsts_with_next_url() {
+            resultFlowable = Flowable.just(
+                    Result(listOf(), lastEvent = Result.Event.GET_FIRSTS, nextUrl = nextUrl))
+        }
+
         fun create_requester() {
             resultCache = ResultCacheFactory.ResultCache(replaceResultObserver,
                     addOrUpdateObserver, updateObserver, resultFlowable)
@@ -127,6 +241,10 @@ class ExperienceRequesterFactoryTest {
 
         fun emit_get_firsts() {
             requesterObserver.onNext(ExperienceRequesterFactory.Action.GET_FIRSTS)
+        }
+
+        fun paginate() {
+            requesterObserver.onNext(ExperienceRequesterFactory.Action.PAGINATE)
         }
 
         fun should_do_nothing() {
@@ -138,7 +256,15 @@ class ExperienceRequesterFactoryTest {
 
         fun should_emit_loading_through_replace_result_cache() {
             val result = replaceResultObserver.events.get(0).get(0) as Result<List<Experience>>
-            assertEquals(Result(listOf<Experience>(), inProgress = true), result)
+            assertEquals(Result(listOf<Experience>(), inProgress = true,
+                                lastEvent = Result.Event.GET_FIRSTS), result)
+        }
+
+        fun should_emit_loading_through_replace_result_cache_with_last_event_paginate() {
+            val result = replaceResultObserver.events.get(0).get(0) as Result<List<Experience>>
+            assertEquals(Result(listOf<Experience>(), inProgress = true,
+                    lastEvent = Result.Event.PAGINATE, nextUrl = nextUrl),
+                    result)
         }
 
         fun should_call_api() {
@@ -152,10 +278,20 @@ class ExperienceRequesterFactoryTest {
             }
         }
 
+        fun should_call_api_paginate_with_next_url() {
+            BDDMockito.then(mockApiRepository).should().paginateExperiences(nextUrl)
+        }
+
         fun should_replace_result_with_that_two_experiences_and_last_event_get_firsts() {
             val result = replaceResultObserver.events.get(0).get(1) as Result<List<Experience>>
             assertEquals(Result(listOf(experienceA, experienceB),
                                 lastEvent = Result.Event.GET_FIRSTS), result)
+        }
+
+        fun should_replace_result_with_that_two_experiences_and_last_event_paginate() {
+            val result = replaceResultObserver.events.get(0).get(1) as Result<List<Experience>>
+            assertEquals(Result(listOf(experienceA, experienceB),
+                    lastEvent = Result.Event.PAGINATE), result)
         }
 
         infix fun start(func: ScenarioMaker.() -> Unit) = buildScenario().given(func)

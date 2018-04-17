@@ -19,7 +19,7 @@ data class Result<T>(val data: T?,
     fun builder() = Builder(this.data, this.nextUrl, this.lastEvent, this.inProgress, this.error)
 
     class Builder<T>(var data: T?, val nextUrl: String?, var lastEvent: Event,
-                     var inProgress: Boolean, val error: Throwable?) {
+                     var inProgress: Boolean, var error: Throwable?) {
 
         fun data(data: T?): Builder<T> {
             this.data = data
@@ -33,6 +33,11 @@ data class Result<T>(val data: T?,
 
         fun inProgress(progress: Boolean): Builder<T> {
             this.inProgress = progress
+            return this
+        }
+
+        fun error(error: Throwable?): Builder<T> {
+            this.error = error
             return this
         }
 

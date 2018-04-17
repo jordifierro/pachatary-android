@@ -44,7 +44,7 @@ class SavedFragment : Fragment(), SavedView {
         retryIcon.setOnClickListener { presenter.onRetryClick() }
         recyclerView = view.findViewById(R.id.experiences_recyclerview)
         recyclerView.layoutManager = GridLayoutManager(activity, 2)
-        recyclerView.adapter = ExperiencesListAdapter(layoutInflater, listOf(), false,
+        recyclerView.adapter = SquareListAdapter(layoutInflater, listOf(), false,
                 { id -> presenter.onExperienceClick(id) }, { presenter.lastExperienceShown() })
 
         presenter.create()
@@ -69,17 +69,17 @@ class SavedFragment : Fragment(), SavedView {
     }
 
     override fun showPaginationLoader() {
-        (recyclerView.adapter as ExperiencesListAdapter).inProgress = true
+        (recyclerView.adapter as SquareListAdapter).inProgress = true
         recyclerView.adapter.notifyDataSetChanged()
     }
 
     override fun hidePaginationLoader() {
-        (recyclerView.adapter as ExperiencesListAdapter).inProgress = false
+        (recyclerView.adapter as SquareListAdapter).inProgress = false
         recyclerView.adapter.notifyDataSetChanged()
     }
 
     override fun showExperienceList(experienceList: List<Experience>) {
-        (recyclerView.adapter as ExperiencesListAdapter).experienceList = experienceList
+        (recyclerView.adapter as SquareListAdapter).experienceList = experienceList
         recyclerView.adapter.notifyDataSetChanged()
     }
 

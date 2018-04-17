@@ -78,6 +78,7 @@ class SavedPresenterTest {
             create_presenter()
         } then {
             should_hide_view_loader()
+            should_hide_view_pagination_loader()
             should_show_view_retry()
         }
     }
@@ -127,6 +128,17 @@ class SavedPresenterTest {
             destroy_presenter()
         } then {
             should_unsubscribe_observable()
+        }
+    }
+
+    @Test
+    fun test_last_experience_shown_calls_repo_get_more_with_saved_kind() {
+        given {
+            nothing()
+        } whenn {
+            last_experience_shown()
+        } then {
+            should_call_repo_get_more_experiences()
         }
     }
 
@@ -245,6 +257,10 @@ class SavedPresenterTest {
 
         fun should_unsubscribe_observable() {
             assertFalse(testObservable.hasObservers())
+        }
+
+        fun should_call_repo_get_more_experiences() {
+            then(mockRepository).should().getMoreExperiences(ExperienceRepoSwitch.Kind.SAVED)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

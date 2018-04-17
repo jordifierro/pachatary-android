@@ -29,7 +29,7 @@ class SavedPresenter @Inject constructor(private val repository: ExperienceRepos
     }
 
     fun lastExperienceShown() {
-        repository.getMoreExperiences(ExperienceRepoSwitch.Kind.MINE)
+        repository.getMoreExperiences(ExperienceRepoSwitch.Kind.SAVED)
     }
 
     private fun connectToExperiences() {

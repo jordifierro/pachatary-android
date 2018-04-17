@@ -53,7 +53,7 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
         recyclerView.layoutManager = GridLayoutManager(activity, 2)
         createExperienceButton = view.findViewById(R.id.create_new_experience_button)
         createExperienceButton.setOnClickListener { presenter.onCreateExperienceClick() }
-        recyclerView.adapter = ExperiencesListAdapter(layoutInflater, listOf(), false,
+        recyclerView.adapter = SquareListAdapter(layoutInflater, listOf(), false,
                 { id -> presenter.onExperienceClick(id) }, { presenter.lastExperienceShown() })
 
         presenter.create()
@@ -83,17 +83,17 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
     }
 
     override fun showPaginationLoader() {
-        (recyclerView.adapter as ExperiencesListAdapter).inProgress = true
+        (recyclerView.adapter as SquareListAdapter).inProgress = true
         recyclerView.adapter.notifyDataSetChanged()
     }
 
     override fun hidePaginationLoader() {
-        (recyclerView.adapter as ExperiencesListAdapter).inProgress = false
+        (recyclerView.adapter as SquareListAdapter).inProgress = false
         recyclerView.adapter.notifyDataSetChanged()
     }
 
     override fun showExperienceList(experienceList: List<Experience>) {
-        (recyclerView.adapter as ExperiencesListAdapter).experienceList = experienceList
+        (recyclerView.adapter as SquareListAdapter).experienceList = experienceList
         recyclerView.adapter.notifyDataSetChanged()
     }
 

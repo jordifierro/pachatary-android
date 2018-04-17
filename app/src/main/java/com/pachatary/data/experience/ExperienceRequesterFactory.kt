@@ -26,8 +26,8 @@ class ExperienceRequesterFactory(val apiRepository: ExperienceApiRepository) {
                     if (it.first == Action.GET_FIRSTS) {
                         if (!it.second.isInProgress() &&
                                 (!it.second.hasBeenInitialized() || it.second.isError())) {
-                            resultCache.replaceResultObserver.onNext(
-                                    Result(listOf(), inProgress = true))
+                            resultCache.replaceResultObserver.onNext(Result(listOf(),
+                                    inProgress = true, lastEvent = Result.Event.GET_FIRSTS))
                             apiCallFlowable(apiRepository, kind).subscribe({ apiResult ->
                                 resultCache.replaceResultObserver.onNext(
                                     apiResult.builder().lastEvent(Result.Event.GET_FIRSTS).build())
@@ -36,10 +36,15 @@ class ExperienceRequesterFactory(val apiRepository: ExperienceApiRepository) {
                     }
                     else if (it.first == Action.PAGINATE) {
                         if (!it.second.isInProgress() &&
-                                (it.second.isSuccess() && it.second.hasBeenInitialized()) &&
+                                (it.second.isSuccess() && it.second.hasBeenInitialized() ||
+                            it.second.isError() && it.second.lastEvent == Result.Event.PAGINATE) &&
                                 it.second.hasMoreElements()) {
                             resultCache.replaceResultObserver.onNext(
-                                    it.second.builder().inProgress(true).lastEvent(Result.Event.PAGINATE).build())
+                                    it.second.builder()
+                                                .inProgress(true)
+                                                .lastEvent(Result.Event.PAGINATE)
+                                                .error(null)
+                                            .build())
                             apiRepository.paginateExperiences(it.second.nextUrl!!).subscribe({ apiResult ->
                                 val allExperiences = it.second.data!!.union(apiResult.data!!).toList()
                                 resultCache.replaceResultObserver.onNext(

@@ -9,12 +9,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar
-import android.widget.TextView
 import com.pachatary.R
 import com.pachatary.data.experience.Experience
 import com.pachatary.presentation.common.PachataryApplication
 import com.pachatary.presentation.scene.show.ExperienceMapActivity
-import com.squareup.picasso.Picasso
 import javax.inject.Inject
 
 class ExploreFragment : Fragment(), ExploreView {
@@ -46,8 +44,8 @@ class ExploreFragment : Fragment(), ExploreView {
         retryIcon.setOnClickListener { presenter.onRetryClick() }
         recyclerView = view.findViewById(R.id.experiences_recyclerview)
         recyclerView.layoutManager = GridLayoutManager(activity, 1)
-        recyclerView.adapter = ExperiencesListAdapter(layoutInflater, listOf(),
-                { id -> presenter.onExperienceClick(id) })
+        recyclerView.adapter = ExtendedListAdapter(layoutInflater, listOf(), false,
+                { id -> presenter.onExperienceClick(id) }, { presenter.lastExperienceShown() })
 
         presenter.create()
         return view
@@ -69,8 +67,18 @@ class ExploreFragment : Fragment(), ExploreView {
         retryIcon.visibility = View.GONE
     }
 
+    override fun showPaginationLoader() {
+        (recyclerView.adapter as ExtendedListAdapter).inProgress = true
+        recyclerView.adapter.notifyDataSetChanged()
+    }
+
+    override fun hidePaginationLoader() {
+        (recyclerView.adapter as ExtendedListAdapter).inProgress = false
+        recyclerView.adapter.notifyDataSetChanged()
+    }
+
     override fun showExperienceList(experienceList: List<Experience>) {
-        (recyclerView.adapter as ExperiencesListAdapter).experienceList = experienceList
+        (recyclerView.adapter as ExtendedListAdapter).experienceList = experienceList
         recyclerView.adapter.notifyDataSetChanged()
     }
 
@@ -78,46 +86,4 @@ class ExploreFragment : Fragment(), ExploreView {
         startActivity(ExperienceMapActivity.newIntent(activity!!.applicationContext, experienceId))
     }
 
-    class ExperiencesListAdapter(private val inflater: LayoutInflater,
-                                 var experienceList: List<Experience>,
-                                 val onClick: (String) -> Unit)
-                                                    : RecyclerView.Adapter<ExperienceViewHolder>() {
-
-        override fun onBindViewHolder(holder: ExperienceViewHolder, position: Int) {
-            holder.bind(experienceList[position])
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExperienceViewHolder {
-            return ExperienceViewHolder(inflater.inflate(R.layout.item_full_experiences_list,
-                    parent, false), onClick)
-        }
-
-        override fun getItemCount(): Int = experienceList.size
-    }
-
-    class ExperienceViewHolder(view: View, val onClick: (String) -> Unit)
-        : RecyclerView.ViewHolder(view), View.OnClickListener {
-
-        private val titleView: TextView = view.findViewById(R.id.experience_title)
-        private val authorView: TextView = view.findViewById(R.id.experience_author)
-        private val descriptionView: TextView = view.findViewById(R.id.experience_description)
-        private val pictureView: ImageView = view.findViewById(R.id.experience_picture)
-        lateinit var experienceId: String
-
-        init {
-            view.setOnClickListener(this)
-        }
-
-        fun bind(experience: Experience) {
-            this.experienceId = experience.id
-            titleView.text = experience.title
-            authorView.text = "by " + experience.author_username
-            descriptionView.text = experience.description
-            Picasso.with(pictureView.context)
-                    .load(experience.picture?.mediumUrl)
-                    .into(pictureView)
-        }
-
-        override fun onClick(view: View?) = this.onClick(this.experienceId)
-    }
 }

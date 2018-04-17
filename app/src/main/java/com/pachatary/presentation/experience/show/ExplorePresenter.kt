@@ -1,6 +1,7 @@
 package com.pachatary.presentation.experience.show
 
 import android.arch.lifecycle.LifecycleObserver
+import com.pachatary.data.common.Result
 import com.pachatary.data.experience.ExperienceRepoSwitch
 import com.pachatary.data.experience.ExperienceRepository
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
@@ -26,19 +27,38 @@ class ExplorePresenter @Inject constructor(private val repository: ExperienceRep
         view.navigateToExperience(experienceId)
     }
 
+    fun lastExperienceShown() {
+        repository.getMoreExperiences(ExperienceRepoSwitch.Kind.EXPLORE)
+    }
+
     private fun connectToExperiences() {
         experiencesDisposable = repository.experiencesFlowable(ExperienceRepoSwitch.Kind.EXPLORE)
                                           .subscribeOn(schedulerProvider.subscriber())
                                           .observeOn(schedulerProvider.observer())
-                                          .subscribe({  if (it.isInProgress()) view.showLoader()
-                                                        else view.hideLoader()
+                                          .subscribe({
+                                              if (it.isInProgress()) {
+                                                  if (it.lastEvent == Result.Event.GET_FIRSTS) {
+                                                      view.showLoader()
+                                                      view.hidePaginationLoader()
+                                                  }
+                                                  else if (it.lastEvent == Result.Event.PAGINATE) {
+                                                      view.hideLoader()
+                                                      view.showPaginationLoader()
+                                                  }
+                                              }
+                                              else {
+                                                  view.hideLoader()
+                                                  view.hidePaginationLoader()
+                                              }
 
-                                                        if (it.isError()) view.showRetry()
-                                                        else view.hideRetry()
+                                              if (it.isError() &&
+                                                      it.lastEvent == Result.Event.GET_FIRSTS)
+                                                  view.showRetry()
+                                              else view.hideRetry()
 
-                                                        if (it.isSuccess())
-                                                            view.showExperienceList(it.data!!)
-                                                      })
+                                              if (it.isSuccess())
+                                                  view.showExperienceList(it.data!!)
+                                          })
         repository.getFirstExperiences(ExperienceRepoSwitch.Kind.EXPLORE)
     }
 

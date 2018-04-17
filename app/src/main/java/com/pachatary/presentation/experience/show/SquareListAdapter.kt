@@ -6,13 +6,14 @@ import android.view.ViewGroup
 import com.pachatary.R
 import com.pachatary.data.experience.Experience
 
-class ExperiencesListAdapter(private val inflater: LayoutInflater,
-                             var experienceList: List<Experience>,
-                             var inProgress: Boolean,
-                             val onClick: (String) -> Unit,
-                             private val onLastItemShown: () -> Unit)
-                                                : RecyclerView.Adapter<ExperienceViewHolder>() {
-    override fun onBindViewHolder(holder: ExperienceViewHolder, position: Int) {
+class SquareListAdapter(private val inflater: LayoutInflater,
+                        var experienceList: List<Experience>,
+                        var inProgress: Boolean,
+                        val onClick: (String) -> Unit,
+                        private val onLastItemShown: () -> Unit)
+                                                : RecyclerView.Adapter<SquareViewHolder>() {
+
+    override fun onBindViewHolder(holder: SquareViewHolder, position: Int) {
         if (inProgress && position == experienceList.size) holder.bindProgressBar()
         else {
             val endHasBeenReached = position == experienceList.size - 1
@@ -21,8 +22,8 @@ class ExperiencesListAdapter(private val inflater: LayoutInflater,
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExperienceViewHolder {
-        return ExperienceViewHolder(inflater.inflate(R.layout.item_experiences_list,
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SquareViewHolder {
+        return SquareViewHolder(inflater.inflate(R.layout.item_square_experiences_list,
                 parent, false), onClick)
     }
 

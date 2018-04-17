@@ -21,7 +21,7 @@ class ExplorePresenterTest {
     @Test
     fun test_create_asks_firsts_experiences() {
         given {
-            an_experience_repo_that_returns_in_progress()
+            an_experience_repo_that_returns_in_progress(Result.Event.GET_FIRSTS)
         } whenn {
             create_presenter()
         } then {
@@ -30,13 +30,28 @@ class ExplorePresenterTest {
     }
 
     @Test
-    fun test_when_result_in_progress_shows_loader() {
+    fun test_when_result_in_progress_last_event_get_firsts_shows_loader() {
         given {
-            an_experience_repo_that_returns_in_progress()
+            an_experience_repo_that_returns_in_progress(lastEvent = Result.Event.GET_FIRSTS)
         } whenn {
             create_presenter()
         } then {
             should_show_view_loader()
+            should_hide_view_pagination_loader()
+            should_hide_view_retry()
+        }
+    }
+
+
+    @Test
+    fun test_when_result_in_progress_last_event_pagination_shows_pagination_loader() {
+        given {
+            an_experience_repo_that_returns_in_progress(lastEvent = Result.Event.PAGINATE)
+        } whenn {
+            create_presenter()
+        } then {
+            should_hide_view_loader()
+            should_show_view_pagination_loader()
             should_hide_view_retry()
         }
     }
@@ -52,20 +67,36 @@ class ExplorePresenterTest {
         } then {
             should_hide_view_loader()
             should_hide_view_retry()
+            should_hide_view_pagination_loader()
             should_show_received_experiences()
         }
 
     }
 
+
     @Test
-    fun test_create_when_response_error_shows_retry() {
+    fun test_create_when_response_error_shows_retry_if_last_event_get_firsts() {
         given {
-            an_experience_repo_that_returns_exception()
+            an_experience_repo_that_returns_exception(lastEvent = Result.Event.GET_FIRSTS)
         } whenn {
             create_presenter()
         } then {
             should_hide_view_loader()
+            should_hide_view_pagination_loader()
             should_show_view_retry()
+        }
+    }
+
+    @Test
+    fun test_create_when_response_error_does_nothing_if_last_event_pagination() {
+        given {
+            an_experience_repo_that_returns_exception(lastEvent = Result.Event.PAGINATE)
+        } whenn {
+            create_presenter()
+        } then {
+            should_hide_view_loader()
+            should_hide_view_retry()
+            should_hide_view_pagination_loader()
         }
     }
 
@@ -141,16 +172,18 @@ class ExplorePresenterTest {
                             arrayListOf(experienceA, experienceB))))
         }
 
-        fun an_experience_repo_that_returns_in_progress() {
+        fun an_experience_repo_that_returns_in_progress(lastEvent: Result.Event) {
             BDDMockito.given(
                     mockRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.EXPLORE))
-                    .willReturn(Flowable.just(Result<List<Experience>>(null, inProgress = true)))
+                    .willReturn(Flowable.just(
+                            Result(listOf(), inProgress = true, lastEvent = lastEvent)))
         }
 
-        fun an_experience_repo_that_returns_exception() {
+        fun an_experience_repo_that_returns_exception(lastEvent: Result.Event) {
             BDDMockito.given(
                     mockRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.EXPLORE))
-                    .willReturn(Flowable.just(Result<List<Experience>>(null, error = Exception())))
+                    .willReturn(Flowable.just(
+                            Result(listOf(), error = Exception(), lastEvent = lastEvent)))
         }
 
         fun create_presenter() {
@@ -175,6 +208,14 @@ class ExplorePresenterTest {
 
         fun should_hide_view_loader() {
             then(mockView).should().hideLoader()
+        }
+
+        fun should_show_view_pagination_loader() {
+            then(mockView).should().showPaginationLoader()
+        }
+
+        fun should_hide_view_pagination_loader() {
+            then(mockView).should().hidePaginationLoader()
         }
 
         fun should_show_view_retry() {

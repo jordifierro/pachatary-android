@@ -239,7 +239,7 @@ class MyExperiencesPresenterTest {
         } whenn {
             last_experience_shown()
         } then {
-            should_call_api_get_more_experiences()
+            should_call_repo_get_more_experiences()
         }
     }
 
@@ -334,7 +334,7 @@ class MyExperiencesPresenterTest {
             presenter.lastExperienceShown()
         }
 
-        fun should_call_api_get_more_experiences() {
+        fun should_call_repo_get_more_experiences() {
             then(mockExperiencesRepository).should()
                     .getMoreExperiences(ExperienceRepoSwitch.Kind.MINE)
         }
