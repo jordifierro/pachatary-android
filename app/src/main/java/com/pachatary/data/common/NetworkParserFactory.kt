@@ -4,6 +4,7 @@ import com.pachatary.data.auth.ClientException
 import io.reactivex.Flowable
 import io.reactivex.FlowableTransformer
 import org.reactivestreams.Publisher
+import java.net.UnknownHostException
 
 class NetworkParserFactory {
 
@@ -81,7 +82,10 @@ class NetworkParserFactory {
         override fun apply(
                 upstream: Flowable<retrofit2.adapter.rxjava2.Result<out T>>): Publisher<Result<U>> =
             upstream.map {
-                if (it.isError) throw it.error()!!
+                if (it.isError) {
+                    if (it.error() is UnknownHostException) Result<U>(null, error = it.error())
+                    else throw it.error()!!
+                }
                 else if (it.response()!!.isSuccessful.not()) {
                     if (errorMapper == null) throw Exception(it.response()!!.errorBody()!!.string())
                     else Result<U>(data = null,

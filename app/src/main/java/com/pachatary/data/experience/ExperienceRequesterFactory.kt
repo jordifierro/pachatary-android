@@ -45,10 +45,22 @@ class ExperienceRequesterFactory(val apiRepository: ExperienceApiRepository) {
                                                 .lastEvent(Result.Event.PAGINATE)
                                                 .error(null)
                                             .build())
-                            apiRepository.paginateExperiences(it.second.nextUrl!!).subscribe({ apiResult ->
-                                val allExperiences = it.second.data!!.union(apiResult.data!!).toList()
-                                resultCache.replaceResultObserver.onNext(
-                                        apiResult.builder().data(allExperiences).lastEvent(Result.Event.PAGINATE).build())
+                            apiRepository.paginateExperiences(it.second.nextUrl!!).subscribe(
+                            { apiResult ->
+                                val newResult =
+                                    if (apiResult.isError()) {
+                                        it.second.builder()
+                                                .lastEvent(Result.Event.PAGINATE)
+                                                .error(apiResult.error)
+                                                .build()
+                                    } else {
+                                        apiResult.builder()
+                                                .data(it.second.data!!
+                                                        .union(apiResult.data!!).toList())
+                                                .lastEvent(Result.Event.PAGINATE)
+                                                .build()
+                                    }
+                                resultCache.replaceResultObserver.onNext(newResult)
                             })
 
                         }

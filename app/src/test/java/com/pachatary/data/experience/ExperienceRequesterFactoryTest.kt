@@ -127,7 +127,7 @@ class ExperienceRequesterFactoryTest {
     }
 
     @Test
-    fun test_paginate_emits_in_progress_and_calls_next_url_after_pagination_error() {
+    fun test_paginate_emits_in_progress_and_calls_next_url_after_pagination_error_when_success() {
         for (kind in ExperienceRepoSwitch.Kind.values()) {
             given {
                 a_kind(kind)
@@ -141,6 +141,25 @@ class ExperienceRequesterFactoryTest {
                 should_emit_loading_through_replace_result_cache_with_last_event_paginate()
                 should_call_api_paginate_with_next_url()
                 should_replace_result_with_that_two_experiences_and_last_event_paginate()
+            }
+        }
+    }
+
+    @Test
+    fun test_paginate_emits_error_with_previous_data_when_api_returns_error() {
+        for (kind in ExperienceRepoSwitch.Kind.values()) {
+            given {
+                a_kind(kind)
+                a_next_url()
+                an_api_repo_that_returns_error_that_next_url()
+                a_result_cache_that_return_two_experiences_and_next_url_from_get_firsts()
+            } whenn {
+                create_requester()
+                paginate()
+            } then {
+                should_emit_loading_through_replace_result_cache_with_that_experiences()
+                should_call_api_paginate_with_next_url()
+                should_replace_result_with_pagination_error_but_same_experiences()
             }
         }
     }
@@ -161,6 +180,7 @@ class ExperienceRequesterFactoryTest {
         lateinit var experienceA: Experience
         lateinit var experienceB: Experience
         var nextUrl = ""
+        val exception = Exception()
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
@@ -196,6 +216,13 @@ class ExperienceRequesterFactoryTest {
                                                    error = Exception(), nextUrl = nextUrl))
         }
 
+        fun a_result_cache_that_return_two_experiences_and_next_url_from_get_firsts() {
+            experienceA = Experience("1", "t", "d", null, true, true, "a")
+            experienceB = Experience("2", "t", "d", null, true, true, "b")
+            resultFlowable = Flowable.just(Result(listOf(experienceA, experienceB),
+                    lastEvent = Result.Event.GET_FIRSTS, nextUrl = nextUrl))
+        }
+
         fun an_api_repo_that_returns_two_experiences() {
             experienceA = Experience("1", "t", "d", null, true, true, "a")
             experienceB = Experience("2", "t", "d", null, true, true, "b")
@@ -217,6 +244,11 @@ class ExperienceRequesterFactoryTest {
             experienceB = Experience("2", "t", "d", null, true, true, "b")
             BDDMockito.given(mockApiRepository.paginateExperiences(nextUrl))
                     .willReturn(Flowable.just(Result(listOf(experienceA, experienceB))))
+        }
+
+        fun an_api_repo_that_returns_error_that_next_url() {
+            BDDMockito.given(mockApiRepository.paginateExperiences(nextUrl))
+                    .willReturn(Flowable.just(Result(listOf(), error = exception)))
         }
 
         fun a_result_cache_that_return_result_that_has_no_more_elements() {
@@ -267,6 +299,13 @@ class ExperienceRequesterFactoryTest {
                     result)
         }
 
+        fun should_emit_loading_through_replace_result_cache_with_that_experiences() {
+            val result = replaceResultObserver.events.get(0).get(0) as Result<List<Experience>>
+            assertEquals(Result(listOf(experienceA, experienceB), inProgress = true,
+                    lastEvent = Result.Event.PAGINATE, nextUrl = nextUrl),
+                    result)
+        }
+
         fun should_call_api() {
             when (kind) {
                 ExperienceRepoSwitch.Kind.MINE -> BDDMockito.then(mockApiRepository).should()
@@ -292,6 +331,12 @@ class ExperienceRequesterFactoryTest {
             val result = replaceResultObserver.events.get(0).get(1) as Result<List<Experience>>
             assertEquals(Result(listOf(experienceA, experienceB),
                     lastEvent = Result.Event.PAGINATE), result)
+        }
+
+        fun should_replace_result_with_pagination_error_but_same_experiences() {
+            val result = replaceResultObserver.events.get(0).get(1) as Result<List<Experience>>
+            assertEquals(Result(listOf(experienceA, experienceB), lastEvent = Result.Event.PAGINATE,
+                    error = exception, nextUrl = nextUrl), result)
         }
 
         infix fun start(func: ScenarioMaker.() -> Unit) = buildScenario().given(func)
