@@ -19,11 +19,10 @@ import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(), MainView {
 
-    val fragmentManager = getSupportFragmentManager()
-    lateinit var myExperiencesFragment: MyExperiencesFragment
-    lateinit var savedFragment: SavedFragment
-    lateinit var exploreFragment: ExploreFragment
-    lateinit var progressBar: ProgressBar
+    private lateinit var myExperiencesFragment: MyExperiencesFragment
+    private lateinit var savedFragment: SavedFragment
+    private lateinit var exploreFragment: ExploreFragment
+    private lateinit var progressBar: ProgressBar
 
     @Inject
     lateinit var presenter: MainPresenter
@@ -43,7 +42,17 @@ class MainActivity : AppCompatActivity(), MainView {
         lifecycle.addObserver(presenter)
 
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
-        navigation.selectedItemId = R.id.navigation_saved
+    }
+
+    override fun selectTab(type: MainView.ExperiencesViewType) {
+        when (type) {
+            MainView.ExperiencesViewType.MY_EXPERIENCES ->
+                navigation.selectedItemId = R.id.navigation_mine
+            MainView.ExperiencesViewType.SAVED ->
+                navigation.selectedItemId = R.id.navigation_saved
+            MainView.ExperiencesViewType.EXPLORE ->
+                navigation.selectedItemId = R.id.navigation_explore
+        }
     }
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
@@ -65,9 +74,8 @@ class MainActivity : AppCompatActivity(), MainView {
     }
 
     private fun navigateToFragment(fragment: Fragment) {
-        val fragmentTransaction = fragmentManager.beginTransaction()
+        val fragmentTransaction = supportFragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.fragment_container, fragment)
-        fragmentTransaction.addToBackStack(fragment.toString())
         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
         fragmentTransaction.commit()
     }
@@ -102,5 +110,9 @@ class MainActivity : AppCompatActivity(), MainView {
     override fun showTabs(visible: Boolean) {
         if (visible) navigation.visibility = View.VISIBLE
         else  navigation.visibility = View.INVISIBLE
+    }
+
+    override fun onBackPressed() {
+        presenter.onBackPressed()
     }
 }

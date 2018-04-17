@@ -11,6 +11,7 @@ class MainPresenter @Inject constructor(private val authRepository: AuthReposito
                                         private val schedulerProvider: SchedulerProvider) : LifecycleObserver {
 
     lateinit var view: MainView
+    val viewsStack = mutableListOf<MainView.ExperiencesViewType>()
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun create() {
@@ -32,10 +33,20 @@ class MainPresenter @Inject constructor(private val authRepository: AuthReposito
     private fun goToInitTab() {
         view.hideLoader()
         view.showTabs(true)
-        view.showView(MainView.ExperiencesViewType.SAVED)
+        view.selectTab(MainView.ExperiencesViewType.SAVED)
     }
 
     fun onTabClick(viewType: MainView.ExperiencesViewType) {
-        if (authRepository.hasPersonCredentials()) view.showView(viewType)
+        if (authRepository.hasPersonCredentials()) {
+            viewsStack.removeAll { it == viewType }
+            viewsStack += viewType
+            view.showView(viewType)
+        }
+    }
+
+    fun onBackPressed() {
+        viewsStack.removeAt(viewsStack.lastIndex)
+        if (viewsStack.isEmpty()) view.finish()
+        else view.selectTab(viewsStack.last())
     }
 }

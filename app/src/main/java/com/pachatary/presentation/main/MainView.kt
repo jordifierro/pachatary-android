@@ -8,6 +8,8 @@ interface MainView : LoaderView {
         MY_EXPERIENCES, SAVED, EXPLORE
     }
 
+    fun selectTab(type: ExperiencesViewType)
     fun showView(viewType: ExperiencesViewType)
     fun showTabs(visible: Boolean)
+    fun finish()
 }
