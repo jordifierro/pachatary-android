@@ -8,79 +8,87 @@ import org.reactivestreams.Publisher
 class NetworkParserFactory {
 
     companion object {
-        fun <T> getTransformer() = ResultTransformer<T>()
-        fun <T> getErrorTransformer(errorMapper: ((String) -> ClientException)) = ResultTransformer<T>(errorMapper)
-        fun <T> getListTransformer() = ListResultTransformer<T>()
-        fun <T, U: ToDomainMapper<T>> getPaginatedListTransformer() = PaginatedListResultTransformer<T, U>()
-        fun getVoidTransformer() = VoidTransformer()
+        fun <T> getTransformer() =
+                ResultTransformer<T>()
+        fun <T> getErrorTransformer(errorMapper: ((String) -> ClientException)) =
+                ResultTransformer<T>(errorMapper)
+        fun <T> getListTransformer() =
+                ListResultTransformer<T>()
+        fun <T, U: ToDomainMapper<T>> getPaginatedListTransformer() =
+                PaginatedListResultTransformer<T, U>()
+        fun getVoidTransformer() =
+                VoidTransformer()
     }
 
-    class ResultTransformer<T>(val errorMapper: ((String) -> ClientException)? = null,
-                               val emptyBody: Boolean = false)
+    class ResultTransformer<T>(private val errorMapper: ((String) -> ClientException)? = null)
         : FlowableTransformer<retrofit2.adapter.rxjava2.Result<out ToDomainMapper<T>>, Result<T>> {
 
-        override fun apply(upstream: Flowable<retrofit2.adapter.rxjava2.Result<out ToDomainMapper<T>>>)
+        override fun apply(
+                upstream: Flowable<retrofit2.adapter.rxjava2.Result<out ToDomainMapper<T>>>)
                 : Publisher<Result<T>> =
-                upstream.map {
-                            if (it.isError()) throw it.error()!!
-                            else if (it.response()!!.isSuccessful.not()) {
-                                if (errorMapper == null) throw Exception(it.response()!!.errorBody()!!.string())
-                                else Result<T>(data = null,
-                                               error = errorMapper.invoke(it.response()!!.errorBody()!!.string()))
-                            } else if (!emptyBody) Result(data = it.response()!!.body()!!.toDomain(), error = null)
-                            else Result<T>(null)
-                        }
-                        .retry(2)
+                upstream.compose(CommonTransformer(parse, errorMapper, false))
+
+        private val parse =
+                { rxJavaResult: retrofit2.adapter.rxjava2.Result<out ToDomainMapper<T>> ->
+                        Result(data = rxJavaResult.response()!!.body()!!.toDomain()) }
     }
 
-    class ListResultTransformer<T>(val errorMapper: ((String) -> ClientException)? = null,
-                                   val emptyBody: Boolean = false)
-        : FlowableTransformer<retrofit2.adapter.rxjava2.Result<out List<ToDomainMapper<T>>>, Result<List<T>>> {
+    class ListResultTransformer<T>(private val errorMapper: ((String) -> ClientException)? = null)
+        : FlowableTransformer<retrofit2.adapter.rxjava2.Result<out List<ToDomainMapper<T>>>,
+                              Result<List<T>>> {
 
-        override fun apply(upstream: Flowable<retrofit2.adapter.rxjava2.Result<out List<ToDomainMapper<T>>>>)
+        override fun apply(
+                upstream: Flowable<retrofit2.adapter.rxjava2.Result<out List<ToDomainMapper<T>>>>)
                 : Publisher<Result<List<T>>> =
-                upstream.map {
-                            if (it.isError()) throw it.error()!!
-                            else if (it.response()!!.isSuccessful.not()) {
-                                if (errorMapper == null) throw Exception(it.response()!!.errorBody()!!.string())
-                                else Result<List<T>>(data = null,
-                                                     error = errorMapper.invoke(it.response()!!.errorBody()!!.string()))
-                            } else if (!emptyBody)
-                                Result(data = it.response()!!.body()!!.map { it.toDomain()!! }, error = null)
-                            else Result<List<T>>(null)
-                        }
-                        .retry(2)
+                upstream.compose(CommonTransformer(parse, errorMapper, false))
+
+        private val parse =
+            { rxJavaResult: retrofit2.adapter.rxjava2.Result<out List<ToDomainMapper<T>>> ->
+                Result(data = rxJavaResult.response()!!.body()!!.map { it.toDomain()!! },
+                       error = null) }
     }
 
-    class PaginatedListResultTransformer<T, U: ToDomainMapper<T>>(val errorMapper: ((String) -> ClientException)? = null,
-                                            val emptyBody: Boolean = false)
-        : FlowableTransformer<retrofit2.adapter.rxjava2.Result<out PaginatedListMapper<T, U>>, Result<List<T>>> {
+    class PaginatedListResultTransformer<T, U: ToDomainMapper<T>>(
+            private val errorMapper: ((String) -> ClientException)? = null)
+        : FlowableTransformer<retrofit2.adapter.rxjava2.Result<out PaginatedListMapper<T, U>>,
+                              Result<List<T>>> {
 
-        override fun apply(upstream: Flowable<retrofit2.adapter.rxjava2.Result<out PaginatedListMapper<T, U>>>)
+        override fun apply(
+                upstream: Flowable<retrofit2.adapter.rxjava2.Result<out PaginatedListMapper<T, U>>>)
                 : Publisher<Result<List<T>>> =
-                upstream.map {
-                    if (it.isError()) throw it.error()!!
-                    else if (it.response()!!.isSuccessful.not()) {
-                        if (errorMapper == null) throw Exception(it.response()!!.errorBody()!!.string())
-                        else Result<List<T>>(data = null,
-                                error = errorMapper.invoke(it.response()!!.errorBody()!!.string()))
-                    } else if (!emptyBody)
-                        Result(data = it.response()!!.body()!!.results.map { it.toDomain() },
-                               nextUrl = it.response()!!.body()!!.nextUrl, error = null)
-                    else Result<List<T>>(null)
-                }
-                        .retry(2)
+                upstream.compose(CommonTransformer(parse, errorMapper, false))
+
+        private val parse =
+            { rxJavaResult: retrofit2.adapter.rxjava2.Result<out PaginatedListMapper<T, U>> ->
+                Result(data = rxJavaResult.response()!!.body()!!.results.map { it.toDomain() },
+                       nextUrl = rxJavaResult.response()!!.body()!!.nextUrl, error = null) }
     }
 
-    class VoidTransformer : FlowableTransformer<retrofit2.adapter.rxjava2.Result<Void>, Result<Void>> {
+    class VoidTransformer : FlowableTransformer<retrofit2.adapter.rxjava2.Result<Void>,
+                                                Result<Void>> {
 
-        override fun apply(upstream: Flowable<retrofit2.adapter.rxjava2.Result<Void>>): Publisher<Result<Void>> =
-                upstream.map {
-                            if (it.isError()) throw it.error()!!
-                            else if (it.response()!!.isSuccessful.not())
-                                throw Exception(it.response()!!.errorBody()!!.string())
-                            else Result<Void>(null)
-                        }
-                        .retry(2)
+        override fun apply(upstream: Flowable<retrofit2.adapter.rxjava2.Result<Void>>)
+                : Publisher<Result<Void>> =
+                upstream.compose(CommonTransformer(null, null, true))
+    }
+
+    class CommonTransformer<T, U>(
+            private val parser: ((retrofit2.adapter.rxjava2.Result<out T>) -> Result<U>)?,
+            private val errorMapper: ((String) -> ClientException)?,
+            private val emptyBody: Boolean)
+        : FlowableTransformer<retrofit2.adapter.rxjava2.Result<out T>, Result<U>> {
+
+        override fun apply(
+                upstream: Flowable<retrofit2.adapter.rxjava2.Result<out T>>): Publisher<Result<U>> =
+            upstream.map {
+                if (it.isError) throw it.error()!!
+                else if (it.response()!!.isSuccessful.not()) {
+                    if (errorMapper == null) throw Exception(it.response()!!.errorBody()!!.string())
+                    else Result<U>(data = null,
+                            error = errorMapper.invoke(it.response()!!.errorBody()!!.string()))
+                } else if (!emptyBody && parser != null) { parser.invoke(it) }
+                else Result<U>(null)
+            }
+            .retry(2)
     }
 }
