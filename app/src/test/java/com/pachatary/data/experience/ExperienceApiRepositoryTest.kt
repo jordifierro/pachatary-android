@@ -1,15 +1,19 @@
 package com.pachatary.data.experience
 
 import android.content.Context
-import com.pachatary.data.auth.AuthHttpInterceptor
-import com.pachatary.data.common.Result
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
+import com.pachatary.data.auth.AuthHttpInterceptor
+import com.pachatary.data.common.Result
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
-import org.junit.Assert.*
+import org.json.JSONObject
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 import org.mockito.Mockito.mock
 import retrofit2.Retrofit
@@ -66,6 +70,7 @@ class ExperienceApiRepositoryTest {
             response_should_experience_list_and_next_url()
         }
     }
+
     @Test
     fun test_post_experiences() {
         given {
@@ -118,6 +123,17 @@ class ExperienceApiRepositoryTest {
         }
     }
 
+    @Test
+    fun test_upload_experience_result_parser() {
+        given {
+            a_json_object_from_POST_experience_json()
+        } whenn {
+            parse_that_json_object()
+        } then {
+            result_should_be_experience_parsed_correctly()
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
@@ -139,9 +155,16 @@ class ExperienceApiRepositoryTest {
                 Schedulers.trampoline(), mockContext, mockAuthHttpInterceptor)
         lateinit var experience: Experience
         var url = ""
+        lateinit var jsonObject: JsonObject
+        lateinit var resultExperience: Experience
 
         fun a_url() {
             url = "/some-url"
+        }
+
+        fun a_json_object_from_POST_experience_json() {
+            jsonObject = JsonParser().parse(ExperienceApiRepositoryTest::class.java
+                    .getResource("/api/POST_experiences.json").readText()).asJsonObject
         }
 
         fun a_web_server_that_returns_get_experiences() {
@@ -211,6 +234,10 @@ class ExperienceApiRepositoryTest {
         fun experience_is_unsaved() {
             repository.saveExperience(save = false, experienceId = experience.id).subscribe(testEmptySubscriber)
             testEmptySubscriber.awaitCount(1)
+        }
+
+        fun parse_that_json_object() {
+            resultExperience = repository.parseExperienceJson(jsonObject)
         }
 
         fun request_should_call_url() {
@@ -297,11 +324,28 @@ class ExperienceApiRepositoryTest {
             assertEquals("https://experiences/00df.small.jpeg", receivedExperience.picture!!.smallUrl)
             assertEquals("https://experiences/00df.medium.jpeg", receivedExperience.picture!!.mediumUrl)
             assertEquals("https://experiences/00df.large.jpeg", receivedExperience.picture!!.largeUrl)
+            assertEquals(true, receivedExperience.isMine)
+            assertEquals(false, receivedExperience.isSaved)
+            assertEquals("usr.nm", receivedExperience.authorUsername)
+            assertEquals(5, receivedExperience.savesCount)
         }
 
         fun response_should_parse_empty_body() {
             val receivedResult = testEmptySubscriber.events.get(0).get(0) as Result<*>
             assertEquals(Result(null), receivedResult)
+        }
+
+        fun result_should_be_experience_parsed_correctly() {
+            assertEquals("4", resultExperience.id)
+            assertEquals("Plaça", resultExperience.title)
+            assertEquals("", resultExperience.description)
+            assertEquals("https://experiences/00df.small.jpeg", resultExperience.picture!!.smallUrl)
+            assertEquals("https://experiences/00df.medium.jpeg", resultExperience.picture!!.mediumUrl)
+            assertEquals("https://experiences/00df.large.jpeg", resultExperience.picture!!.largeUrl)
+            assertEquals(true, resultExperience.isMine)
+            assertEquals(false, resultExperience.isSaved)
+            assertEquals("usr.nm", resultExperience.authorUsername)
+            assertEquals(5, resultExperience.savesCount)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = apply(func)

@@ -3,6 +3,8 @@ package com.pachatary.data.experience
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import com.pachatary.BuildConfig
 import com.pachatary.data.auth.AuthHttpInterceptor
 import com.pachatary.data.common.NetworkParserFactory
@@ -76,7 +78,7 @@ class ExperienceApiRepository (retrofit: Retrofit, @Named("io") val scheduler: S
                         override fun onCancelled(context: Context, uploadInfo: UploadInfo) {}
                         override fun onCompleted(context: Context, uploadInfo: UploadInfo,
                                                  serverResponse: ServerResponse) {
-                            val jsonExperience = JSONObject(serverResponse.bodyAsString)
+                            val jsonExperience = JsonParser().parse(serverResponse.bodyAsString).asJsonObject
                             delegate(Result(parseExperienceJson(jsonExperience)))
                         }
                     })
@@ -86,20 +88,22 @@ class ExperienceApiRepository (retrofit: Retrofit, @Named("io") val scheduler: S
         }
     }
 
-    private fun parseExperienceJson(jsonExperience: JSONObject): Experience {
-        val id = jsonExperience.getString("id")
-        val title = jsonExperience.getString("title")
-        val description = jsonExperience.getString("description")
-        val pictureJson = jsonExperience.getJSONObject("picture")
-        val smallUrl = pictureJson.getString("small_url")
-        val mediumUrl = pictureJson.getString("medium_url")
-        val largeUrl = pictureJson.getString("large_url")
+    internal fun parseExperienceJson(jsonExperience: JsonObject): Experience {
+        val id = jsonExperience.get("id").asString
+        val title = jsonExperience.get("title").asString
+        val description = jsonExperience.get("description").asString
+        val pictureJson = jsonExperience.get("picture").asJsonObject
+        val smallUrl = pictureJson.get("small_url").asString
+        val mediumUrl = pictureJson.get("medium_url").asString
+        val largeUrl = pictureJson.get("large_url").asString
         val picture = Picture(smallUrl = smallUrl, mediumUrl = mediumUrl, largeUrl = largeUrl)
-        val isMine = jsonExperience.getBoolean("is_mine")
-        val isSaved = jsonExperience.getBoolean("is_saved")
-        val authorUsername = jsonExperience.getString("authorUsername")
+        val isMine = jsonExperience.get("is_mine").asBoolean
+        val isSaved = jsonExperience.get("is_saved").asBoolean
+        val authorUsername = jsonExperience.get("author_username").asString
+        val savesCount = jsonExperience.get("saves_count").asInt
 
         return Experience(id = id, title = title, description = description,
-                          picture = picture, isMine = isMine, isSaved = isSaved, authorUsername = authorUsername)
+                          picture = picture, isMine = isMine, isSaved = isSaved,
+                          authorUsername = authorUsername, savesCount = savesCount)
     }
 }

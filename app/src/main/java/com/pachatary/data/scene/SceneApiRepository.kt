@@ -3,6 +3,8 @@ package com.pachatary.data.scene
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import com.pachatary.BuildConfig
 import com.pachatary.data.auth.AuthHttpInterceptor
 import com.pachatary.data.common.NetworkParserFactory
@@ -57,7 +59,8 @@ class SceneApiRepository(retrofit: Retrofit, @Named("io") val scheduler: Schedul
                         override fun onCancelled(context: Context, uploadInfo: UploadInfo) {}
                         override fun onCompleted(context: Context, uploadInfo: UploadInfo,
                                                  serverResponse: ServerResponse) {
-                            val jsonScene = JSONObject(serverResponse.bodyAsString)
+                            val jsonScene =
+                                    JsonParser().parse(serverResponse.bodyAsString).asJsonObject
                             delegate(Result(parseSceneJson(jsonScene)))
                         }
                     })
@@ -67,17 +70,17 @@ class SceneApiRepository(retrofit: Retrofit, @Named("io") val scheduler: Schedul
         }
     }
 
-    private fun parseSceneJson(jsonScene: JSONObject): Scene {
-        val id = jsonScene.getString("id")
-        val title = jsonScene.getString("title")
-        val description = jsonScene.getString("description")
-        val latitude = jsonScene.getDouble("latitude")
-        val longitude = jsonScene.getDouble("longitude")
-        val experienceId = jsonScene.getString("experience_id")
-        val pictureJson = jsonScene.getJSONObject("picture")
-        val smallUrl = pictureJson.getString("small_url")
-        val mediumUrl = pictureJson.getString("medium_url")
-        val largeUrl = pictureJson.getString("large_url")
+    internal fun parseSceneJson(jsonScene: JsonObject): Scene {
+        val id = jsonScene.get("id").asString
+        val title = jsonScene.get("title").asString
+        val description = jsonScene.get("description").asString
+        val latitude = jsonScene.get("latitude").asDouble
+        val longitude = jsonScene.get("longitude").asDouble
+        val experienceId = jsonScene.get("experience_id").asString
+        val pictureJson = jsonScene.get("picture").asJsonObject
+        val smallUrl = pictureJson.get("small_url").asString
+        val mediumUrl = pictureJson.get("medium_url").asString
+        val largeUrl = pictureJson.get("large_url").asString
         val picture = Picture(smallUrl = smallUrl, mediumUrl = mediumUrl, largeUrl = largeUrl)
 
         return Scene(id = id, title = title, description = description, latitude = latitude,

@@ -6,6 +6,7 @@ import com.pachatary.data.common.Result
 import com.pachatary.data.experience.ExperienceApiRepositoryTest
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonParser
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
 import okhttp3.mockwebserver.MockResponse
@@ -192,5 +193,23 @@ class SceneApiRepositoryTest {
         assertEquals(41.364679, receivedScene.latitude, 1e-15)
         assertEquals(2.135489, receivedScene.longitude, 1e-15)
         assertEquals("5", receivedScene.experienceId)
+    }
+
+    @Test
+    fun test_upload_picture_scene_parser() {
+        val jsonObject = JsonParser().parse(ExperienceApiRepositoryTest::class.java
+                .getResource("/api/POST_scenes.json").readText()).asJsonObject
+
+        val parsedScene = repository.parseSceneJson(jsonObject)
+
+        assertEquals("4", parsedScene.id)
+        assertEquals("Plaça", parsedScene.title)
+        assertEquals("", parsedScene.description)
+        assertEquals("https://scenes/00df.small.jpeg", parsedScene.picture!!.smallUrl)
+        assertEquals("https://scenes/00df.medium.jpeg", parsedScene.picture!!.mediumUrl)
+        assertEquals("https://scenes/00df.large.jpeg", parsedScene.picture!!.largeUrl)
+        assertEquals(41.364679, parsedScene.latitude, 1e-15)
+        assertEquals(2.135489, parsedScene.longitude, 1e-15)
+        assertEquals("5", parsedScene.experienceId)
     }
 }
