@@ -122,6 +122,10 @@ Follow these instructions to start working locally on the project:
 First of all, you must run api server locally.
 Code and setup instructions can be found in this other repo:
 [pachatary-api](https://github.com/jordifierro/pachatary-api).
+You also have to register at [Mapbox](https://www.mapbox.com/)
+to get a token to use their api.
+Finally, create a project at [Firebase](https://firebase.google.com/)
+and create both debug and relase projects and get their `google-services.json`.
 
 Once server is working, we must:
 
@@ -129,17 +133,24 @@ Once server is working, we must:
 ```bash
 git clone https://github.com/jordifierro/pachatary-android.git
 ```
-* Copy `app.properties.sample` file to `app.properties`:
+* Copy `app.properties.sample` file to `app.properties`
+and fill the fields following the hint instructions:
 ```bash
 cp app/app.properties.sample app/app.properties
+```
+* Create a keystore with Android Studio to fill last properties:
+`RELEASE_STORE_FILE`, `RELEASE_STORE_PASSWORD`,
+`RELEASE_KEY_ALIAS` and `RELEASE_KEY_PASSWORD`
+
+* Move `google-services.json` files to release and debug:
+```bash
+mv release-google-services.json app/
+mkdir app/src/debug
+mv debug-google-services.json app/src/debug
 ```
 * Run tests:
 ```bash
 ./gradlew test
 ```
-* Fill `app.properties`: `apiUrl` with your local server url
-and get a [Mapbox](https://www.mapbox.com/) account
-to get your own `mapboxAccessToken`,
-`clientSecretKey` must be agreed with server and also set in properties (same for `dev-`).
 
 * You are ready to run the application on your device!
