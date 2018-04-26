@@ -17,6 +17,7 @@ class ExtendedViewHolder(view: View, val onClick: (String) -> Unit)
     private val descriptionView: TextView = view.findViewById(R.id.experience_description)
     private val pictureView: ImageView = view.findViewById(R.id.experience_picture)
     private val progressBar: ProgressBar = view.findViewById(R.id.experience_progressbar)
+    private val savesCountView: TextView = view.findViewById(R.id.experience_saves_count)
     lateinit var experienceId: String
 
     init { view.setOnClickListener(this) }
@@ -26,12 +27,14 @@ class ExtendedViewHolder(view: View, val onClick: (String) -> Unit)
         pictureView.visibility = View.VISIBLE
         authorView.visibility = View.VISIBLE
         descriptionView.visibility = View.VISIBLE
+        savesCountView.visibility = View.VISIBLE
         progressBar.visibility = View.GONE
 
         this.experienceId = experience.id
         titleView.text = experience.title
         authorView.text = "by " + experience.authorUsername
         descriptionView.text = experience.description
+        savesCountView.text = experience.savesCount.toString()
         Picasso.with(pictureView.context)
                 .load(experience.picture?.mediumUrl)
                 .into(pictureView)
@@ -42,6 +45,7 @@ class ExtendedViewHolder(view: View, val onClick: (String) -> Unit)
         pictureView.visibility = View.GONE
         authorView.visibility = View.GONE
         descriptionView.visibility = View.GONE
+        savesCountView.visibility = View.GONE
         progressBar.visibility = View.VISIBLE
     }
 
