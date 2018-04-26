@@ -9,5 +9,5 @@ data class ExperienceMapper(val id: String, val title: String, val description: 
 
     override fun toDomain() = Experience(id = this.id, title = this.title, description = this.description,
                     picture = this.picture?.toDomain(), isMine = this.isMine, isSaved = this.isSaved,
-                    author_username = this.authorUsername)
+                    authorUsername = this.authorUsername)
 }

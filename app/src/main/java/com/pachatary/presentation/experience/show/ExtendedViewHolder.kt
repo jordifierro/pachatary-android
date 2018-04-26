@@ -30,7 +30,7 @@ class ExtendedViewHolder(view: View, val onClick: (String) -> Unit)
 
         this.experienceId = experience.id
         titleView.text = experience.title
-        authorView.text = "by " + experience.author_username
+        authorView.text = "by " + experience.authorUsername
         descriptionView.text = experience.description
         Picasso.with(pictureView.context)
                 .load(experience.picture?.mediumUrl)

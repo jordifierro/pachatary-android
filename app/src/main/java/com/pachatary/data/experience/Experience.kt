@@ -6,20 +6,20 @@ import com.pachatary.data.picture.Picture
 data class Experience(override val id: String, val title: String,
                       val description: String, val picture: Picture?,
                       val isMine: Boolean = false, val isSaved: Boolean = false,
-                      val author_username: String = "") : Identifiable {
+                      val authorUsername: String = "") : Identifiable {
 
-    fun builder() = Builder(id, title, description, picture, isMine, isSaved, author_username)
+    fun builder() = Builder(id, title, description, picture, isMine, isSaved, authorUsername)
 
     class Builder(val id: String, val title: String,
                   val description: String, val picture: Picture?,
                   val isMine: Boolean = false, var isSaved: Boolean = false,
-                  val author_username: String = "") {
+                  val authorUsername: String = "") {
 
         fun isSaved(isSaved: Boolean): Builder {
             this.isSaved = isSaved
             return this
         }
 
-        fun build() = Experience(id, title, description, picture, isMine, isSaved, author_username)
+        fun build() = Experience(id, title, description, picture, isMine, isSaved, authorUsername)
     }
 }

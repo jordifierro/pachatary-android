@@ -151,7 +151,7 @@ class ExperienceApiRepositoryTest {
 
         fun an_experience() {
             experience = Experience(id = "1", title = "T", description = "desc",
-                                    picture = null, author_username = "usr.nm")
+                                    picture = null, authorUsername = "usr.nm")
         }
 
         fun a_web_server_that_returns_post_experiences() {
@@ -271,7 +271,7 @@ class ExperienceApiRepositoryTest {
             assertEquals("https://experiences/8c29c4735.large.jpg", experience.picture!!.largeUrl)
             assertEquals(true, experience.isMine)
             assertEquals(false, experience.isSaved)
-            assertEquals("usr.nm", experience.author_username)
+            assertEquals("usr.nm", experience.authorUsername)
 
             val secondExperience = experiences[1] as Experience
             assertEquals("3", secondExperience.id)
@@ -280,7 +280,7 @@ class ExperienceApiRepositoryTest {
             assertEquals(false, secondExperience.isMine)
             assertEquals(true, secondExperience.isSaved)
             assertNull(secondExperience.picture)
-            assertEquals("other.nm", secondExperience.author_username)
+            assertEquals("other.nm", secondExperience.authorUsername)
 
             assertEquals("https://next_url", result.nextUrl)
         }

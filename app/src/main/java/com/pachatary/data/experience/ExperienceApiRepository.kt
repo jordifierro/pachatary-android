@@ -97,9 +97,9 @@ class ExperienceApiRepository (retrofit: Retrofit, @Named("io") val scheduler: S
         val picture = Picture(smallUrl = smallUrl, mediumUrl = mediumUrl, largeUrl = largeUrl)
         val isMine = jsonExperience.getBoolean("is_mine")
         val isSaved = jsonExperience.getBoolean("is_saved")
-        val authorUsername = jsonExperience.getString("author_username")
+        val authorUsername = jsonExperience.getString("authorUsername")
 
         return Experience(id = id, title = title, description = description,
-                          picture = picture, isMine = isMine, isSaved = isSaved, author_username = authorUsername)
+                          picture = picture, isMine = isMine, isSaved = isSaved, authorUsername = authorUsername)
     }
 }
