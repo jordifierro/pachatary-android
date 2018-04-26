@@ -272,6 +272,7 @@ class ExperienceApiRepositoryTest {
             assertEquals(true, experience.isMine)
             assertEquals(false, experience.isSaved)
             assertEquals("usr.nm", experience.authorUsername)
+            assertEquals(4, experience.savesCount)
 
             val secondExperience = experiences[1] as Experience
             assertEquals("3", secondExperience.id)
@@ -281,6 +282,7 @@ class ExperienceApiRepositoryTest {
             assertEquals(true, secondExperience.isSaved)
             assertNull(secondExperience.picture)
             assertEquals("other.nm", secondExperience.authorUsername)
+            assertEquals(7, secondExperience.savesCount)
 
             assertEquals("https://next_url", result.nextUrl)
         }

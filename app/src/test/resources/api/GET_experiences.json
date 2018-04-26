@@ -12,7 +12,8 @@
             "is_mine": true,
             "is_saved": false,
             "author_id": "3",
-            "author_username": "usr.nm"
+            "author_username": "usr.nm",
+            "saves_count": 4
         },
         {
             "id": "3",
@@ -22,7 +23,8 @@
             "is_mine": false,
             "is_saved": true,
             "author_id": "4",
-            "author_username": "other.nm"
+            "author_username": "other.nm",
+            "saves_count": 7
         }
     ],
     "next_url": "https://next_url"
