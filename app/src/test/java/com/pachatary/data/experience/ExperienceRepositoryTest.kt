@@ -106,12 +106,28 @@ class ExperienceRepositoryTest {
             an_experience_id()
             an_experience_repo_that_returns_a_publisher_when_save_is_called()
             a_non_saved_experience()
-            a_repo_switch_that_returns_that_experience_when_call_with_experience_id()
+            a_repo_switch_that_returns_non_saved_experience_when_call_with_experience_id()
         } whenn {
             save_experience_is_called()
         } then {
             should_call_api_repo_save_experience()
             should_modify_experience_to_saved_and_update_saved_and_explore_cache()
+            should_subscribe_to_publisher_returned_by_api()
+        }
+    }
+
+    @Test
+    fun test_unsave_experience_call_unsave_experience_and_updates_saved_and_explore() {
+        given {
+            an_experience_id()
+            an_experience_repo_that_returns_a_publisher_when_unsave_is_called()
+            a_saved_experience()
+            a_repo_switch_that_returns_saved_experience_when_call_with_experience_id()
+        } whenn {
+            unsave_experience_is_called()
+        } then {
+            should_call_api_repo_unsave_experience()
+            should_modify_experience_to_unsaved_and_update_saved_and_explore_cache()
             should_subscribe_to_publisher_returned_by_api()
         }
     }
@@ -129,6 +145,7 @@ class ExperienceRepositoryTest {
         }
     }
 
+    @Test
     fun test_get_more_experiences_emits_paginate_action_through_switch() {
         for (kind in ExperienceRepoSwitch.Kind.values()) {
             given {
@@ -189,6 +206,11 @@ class ExperienceRepositoryTest {
                     .willReturn(saveExperiencePublisher.toFlowable(BackpressureStrategy.LATEST))
         }
 
+        fun an_experience_repo_that_returns_a_publisher_when_unsave_is_called() {
+            BDDMockito.given(mockApiRepository.saveExperience(false, experienceId))
+                    .willReturn(saveExperiencePublisher.toFlowable(BackpressureStrategy.LATEST))
+        }
+
         fun an_experience_repo_that_returns_that_experience_when_create() {
             BDDMockito.given(mockApiRepository.createExperience(experience))
                     .willReturn(Flowable.just(Result(experience)))
@@ -224,9 +246,14 @@ class ExperienceRepositoryTest {
                     .willReturn(experienceFlowable)
         }
 
-        fun a_repo_switch_that_returns_that_experience_when_call_with_experience_id() {
+        fun a_repo_switch_that_returns_non_saved_experience_when_call_with_experience_id() {
             BDDMockito.given(mockExperiencesRepoSwitch.getExperienceFlowable(experienceId))
                     .willReturn(Flowable.just(Result(nonSavedExperience)))
+        }
+
+        fun a_repo_switch_that_returns_saved_experience_when_call_with_experience_id() {
+            BDDMockito.given(mockExperiencesRepoSwitch.getExperienceFlowable(experienceId))
+                    .willReturn(Flowable.just(Result(savedExperience)))
         }
 
         fun repo_switch_that_returns_that_flowable_for_that_kind() {
@@ -259,6 +286,10 @@ class ExperienceRepositoryTest {
 
         fun save_experience_is_called() {
             repository.saveExperience(experienceId, true)
+        }
+
+        fun unsave_experience_is_called() {
+            repository.saveExperience(experienceId, false)
         }
 
         fun experience_flowable_is_called() {
@@ -321,15 +352,42 @@ class ExperienceRepositoryTest {
             BDDMockito.then(mockApiRepository).should().saveExperience(true, experienceId)
         }
 
+        fun should_call_api_repo_unsave_experience() {
+            BDDMockito.then(mockApiRepository).should().saveExperience(false, experienceId)
+        }
+
         fun should_modify_experience_to_saved_and_update_saved_and_explore_cache() {
             BDDMockito.then(mockExperiencesRepoSwitch).should()
                     .modifyResult(ExperienceRepoSwitch.Kind.SAVED,
                                   ExperienceRepoSwitch.Modification.ADD_OR_UPDATE_LIST,
-                                  list = listOf(nonSavedExperience.builder().isSaved(true).build()))
+                                  list = listOf(nonSavedExperience.builder()
+                                                                    .isSaved(true)
+                                                      .savesCount(nonSavedExperience.savesCount + 1)
+                                                                    .build()))
             BDDMockito.then(mockExperiencesRepoSwitch).should()
                     .modifyResult(ExperienceRepoSwitch.Kind.EXPLORE,
                             ExperienceRepoSwitch.Modification.UPDATE_LIST,
-                            list = listOf(nonSavedExperience.builder().isSaved(true).build()))
+                            list = listOf(nonSavedExperience.builder()
+                                                                .isSaved(true)
+                                                      .savesCount(nonSavedExperience.savesCount + 1)
+                                                                .build()))
+        }
+
+        fun should_modify_experience_to_unsaved_and_update_saved_and_explore_cache() {
+            BDDMockito.then(mockExperiencesRepoSwitch).should()
+                    .modifyResult(ExperienceRepoSwitch.Kind.SAVED,
+                            ExperienceRepoSwitch.Modification.ADD_OR_UPDATE_LIST,
+                            list = listOf(savedExperience.builder()
+                                    .isSaved(false)
+                                    .savesCount(savedExperience.savesCount - 1)
+                                    .build()))
+            BDDMockito.then(mockExperiencesRepoSwitch).should()
+                    .modifyResult(ExperienceRepoSwitch.Kind.EXPLORE,
+                            ExperienceRepoSwitch.Modification.UPDATE_LIST,
+                            list = listOf(savedExperience.builder()
+                                    .isSaved(false)
+                                    .savesCount(savedExperience.savesCount - 1)
+                                    .build()))
         }
 
         fun should_subscribe_to_publisher_returned_by_api() {

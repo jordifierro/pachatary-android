@@ -39,7 +39,12 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
 
     fun saveExperience(experienceId: String, save: Boolean) {
         val disposable = experienceFlowable(experienceId)
-                .map { listOf(it.data!!.builder().isSaved(save).build()) }
+                .map {
+                    val modifier = if (save) 1 else -1
+                    listOf(it.data!!.builder()
+                                    .isSaved(save)
+                                    .savesCount(it.data.savesCount + modifier)
+                                    .build()) }
                 .take(1)
                 .subscribe(addOrUpdateToSavedAndUpdateToExploreExperiences)
         apiRepository.saveExperience(save = save, experienceId = experienceId).subscribe()

@@ -14,10 +14,15 @@ data class Experience(override val id: String, val title: String,
     class Builder(val id: String, val title: String,
                   val description: String, val picture: Picture?,
                   val isMine: Boolean = false, var isSaved: Boolean = false,
-                  val authorUsername: String = "", val savesCount: Int = 0) {
+                  val authorUsername: String = "", var savesCount: Int = 0) {
 
         fun isSaved(isSaved: Boolean): Builder {
             this.isSaved = isSaved
+            return this
+        }
+
+        fun savesCount(savesCount: Int): Builder {
+            this.savesCount = savesCount
             return this
         }
 
