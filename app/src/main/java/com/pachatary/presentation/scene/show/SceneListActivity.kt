@@ -14,6 +14,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.RelativeLayout
 import android.widget.TextView
 import com.pachatary.R
 import com.pachatary.data.experience.Experience
@@ -145,6 +146,10 @@ class SceneListActivity : AppCompatActivity(), SceneListView {
         private val descriptionView: TextView = view.findViewById(R.id.description)
         private val pictureView: ImageView = view.findViewById(R.id.picture)
         private val editButton: FloatingActionButton = view.findViewById(R.id.edit_button)
+        private val savesCountAndAuthorLayout: RelativeLayout =
+                view.findViewById(R.id.saves_count_and_author)
+        private val savesCountView: TextView = view.findViewById(R.id.saves_count)
+        private val authorView: TextView = view.findViewById(R.id.author)
         private var isScene = true
         lateinit var experienceId: String
         lateinit var sceneId: String
@@ -160,6 +165,9 @@ class SceneListActivity : AppCompatActivity(), SceneListView {
             titleView.text = experience.title
             descriptionView.text = experience.description
             editButton.setOnClickListener { onEditButtonClick() }
+            savesCountAndAuthorLayout.visibility = View.VISIBLE
+            savesCountView.text = experience.savesCount.toString()
+            authorView.text = "by " + experience.authorUsername
             Picasso.with(pictureView.context)
                     .load(experience.picture?.mediumUrl)
                     .into(pictureView)
@@ -170,6 +178,7 @@ class SceneListActivity : AppCompatActivity(), SceneListView {
             this.sceneId = scene.id
             titleView.text = scene.title
             descriptionView.text = scene.description
+            savesCountAndAuthorLayout.visibility = View.GONE
             editButton.setOnClickListener { onEditButtonClick() }
             Picasso.with(pictureView.context)
                     .load(scene.picture?.mediumUrl)
