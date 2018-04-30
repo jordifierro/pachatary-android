@@ -1,5 +1,6 @@
 package com.pachatary.data.experience
 
+import com.pachatary.data.common.Request
 import com.pachatary.data.common.Result
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -178,7 +179,7 @@ class ExperienceRepositoryTest {
         lateinit var experience: Experience
         var experienceId = ""
         var croppedImageString = ""
-        lateinit var searchParams: ExperienceRequesterFactory.RequestParams
+        lateinit var searchParams: Request.Params
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
@@ -188,7 +189,7 @@ class ExperienceRepositoryTest {
         }
 
         fun a_search_params() {
-            searchParams = ExperienceRequesterFactory.RequestParams("c", 8.5, -0.3)
+            searchParams = Request.Params("c", 8.5, -0.3)
         }
 
         fun a_flowable() {
@@ -402,12 +403,12 @@ class ExperienceRepositoryTest {
 
         fun should_call_switch_execute_get_firsts_action() {
             BDDMockito.then(mockExperiencesRepoSwitch).should()
-                    .executeAction(kind, ExperienceRequesterFactory.Action.GET_FIRSTS, searchParams)
+                    .executeAction(kind, Request.Action.GET_FIRSTS, searchParams)
         }
 
         fun should_call_switch_execute_paginate_action() {
             BDDMockito.then(mockExperiencesRepoSwitch).should()
-                    .executeAction(kind, ExperienceRequesterFactory.Action.PAGINATE)
+                    .executeAction(kind, Request.Action.PAGINATE)
         }
 
 

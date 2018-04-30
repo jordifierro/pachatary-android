@@ -1,7 +1,8 @@
 package com.pachatary.data.experience
 
-import com.pachatary.data.common.ResultCacheFactory
+import com.pachatary.data.common.Request
 import com.pachatary.data.common.Result
+import com.pachatary.data.common.ResultCacheFactory
 import io.reactivex.Flowable
 import io.reactivex.observers.TestObserver
 import io.reactivex.subscribers.TestSubscriber
@@ -94,7 +95,7 @@ class ExperienceRepoSwitchTest {
     @Test
     fun test_execute_action_emits_through_appropiate_observer() {
         for (kind in ExperienceRepoSwitch.Kind.values()) {
-            for(action in ExperienceRequesterFactory.Action.values()) {
+            for(action in Request.Action.values()) {
                 given {
                     a_kind(kind)
                     an_action(action)
@@ -138,12 +139,12 @@ class ExperienceRepoSwitchTest {
         var resultExploreCache = ResultCacheFactory.ResultCache(replaceResultExploreObserver,
                 addOrUpdateExploreObserver, updateExploreObserver, resultExploreFlowable)
 
-        val testMineActionObserver = TestObserver.create<ExperienceRequesterFactory.Request>()
-        val testSavedActionObserver = TestObserver.create<ExperienceRequesterFactory.Request>()
-        val testExploreActionObserver = TestObserver.create<ExperienceRequesterFactory.Request>()
+        val testMineActionObserver = TestObserver.create<Request>()
+        val testSavedActionObserver = TestObserver.create<Request>()
+        val testExploreActionObserver = TestObserver.create<Request>()
 
         var kind = ExperienceRepoSwitch.Kind.MINE
-        var action = ExperienceRequesterFactory.Action.GET_FIRSTS
+        var action = Request.Action.GET_FIRSTS
         lateinit var resultFlowable: Flowable<Result<List<Experience>>>
         lateinit var experienceList: List<Experience>
         var experiencesResult: Result<List<Experience>>? = null
@@ -151,7 +152,7 @@ class ExperienceRepoSwitchTest {
         var experienceId = ""
         lateinit var experience: Experience
         lateinit var resultExperienceFlowable: Flowable<Result<Experience>>
-        lateinit var searchParams: ExperienceRequesterFactory.RequestParams
+        lateinit var searchParams: Request.Params
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
@@ -191,7 +192,7 @@ class ExperienceRepoSwitchTest {
         }
 
         fun a_search_params() {
-            searchParams = ExperienceRequesterFactory.RequestParams("c", 8.0, -9.1)
+            searchParams = Request.Params("c", 8.0, -9.1)
         }
 
         fun some_result_flowables_that_emit_different_and_repeated_experiences() {
@@ -208,7 +209,7 @@ class ExperienceRepoSwitchTest {
             this.kind = kind
         }
 
-        fun an_action(action: ExperienceRequesterFactory.Action) {
+        fun an_action(action: Request.Action) {
             this.action = action
         }
 
@@ -313,18 +314,15 @@ class ExperienceRepoSwitchTest {
             when (kind) {
                 ExperienceRepoSwitch.Kind.MINE -> {
                     testMineActionObserver.awaitCount(1)
-                    testMineActionObserver.assertValue(
-                            ExperienceRequesterFactory.Request(action, searchParams))
+                    testMineActionObserver.assertValue(Request(action, searchParams))
                 }
                 ExperienceRepoSwitch.Kind.SAVED -> {
                     testSavedActionObserver.awaitCount(1)
-                    testSavedActionObserver.assertValue(
-                            ExperienceRequesterFactory.Request(action, searchParams))
+                    testSavedActionObserver.assertValue(Request(action, searchParams))
                 }
                 ExperienceRepoSwitch.Kind.EXPLORE -> {
                     testExploreActionObserver.awaitCount(1)
-                    testExploreActionObserver.assertValue(
-                            ExperienceRequesterFactory.Request(action, searchParams))
+                    testExploreActionObserver.assertValue(Request(action, searchParams))
                 }
             }
         }

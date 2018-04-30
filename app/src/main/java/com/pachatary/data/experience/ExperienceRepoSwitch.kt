@@ -1,28 +1,23 @@
 package com.pachatary.data.experience
 
-import com.pachatary.data.common.ResultCacheFactory
+import com.pachatary.data.common.Request
 import com.pachatary.data.common.Result
+import com.pachatary.data.common.ResultCacheFactory
 import io.reactivex.Flowable
 import io.reactivex.functions.Function3
 
 class ExperienceRepoSwitch(resultCacheFactory: ResultCacheFactory<Experience>,
                            requesterFactory: ExperienceRequesterFactory) {
 
-    enum class Modification {
-        ADD_OR_UPDATE_LIST, UPDATE_LIST, REPLACE_RESULT
-    }
-
-    enum class Kind {
-        MINE, SAVED, EXPLORE
-    }
+    enum class Modification { ADD_OR_UPDATE_LIST, UPDATE_LIST, REPLACE_RESULT }
+    enum class Kind { MINE, SAVED, EXPLORE }
 
     val mineResultCache = resultCacheFactory.create()
     private val savedResultCache = resultCacheFactory.create()
     private val exploreResultCache = resultCacheFactory.create()
     private val mineActionObserver = requesterFactory.create(mineResultCache, Kind.MINE)
     private val savedActionObserver = requesterFactory.create(savedResultCache, Kind.SAVED)
-    private val exploreActionObserver =
-            requesterFactory.create(exploreResultCache, Kind.EXPLORE)
+    private val exploreActionObserver = requesterFactory.create(exploreResultCache, Kind.EXPLORE)
 
     fun getResultFlowable(kind: Kind) =
             when(kind) {
@@ -53,15 +48,12 @@ class ExperienceRepoSwitch(resultCacheFactory: ResultCacheFactory<Experience>,
                         Result(datas.toList()) })
                     .map { Result(it.data?.first { it.id == experienceId }) }
 
-    fun executeAction(kind: Kind, action: ExperienceRequesterFactory.Action,
-                      requestParams: ExperienceRequesterFactory.RequestParams? = null) {
+    fun executeAction(kind: Kind, action: Request.Action,
+                      requestParams: Request.Params? = null) {
         when (kind) {
-            Kind.MINE -> mineActionObserver.onNext(
-                    ExperienceRequesterFactory.Request(action, requestParams))
-            Kind.SAVED -> savedActionObserver.onNext(
-                    ExperienceRequesterFactory.Request(action, requestParams))
-            Kind.EXPLORE -> exploreActionObserver.onNext(
-                    ExperienceRequesterFactory.Request(action, requestParams))
+            Kind.MINE -> mineActionObserver.onNext(Request(action, requestParams))
+            Kind.SAVED -> savedActionObserver.onNext(Request(action, requestParams))
+            Kind.EXPLORE -> exploreActionObserver.onNext(Request(action, requestParams))
         }
     }
 

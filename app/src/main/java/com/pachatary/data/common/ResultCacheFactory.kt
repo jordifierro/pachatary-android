@@ -45,7 +45,7 @@ class ResultCacheFactory<T> where T : Identifiable {
                                 previousTListResult.builder().data(newList).build()
                             }
                         })
-                    .scan(Result(listOf<T>(), lastEvent = Result.Event.NONE),
+                    .scan(Result(listOf<T>(), action = Request.Action.NONE),
                             { oldValue, func -> func.apply(oldValue) })
                     .replay(1)
                     .autoConnect()

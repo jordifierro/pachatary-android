@@ -1,16 +1,16 @@
 package com.pachatary.presentation.experience.show
 
 import android.arch.lifecycle.LifecycleObserver
-import com.pachatary.data.common.Result
+import com.pachatary.data.common.Request
 import com.pachatary.data.experience.ExperienceRepoSwitch
 import com.pachatary.data.experience.ExperienceRepository
-import com.pachatary.data.experience.ExperienceRequesterFactory
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
 import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
 class ExplorePresenter @Inject constructor(private val repository: ExperienceRepository,
-                                           private val schedulerProvider: SchedulerProvider) : LifecycleObserver {
+                                           private val schedulerProvider: SchedulerProvider)
+                                                                               : LifecycleObserver {
 
     lateinit var view: ExploreView
 
@@ -38,11 +38,11 @@ class ExplorePresenter @Inject constructor(private val repository: ExperienceRep
                                           .observeOn(schedulerProvider.observer())
                                           .subscribe({
                                               if (it.isInProgress()) {
-                                                  if (it.lastEvent == Result.Event.GET_FIRSTS) {
+                                                  if (it.action == Request.Action.GET_FIRSTS) {
                                                       view.showLoader()
                                                       view.hidePaginationLoader()
                                                   }
-                                                  else if (it.lastEvent == Result.Event.PAGINATE) {
+                                                  else if (it.action == Request.Action.PAGINATE) {
                                                       view.hideLoader()
                                                       view.showPaginationLoader()
                                                   }
@@ -53,7 +53,7 @@ class ExplorePresenter @Inject constructor(private val repository: ExperienceRep
                                               }
 
                                               if (it.isError() &&
-                                                      it.lastEvent == Result.Event.GET_FIRSTS)
+                                                      it.action == Request.Action.GET_FIRSTS)
                                                   view.showRetry()
                                               else view.hideRetry()
 

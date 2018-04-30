@@ -1,5 +1,6 @@
 package com.pachatary.data.experience
 
+import com.pachatary.data.common.Request
 import com.pachatary.data.common.Result
 import io.reactivex.Flowable
 
@@ -13,13 +14,12 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
         return result
     }
 
-    fun getFirstExperiences(kind: ExperienceRepoSwitch.Kind,
-                            params: ExperienceRequesterFactory.RequestParams? = null) {
-        repoSwitch.executeAction(kind, ExperienceRequesterFactory.Action.GET_FIRSTS, params)
+    fun getFirstExperiences(kind: ExperienceRepoSwitch.Kind, params: Request.Params? = null) {
+        repoSwitch.executeAction(kind, Request.Action.GET_FIRSTS, params)
     }
 
     fun getMoreExperiences(kind: ExperienceRepoSwitch.Kind) {
-        repoSwitch.executeAction(kind, ExperienceRequesterFactory.Action.PAGINATE)
+        repoSwitch.executeAction(kind, Request.Action.PAGINATE)
     }
 
     fun experienceFlowable(experienceId: String): Flowable<Result<Experience>> =

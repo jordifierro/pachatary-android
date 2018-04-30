@@ -1,6 +1,7 @@
 package com.pachatary.presentation.experience.show
 
 import com.pachatary.data.auth.AuthRepository
+import com.pachatary.data.common.Request
 import com.pachatary.data.common.Result
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.experience.ExperienceRepoSwitch
@@ -51,7 +52,7 @@ class MyExperiencesPresenterTest {
     fun test_when_result_in_progress_last_event_get_firsts_shows_loader_if_can_create_content() {
         given {
             an_auth_repo_that_returns_true_on_can_create_content()
-            an_experience_repo_that_returns_in_progress(lastEvent = Result.Event.GET_FIRSTS)
+            an_experience_repo_that_returns_in_progress(action = Request.Action.GET_FIRSTS)
         } whenn {
             create_presenter()
         } then {
@@ -65,7 +66,7 @@ class MyExperiencesPresenterTest {
     fun test_when_result_in_progress_last_event_paginate_shows_loader_if_can_create_content() {
         given {
             an_auth_repo_that_returns_true_on_can_create_content()
-            an_experience_repo_that_returns_in_progress(lastEvent = Result.Event.PAGINATE)
+            an_experience_repo_that_returns_in_progress(action = Request.Action.PAGINATE)
         } whenn {
             create_presenter()
         } then {
@@ -129,7 +130,7 @@ class MyExperiencesPresenterTest {
     fun test_create_when_response_error_shows_retry_if_last_event_is_get_firsts() {
         given {
             an_auth_repo_that_returns_true_on_can_create_content()
-            an_experience_repo_that_returns_exception(lastEvent = Result.Event.GET_FIRSTS)
+            an_experience_repo_that_returns_exception(action = Request.Action.GET_FIRSTS)
         } whenn {
             create_presenter()
         } then {
@@ -143,7 +144,7 @@ class MyExperiencesPresenterTest {
     fun test_create_when_response_error_hides_loaders_if_last_event_is_paginate() {
         given {
             an_auth_repo_that_returns_true_on_can_create_content()
-            an_experience_repo_that_returns_exception(lastEvent = Result.Event.PAGINATE)
+            an_experience_repo_that_returns_exception(action = Request.Action.PAGINATE)
         } whenn {
             create_presenter()
         } then {
@@ -282,16 +283,16 @@ class MyExperiencesPresenterTest {
                             Result<List<Experience>>(arrayListOf(experienceA, experienceB))))
         }
 
-        fun an_experience_repo_that_returns_exception(lastEvent: Result.Event) {
+        fun an_experience_repo_that_returns_exception(action: Request.Action) {
             given(mockExperiencesRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.MINE))
                     .willReturn(Flowable.just(Result<List<Experience>>(null, error = Exception(),
-                            lastEvent = lastEvent)))
+                            action = action)))
         }
 
-        fun an_experience_repo_that_returns_in_progress(lastEvent: Result.Event) {
+        fun an_experience_repo_that_returns_in_progress(action: Request.Action) {
             given(mockExperiencesRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.MINE))
                     .willReturn(Flowable.just(
-                        Result<List<Experience>>(null, inProgress = true, lastEvent = lastEvent)))
+                        Result<List<Experience>>(null, inProgress = true, action = action)))
         }
 
         fun an_auth_repo_that_returns_true_on_can_create_content() {

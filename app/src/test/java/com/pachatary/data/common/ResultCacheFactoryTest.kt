@@ -81,19 +81,13 @@ class ResultCacheFactoryTest {
         val secondTestSubscriber: TestSubscriber<Result<List<Scene>>> = TestSubscriber.create()
 
         fun buildScenario(): ScenarioMaker {
-            newScene = Scene("5", "Title", "description", null,
-                    2.6, 1.2, "1")
-            updatedScene = Scene("1", "Other", "info", null,
-                    3.4, 0.9, "1")
-            val firstScene = Scene("1", "A", "a", null,
-                    3.4, 0.9, "1")
-            secondScene = Scene("2", "B", "b", null,
-                    3.4, 0.9, "1")
+            newScene = Scene("5", "Title", "description", null, 2.6, 1.2, "1")
+            updatedScene = Scene("1", "Other", "info", null, 3.4, 0.9, "1")
+            val firstScene = Scene("1", "A", "a", null, 3.4, 0.9, "1")
+            secondScene = Scene("2", "B", "b", null, 3.4, 0.9, "1")
             oldScenes = listOf(firstScene, secondScene)
-            val thirdScene = Scene("3", "C", "c", null,
-                    3.4, 0.9, "1")
-            val forthScene = Scene("4", "D", "d", null,
-                    3.4, 0.9, "1")
+            val thirdScene = Scene("3", "C", "c", null, 3.4, 0.9, "1")
+            val forthScene = Scene("4", "D", "d", null, 3.4, 0.9, "1")
             newScenes = listOf(thirdScene, forthScene)
 
             return this
@@ -127,8 +121,7 @@ class ResultCacheFactoryTest {
         }
 
         fun another_observer_subscribes_to_flowable() {
-            cache.resultFlowable
-                    .subscribeOn(Schedulers.trampoline()).subscribe(secondTestSubscriber)
+            cache.resultFlowable.subscribeOn(Schedulers.trampoline()).subscribe(secondTestSubscriber)
         }
 
         fun a_list_with_previous_scenes_and_new_one_should_be_received() {
@@ -160,7 +153,7 @@ class ResultCacheFactoryTest {
             testSubscriber.awaitCount(1)
 
             val result = testSubscriber.events.get(0).get(0) as Result<*>
-            assertEquals(Result<List<Scene>>(listOf(), lastEvent = Result.Event.NONE), result)
+            assertEquals(Result<List<Scene>>(listOf(), action = Request.Action.NONE), result)
         }
 
         fun this_other_observer_should_received_second_emitted_list() {

@@ -1,5 +1,6 @@
 package com.pachatary.presentation.experience.show
 
+import com.pachatary.data.common.Request
 import com.pachatary.data.common.Result
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.experience.ExperienceRepoSwitch
@@ -21,7 +22,7 @@ class ExplorePresenterTest {
     @Test
     fun test_create_asks_firsts_experiences() {
         given {
-            an_experience_repo_that_returns_in_progress(Result.Event.GET_FIRSTS)
+            an_experience_repo_that_returns_in_progress(Request.Action.GET_FIRSTS)
         } whenn {
             create_presenter()
         } then {
@@ -32,7 +33,7 @@ class ExplorePresenterTest {
     @Test
     fun test_when_result_in_progress_last_event_get_firsts_shows_loader() {
         given {
-            an_experience_repo_that_returns_in_progress(lastEvent = Result.Event.GET_FIRSTS)
+            an_experience_repo_that_returns_in_progress(action = Request.Action.GET_FIRSTS)
         } whenn {
             create_presenter()
         } then {
@@ -46,7 +47,7 @@ class ExplorePresenterTest {
     @Test
     fun test_when_result_in_progress_last_event_pagination_shows_pagination_loader() {
         given {
-            an_experience_repo_that_returns_in_progress(lastEvent = Result.Event.PAGINATE)
+            an_experience_repo_that_returns_in_progress(action = Request.Action.PAGINATE)
         } whenn {
             create_presenter()
         } then {
@@ -77,7 +78,7 @@ class ExplorePresenterTest {
     @Test
     fun test_create_when_response_error_shows_retry_if_last_event_get_firsts() {
         given {
-            an_experience_repo_that_returns_exception(lastEvent = Result.Event.GET_FIRSTS)
+            an_experience_repo_that_returns_exception(action = Request.Action.GET_FIRSTS)
         } whenn {
             create_presenter()
         } then {
@@ -90,7 +91,7 @@ class ExplorePresenterTest {
     @Test
     fun test_create_when_response_error_does_nothing_if_last_event_pagination() {
         given {
-            an_experience_repo_that_returns_exception(lastEvent = Result.Event.PAGINATE)
+            an_experience_repo_that_returns_exception(action = Request.Action.PAGINATE)
         } whenn {
             create_presenter()
         } then {
@@ -148,7 +149,8 @@ class ExplorePresenterTest {
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
-            val testSchedulerProvider = SchedulerProvider(Schedulers.trampoline(), Schedulers.trampoline())
+            val testSchedulerProvider =
+                    SchedulerProvider(Schedulers.trampoline(), Schedulers.trampoline())
             presenter = ExplorePresenter(mockRepository, testSchedulerProvider)
             presenter.view = mockView
 
@@ -172,18 +174,14 @@ class ExplorePresenterTest {
                             arrayListOf(experienceA, experienceB))))
         }
 
-        fun an_experience_repo_that_returns_in_progress(lastEvent: Result.Event) {
-            BDDMockito.given(
-                    mockRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.EXPLORE))
-                    .willReturn(Flowable.just(
-                            Result(listOf(), inProgress = true, lastEvent = lastEvent)))
+        fun an_experience_repo_that_returns_in_progress(action: Request.Action) {
+            BDDMockito.given(mockRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.EXPLORE))
+                    .willReturn(Flowable.just(Result(listOf(), inProgress = true, action = action)))
         }
 
-        fun an_experience_repo_that_returns_exception(lastEvent: Result.Event) {
-            BDDMockito.given(
-                    mockRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.EXPLORE))
-                    .willReturn(Flowable.just(
-                            Result(listOf(), error = Exception(), lastEvent = lastEvent)))
+        fun an_experience_repo_that_returns_exception(action: Request.Action) {
+            BDDMockito.given(mockRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.EXPLORE))
+                .willReturn(Flowable.just(Result(listOf(), error = Exception(), action = action)))
         }
 
         fun create_presenter() {
@@ -240,8 +238,7 @@ class ExplorePresenterTest {
         }
 
         fun an_experience_repo_that_returns_test_observable() {
-            BDDMockito.given(
-                    mockRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.EXPLORE))
+            BDDMockito.given(mockRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.EXPLORE))
                     .willReturn(testObservable.toFlowable(BackpressureStrategy.LATEST))
         }
 

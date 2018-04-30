@@ -1,7 +1,7 @@
 package com.pachatary.presentation.experience.show
 
 import android.arch.lifecycle.LifecycleObserver
-import com.pachatary.data.common.Result
+import com.pachatary.data.common.Request
 import com.pachatary.data.experience.ExperienceRepoSwitch
 import com.pachatary.data.experience.ExperienceRepository
 import io.reactivex.Scheduler
@@ -10,7 +10,8 @@ import javax.inject.Inject
 import javax.inject.Named
 
 class SavedPresenter @Inject constructor(private val repository: ExperienceRepository,
-                                         @Named("main") val scheduler: Scheduler) : LifecycleObserver {
+                                         @Named("main") val scheduler: Scheduler)
+                                                                               : LifecycleObserver {
 
     lateinit var view: SavedView
 
@@ -37,11 +38,11 @@ class SavedPresenter @Inject constructor(private val repository: ExperienceRepos
                                           .observeOn(scheduler)
                                           .subscribe({
                                               if (it.isInProgress()) {
-                                                  if (it.lastEvent == Result.Event.GET_FIRSTS) {
+                                                  if (it.action == Request.Action.GET_FIRSTS) {
                                                       view.showLoader()
                                                       view.hidePaginationLoader()
                                                   }
-                                                  else if (it.lastEvent == Result.Event.PAGINATE) {
+                                                  else if (it.action == Request.Action.PAGINATE) {
                                                       view.hideLoader()
                                                       view.showPaginationLoader()
                                                   }
@@ -52,7 +53,7 @@ class SavedPresenter @Inject constructor(private val repository: ExperienceRepos
                                               }
 
                                               if (it.isError() &&
-                                                      it.lastEvent == Result.Event.GET_FIRSTS)
+                                                      it.action == Request.Action.GET_FIRSTS)
                                                   view.showRetry()
                                               else view.hideRetry()
 

@@ -4,7 +4,7 @@ import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.OnLifecycleEvent
 import com.pachatary.data.auth.AuthRepository
-import com.pachatary.data.common.Result
+import com.pachatary.data.common.Request
 import com.pachatary.data.experience.ExperienceRepoSwitch
 import com.pachatary.data.experience.ExperienceRepository
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
@@ -47,11 +47,11 @@ class MyExperiencesPresenter @Inject constructor(
                                         .observeOn(schedulerProvider.observer())
                                         .subscribe({
                                             if (it.isInProgress()) {
-                                                if (it.lastEvent == Result.Event.GET_FIRSTS) {
+                                                if (it.action == Request.Action.GET_FIRSTS) {
                                                     view.showLoader()
                                                     view.hidePaginationLoader()
                                                 }
-                                                else if (it.lastEvent == Result.Event.PAGINATE) {
+                                                else if (it.action == Request.Action.PAGINATE) {
                                                     view.hideLoader()
                                                     view.showPaginationLoader()
                                                 }
@@ -62,7 +62,7 @@ class MyExperiencesPresenter @Inject constructor(
                                             }
 
                                             if (it.isError() &&
-                                                    it.lastEvent == Result.Event.GET_FIRSTS)
+                                                    it.action == Request.Action.GET_FIRSTS)
                                                     view.showRetry()
                                             else view.hideRetry()
 

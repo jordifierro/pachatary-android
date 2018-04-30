@@ -2,23 +2,19 @@ package com.pachatary.data.common
 
 data class Result<T>(val data: T?,
                      val nextUrl: String? = null,
-                     val lastEvent: Event = Event.NONE,
+                     val action: Request.Action = Request.Action.NONE,
                      val inProgress: Boolean = false,
                      val error: Throwable? = null) {
 
-    enum class Event {
-        NONE, GET_FIRSTS, PAGINATE, REFRESH
-    }
-
-    fun hasBeenInitialized() = lastEvent != Event.NONE
+    fun hasBeenInitialized() = action != Request.Action.NONE
     fun isInProgress() = inProgress
     fun isSuccess() = !isInProgress() && error == null
     fun isError() = !isInProgress() && error != null
     fun hasMoreElements() = nextUrl != null
 
-    fun builder() = Builder(this.data, this.nextUrl, this.lastEvent, this.inProgress, this.error)
+    fun builder() = Builder(this.data, this.nextUrl, this.action, this.inProgress, this.error)
 
-    class Builder<T>(var data: T?, val nextUrl: String?, var lastEvent: Event,
+    class Builder<T>(var data: T?, val nextUrl: String?, var action: Request.Action,
                      var inProgress: Boolean, var error: Throwable?) {
 
         fun data(data: T?): Builder<T> {
@@ -26,8 +22,8 @@ data class Result<T>(val data: T?,
             return this
         }
 
-        fun lastEvent(event: Event): Builder<T> {
-            this.lastEvent = event
+        fun action(action: Request.Action): Builder<T> {
+            this.action = action
             return this
         }
 
@@ -41,6 +37,6 @@ data class Result<T>(val data: T?,
             return this
         }
 
-        fun build() = Result(this.data, this.nextUrl, this.lastEvent, this.inProgress, this.error)
+        fun build() = Result(this.data, this.nextUrl, this.action, this.inProgress, this.error)
     }
 }
