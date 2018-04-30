@@ -13,18 +13,55 @@ import io.reactivex.subjects.PublishSubject
 import org.junit.Assert.assertFalse
 import org.junit.Test
 import org.mockito.BDDMockito
+import org.mockito.BDDMockito.never
 import org.mockito.BDDMockito.then
 import org.mockito.Mock
+import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 
 class ExplorePresenterTest {
 
     @Test
-    fun test_create_asks_firsts_experiences() {
+    fun test_create_dont_ask_firsts_experiences() {
         given {
             an_experience_repo_that_returns_in_progress(Request.Action.GET_FIRSTS)
         } whenn {
             create_presenter()
+        } then {
+            should_not_call_repo_get_firsts_experiences()
+        }
+    }
+
+    @Test
+    fun test_on_retry_click_dont_calls_get_firsts_experiences_again() {
+        given {
+            nothing()
+        } whenn {
+            retry_clicked()
+        } then {
+            should_not_call_repo_get_firsts_experiences()
+        }
+    }
+
+    @Test
+    fun test_create_with_last_location_known_ask_firsts_experiences() {
+        given {
+            an_experience_repo_that_returns_in_progress(Request.Action.GET_FIRSTS)
+        } whenn {
+            create_presenter()
+            last_location_known()
+        } then {
+            should_call_repo_get_firsts_experiences()
+        }
+    }
+
+    @Test
+    fun test_on_retry_click_with_last_location_calls_get_firsts_experiences_again() {
+        given {
+            nothing()
+        } whenn {
+            retry_clicked()
+            last_location_known()
         } then {
             should_call_repo_get_firsts_experiences()
         }
@@ -102,17 +139,6 @@ class ExplorePresenterTest {
     }
 
     @Test
-    fun test_on_retry_click_calls_get_firsts_experiences_again() {
-        given {
-            nothing()
-        } whenn {
-            retry_clicked()
-        } then {
-            should_call_repo_get_firsts_experiences()
-        }
-    }
-
-    @Test
     fun test_experience_tapped() {
         given {
             nothing()
@@ -146,6 +172,8 @@ class ExplorePresenterTest {
         lateinit var experienceA: Experience
         lateinit var experienceB: Experience
         lateinit var testObservable: PublishSubject<Result<List<Experience>>>
+        val latitude = 4.8
+        val longitude = -0.3
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
@@ -192,6 +220,10 @@ class ExplorePresenterTest {
             presenter.onRetryClick()
         }
 
+        fun last_location_known() {
+            presenter.onLastLocationFound(latitude, longitude)
+        }
+
         fun experience_click(experienceId: String) {
             presenter.onExperienceClick(experienceId)
         }
@@ -225,7 +257,15 @@ class ExplorePresenterTest {
         }
 
         fun should_call_repo_get_firsts_experiences() {
-            then(mockRepository).should().getFirstExperiences(ExperienceRepoSwitch.Kind.EXPLORE)
+            then(mockRepository).should()
+                    .getFirstExperiences(ExperienceRepoSwitch.Kind.EXPLORE,
+                                         Request.Params(null, latitude, longitude))
+        }
+
+        fun should_not_call_repo_get_firsts_experiences() {
+            then(mockRepository).should(Mockito.never())
+                    .getFirstExperiences(ExperienceRepoSwitch.Kind.EXPLORE,
+                                         Request.Params(null, latitude, longitude))
         }
 
         fun should_navigate_to_experience(experienceId: String) {

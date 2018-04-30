@@ -1,5 +1,6 @@
 package com.pachatary.presentation.experience.show
 
+import android.location.Location
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
@@ -12,6 +13,8 @@ import android.widget.ProgressBar
 import com.pachatary.R
 import com.pachatary.data.experience.Experience
 import com.pachatary.presentation.common.PachataryApplication
+import com.pachatary.presentation.common.location.LocationUtils
+import com.pachatary.presentation.main.MainActivity
 import com.pachatary.presentation.scene.show.ExperienceMapActivity
 import javax.inject.Inject
 
@@ -46,6 +49,9 @@ class ExploreFragment : Fragment(), ExploreView {
         recyclerView.layoutManager = GridLayoutManager(activity, 1)
         recyclerView.adapter = ExtendedListAdapter(layoutInflater, listOf(), false,
                 { id -> presenter.onExperienceClick(id) }, { presenter.lastExperienceShown() })
+
+        LocationUtils.addListenerToLocation((activity as MainActivity), { location: Location ->
+            presenter.onLastLocationFound(location.latitude, location.longitude) })
 
         presenter.create()
         return view
