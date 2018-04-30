@@ -4,6 +4,7 @@ import android.arch.lifecycle.LifecycleObserver
 import com.pachatary.data.common.Result
 import com.pachatary.data.experience.ExperienceRepoSwitch
 import com.pachatary.data.experience.ExperienceRepository
+import com.pachatary.data.experience.ExperienceRequesterFactory
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
 import io.reactivex.disposables.Disposable
 import javax.inject.Inject

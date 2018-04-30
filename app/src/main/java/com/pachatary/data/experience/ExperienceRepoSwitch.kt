@@ -53,11 +53,15 @@ class ExperienceRepoSwitch(resultCacheFactory: ResultCacheFactory<Experience>,
                         Result(datas.toList()) })
                     .map { Result(it.data?.first { it.id == experienceId }) }
 
-    fun executeAction(kind: Kind, action: ExperienceRequesterFactory.Action) {
+    fun executeAction(kind: Kind, action: ExperienceRequesterFactory.Action,
+                      requestParams: ExperienceRequesterFactory.RequestParams? = null) {
         when (kind) {
-            Kind.MINE -> mineActionObserver.onNext(action)
-            Kind.SAVED -> savedActionObserver.onNext(action)
-            Kind.EXPLORE -> exploreActionObserver.onNext(action)
+            Kind.MINE -> mineActionObserver.onNext(
+                    ExperienceRequesterFactory.Request(action, requestParams))
+            Kind.SAVED -> savedActionObserver.onNext(
+                    ExperienceRequesterFactory.Request(action, requestParams))
+            Kind.EXPLORE -> exploreActionObserver.onNext(
+                    ExperienceRequesterFactory.Request(action, requestParams))
         }
     }
 

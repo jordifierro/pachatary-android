@@ -6,6 +6,7 @@ import io.reactivex.Flowable
 import io.reactivex.Observer
 import io.reactivex.observers.TestObserver
 import junit.framework.Assert.assertEquals
+import org.bouncycastle.ocsp.Req
 import org.junit.Test
 import org.mockito.BDDMockito
 import org.mockito.Mock
@@ -49,6 +50,7 @@ class ExperienceRequesterFactoryTest {
         for (kind in ExperienceRepoSwitch.Kind.values()) {
             given {
                 a_kind(kind)
+                a_search_params()
                 a_result_cache_that_return_initial_result()
                 an_api_repo_that_returns_two_experiences()
             } whenn {
@@ -170,7 +172,7 @@ class ExperienceRequesterFactoryTest {
     class ScenarioMaker {
         @Mock lateinit var mockApiRepository: ExperienceApiRepository
         lateinit var requesterFactory: ExperienceRequesterFactory
-        lateinit var requesterObserver: Observer<ExperienceRequesterFactory.Action>
+        lateinit var requesterObserver: Observer<ExperienceRequesterFactory.Request>
         var kind = ExperienceRepoSwitch.Kind.MINE
         lateinit var resultCache: ResultCacheFactory.ResultCache<Experience>
         lateinit var resultFlowable: Flowable<Result<List<Experience>>>
@@ -181,6 +183,7 @@ class ExperienceRequesterFactoryTest {
         lateinit var experienceB: Experience
         var nextUrl = ""
         val exception = Exception()
+        var searchParams: ExperienceRequesterFactory.RequestParams? = null
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
@@ -191,6 +194,10 @@ class ExperienceRequesterFactoryTest {
 
         fun a_kind(kind: ExperienceRepoSwitch.Kind) {
             this.kind = kind
+        }
+
+        fun a_search_params() {
+            searchParams = ExperienceRequesterFactory.RequestParams("culture", 2.8, -4.3)
         }
 
         fun a_next_url() {
@@ -234,7 +241,8 @@ class ExperienceRequesterFactoryTest {
                     BDDMockito.given(mockApiRepository.savedExperiencesFlowable())
                             .willReturn(Flowable.just(Result(listOf(experienceA, experienceB))))
                 ExperienceRepoSwitch.Kind.EXPLORE ->
-                    BDDMockito.given(mockApiRepository.exploreExperiencesFlowable())
+                    BDDMockito.given(mockApiRepository.exploreExperiencesFlowable(searchParams!!.word,
+                            searchParams!!.latitude, searchParams!!.longintude))
                             .willReturn(Flowable.just(Result(listOf(experienceA, experienceB))))
             }
         }
@@ -272,11 +280,13 @@ class ExperienceRequesterFactoryTest {
         }
 
         fun emit_get_firsts() {
-            requesterObserver.onNext(ExperienceRequesterFactory.Action.GET_FIRSTS)
+            requesterObserver.onNext(ExperienceRequesterFactory.Request(
+                    ExperienceRequesterFactory.Action.GET_FIRSTS, searchParams))
         }
 
         fun paginate() {
-            requesterObserver.onNext(ExperienceRequesterFactory.Action.PAGINATE)
+            requesterObserver.onNext(
+                    ExperienceRequesterFactory.Request(ExperienceRequesterFactory.Action.PAGINATE))
         }
 
         fun should_do_nothing() {
@@ -313,7 +323,8 @@ class ExperienceRequesterFactoryTest {
                 ExperienceRepoSwitch.Kind.SAVED -> BDDMockito.then(mockApiRepository).should()
                         .savedExperiencesFlowable()
                 ExperienceRepoSwitch.Kind.EXPLORE -> BDDMockito.then(mockApiRepository).should()
-                        .exploreExperiencesFlowable()
+                        .exploreExperiencesFlowable(searchParams!!.word, searchParams!!.latitude,
+                                searchParams!!.longintude)
             }
         }
 

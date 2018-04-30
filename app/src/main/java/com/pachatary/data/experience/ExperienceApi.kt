@@ -7,8 +7,11 @@ import retrofit2.http.*
 
 interface ExperienceApi {
 
-    @GET("/experiences/?mine=false")
-    fun exploreExperiences(): Flowable<Result<PaginatedListMapper<Experience, ExperienceMapper>>>
+    @GET("/experiences/search")
+    fun exploreExperiences(@Query("word") word: String?,
+                           @Query("latitude") latitude: Double?,
+                           @Query("longitude") longitude: Double?)
+            : Flowable<Result<PaginatedListMapper<Experience, ExperienceMapper>>>
 
     @GET("/experiences/?mine=true")
     fun myExperiences(): Flowable<Result<PaginatedListMapper<Experience, ExperienceMapper>>>

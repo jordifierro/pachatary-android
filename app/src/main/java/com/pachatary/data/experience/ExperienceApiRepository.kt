@@ -22,8 +22,9 @@ class ExperienceApiRepository (retrofit: Retrofit, @Named("io") val scheduler: S
 
     private val experienceApi: ExperienceApi = retrofit.create(ExperienceApi::class.java)
 
-    fun exploreExperiencesFlowable(): Flowable<Result<List<Experience>>> =
-            experienceApi.exploreExperiences()
+    fun exploreExperiencesFlowable(word: String?, latitude: Double?, longitude: Double?)
+            : Flowable<Result<List<Experience>>> =
+            experienceApi.exploreExperiences(word, latitude, longitude)
                 .compose(NetworkParserFactory.getPaginatedListTransformer<Experience, ExperienceMapper>())
                 .subscribeOn(scheduler)
 

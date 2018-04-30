@@ -137,6 +137,7 @@ class ExperienceRepositoryTest {
         for (kind in ExperienceRepoSwitch.Kind.values()) {
             given {
                 kind_of_experiences(kind)
+                a_search_params()
             } whenn {
                 get_first_experiences_is_called()
             } then {
@@ -177,12 +178,17 @@ class ExperienceRepositoryTest {
         lateinit var experience: Experience
         var experienceId = ""
         var croppedImageString = ""
+        lateinit var searchParams: ExperienceRequesterFactory.RequestParams
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
             repository = ExperienceRepository(mockApiRepository, mockExperiencesRepoSwitch)
 
             return this
+        }
+
+        fun a_search_params() {
+            searchParams = ExperienceRequesterFactory.RequestParams("c", 8.5, -0.3)
         }
 
         fun a_flowable() {
@@ -273,7 +279,7 @@ class ExperienceRepositoryTest {
         }
 
         fun get_first_experiences_is_called() {
-            repository.getFirstExperiences(kind)
+            repository.getFirstExperiences(kind, searchParams)
         }
 
         fun get_more_experiences_is_called() {
@@ -396,7 +402,7 @@ class ExperienceRepositoryTest {
 
         fun should_call_switch_execute_get_firsts_action() {
             BDDMockito.then(mockExperiencesRepoSwitch).should()
-                    .executeAction(kind, ExperienceRequesterFactory.Action.GET_FIRSTS)
+                    .executeAction(kind, ExperienceRequesterFactory.Action.GET_FIRSTS, searchParams)
         }
 
         fun should_call_switch_execute_paginate_action() {

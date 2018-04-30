@@ -34,14 +34,27 @@ class ExperienceApiRepositoryTest {
         }
     }
 
+
     @Test
-    fun test_get_explore_experiences() {
+    fun test_get_explore_experiences_with_params() {
+        given {
+            a_web_server_that_returns_get_experiences()
+        } whenn {
+            explore_experiences_are_requested("culture", 8.5, -7.4)
+        } then {
+            request_should_search_experiences("culture", 8.5, -7.4)
+            response_should_experience_list_and_next_url()
+        }
+    }
+
+    @Test
+    fun test_get_explore_experiences_without_params() {
         given {
             a_web_server_that_returns_get_experiences()
         } whenn {
             explore_experiences_are_requested()
         } then {
-            request_should_get_experiences()
+            request_should_search_experiences()
             response_should_experience_list_and_next_url()
         }
     }
@@ -196,17 +209,23 @@ class ExperienceApiRepositoryTest {
         }
 
         fun my_experiences_are_requested() {
-            repository.myExperiencesFlowable().subscribeOn(Schedulers.trampoline()).subscribe(testListSubscriber)
+            repository.myExperiencesFlowable()
+                    .subscribeOn(Schedulers.trampoline())
+                    .subscribe(testListSubscriber)
             testListSubscriber.awaitCount(1)
         }
 
-        fun explore_experiences_are_requested() {
-            repository.exploreExperiencesFlowable().subscribeOn(Schedulers.trampoline()).subscribe(testListSubscriber)
+        fun explore_experiences_are_requested(word: String? = null, latitude: Double? = null,
+                                              longitude: Double? = null) {
+            repository.exploreExperiencesFlowable(word, latitude, longitude)
+                    .subscribeOn(Schedulers.trampoline()).subscribe(testListSubscriber)
             testListSubscriber.awaitCount(1)
         }
 
         fun saved_experiences_are_requested() {
-            repository.savedExperiencesFlowable().subscribeOn(Schedulers.trampoline()).subscribe(testListSubscriber)
+            repository.savedExperiencesFlowable()
+                    .subscribeOn(Schedulers.trampoline())
+                    .subscribe(testListSubscriber)
             testListSubscriber.awaitCount(1)
         }
 
@@ -242,23 +261,35 @@ class ExperienceApiRepositoryTest {
 
         fun request_should_call_url() {
             val request = mockWebServer.takeRequest()
-            assertEquals(url, request.getPath())
+            assertEquals(url, request.path)
             assertEquals("GET", request.getMethod())
             assertEquals("", request.getBody().readUtf8())
         }
 
         fun request_should_get_experiences(mine: Boolean = false, saved: Boolean = false) {
             val request = mockWebServer.takeRequest()
-            if (saved) assertEquals("/experiences/?saved=true", request.getPath())
-            else if (mine) assertEquals("/experiences/?mine=true", request.getPath())
-            else assertEquals("/experiences/?mine=false", request.getPath())
+            if (saved) assertEquals("/experiences/?saved=true", request.path)
+            else if (mine) assertEquals("/experiences/?mine=true", request.path)
+            else assertEquals("/experiences/?mine=false", request.path)
             assertEquals("GET", request.getMethod())
             assertEquals("", request.getBody().readUtf8())
         }
 
+        fun request_should_search_experiences(word: String? = null, latitude: Double? = null,
+                                              longitude: Double? = null) {
+            val request = mockWebServer.takeRequest()
+            if (word == null && latitude == null && longitude == null)
+                assertEquals("/experiences/search", request.path)
+            else assertEquals("/experiences/search?word=" + word + "&latitude=" +
+                    latitude.toString() + "&longitude=" + longitude.toString(), request.path)
+            assertEquals("GET", request.getMethod())
+            assertEquals("", request.getBody().readUtf8())
+
+        }
+
         fun request_should_post_experience_attrs() {
             val request = mockWebServer.takeRequest()
-            assertEquals("/experiences/", request.getPath())
+            assertEquals("/experiences/", request.path)
             assertEquals("POST", request.getMethod())
             assertEquals("title=T&description=desc",
                     request.getBody().readUtf8())
@@ -266,21 +297,21 @@ class ExperienceApiRepositoryTest {
 
         fun request_should_patch_experience_attrs() {
             val request = mockWebServer.takeRequest()
-            assertEquals("/experiences/1", request.getPath())
+            assertEquals("/experiences/1", request.path)
             assertEquals("PATCH", request.getMethod())
             assertEquals("title=T&description=desc", request.getBody().readUtf8())
         }
 
         fun request_should_post_experience_id_save() {
             val request = mockWebServer.takeRequest()
-            assertEquals("/experiences/" + experience.id + "/save/", request.getPath())
+            assertEquals("/experiences/" + experience.id + "/save/", request.path)
             assertEquals("POST", request.getMethod())
             assertEquals("", request.getBody().readUtf8())
         }
 
         fun request_should_delete_experience_id_save() {
             val request = mockWebServer.takeRequest()
-            assertEquals("/experiences/" + experience.id + "/save/", request.getPath())
+            assertEquals("/experiences/" + experience.id + "/save/", request.path)
             assertEquals("DELETE", request.getMethod())
             assertEquals("", request.getBody().readUtf8())
         }

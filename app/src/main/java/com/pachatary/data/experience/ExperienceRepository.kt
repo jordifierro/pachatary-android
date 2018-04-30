@@ -13,8 +13,9 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
         return result
     }
 
-    fun getFirstExperiences(kind: ExperienceRepoSwitch.Kind) {
-        repoSwitch.executeAction(kind, ExperienceRequesterFactory.Action.GET_FIRSTS)
+    fun getFirstExperiences(kind: ExperienceRepoSwitch.Kind,
+                            params: ExperienceRequesterFactory.RequestParams? = null) {
+        repoSwitch.executeAction(kind, ExperienceRequesterFactory.Action.GET_FIRSTS, params)
     }
 
     fun getMoreExperiences(kind: ExperienceRepoSwitch.Kind) {

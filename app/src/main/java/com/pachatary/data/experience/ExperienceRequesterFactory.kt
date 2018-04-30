@@ -14,27 +14,34 @@ class ExperienceRequesterFactory(val apiRepository: ExperienceApiRepository) {
         GET_FIRSTS, PAGINATE, REFRESH
     }
 
+    data class RequestParams(val word: String? = null,
+                             val latitude: Double? = null,
+                             val longintude: Double? = null) {}
+
+    data class Request(val action: Action, val params: RequestParams? = null) {}
+
     fun create(resultCache: ResultCacheFactory.ResultCache<Experience>,
-               kind: ExperienceRepoSwitch.Kind): Observer<Action> {
-        val actionsSubject = PublishSubject.create<Action>()
+               kind: ExperienceRepoSwitch.Kind): Observer<Request> {
+        val actionsSubject = PublishSubject.create<Request>()
         val disposable = actionsSubject.toFlowable(BackpressureStrategy.LATEST)
                 .withLatestFrom(resultCache.resultFlowable,
-                        BiFunction<Action, Result<List<Experience>>,
-                                Pair<Action, Result<List<Experience>>>>
-                        { action, result -> Pair(action, result) })
+                        BiFunction<Request, Result<List<Experience>>,
+                                Pair<Request, Result<List<Experience>>>>
+                        { request, result -> Pair(request, result) })
                 .subscribe({
-                    if (it.first == Action.GET_FIRSTS) {
+                    if (it.first.action == Action.GET_FIRSTS) {
                         if (!it.second.isInProgress() &&
                                 (!it.second.hasBeenInitialized() || it.second.isError())) {
                             resultCache.replaceResultObserver.onNext(Result(listOf(),
                                     inProgress = true, lastEvent = Result.Event.GET_FIRSTS))
-                            apiCallFlowable(apiRepository, kind).subscribe({ apiResult ->
+                            apiCallFlowable(apiRepository, kind, it.first.params)
+                                    .subscribe({ apiResult ->
                                 resultCache.replaceResultObserver.onNext(
                                     apiResult.builder().lastEvent(Result.Event.GET_FIRSTS).build())
                             })
                         }
                     }
-                    else if (it.first == Action.PAGINATE) {
+                    else if (it.first.action == Action.PAGINATE) {
                         if (!it.second.isInProgress() &&
                                 (it.second.isSuccess() && it.second.hasBeenInitialized() ||
                             it.second.isError() && it.second.lastEvent == Result.Event.PAGINATE) &&
@@ -62,7 +69,6 @@ class ExperienceRequesterFactory(val apiRepository: ExperienceApiRepository) {
                                     }
                                 resultCache.replaceResultObserver.onNext(newResult)
                             })
-
                         }
                     }
                 })
@@ -70,22 +76,13 @@ class ExperienceRequesterFactory(val apiRepository: ExperienceApiRepository) {
     }
 
     private fun apiCallFlowable(apiRepository: ExperienceApiRepository,
-                                kind: ExperienceRepoSwitch.Kind)
+                                kind: ExperienceRepoSwitch.Kind, requestParams: RequestParams?)
             : Flowable<Result<List<Experience>>> {
         when (kind) {
             ExperienceRepoSwitch.Kind.MINE -> return apiRepository.myExperiencesFlowable()
             ExperienceRepoSwitch.Kind.SAVED -> return apiRepository.savedExperiencesFlowable()
-            ExperienceRepoSwitch.Kind.EXPLORE -> return apiRepository.exploreExperiencesFlowable()
-        }
-    }
-
-    private fun apiPaginateCallFlowable(apiRepository: ExperienceApiRepository,
-                                        kind: ExperienceRepoSwitch.Kind)
-            : Flowable<Result<List<Experience>>> {
-        when (kind) {
-            ExperienceRepoSwitch.Kind.MINE -> return apiRepository.myExperiencesFlowable()
-            ExperienceRepoSwitch.Kind.SAVED -> return apiRepository.savedExperiencesFlowable()
-            ExperienceRepoSwitch.Kind.EXPLORE -> return apiRepository.exploreExperiencesFlowable()
+            ExperienceRepoSwitch.Kind.EXPLORE -> return apiRepository.exploreExperiencesFlowable(
+                    requestParams!!.word, requestParams.latitude, requestParams.longintude)
         }
     }
 }
