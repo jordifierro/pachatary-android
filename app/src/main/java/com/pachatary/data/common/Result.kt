@@ -3,6 +3,7 @@ package com.pachatary.data.common
 data class Result<T>(val data: T?,
                      val nextUrl: String? = null,
                      val action: Request.Action = Request.Action.NONE,
+                     val params: Request.Params? = null,
                      val inProgress: Boolean = false,
                      val error: Throwable? = null) {
 
@@ -12,10 +13,11 @@ data class Result<T>(val data: T?,
     fun isError() = !isInProgress() && error != null
     fun hasMoreElements() = nextUrl != null
 
-    fun builder() = Builder(this.data, this.nextUrl, this.action, this.inProgress, this.error)
+    fun builder() = Builder(this.data, this.nextUrl, this.action,
+                            this.params, this.inProgress, this.error)
 
     class Builder<T>(var data: T?, val nextUrl: String?, var action: Request.Action,
-                     var inProgress: Boolean, var error: Throwable?) {
+                     var params: Request.Params?, var inProgress: Boolean, var error: Throwable?) {
 
         fun data(data: T?): Builder<T> {
             this.data = data
@@ -37,6 +39,12 @@ data class Result<T>(val data: T?,
             return this
         }
 
-        fun build() = Result(this.data, this.nextUrl, this.action, this.inProgress, this.error)
+        fun params(params: Request.Params?): Builder<T> {
+            this.params = params
+            return this
+        }
+
+        fun build() = Result(this.data, this.nextUrl, this.action,
+                             this.params, this.inProgress, this.error)
     }
 }

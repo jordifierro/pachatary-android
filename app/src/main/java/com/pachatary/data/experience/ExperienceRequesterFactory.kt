@@ -21,14 +21,20 @@ class ExperienceRequesterFactory(val apiRepository: ExperienceApiRepository) {
                         { request, result -> Pair(request, result) })
                 .subscribe({
                     if (it.first.action == Request.Action.GET_FIRSTS) {
-                        if (!it.second.isInProgress() &&
-                                (!it.second.hasBeenInitialized() || it.second.isError())) {
+                        if ((!it.second.isInProgress() &&
+                                (!it.second.hasBeenInitialized() || it.second.isError()))
+                        || it.first.params != it.second.params) {
                             resultCache.replaceResultObserver.onNext(Result(listOf(),
-                                    inProgress = true, action = Request.Action.GET_FIRSTS))
+                                    inProgress = true,
+                                    action = Request.Action.GET_FIRSTS,
+                                    params = it.first.params))
                             apiCallFlowable(apiRepository, kind, it.first.params)
                                     .subscribe({ apiResult ->
                                 resultCache.replaceResultObserver.onNext(
-                                    apiResult.builder().action(Request.Action.GET_FIRSTS).build())
+                                    apiResult.builder()
+                                            .action(Request.Action.GET_FIRSTS)
+                                            .params(it.first.params)
+                                            .build())
                             })
                         }
                     }

@@ -65,6 +65,23 @@ class ExperienceRequesterFactoryTest {
     }
 
     @Test
+    fun test_get_firsts_after_search_params_changed_reset_and_acts_like_normal_get_firsts() {
+        given {
+            a_kind(ExperienceRepoSwitch.Kind.EXPLORE)
+            a_search_params()
+            a_result_cache_that_returns_paginated_search()
+            an_api_repo_that_returns_two_experiences()
+        } whenn {
+            create_requester()
+            emit_get_firsts()
+        } then {
+            should_emit_loading_through_replace_result_cache()
+            should_call_api()
+            should_replace_result_with_that_two_experiences_and_last_event_get_firsts()
+        }
+    }
+
+    @Test
     fun test_paginate_does_nothing_if_not_there_are_more_elements() {
         for (kind in ExperienceRepoSwitch.Kind.values()) {
             given {
@@ -263,6 +280,11 @@ class ExperienceRequesterFactoryTest {
             resultFlowable = Flowable.just(Result(listOf(), nextUrl = null))
         }
 
+        fun a_result_cache_that_returns_paginated_search() {
+            resultFlowable = Flowable.just(Result(
+                    listOf(), action = Request.Action.PAGINATE, params = Request.Params("other")))
+        }
+
         fun a_result_cache_that_return_error_getting_firsts() {
             resultFlowable = Flowable.just(Result(listOf(), error = Exception(),
                                                   action = Request.Action.GET_FIRSTS))
@@ -297,7 +319,7 @@ class ExperienceRequesterFactoryTest {
         fun should_emit_loading_through_replace_result_cache() {
             val result = replaceResultObserver.events.get(0).get(0) as Result<List<Experience>>
             assertEquals(Result(listOf<Experience>(), inProgress = true,
-                                action = Request.Action.GET_FIRSTS), result)
+                                action = Request.Action.GET_FIRSTS, params = searchParams), result)
         }
 
         fun should_emit_loading_through_replace_result_cache_with_last_event_paginate() {
@@ -333,7 +355,7 @@ class ExperienceRequesterFactoryTest {
         fun should_replace_result_with_that_two_experiences_and_last_event_get_firsts() {
             val result = replaceResultObserver.events.get(0).get(1) as Result<List<Experience>>
             assertEquals(Result(listOf(experienceA, experienceB),
-                                action = Request.Action.GET_FIRSTS), result)
+                                action = Request.Action.GET_FIRSTS, params = searchParams), result)
         }
 
         fun should_replace_result_with_that_two_experiences_and_last_event_paginate() {
