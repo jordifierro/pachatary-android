@@ -56,7 +56,8 @@ class SelectLocationActivity : AppCompatActivity(), SelectLocationView {
         val INITIAL_LOCATION_TYPE = "initial_location_type"
 
         fun newIntent(context: Context, initialLatitude: Double = 0.0,
-                      initialLongitude: Double = 0.0, initialType: LocationType = LocationType.UNKNWON): Intent {
+                      initialLongitude: Double = 0.0,
+                      initialType: LocationType = LocationType.UNKNWON): Intent {
             val intent = Intent(context, SelectLocationActivity::class.java)
             intent.putExtra(INITIAL_LATITUDE, initialLatitude)
             intent.putExtra(INITIAL_LONGITUDE, initialLongitude)
@@ -84,7 +85,8 @@ class SelectLocationActivity : AppCompatActivity(), SelectLocationView {
         searchEditText = findViewById(R.id.select_location_search_edittext)
         searchButton.setOnClickListener {
             val inputManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            inputManager.hideSoftInputFromWindow(currentFocus!!.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+            inputManager.hideSoftInputFromWindow(currentFocus!!.windowToken,
+                                                 InputMethodManager.HIDE_NOT_ALWAYS)
             presenter.searchButtonClick(searchEditText.text.toString())
         }
 
@@ -95,7 +97,8 @@ class SelectLocationActivity : AppCompatActivity(), SelectLocationView {
         registry.addObserver(presenter)
     }
 
-    override fun setInitialLocation(latitude: Double, longitude: Double, zoomLevel: SelectLocationView.ZoomLevel) {
+    override fun setInitialLocation(latitude: Double, longitude: Double,
+                                    zoomLevel: SelectLocationView.ZoomLevel) {
         mapView.getMapAsync { mapboxMap ->
             this.mapboxMap = mapboxMap
             this.mapboxMap.cameraPosition = CameraPosition.Builder()
@@ -126,7 +129,8 @@ class SelectLocationActivity : AppCompatActivity(), SelectLocationView {
             try {
                 val geocoder = Geocoder(this, Locale.getDefault())
                 val latLongList = geocoder.getFromLocationName(address, 1)
-                if (latLongList.size > 0) emitter.onNext(Pair(latLongList[0].latitude, latLongList[0].longitude))
+                if (latLongList.size > 0)
+                    emitter.onNext(Pair(latLongList[0].latitude, latLongList[0].longitude))
                 emitter.onComplete()
             } catch (e: Exception) { emitter.onError(e) }
         }, BackpressureStrategy.LATEST)

@@ -28,8 +28,6 @@ class CreateExperienceActivity : AppCompatActivity(), CreateExperienceView {
     val registry: LifecycleRegistry = LifecycleRegistry(this)
 
     companion object {
-        private val EXPERIENCE_ID = "experienceId"
-
         fun newIntent(context: Context) = Intent(context, CreateExperienceActivity::class.java)
     }
 
@@ -46,21 +44,24 @@ class CreateExperienceActivity : AppCompatActivity(), CreateExperienceView {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == EDIT_TITLE_AND_DESCRIPTION && resultCode == Activity.RESULT_OK)
             presenter.onTitleAndDescriptionEdited(
-                    title = data!!.extras.getString(EditTitleAndDescriptionActivity.TITLE),
-                    description = data.extras.getString(EditTitleAndDescriptionActivity.DESCRIPTION))
-        else if (requestCode == EDIT_TITLE_AND_DESCRIPTION && resultCode == Activity.RESULT_CANCELED)
+                title = data!!.extras.getString(EditTitleAndDescriptionActivity.TITLE),
+                description = data.extras.getString(EditTitleAndDescriptionActivity.DESCRIPTION))
+        else if (requestCode == EDIT_TITLE_AND_DESCRIPTION
+                 && resultCode == Activity.RESULT_CANCELED)
             presenter.onEditTitleAndDescriptionCanceled()
         else if (requestCode == PICK_IMAGE && resultCode == Activity.RESULT_OK)
             presenter.onImagePicked(PickImageActivity.getPickedImageUriStringFromResultData(data!!))
         else if (requestCode == PICK_IMAGE && resultCode == Activity.RESULT_CANCELED)
             presenter.onPickImageCanceled()
         else if (requestCode == CROP_IMAGE && resultCode == Activity.RESULT_OK)
-            presenter.onImageCropped(CropImageActivity.getCroppedImageUriStringFromResultData(data!!))
+            presenter.onImageCropped(
+                    CropImageActivity.getCroppedImageUriStringFromResultData(data!!))
         else if (requestCode == CROP_IMAGE && resultCode == Activity.RESULT_CANCELED)
             presenter.onCropImageCanceled()
     }
 
-    override fun navigateToEditTitleAndDescription(initialTitle: String, initialDescription: String) {
+    override fun navigateToEditTitleAndDescription(initialTitle: String,
+                                                   initialDescription: String) {
         startActivityForResult(
                 EditTitleAndDescriptionActivity.newIntent(this, initialTitle, initialDescription),
                 EDIT_TITLE_AND_DESCRIPTION)

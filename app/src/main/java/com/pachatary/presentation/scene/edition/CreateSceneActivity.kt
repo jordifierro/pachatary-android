@@ -6,6 +6,7 @@ import android.arch.lifecycle.LifecycleRegistry
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Location
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.pachatary.R
@@ -17,6 +18,7 @@ import com.pachatary.presentation.common.edition.SelectLocationActivity
 import com.pachatary.presentation.common.edition.SelectLocationPresenter
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.pachatary.presentation.common.location.LocationUtils
 import com.yalantis.ucrop.UCrop
 import kotlinx.android.synthetic.main.activity_create_scene.*
 import javax.inject.Inject
@@ -24,17 +26,15 @@ import javax.inject.Inject
 
 class CreateSceneActivity : AppCompatActivity(), CreateSceneView {
 
-    val EDIT_TITLE_AND_DESCRIPTION = 1
-    val SELECT_LOCATION = 2
-    val PICK_IMAGE = 3
-    val CROP_IMAGE = UCrop.REQUEST_CROP
+    private val EDIT_TITLE_AND_DESCRIPTION = 1
+    private val SELECT_LOCATION = 2
+    private val PICK_IMAGE = 3
+    private val CROP_IMAGE = UCrop.REQUEST_CROP
 
     @Inject
     lateinit var presenter: CreateScenePresenter
 
-    lateinit var fusedLocationClient: FusedLocationProviderClient
-
-    val registry: LifecycleRegistry = LifecycleRegistry(this)
+    private val registry: LifecycleRegistry = LifecycleRegistry(this)
 
     companion object {
         private val EXPERIENCE_ID = "experienceId"
@@ -52,12 +52,8 @@ class CreateSceneActivity : AppCompatActivity(), CreateSceneView {
         setContentView(R.layout.activity_create_scene)
         setSupportActionBar(toolbar)
 
-        if (checkLocationPermission()) {
-            fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                if (location != null) presenter.onLastLocationFound(location.latitude, location.longitude)
-            }
-        }
+        LocationUtils.addListenerToLocation(this, { location: Location ->
+            presenter.onLastLocationFound(location.latitude, location.longitude) })
 
         PachataryApplication.injector.inject(this)
         presenter.setView(this, intent.getStringExtra(EXPERIENCE_ID))
@@ -67,13 +63,15 @@ class CreateSceneActivity : AppCompatActivity(), CreateSceneView {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == EDIT_TITLE_AND_DESCRIPTION && resultCode == Activity.RESULT_OK)
             presenter.onTitleAndDescriptionEdited(
-                    title = data!!.extras.getString(EditTitleAndDescriptionActivity.TITLE),
-                    description = data.extras.getString(EditTitleAndDescriptionActivity.DESCRIPTION))
-        else if (requestCode == EDIT_TITLE_AND_DESCRIPTION && resultCode == Activity.RESULT_CANCELED)
+                title = data!!.extras.getString(EditTitleAndDescriptionActivity.TITLE),
+                description = data.extras.getString(EditTitleAndDescriptionActivity.DESCRIPTION))
+        else if (requestCode == EDIT_TITLE_AND_DESCRIPTION
+                 && resultCode == Activity.RESULT_CANCELED)
             presenter.onEditTitleAndDescriptionCanceled()
         else if (requestCode == SELECT_LOCATION && resultCode == Activity.RESULT_OK)
-            presenter.onLocationSelected(latitude = data!!.extras.getDouble(SelectLocationActivity.LATITUDE),
-                                         longitude = data.extras.getDouble(SelectLocationActivity.LONGITUDE))
+            presenter.onLocationSelected(
+                    latitude = data!!.extras.getDouble(SelectLocationActivity.LATITUDE),
+                    longitude = data.extras.getDouble(SelectLocationActivity.LONGITUDE))
         else if (requestCode == SELECT_LOCATION && resultCode == Activity.RESULT_CANCELED)
             presenter.onSelectLocationCanceled()
         else if (requestCode == PICK_IMAGE && resultCode == Activity.RESULT_OK)
@@ -81,12 +79,14 @@ class CreateSceneActivity : AppCompatActivity(), CreateSceneView {
         else if (requestCode == PICK_IMAGE && resultCode == Activity.RESULT_CANCELED)
             presenter.onPickImageCanceled()
         else if (requestCode == CROP_IMAGE && resultCode == Activity.RESULT_OK)
-            presenter.onImageCropped(CropImageActivity.getCroppedImageUriStringFromResultData(data!!))
+            presenter.onImageCropped(
+                    CropImageActivity.getCroppedImageUriStringFromResultData(data!!))
         else if (requestCode == CROP_IMAGE && resultCode == Activity.RESULT_CANCELED)
             presenter.onCropImageCanceled()
     }
 
-    override fun navigateToEditTitleAndDescription(initialTitle: String, initialDescription: String) {
+    override fun navigateToEditTitleAndDescription(initialTitle: String,
+                                                   initialDescription: String) {
         startActivityForResult(
                 EditTitleAndDescriptionActivity.newIntent(this, initialTitle, initialDescription),
                 EDIT_TITLE_AND_DESCRIPTION)
@@ -95,8 +95,8 @@ class CreateSceneActivity : AppCompatActivity(), CreateSceneView {
     override fun navigateToSelectLocation(latitude: Double, longitude: Double,
                                           locationType: SelectLocationPresenter.LocationType) {
         startActivityForResult(
-                SelectLocationActivity.newIntent(this, initialLatitude = latitude, initialLongitude = longitude,
-                                                 initialType = locationType), SELECT_LOCATION)
+                SelectLocationActivity.newIntent(this, initialLatitude = latitude,
+                        initialLongitude = longitude, initialType = locationType), SELECT_LOCATION)
     }
 
     override fun navigateToPickImage() {
@@ -108,8 +108,4 @@ class CreateSceneActivity : AppCompatActivity(), CreateSceneView {
     }
 
     override fun getLifecycle(): LifecycleRegistry = registry
-
-    private fun checkLocationPermission() =
-            this.checkCallingOrSelfPermission("android.permission.ACCESS_COARSE_LOCATION") ==
-                PackageManager.PERMISSION_GRANTED
 }
