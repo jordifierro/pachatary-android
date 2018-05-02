@@ -25,6 +25,9 @@ There are three section tabs: mine, saved and explore.
 All of them show experiences (title and picture) in a scrollable list.
 When an item is clicked,
 it navigates to the selected experience map view.
+Explore shows experiences by proximity and saves count.
+You change search settings like location
+and also introduce search terms.
 
 
 #### ExperienceMapActivity
