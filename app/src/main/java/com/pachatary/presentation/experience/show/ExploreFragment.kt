@@ -14,6 +14,7 @@ import com.pachatary.R
 import com.pachatary.data.experience.Experience
 import com.pachatary.presentation.common.PachataryApplication
 import com.pachatary.presentation.common.location.LocationUtils
+import com.pachatary.presentation.experience.show.view.ExtendedListAdapter
 import com.pachatary.presentation.main.MainActivity
 import com.pachatary.presentation.scene.show.ExperienceMapActivity
 import javax.inject.Inject

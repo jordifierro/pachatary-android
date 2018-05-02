@@ -1,4 +1,4 @@
-package com.pachatary.presentation.experience.show
+package com.pachatary.presentation.experience.show.view
 
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater

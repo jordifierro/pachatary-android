@@ -16,6 +16,7 @@ import com.pachatary.R
 import com.pachatary.data.experience.Experience
 import com.pachatary.presentation.common.PachataryApplication
 import com.pachatary.presentation.experience.edition.CreateExperienceActivity
+import com.pachatary.presentation.experience.show.view.SquareListAdapter
 import com.pachatary.presentation.register.RegisterActivity
 import com.pachatary.presentation.scene.show.ExperienceMapActivity
 import javax.inject.Inject
