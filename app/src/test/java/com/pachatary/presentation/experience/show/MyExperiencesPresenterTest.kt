@@ -58,6 +58,7 @@ class MyExperiencesPresenterTest {
         } then {
             should_hide_view_pagination_loader()
             should_show_view_loader()
+            should_show_empty_experiences()
             should_hide_view_retry()
         }
     }
@@ -415,6 +416,10 @@ class MyExperiencesPresenterTest {
 
         fun should_navigate_to_register() {
             BDDMockito.then(mockView).should().navigateToRegister()
+        }
+
+        fun should_show_empty_experiences() {
+            BDDMockito.then(mockView).should().showExperienceList(listOf())
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

@@ -37,6 +37,7 @@ class SavedPresenterTest {
             create_presenter()
         } then {
             should_show_view_loader()
+            should_show_empty_experiences()
             should_hide_view_pagination_loader()
             should_hide_view_retry()
         }
@@ -262,6 +263,10 @@ class SavedPresenterTest {
 
         fun should_call_repo_get_more_experiences() {
             then(mockRepository).should().getMoreExperiences(ExperienceRepoSwitch.Kind.SAVED)
+        }
+
+        fun should_show_empty_experiences() {
+            BDDMockito.then(mockView).should().showExperienceList(listOf())
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

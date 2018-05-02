@@ -40,6 +40,7 @@ class SavedPresenter @Inject constructor(private val repository: ExperienceRepos
                                               if (it.isInProgress()) {
                                                   if (it.action == Request.Action.GET_FIRSTS) {
                                                       view.showLoader()
+                                                      view.showExperienceList(listOf())
                                                       view.hidePaginationLoader()
                                                   }
                                                   else if (it.action == Request.Action.PAGINATE) {

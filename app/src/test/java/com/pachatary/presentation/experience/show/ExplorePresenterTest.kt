@@ -75,6 +75,7 @@ class ExplorePresenterTest {
             create_presenter()
         } then {
             should_show_view_loader()
+            should_show_empty_experiences()
             should_hide_view_pagination_loader()
             should_hide_view_retry()
         }
@@ -313,6 +314,10 @@ class ExplorePresenterTest {
             then(mockRepository).should()
                     .getFirstExperiences(ExperienceRepoSwitch.Kind.EXPLORE,
                                          Request.Params(null, latitude, longitude))
+        }
+
+        fun should_show_empty_experiences() {
+            BDDMockito.then(mockView).should().showExperienceList(listOf())
         }
 
         fun should_not_call_repo_get_firsts_experiences() {
