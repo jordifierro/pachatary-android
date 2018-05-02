@@ -17,6 +17,7 @@ class ExplorePresenter @Inject constructor(private val repository: ExperienceRep
                                                                                : LifecycleObserver {
     val getFirstExperiencesPublishSubject = PublishSubject.create<Unit>()
     val searchParamsChangedPublishSubject = PublishSubject.create<Request.Params>()
+    lateinit var searchSettingsModel: SearchSettingsModel
 
     init {
         Flowable.combineLatest<Unit, Request.Params, Request.Params>(
@@ -48,6 +49,9 @@ class ExplorePresenter @Inject constructor(private val repository: ExperienceRep
 
     fun onLastLocationFound(latitude: Double, longitude: Double) {
         searchParamsChangedPublishSubject.onNext(Request.Params(null, latitude, longitude))
+        if (!::searchSettingsModel.isInitialized) searchSettingsModel =
+                SearchSettingsModel("", SearchSettingsModel.LocationOption.CURRENT,
+                                    latitude, longitude, latitude, longitude)
     }
 
     private fun connectToExperiences() {
@@ -83,5 +87,21 @@ class ExplorePresenter @Inject constructor(private val repository: ExperienceRep
 
     fun destroy() {
         experiencesDisposable?.dispose()
+    }
+
+    fun onSearchClick() {
+        view.navigateToSearchSettings(searchSettingsModel)
+    }
+
+    fun onSearchSettingsResult(searchSettingsModel: SearchSettingsModel) {
+        this.searchSettingsModel = searchSettingsModel
+        val newSearchParams =
+            if (searchSettingsModel.locationOption == SearchSettingsModel.LocationOption.CURRENT)
+                Request.Params(searchSettingsModel.searchText,
+                        searchSettingsModel.currentLatitude, searchSettingsModel.currentLongitude)
+            else
+                Request.Params(searchSettingsModel.searchText,
+                        searchSettingsModel.selectedLatitude, searchSettingsModel.selectedLongitude)
+        searchParamsChangedPublishSubject.onNext(newSearchParams)
     }
 }

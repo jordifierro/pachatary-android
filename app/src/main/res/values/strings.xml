@@ -16,6 +16,7 @@
     <string name="fab_title_add_scene">Add new scene</string>
     <string name="title_activity_create_experience">Create experience</string>
     <string name="title_scenes_list_activity">Scenes</string>
+    <string name="title_search_settings_activity">Search</string>
 
     <string name="retry">Retry</string>
 

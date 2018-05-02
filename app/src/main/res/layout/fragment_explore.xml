@@ -35,4 +35,15 @@
         android:visibility="gone"
         tools:visibility="visible"/>
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/search_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@android:drawable/ic_menu_search"
+        android:tint="@color/black" />
+
 </RelativeLayout>

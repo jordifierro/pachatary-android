@@ -162,6 +162,37 @@ class ExplorePresenterTest {
         }
     }
 
+    @Test
+    fun test_last_location_found_and_search_click_navigates_with_correct_params() {
+        given {
+            an_experience_repo_that_returns_in_progress(Request.Action.GET_FIRSTS)
+        } whenn {
+            create_presenter()
+            last_location_known()
+            on_search_click()
+        } then {
+            should_call_repo_get_firsts_experiences()
+            should_navigate_with_location_option_current_and_current_locations()
+        }
+    }
+
+    @Test
+    fun test_search_settings_result_uses_it_to_call_api_and_navigate_to_search_again_if_search() {
+        given {
+            an_experience_repo_that_returns_in_progress(Request.Action.GET_FIRSTS)
+        } whenn {
+            create_presenter()
+            last_location_known()
+            a_search_word()
+            a_selected_latitude_and_longitude()
+            on_search_result()
+            on_search_click()
+        } then {
+            should_call_repo_get_firsts_experiences_and_again_with_new_search_settings()
+            should_navigate_with_new_settings()
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
@@ -174,6 +205,9 @@ class ExplorePresenterTest {
         lateinit var testObservable: PublishSubject<Result<List<Experience>>>
         val latitude = 4.8
         val longitude = -0.3
+        lateinit var searchWord: String
+        var selectedLatitude: Double = 0.0
+        var selectedLongitude: Double = 0.0
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
@@ -186,6 +220,15 @@ class ExplorePresenterTest {
         }
 
         fun nothing() {}
+
+        fun a_search_word() {
+            searchWord = "culture"
+        }
+
+        fun a_selected_latitude_and_longitude() {
+            selectedLatitude = 0.12
+            selectedLongitude = -1.99
+        }
 
         fun an_experience() {
             experienceA = Experience(id = "1", title = "A", description = "", picture = null)
@@ -226,6 +269,16 @@ class ExplorePresenterTest {
 
         fun experience_click(experienceId: String) {
             presenter.onExperienceClick(experienceId)
+        }
+
+        fun on_search_click() {
+            presenter.onSearchClick()
+        }
+
+        fun on_search_result() {
+            presenter.onSearchSettingsResult(
+                    SearchSettingsModel(searchWord, SearchSettingsModel.LocationOption.SELECTED,
+                            latitude, longitude, selectedLatitude, selectedLongitude))
         }
 
         fun should_show_view_loader() {
@@ -288,6 +341,26 @@ class ExplorePresenterTest {
 
         fun should_unsubscribe_observable() {
             assertFalse(testObservable.hasObservers())
+        }
+
+        fun should_navigate_with_location_option_current_and_current_locations() {
+            BDDMockito.then(mockView).should().navigateToSearchSettings(
+                    SearchSettingsModel("", SearchSettingsModel.LocationOption.CURRENT,
+                            latitude, longitude, latitude, longitude)
+            )
+        }
+
+        fun should_call_repo_get_firsts_experiences_and_again_with_new_search_settings() {
+            then(mockRepository).should()
+                    .getFirstExperiences(ExperienceRepoSwitch.Kind.EXPLORE,
+                            Request.Params(searchWord, selectedLatitude, selectedLongitude))
+        }
+
+        fun should_navigate_with_new_settings() {
+            BDDMockito.then(mockView).should().navigateToSearchSettings(
+                    SearchSettingsModel(searchWord, SearchSettingsModel.LocationOption.SELECTED,
+                            latitude, longitude, selectedLatitude, selectedLongitude)
+            )
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

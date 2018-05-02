@@ -83,6 +83,11 @@
             android:name=".presentation.scene.show.SceneListActivity"
             android:label="@string/title_scenes_list_activity"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".presentation.experience.show.SearchSettingsActivity"
+            android:label="@string/title_search_settings_activity"
+            android:excludeFromRecents="true"
+            android:theme="@style/Theme.AppCompat.Light.Dialog" />
     </application>
 
 </manifest>
