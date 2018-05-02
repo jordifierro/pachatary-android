@@ -73,13 +73,6 @@ class MainActivity : AppCompatActivity(), MainView {
         false
     }
 
-    private fun navigateToFragment(fragment: Fragment) {
-        val fragmentTransaction = supportFragmentManager.beginTransaction()
-        fragmentTransaction.replace(R.id.fragment_container, fragment)
-        fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-        fragmentTransaction.commit()
-    }
-
     override fun showLoader() {
         progressBar.visibility = View.VISIBLE
     }
@@ -89,22 +82,47 @@ class MainActivity : AppCompatActivity(), MainView {
     }
 
     override fun showView(viewType: MainView.ExperiencesViewType) {
+        val fragmentTransaction = supportFragmentManager.beginTransaction()
         when (viewType) {
             MainView.ExperiencesViewType.MY_EXPERIENCES -> {
-                if (!this::myExperiencesFragment.isInitialized)
+                if (::savedFragment.isInitialized && savedFragment.isVisible)
+                    fragmentTransaction.hide(savedFragment)
+                if (::exploreFragment.isInitialized && exploreFragment.isVisible)
+                    fragmentTransaction.hide(exploreFragment)
+
+                if (!this::myExperiencesFragment.isInitialized) {
                     myExperiencesFragment = MyExperiencesFragment.newInstance()
-                navigateToFragment(myExperiencesFragment) }
+                    fragmentTransaction.add(R.id.fragment_container, myExperiencesFragment)
+                }
+                else fragmentTransaction.show(myExperiencesFragment)
+            }
             MainView.ExperiencesViewType.SAVED -> {
-                if (!this::savedFragment.isInitialized)
+                if (::myExperiencesFragment.isInitialized && myExperiencesFragment.isVisible)
+                    fragmentTransaction.hide(myExperiencesFragment)
+                if (::exploreFragment.isInitialized && exploreFragment.isVisible)
+                    fragmentTransaction.hide(exploreFragment)
+
+                if (!this::savedFragment.isInitialized) {
                     savedFragment = SavedFragment.newInstance()
-                navigateToFragment(savedFragment)
+                    fragmentTransaction.add(R.id.fragment_container, savedFragment)
+                }
+                else fragmentTransaction.show(savedFragment)
             }
             MainView.ExperiencesViewType.EXPLORE -> {
-                if (!this::exploreFragment.isInitialized)
+                if (::myExperiencesFragment.isInitialized && myExperiencesFragment.isVisible)
+                    fragmentTransaction.hide(myExperiencesFragment)
+                if (::savedFragment.isInitialized && savedFragment.isVisible)
+                    fragmentTransaction.hide(savedFragment)
+
+                if (!this::exploreFragment.isInitialized) {
                     exploreFragment = ExploreFragment.newInstance()
-                navigateToFragment(exploreFragment)
+                    fragmentTransaction.add(R.id.fragment_container, exploreFragment)
+                }
+                else fragmentTransaction.show(exploreFragment)
             }
         }
+        fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+        fragmentTransaction.commit()
     }
 
     override fun showTabs(visible: Boolean) {
