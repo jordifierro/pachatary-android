@@ -22,7 +22,6 @@ class MainActivity : AppCompatActivity(), MainView {
     private lateinit var myExperiencesFragment: MyExperiencesFragment
     private lateinit var savedFragment: SavedFragment
     private lateinit var exploreFragment: ExploreFragment
-    private lateinit var progressBar: ProgressBar
 
     @Inject
     lateinit var presenter: MainPresenter
@@ -34,8 +33,6 @@ class MainActivity : AppCompatActivity(), MainView {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        progressBar = findViewById(R.id.experiences_progressbar)
 
         PachataryApplication.injector.inject(this)
         presenter.view = this
@@ -71,14 +68,6 @@ class MainActivity : AppCompatActivity(), MainView {
             }
         }
         false
-    }
-
-    override fun showLoader() {
-        progressBar.visibility = View.VISIBLE
-    }
-
-    override fun hideLoader() {
-        progressBar.visibility = View.INVISIBLE
     }
 
     override fun showView(viewType: MainView.ExperiencesViewType) {
@@ -125,12 +114,11 @@ class MainActivity : AppCompatActivity(), MainView {
         fragmentTransaction.commit()
     }
 
-    override fun showTabs(visible: Boolean) {
-        if (visible) navigation.visibility = View.VISIBLE
-        else  navigation.visibility = View.INVISIBLE
-    }
-
     override fun onBackPressed() {
         presenter.onBackPressed()
+    }
+
+    override fun navigateToWelcome() {
+        startActivity(WelcomeActivity.newIntent(this))
     }
 }

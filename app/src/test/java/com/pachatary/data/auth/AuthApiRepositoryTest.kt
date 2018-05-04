@@ -23,7 +23,7 @@ class AuthApiRepositoryTest {
             get_person_invitation()
         } then {
             request_should_post_to_people_with_client_secret_key()
-            response_should_be_auth_token()
+            response_should_be_first_in_progress_then_auth_token()
         }
     }
 
@@ -93,7 +93,7 @@ class AuthApiRepositoryTest {
                                 FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                                 .create()))
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build(), clientSecretKey)
+                .build(), clientSecretKey, Schedulers.trampoline())
         val testAuthTokenSubscriber = TestSubscriber<Result<AuthToken>>()
         val testRegisterSubscriber = TestSubscriber<Result<Person>>()
         var username = ""
@@ -179,8 +179,9 @@ class AuthApiRepositoryTest {
             assertEquals(formParams, request.getBody().readUtf8())
         }
 
-        fun response_should_be_auth_token() {
+        fun response_should_be_first_in_progress_then_auth_token() {
             testAuthTokenSubscriber.assertResult(
+                    Result(null, inProgress = true),
                     Result(AuthToken("868a2b9a", "9017c7e7")))
         }
 

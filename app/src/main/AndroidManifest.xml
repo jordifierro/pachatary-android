@@ -88,6 +88,9 @@
             android:label="@string/title_search_settings_activity"
             android:excludeFromRecents="true"
             android:theme="@style/Theme.AppCompat.Light.Dialog" />
+        <activity android:name=".presentation.main.WelcomeActivity"
+            android:label="@string/title_welcome_activity"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

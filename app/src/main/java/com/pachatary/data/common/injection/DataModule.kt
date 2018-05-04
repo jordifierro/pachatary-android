@@ -106,8 +106,8 @@ class DataModule {
 
     @Provides
     @Singleton
-    fun provideAuthApiRepository(retrofit: Retrofit) =
-            AuthApiRepository(retrofit, BuildConfig.CLIENT_SECRET_KEY)
+    fun provideAuthApiRepository(retrofit: Retrofit, @Named("io") scheduler: Scheduler) =
+            AuthApiRepository(retrofit, BuildConfig.CLIENT_SECRET_KEY, scheduler)
 
     @Provides
     @Singleton

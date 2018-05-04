@@ -1,51 +1,38 @@
 package com.pachatary.presentation.main
 
 import com.pachatary.data.auth.AuthRepository
-import com.pachatary.data.auth.AuthToken
-import com.pachatary.data.common.Result
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
-import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 import org.junit.Test
 import org.mockito.BDDMockito
 import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.then
 import org.mockito.Mock
-import org.mockito.Mockito.times
 import org.mockito.MockitoAnnotations
 
 class MainPresenterTest {
 
     @Test
-    fun test_if_has_credentials_go_to_initial_tab_on_create() {
+    fun test_if_has_credentials_selects_saved_tab() {
         given {
             an_auth_repo_has_credentials()
         } whenn {
             create_presenter()
         } then {
             should_call_auth_repo_has_person_credentials()
-            should_hide_view_loader()
-            should_show_view_tabs()
             should_select_tab(MainView.ExperiencesViewType.SAVED)
         }
     }
 
     @Test
-    fun test_if_has_no_credentials_should_ask_person_invitation_and_go_to_initial_tab_on_create() {
+    fun test_if_has_no_credentials_should_navigate_to_welcome() {
         given {
             an_auth_repo_has_no_credentials()
-            an_auth_repo_returns_auth_token_on_get_person_invitation()
         } whenn {
             create_presenter()
         } then {
-            should_call_auth_repo_has_person_credentials()
-            should_call_auth_repo_get_person_invitation()
-            should_show_view_loader()
-            should_hide_view_tabs()
-
-            should_hide_view_loader()
-            should_show_view_tabs()
-            should_select_tab(MainView.ExperiencesViewType.SAVED)
+            should_navigate_to_welcome()
+            should_finish_view()
         }
     }
 
@@ -64,18 +51,7 @@ class MainPresenterTest {
     }
 
     @Test
-    fun test_tab_click_while_no_credentials() {
-        given {
-            an_auth_repo_has_no_credentials()
-        } whenn {
-            tab_click(MainView.ExperiencesViewType.SAVED)
-        } then {
-            should_not_call_show_view()
-        }
-    }
-
-    @Test
-    fun test_tab_click_when_credentials() {
+    fun test_tab_click_shows_view() {
         given {
             an_auth_repo_has_credentials()
         } whenn {
@@ -123,8 +99,7 @@ class MainPresenterTest {
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
-            val testSchedulerProvider = SchedulerProvider(Schedulers.trampoline(), Schedulers.trampoline())
-            presenter = MainPresenter(mockAuthRepository, testSchedulerProvider)
+            presenter = MainPresenter(mockAuthRepository)
             presenter.view = mockView
 
             return this
@@ -142,11 +117,6 @@ class MainPresenterTest {
 
         fun an_auth_repo_has_credentials() {
             given(mockAuthRepository.hasPersonCredentials()).willReturn(true)
-        }
-
-        fun an_auth_repo_returns_auth_token_on_get_person_invitation() {
-            given(mockAuthRepository.getPersonInvitation()).willReturn(
-                    Flowable.just(Result(AuthToken("A", "R"))))
         }
 
         fun create_presenter() {
@@ -169,32 +139,8 @@ class MainPresenterTest {
             then(mockAuthRepository).should().hasPersonCredentials()
         }
 
-        fun should_call_auth_repo_get_person_invitation() {
-            then(mockAuthRepository).should().getPersonInvitation()
-        }
-
-        fun should_show_view_loader() {
-            then(mockView).should().showLoader()
-        }
-
-        fun should_hide_view_loader() {
-            then(mockView).should().hideLoader()
-        }
-
-        fun should_show_view_tabs() {
-            BDDMockito.then(mockView).should().showTabs(true)
-        }
-
         fun should_show_view(type: MainView.ExperiencesViewType, timesCalled: Int) {
             BDDMockito.then(mockView).should(BDDMockito.times(timesCalled)).showView(type)
-        }
-
-        fun should_hide_view_tabs() {
-            BDDMockito.then(mockView).should().showTabs(false)
-        }
-
-        fun should_not_call_show_view() {
-            BDDMockito.then(mockView).shouldHaveZeroInteractions()
         }
 
         fun should_show_view() {
@@ -211,6 +157,10 @@ class MainPresenterTest {
 
         fun should_finish_view() {
             BDDMockito.then(mockView).should().finish()
+        }
+
+        fun should_navigate_to_welcome() {
+            BDDMockito.then(mockView).should().navigateToWelcome()
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)
