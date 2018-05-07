@@ -91,6 +91,9 @@
         <activity android:name=".presentation.main.WelcomeActivity"
             android:label="@string/title_welcome_activity"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".presentation.login.AskLoginEmailActivity"
+            android:label="@string/title_welcome_activity"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

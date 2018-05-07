@@ -12,7 +12,7 @@ interface AuthApi {
     @FormUrlEncoded
     @POST("/people/")
     fun createPersonResource(@Field("client_secret_key") clientSecretKey: String)
-            : Flowable<Result<AuthTokenMapper>>
+                                                                : Flowable<Result<AuthTokenMapper>>
 
     @FormUrlEncoded
     @PATCH("/people/me")
@@ -21,5 +21,10 @@ interface AuthApi {
 
     @FormUrlEncoded
     @POST("/people/me/email-confirmation")
-    fun confirmEmail(@Field("confirmation_token")confirmationToken: String): Flowable<Result<PersonMapper>>
+    fun confirmEmail(@Field("confirmation_token") confirmationToken: String)
+                                                                    : Flowable<Result<PersonMapper>>
+
+    @FormUrlEncoded
+    @POST("/people/me/login-email")
+    fun askLoginEmail(@Field("email") email: String): Flowable<Result<Void>>
 }

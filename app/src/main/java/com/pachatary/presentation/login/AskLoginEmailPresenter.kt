@@ -1,4 +1,4 @@
-package com.pachatary.presentation.main
+package com.pachatary.presentation.login
 
 import android.annotation.SuppressLint
 import android.arch.lifecycle.LifecycleObserver
@@ -7,40 +7,31 @@ import io.reactivex.Scheduler
 import javax.inject.Inject
 import javax.inject.Named
 
-class WelcomePresenter @Inject constructor(private val authRepository: AuthRepository,
-                                           @Named("main") private val mainScheduler: Scheduler)
-                                                                            : LifecycleObserver {
+class AskLoginEmailPresenter @Inject constructor(
+        private val authRepository: AuthRepository,
+        @Named("main") private val mainScheduler: Scheduler) : LifecycleObserver {
 
-    lateinit var view: WelcomeView
-
-    fun onStartClick() {
-        getPersonInvitation()
-    }
+    lateinit var view: AskLoginEmailView
 
     @SuppressLint("CheckResult")
-    private fun getPersonInvitation() {
-        authRepository.getPersonInvitation()
+    fun onAskClick(email: String) {
+        authRepository.askLoginEmail(email)
                 .observeOn(mainScheduler)
                 .subscribe {
                     if (it.isSuccess()) {
                         view.hideLoader()
-                        view.navigateToMain()
+                        view.showSuccessMessage()
                         view.finish()
                     }
                     else if (it.isError()) {
                         view.showErrorMessage()
+                        view.enableAskButton()
                         view.hideLoader()
-                        view.enableButtons()
                     }
                     else if (it.isInProgress()) {
                         view.showLoader()
-                        view.disableButtons()
+                        view.disableAskButton()
                     }
                 }
-    }
-
-    fun onLoginClick() {
-        view.navigateToAskLogin()
-        view.finish()
     }
 }

@@ -81,6 +81,19 @@ class AuthApiRepositoryTest {
         }
     }
 
+    @Test
+    fun test_on_ask_login_email() {
+        given {
+            an_email()
+            a_web_server_that_returns_204()
+        } whenn {
+            ask_login_email()
+        } then {
+            request_should_post_login_email_with_email()
+            response_should_be_in_progress_and_success()
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
@@ -96,6 +109,7 @@ class AuthApiRepositoryTest {
                 .build(), clientSecretKey, Schedulers.trampoline())
         val testAuthTokenSubscriber = TestSubscriber<Result<AuthToken>>()
         val testRegisterSubscriber = TestSubscriber<Result<Person>>()
+        val testAskLoginEmailSubscriber = TestSubscriber<Result<Void>>()
         var username = ""
         var email = ""
         var confirmationToken = ""
@@ -139,6 +153,10 @@ class AuthApiRepositoryTest {
                             "/api/POST_people_me_email_confirmation_ERROR.json").readText()))
         }
 
+        fun a_web_server_that_returns_204() {
+            mockWebServer.enqueue(MockResponse().setResponseCode(204).setBody(""))
+        }
+
         fun get_person_invitation() {
             repository.getPersonInvitation().subscribeOn(Schedulers.trampoline()).subscribe(testAuthTokenSubscriber)
             testAuthTokenSubscriber.awaitCount(1)
@@ -154,6 +172,11 @@ class AuthApiRepositoryTest {
             repository.confirmEmail(confirmationToken = confirmationToken)
                     .subscribeOn(Schedulers.trampoline()).subscribe(testRegisterSubscriber)
             testRegisterSubscriber.awaitCount(1)
+        }
+
+        fun ask_login_email() {
+            repository.askLoginEmail(email).subscribe(testAskLoginEmailSubscriber)
+            testAskLoginEmailSubscriber.awaitCount(2)
         }
 
         fun request_should_post_to_people_with_client_secret_key() {
@@ -177,6 +200,14 @@ class AuthApiRepositoryTest {
             assertEquals("POST", request.getMethod())
             val formParams = "confirmation_token=" + confirmationToken
             assertEquals(formParams, request.getBody().readUtf8())
+        }
+
+        fun request_should_post_login_email_with_email() {
+            val request = mockWebServer.takeRequest()
+            assertEquals("/people/me/login-email", request.getPath())
+            assertEquals("POST", request.getMethod())
+            assertEquals("email=e%40m.c", request.getBody().readUtf8())
+
         }
 
         fun response_should_be_first_in_progress_then_auth_token() {
@@ -204,6 +235,10 @@ class AuthApiRepositoryTest {
                     error = ClientException(source = "confirmation_token", code = "invalid",
                             message = "Invalid confirmation token"))
             )
+        }
+
+        fun response_should_be_in_progress_and_success() {
+            testAskLoginEmailSubscriber.assertResult(Result(null, inProgress = true), Result(null))
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = apply(func)

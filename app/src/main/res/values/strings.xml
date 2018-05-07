@@ -18,6 +18,7 @@
     <string name="title_scenes_list_activity">Scenes</string>
     <string name="title_search_settings_activity">Search</string>
     <string name="title_welcome_activity">Welcome</string>
+    <string name="title_ask_login_email_activity">Ask login email</string>
 
     <string name="retry">Retry</string>
 
@@ -51,4 +52,7 @@
     <string name="edit_register_done_button">Done</string>
     <string name="title_confirm_email_activity">Confirm Email</string>
     <string name="filter_view_confirm_email_activity">Confirm Email</string>
+
+    <string name="ask_login_email_button">Ask login email</string>
+    <string name="ask_login_email_email">Email:</string>
 </resources>

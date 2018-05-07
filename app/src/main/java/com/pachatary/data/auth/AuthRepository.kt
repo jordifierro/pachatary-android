@@ -28,6 +28,8 @@ class AuthRepository(val authStorageRepository: AuthStorageRepository, val authA
     fun confirmEmail(confirmationToken: String) = authApiRepository.confirmEmail(confirmationToken)
                 .doOnNext { if (it.isSuccess()) savePerson(it.data!!) }
 
+    fun askLoginEmail(email: String) = authApiRepository.askLoginEmail(email)
+
     internal fun savePerson(person: Person) {
         authStorageRepository.setPerson(person)
     }

@@ -3,9 +3,6 @@ package com.pachatary.presentation.main
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.BottomNavigationView
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.Button
@@ -13,16 +10,14 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import com.pachatary.R
 import com.pachatary.presentation.common.PachataryApplication
-import com.pachatary.presentation.experience.show.ExploreFragment
-import com.pachatary.presentation.experience.show.MyExperiencesFragment
-import com.pachatary.presentation.experience.show.SavedFragment
-import kotlinx.android.synthetic.main.activity_main.*
+import com.pachatary.presentation.login.AskLoginEmailActivity
 import javax.inject.Inject
 
 class WelcomeActivity : AppCompatActivity(), WelcomeView {
 
     private lateinit var progressBar: ProgressBar
     private lateinit var startButton: Button
+    private lateinit var loginButton: Button
 
     @Inject
     lateinit var presenter: WelcomePresenter
@@ -38,6 +33,8 @@ class WelcomeActivity : AppCompatActivity(), WelcomeView {
         progressBar = findViewById(R.id.welcome_progressbar)
         startButton = findViewById(R.id.welcome_start_button)
         startButton.setOnClickListener { presenter.onStartClick() }
+        loginButton = findViewById(R.id.welcome_login_button)
+        loginButton.setOnClickListener { presenter.onLoginClick() }
 
         PachataryApplication.injector.inject(this)
         presenter.view = this
@@ -48,12 +45,18 @@ class WelcomeActivity : AppCompatActivity(), WelcomeView {
         startActivity(MainActivity.newIntent(this))
     }
 
-    override fun disableStartButton() {
-        startButton.isEnabled = false
+    override fun navigateToAskLogin() {
+        startActivity(AskLoginEmailActivity.newIntent(this))
     }
 
-    override fun enableStartButton() {
+    override fun disableButtons() {
+        startButton.isEnabled = false
+        loginButton.isEnabled = false
+    }
+
+    override fun enableButtons() {
         startButton.isEnabled = true
+        loginButton.isEnabled = true
     }
 
     override fun showErrorMessage() {

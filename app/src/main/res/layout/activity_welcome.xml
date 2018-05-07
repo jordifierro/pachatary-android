@@ -19,8 +19,15 @@
         android:id="@+id/welcome_start_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_above="@+id/welcome_login_button"
         android:text="START NEW ADVENTURE"/>
+
+    <Button
+        android:id="@+id/welcome_login_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="I already have an account"/>
 
     <ProgressBar
         android:id="@+id/welcome_progressbar"

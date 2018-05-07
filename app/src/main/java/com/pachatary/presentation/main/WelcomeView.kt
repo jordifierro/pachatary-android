@@ -7,6 +7,7 @@ interface WelcomeView : LoaderView {
     fun finish()
     fun navigateToMain()
     fun showErrorMessage()
-    fun disableStartButton()
-    fun enableStartButton()
+    fun disableButtons()
+    fun enableButtons()
+    fun navigateToAskLogin()
 }

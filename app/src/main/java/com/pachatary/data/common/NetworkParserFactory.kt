@@ -9,16 +9,13 @@ import java.net.UnknownHostException
 class NetworkParserFactory {
 
     companion object {
-        fun <T> getTransformer() =
-                ResultTransformer<T>()
+        fun <T> getTransformer() = ResultTransformer<T>()
         fun <T> getErrorTransformer(errorMapper: ((String) -> ClientException)) =
                 ResultTransformer<T>(errorMapper)
-        fun <T> getListTransformer() =
-                ListResultTransformer<T>()
+        fun <T> getListTransformer() = ListResultTransformer<T>()
         fun <T, U: ToDomainMapper<T>> getPaginatedListTransformer() =
                 PaginatedListResultTransformer<T, U>()
-        fun getVoidTransformer() =
-                VoidTransformer()
+        fun getVoidTransformer() = VoidTransformer()
     }
 
     class ResultTransformer<T>(private val errorMapper: ((String) -> ClientException)? = null)

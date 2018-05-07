@@ -3,13 +3,10 @@ package com.pachatary.presentation.main
 import com.pachatary.data.auth.AuthRepository
 import com.pachatary.data.auth.AuthToken
 import com.pachatary.data.common.Result
-import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 import org.junit.Test
 import org.mockito.BDDMockito
-import org.mockito.BDDMockito.given
-import org.mockito.BDDMockito.then
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 
@@ -53,6 +50,19 @@ class WelcomePresenterTest {
         }
     }
 
+    @Test
+    fun test_on_login_click_navigates_to_ask_login_email_and_finishes() {
+        given {
+            nothing()
+        } whenn {
+            on_login_click()
+        } then {
+            should_navigate_to_ask_login()
+            should_finish_view()
+        }
+
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
@@ -68,6 +78,8 @@ class WelcomePresenterTest {
 
             return this
         }
+
+        fun nothing() {}
 
         fun an_auth_repo_that_returns_loading_result_when_get_invitation_called() {
             BDDMockito.given(mockAuthRepository.getPersonInvitation())
@@ -88,12 +100,16 @@ class WelcomePresenterTest {
             presenter.onStartClick()
         }
 
+        fun on_login_click() {
+            presenter.onLoginClick()
+        }
+
         fun should_show_loader() {
             BDDMockito.then(mockView).should().showLoader()
         }
 
         fun should_disable_start_button() {
-            BDDMockito.then(mockView).should().disableStartButton()
+            BDDMockito.then(mockView).should().disableButtons()
         }
 
         fun should_hide_loader() {
@@ -109,11 +125,15 @@ class WelcomePresenterTest {
         }
 
         fun should_enable_start_button() {
-            BDDMockito.then(mockView).should().enableStartButton()
+            BDDMockito.then(mockView).should().enableButtons()
         }
 
         fun should_show_error_message() {
             BDDMockito.then(mockView).should().showErrorMessage()
+        }
+
+        fun should_navigate_to_ask_login() {
+            BDDMockito.then(mockView).should().navigateToAskLogin()
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)
