@@ -94,6 +94,22 @@
         <activity android:name=".presentation.login.AskLoginEmailActivity"
             android:label="@string/title_welcome_activity"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name="com.pachatary.presentation.login.LoginActivity"
+            android:label="@string/title_login_activity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter android:label="@string/filter_view_login_activity">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Accepts URIs that begin with "https://pachatary.com -->
+                <data android:scheme="https"
+                    android:host="@string/https_deeplink_host"
+                    android:path="/people/me/login/redirect"/>
+                <data android:scheme="app"
+                    android:host="@string/app_deeplink_host"
+                    android:path="/people/me/login"/>
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

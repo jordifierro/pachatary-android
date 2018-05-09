@@ -1,0 +1,12 @@
+{
+    "person": {
+        "is_registered": true,
+        "username": "user.name",
+        "email": "email@example.com",
+        "is_email_confirmed": true
+    },
+    "auth_token" : {
+        "access_token": "A_T_12345",
+        "refresh_token": "R_T_67890"
+    }
+}

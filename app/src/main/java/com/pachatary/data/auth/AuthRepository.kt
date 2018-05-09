@@ -3,7 +3,8 @@ package com.pachatary.data.auth
 import com.pachatary.data.common.Result
 import io.reactivex.Flowable
 
-class AuthRepository(val authStorageRepository: AuthStorageRepository, val authApiRepository: AuthApiRepository) {
+class AuthRepository(val authStorageRepository: AuthStorageRepository,
+                     private val authApiRepository: AuthApiRepository) {
 
     fun hasPersonCredentials(): Boolean {
         return try { authStorageRepository.getPersonCredentials()
@@ -18,17 +19,26 @@ class AuthRepository(val authStorageRepository: AuthStorageRepository, val authA
     }
 
     fun canPersonCreateContent(): Boolean {
-        try { return authStorageRepository.getPerson().isEmailConfirmed }
-        catch (e: NoPersonInfoException) { return false }
+        return try { authStorageRepository.getPerson().isEmailConfirmed }
+        catch (e: NoPersonInfoException) { false }
     }
 
-    fun register(username: String, email: String) = authApiRepository.register(username, email)
+    fun register(username: String, email: String): Flowable<Result<Person>> =
+            authApiRepository.register(username, email)
                 .doOnNext { if (it.isSuccess()) savePerson(it.data!!) }
 
-    fun confirmEmail(confirmationToken: String) = authApiRepository.confirmEmail(confirmationToken)
+    fun confirmEmail(confirmationToken: String): Flowable<Result<Person>> =
+            authApiRepository.confirmEmail(confirmationToken)
                 .doOnNext { if (it.isSuccess()) savePerson(it.data!!) }
 
     fun askLoginEmail(email: String) = authApiRepository.askLoginEmail(email)
+
+    fun login(loginToken: String): Flowable<Result<Pair<Person, AuthToken>>> =
+            authApiRepository.login(loginToken)
+                .doOnNext { if (it.isSuccess()) {
+                                savePerson(it.data!!.first)
+                                authStorageRepository.setPersonCredentials(it.data.second)
+                            } }
 
     internal fun savePerson(person: Person) {
         authStorageRepository.setPerson(person)

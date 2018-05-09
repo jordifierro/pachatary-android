@@ -154,6 +154,22 @@ class AuthRepositoryTest {
         }
     }
 
+    @Test
+    fun test_login_calls_api_and_saves_person_and_auth_token() {
+        given {
+            a_login_token()
+            a_person()
+            an_auth_token()
+            an_auth_api_that_returns_person_and_auth_token_when_login()
+        } whenn {
+            login()
+        } then {
+            should_call_api_repo_login_with_login_token()
+            should_receive_person_and_auth_token()
+            should_save_person_and_auth_token_to_storage_repo()
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
@@ -164,15 +180,21 @@ class AuthRepositoryTest {
         var canCreateContentResult = false
         val testAuthTokenSubscriber = TestSubscriber<Result<AuthToken>>()
         val testPersonSubscriber = TestSubscriber<Result<Person>>()
+        val testPersonAuthTokenSubscriber = TestSubscriber<Result<Pair<Person, AuthToken>>>()
         lateinit var authToken: AuthToken
         lateinit var person: Person
         var username = ""
         var email = ""
         var confirmationToken = ""
+        var loginToken = ""
         var resultError: Result<Person>? = null
 
         fun a_username() {
             username = "usr.nm"
+        }
+
+        fun an_auth_token() {
+            authToken = AuthToken("a", "r")
         }
 
         fun an_email() {
@@ -181,6 +203,10 @@ class AuthRepositoryTest {
 
         fun a_confirmation_token() {
             confirmationToken = "ASDF"
+        }
+
+        fun a_login_token() {
+            loginToken = "ABC"
         }
 
         fun a_person() {
@@ -224,6 +250,11 @@ class AuthRepositoryTest {
                     Flowable.just(Result(authToken)))
         }
 
+        fun an_auth_api_that_returns_person_and_auth_token_when_login() {
+            BDDMockito.given(authApiRepository.login(loginToken))
+                    .willReturn(Flowable.just(Result(Pair(person, authToken))))
+        }
+
         fun has_person_credentials() {
             hasCredentialsResult = repository.hasPersonCredentials()
         }
@@ -242,6 +273,11 @@ class AuthRepositoryTest {
             repository.confirmEmail(confirmationToken = confirmationToken)
                     .subscribeOn(Schedulers.trampoline()).subscribe(testPersonSubscriber)
             testPersonSubscriber.awaitCount(1)
+        }
+
+        fun login() {
+            repository.login(loginToken).subscribeOn(Schedulers.trampoline())
+                    .subscribe(testPersonAuthTokenSubscriber)
         }
 
         fun result_is_true() {
@@ -319,6 +355,20 @@ class AuthRepositoryTest {
 
         fun should_call_api_confirm_email_with_confirmation_token() {
             BDDMockito.then(authApiRepository).should().confirmEmail(confirmationToken)
+        }
+
+        fun should_call_api_repo_login_with_login_token() {
+            BDDMockito.then(authApiRepository).should().login(loginToken)
+        }
+
+        fun should_receive_person_and_auth_token() {
+            testPersonAuthTokenSubscriber.awaitCount(1)
+            testPersonAuthTokenSubscriber.assertResult(Result(Pair(person, authToken)))
+        }
+
+        fun should_save_person_and_auth_token_to_storage_repo() {
+            BDDMockito.then(authStorageRepository).should().setPerson(person)
+            BDDMockito.then(authStorageRepository).should().setPersonCredentials(authToken)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = apply(func)

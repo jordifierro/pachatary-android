@@ -33,4 +33,11 @@ class AuthApiRepository (retrofit: Retrofit, private val clientSecretKey: String
                 .subscribeOn(ioScheduler)
                 .compose(NetworkParserFactory.getVoidTransformer())
                 .startWith(Result<Void>(null, inProgress = true))
+
+    fun login(loginToken: String): Flowable<Result<Pair<Person, AuthToken>>> =
+        authApi.login(loginToken)
+                .subscribeOn(ioScheduler)
+                .compose(NetworkParserFactory.getErrorTransformer(
+                        { ClientExceptionMapper(it).toError() }))
+                .startWith(Result<Pair<Person, AuthToken>>(null, inProgress = true))
 }

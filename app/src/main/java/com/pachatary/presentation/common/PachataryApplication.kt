@@ -26,7 +26,7 @@ class PachataryApplication : Application() {
                                                 .dataModule(DataModule())
                                              .build()
 
-        if (BuildConfig.DEBUG) Stetho.initializeWithDefaults(this);
+        if (BuildConfig.DEBUG) Stetho.initializeWithDefaults(this)
 
         val picassoBuilder = Picasso.Builder(this)
         picassoBuilder.downloader(OkHttp3Downloader(this, Long.MAX_VALUE))

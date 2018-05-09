@@ -27,4 +27,8 @@ interface AuthApi {
     @FormUrlEncoded
     @POST("/people/me/login-email")
     fun askLoginEmail(@Field("email") email: String): Flowable<Result<Void>>
+
+    @FormUrlEncoded
+    @POST("/people/me/login")
+    fun login(@Field("token") loginToken: String) : Flowable<Result<PairPersonAuthTokenMapper>>
 }
