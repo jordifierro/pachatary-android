@@ -107,6 +107,18 @@ class AuthApiRepositoryTest {
         }
     }
 
+    @Test
+    fun test_client_versions() {
+        given {
+            a_web_server_that_returns_get_client_versions_200()
+        } whenn {
+            client_versions()
+        } then {
+            request_should_get_client_versions()
+            response_should_return_inprogress_and_3()
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
@@ -124,6 +136,7 @@ class AuthApiRepositoryTest {
         val testRegisterSubscriber = TestSubscriber<Result<Person>>()
         val testAskLoginEmailSubscriber = TestSubscriber<Result<Void>>()
         val testLoginSubscriber = TestSubscriber<Result<Pair<Person, AuthToken>>>()
+        val testClientVersionsSubscriber = TestSubscriber<Result<Int>>()
         var username = ""
         var email = ""
         var confirmationToken = ""
@@ -182,6 +195,12 @@ class AuthApiRepositoryTest {
             mockWebServer.enqueue(MockResponse().setResponseCode(204).setBody(""))
         }
 
+        fun a_web_server_that_returns_get_client_versions_200() {
+            mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(
+                    AuthApiRepository::class.java.getResource(
+                            "/api/GET_client_versions.json").readText()))
+        }
+
         fun get_person_invitation() {
             repository.getPersonInvitation()
                     .subscribeOn(Schedulers.trampoline())
@@ -209,6 +228,11 @@ class AuthApiRepositoryTest {
         fun login() {
             repository.login(loginToken).subscribe(testLoginSubscriber)
             testLoginSubscriber.awaitCount(2)
+        }
+
+        fun client_versions() {
+            repository.clientVersions().subscribe(testClientVersionsSubscriber)
+            testClientVersionsSubscriber.awaitCount(2)
         }
 
         fun request_should_post_to_people_with_client_secret_key() {
@@ -248,6 +272,13 @@ class AuthApiRepositoryTest {
             assertEquals("token=" + loginToken, request.getBody().readUtf8())
         }
 
+        fun request_should_get_client_versions() {
+            val request = mockWebServer.takeRequest()
+            assertEquals("/client-versions", request.getPath())
+            assertEquals("GET", request.getMethod())
+            assertEquals("", request.getBody().readUtf8())
+        }
+
         fun response_should_be_first_in_progress_then_auth_token() {
             testAuthTokenSubscriber.assertResult(Result(null, inProgress = true),
                                                  Result(AuthToken("868a2b9a", "9017c7e7")))
@@ -279,6 +310,11 @@ class AuthApiRepositoryTest {
             testLoginSubscriber.assertResult(Result(null, inProgress = true),
                     Result(Pair(Person(true, "user.name", "email@example.com", true),
                                 AuthToken("A_T_12345", "R_T_67890"))))
+        }
+
+        fun response_should_return_inprogress_and_3() {
+            testClientVersionsSubscriber.assertResult(
+                    Result(null, inProgress = true), Result(3))
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = apply(func)

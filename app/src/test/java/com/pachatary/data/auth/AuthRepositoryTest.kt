@@ -170,17 +170,78 @@ class AuthRepositoryTest {
         }
     }
 
+    @Test
+    fun test_current_version_has_expired_returns_false_if_error() {
+        given {
+            an_api_that_returns_error_client_version()
+        } whenn {
+            current_version_has_expired()
+        } then {
+            should_call_api_client_version()
+            should_return_has_expired_false()
+        }
+    }
+
+    @Test
+    fun test_current_version_has_expired_returns_false_if_current_version_higher_than_apis() {
+        given {
+            an_api_that_returns_min_client_version(1)
+        } whenn {
+            current_version_has_expired()
+        } then {
+            should_call_api_client_version()
+            should_return_has_expired_false()
+        }
+    }
+
+    @Test
+    fun test_current_version_has_expired_returns_false_if_current_version_equals_apis() {
+        given {
+            an_api_that_returns_min_client_version(3)
+        } whenn {
+            current_version_has_expired()
+        } then {
+            should_call_api_client_version()
+            should_return_has_expired_false()
+        }
+    }
+
+    @Test
+    fun test_current_version_has_expired_returns_true_if_current_version_lower_than_apis() {
+        given {
+            an_api_that_returns_min_client_version(8)
+        } whenn {
+            current_version_has_expired()
+        } then {
+            should_call_api_client_version()
+            should_return_has_expired_true()
+        }
+    }
+
+    @Test
+    fun test_current_version_has_expired_filters_in_progress() {
+        given {
+            an_api_that_returns_in_progress_client_version()
+        } whenn {
+            current_version_has_expired()
+        } then {
+            should_call_api_client_version()
+            should_return_nothing()
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
         val authStorageRepository = mock(AuthStorageRepository::class.java)
         val authApiRepository = mock(AuthApiRepository::class.java)
-        val repository = AuthRepository(authStorageRepository, authApiRepository)
+        val repository = AuthRepository(authStorageRepository, authApiRepository, 3)
         var hasCredentialsResult = false
         var canCreateContentResult = false
         val testAuthTokenSubscriber = TestSubscriber<Result<AuthToken>>()
         val testPersonSubscriber = TestSubscriber<Result<Person>>()
         val testPersonAuthTokenSubscriber = TestSubscriber<Result<Pair<Person, AuthToken>>>()
+        val testCurrentVersionExpiredSubscriber = TestSubscriber<Boolean>()
         lateinit var authToken: AuthToken
         lateinit var person: Person
         var username = ""
@@ -210,11 +271,13 @@ class AuthRepositoryTest {
         }
 
         fun a_person() {
-            person = Person(isRegistered = true, username = "srnm", email = "test@m.c", isEmailConfirmed = false)
+            person = Person(isRegistered = true, username = "srnm",
+                            email = "test@m.c", isEmailConfirmed = false)
         }
 
         fun a_result_error() {
-            resultError = Result(null, error = ClientException(source = "s", code = "c", message = "m"))
+            resultError = Result(null,
+                                 error = ClientException(source = "s", code = "c", message = "m"))
         }
 
         fun an_auth_api_that_returns_a_flowable_with_that_person() {
@@ -223,7 +286,8 @@ class AuthRepositoryTest {
         }
 
         fun an_auth_api_that_returns_a_flowable_with_that_result_error() {
-            BDDMockito.given(authApiRepository.register(username, email)).willReturn(Flowable.just(resultError))
+            BDDMockito.given(authApiRepository.register(username, email))
+                    .willReturn(Flowable.just(resultError))
         }
 
         fun an_auth_api_that_returns_a_flowable_with_that_person_on_confirm_email() {
@@ -232,7 +296,8 @@ class AuthRepositoryTest {
         }
 
         fun an_auth_api_that_returns_a_flowable_with_that_result_error_on_confirm_email() {
-            BDDMockito.given(authApiRepository.confirmEmail(confirmationToken)).willReturn(Flowable.just(resultError))
+            BDDMockito.given(authApiRepository.confirmEmail(confirmationToken))
+                    .willReturn(Flowable.just(resultError))
         }
 
         fun an_auth_storage_repository_that_returns_an_auth_token() {
@@ -241,7 +306,8 @@ class AuthRepositoryTest {
         }
 
         fun an_auth_storage_repository_that_raises_no_logged_exception() {
-            BDDMockito.given(authStorageRepository.getPersonCredentials()).willThrow(NoLoggedException("Error"))
+            BDDMockito.given(authStorageRepository.getPersonCredentials())
+                    .willThrow(NoLoggedException("Error"))
         }
 
         fun an_auth_api_that_returns_a_flowable_with_auth_token() {
@@ -255,12 +321,29 @@ class AuthRepositoryTest {
                     .willReturn(Flowable.just(Result(Pair(person, authToken))))
         }
 
+        fun an_api_that_returns_error_client_version() {
+            BDDMockito.given(authApiRepository.clientVersions())
+                    .willReturn(Flowable.just(Result<Int>(null, error = Exception())))
+        }
+
+        fun an_api_that_returns_min_client_version(minClientVersion: Int) {
+            BDDMockito.given(authApiRepository.clientVersions())
+                    .willReturn(Flowable.just(Result(minClientVersion)))
+        }
+
+        fun an_api_that_returns_in_progress_client_version() {
+            BDDMockito.given(authApiRepository.clientVersions())
+                    .willReturn(Flowable.just(Result<Int>(null, inProgress = true)))
+        }
+
         fun has_person_credentials() {
             hasCredentialsResult = repository.hasPersonCredentials()
         }
 
         fun get_person_invitation() {
-            repository.getPersonInvitation().subscribeOn(Schedulers.trampoline()).subscribe(testAuthTokenSubscriber)
+            repository.getPersonInvitation()
+                    .subscribeOn(Schedulers.trampoline())
+                    .subscribe(testAuthTokenSubscriber)
         }
 
         fun register_person() {
@@ -278,6 +361,11 @@ class AuthRepositoryTest {
         fun login() {
             repository.login(loginToken).subscribeOn(Schedulers.trampoline())
                     .subscribe(testPersonAuthTokenSubscriber)
+        }
+
+        fun current_version_has_expired() {
+            repository.currentVersionHasExpired().subscribeOn(Schedulers.trampoline())
+                    .subscribe(testCurrentVersionExpiredSubscriber)
         }
 
         fun result_is_true() {
@@ -302,11 +390,13 @@ class AuthRepositoryTest {
         }
 
         fun a_person_with_is_email_confirmed_false() {
-            person = Person(isRegistered = true, username = "usr", email = "e@m.c", isEmailConfirmed = false)
+            person = Person(isRegistered = true, username = "usr",
+                            email = "e@m.c", isEmailConfirmed = false)
         }
 
         fun a_person_with_is_email_confirmed_true() {
-            person = Person(isRegistered = true, username = "usr", email = "e@m.c", isEmailConfirmed = true)
+            person = Person(isRegistered = true, username = "usr",
+                            email = "e@m.c", isEmailConfirmed = true)
         }
 
         fun an_auth_api_that_returns_that_person_on_get_person() {
@@ -331,6 +421,10 @@ class AuthRepositoryTest {
 
         fun should_call_storage_repo_set_person_with_that_person() {
             BDDMockito.then(authStorageRepository).should().setPerson(person)
+        }
+
+        fun should_call_api_client_version() {
+            BDDMockito.then(authApiRepository).should().clientVersions()
         }
 
         fun should_call_api_register_with_username_and_email() {
@@ -369,6 +463,21 @@ class AuthRepositoryTest {
         fun should_save_person_and_auth_token_to_storage_repo() {
             BDDMockito.then(authStorageRepository).should().setPerson(person)
             BDDMockito.then(authStorageRepository).should().setPersonCredentials(authToken)
+        }
+
+        fun should_return_has_expired_false() {
+            testCurrentVersionExpiredSubscriber.awaitCount(1)
+            testCurrentVersionExpiredSubscriber.assertResult(false)
+        }
+
+        fun should_return_has_expired_true() {
+            testCurrentVersionExpiredSubscriber.awaitCount(1)
+            testCurrentVersionExpiredSubscriber.assertResult(true)
+        }
+
+        fun should_return_nothing() {
+            testCurrentVersionExpiredSubscriber.assertComplete()
+            testCurrentVersionExpiredSubscriber.assertNoValues()
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = apply(func)

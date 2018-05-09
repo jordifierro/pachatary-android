@@ -2,10 +2,7 @@ package com.pachatary.data.auth
 
 import io.reactivex.Flowable
 import retrofit2.adapter.rxjava2.Result
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
-import retrofit2.http.PATCH
-import retrofit2.http.POST
+import retrofit2.http.*
 
 interface AuthApi {
 
@@ -31,4 +28,7 @@ interface AuthApi {
     @FormUrlEncoded
     @POST("/people/me/login")
     fun login(@Field("token") loginToken: String) : Flowable<Result<PairPersonAuthTokenMapper>>
+
+    @GET("/client-versions")
+    fun clientVersions(): Flowable<Result<ClientVersionsMapper>>
 }

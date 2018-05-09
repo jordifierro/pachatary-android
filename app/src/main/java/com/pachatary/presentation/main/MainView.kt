@@ -10,4 +10,6 @@ interface MainView {
     fun showView(viewType: ExperiencesViewType)
     fun finish()
     fun navigateToWelcome()
+    fun showUpgradeDialog()
+    fun navigateToUpgradeApp()
 }

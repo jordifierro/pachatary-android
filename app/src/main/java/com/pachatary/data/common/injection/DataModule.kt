@@ -113,5 +113,5 @@ class DataModule {
     @Singleton
     fun provideAuthRepository(authStorageRepository: AuthStorageRepository,
                               authApiRepository: AuthApiRepository) =
-            AuthRepository(authStorageRepository, authApiRepository)
+            AuthRepository(authStorageRepository, authApiRepository, BuildConfig.VERSION_CODE)
 }

@@ -2,13 +2,12 @@ package com.pachatary.presentation.main
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
-import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentTransaction
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
-import android.view.View
-import android.widget.ProgressBar
 import com.pachatary.R
 import com.pachatary.presentation.common.PachataryApplication
 import com.pachatary.presentation.experience.show.ExploreFragment
@@ -16,6 +15,7 @@ import com.pachatary.presentation.experience.show.MyExperiencesFragment
 import com.pachatary.presentation.experience.show.SavedFragment
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
+
 
 class MainActivity : AppCompatActivity(), MainView {
 
@@ -52,23 +52,24 @@ class MainActivity : AppCompatActivity(), MainView {
         }
     }
 
-    private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
-        when (item.itemId) {
-            R.id.navigation_mine -> {
-                presenter.onTabClick(MainView.ExperiencesViewType.MY_EXPERIENCES)
-                return@OnNavigationItemSelectedListener true
+    private val mOnNavigationItemSelectedListener =
+            BottomNavigationView.OnNavigationItemSelectedListener { item ->
+                when (item.itemId) {
+                    R.id.navigation_mine -> {
+                        presenter.onTabClick(MainView.ExperiencesViewType.MY_EXPERIENCES)
+                        return@OnNavigationItemSelectedListener true
+                    }
+                    R.id.navigation_saved -> {
+                        presenter.onTabClick(MainView.ExperiencesViewType.SAVED)
+                        return@OnNavigationItemSelectedListener true
+                    }
+                    R.id.navigation_explore -> {
+                        presenter.onTabClick(MainView.ExperiencesViewType.EXPLORE)
+                        return@OnNavigationItemSelectedListener true
+                    }
+                }
+                false
             }
-            R.id.navigation_saved -> {
-                presenter.onTabClick(MainView.ExperiencesViewType.SAVED)
-                return@OnNavigationItemSelectedListener true
-            }
-            R.id.navigation_explore -> {
-                presenter.onTabClick(MainView.ExperiencesViewType.EXPLORE)
-                return@OnNavigationItemSelectedListener true
-            }
-        }
-        false
-    }
 
     override fun showView(viewType: MainView.ExperiencesViewType) {
         val fragmentTransaction = supportFragmentManager.beginTransaction()
@@ -120,5 +121,24 @@ class MainActivity : AppCompatActivity(), MainView {
 
     override fun navigateToWelcome() {
         startActivity(WelcomeActivity.newIntent(this))
+    }
+
+    override fun showUpgradeDialog() {
+        val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+        else AlertDialog.Builder(this)
+
+        builder.setTitle("Deprecated version")
+                .setMessage("This app version has been deprecated. Please, upgrade it.")
+                .setPositiveButton(android.R.string.yes,
+                                   { _, _ -> presenter.onUpgradeDialogClick() })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setCancelable(false)
+                .show()
+    }
+
+    override fun navigateToUpgradeApp() {
+        //TODO
+        finish()
     }
 }

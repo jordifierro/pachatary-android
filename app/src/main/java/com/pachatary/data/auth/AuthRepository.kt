@@ -4,7 +4,8 @@ import com.pachatary.data.common.Result
 import io.reactivex.Flowable
 
 class AuthRepository(val authStorageRepository: AuthStorageRepository,
-                     private val authApiRepository: AuthApiRepository) {
+                     private val authApiRepository: AuthApiRepository,
+                     val currentVersion: Int) {
 
     fun hasPersonCredentials(): Boolean {
         return try { authStorageRepository.getPersonCredentials()
@@ -39,6 +40,12 @@ class AuthRepository(val authStorageRepository: AuthStorageRepository,
                                 savePerson(it.data!!.first)
                                 authStorageRepository.setPersonCredentials(it.data.second)
                             } }
+
+    fun currentVersionHasExpired(): Flowable<Boolean> =
+            authApiRepository.clientVersions()
+                    .filter { !it.isInProgress() }
+                    .map { if (it.isSuccess()) currentVersion < it.data!!
+                           else false }
 
     internal fun savePerson(person: Person) {
         authStorageRepository.setPerson(person)
