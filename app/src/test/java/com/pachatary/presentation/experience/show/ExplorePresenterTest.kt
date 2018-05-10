@@ -13,13 +13,71 @@ import io.reactivex.subjects.PublishSubject
 import org.junit.Assert.assertFalse
 import org.junit.Test
 import org.mockito.BDDMockito
-import org.mockito.BDDMockito.never
-import org.mockito.BDDMockito.then
+import org.mockito.BDDMockito.*
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 
 class ExplorePresenterTest {
+
+    @Test
+    fun test_create_when_no_permissions_asks_permissions() {
+        given {
+            no_permissions()
+            an_experience_repo_that_returns_in_progress(Request.Action.GET_FIRSTS)
+        } whenn {
+            create_presenter()
+        } then {
+            should_ask_permissions()
+        }
+    }
+
+    @Test
+    fun test_create_with_permissions_show_views_and_ask_last_known_location() {
+        given {
+            permissions()
+            an_experience_repo_that_returns_in_progress(Request.Action.GET_FIRSTS)
+        } whenn {
+            create_presenter()
+        } then {
+            should_show_accepted_permissions_views()
+            should_ask_last_known_location()
+        }
+    }
+
+    @Test
+    fun test_when_permisions_accepted_shows_views_and_asks_last_known_location() {
+        given {
+            nothing()
+        } whenn {
+            permissions_accepted()
+        } then {
+            should_show_accepted_permissions_views()
+            should_ask_last_known_location()
+        }
+    }
+
+    @Test
+    fun test_on_permissions_denied_shows_no_permissions_views() {
+        given {
+            nothing()
+        } whenn {
+            permissions_denied()
+        } then {
+            should_show_denied_permissions_views()
+        }
+    }
+
+    @Test
+    fun test_on_retry_permissions_click_shows_permissions_dialog() {
+        given {
+            nothing()
+        } whenn {
+            retry_permissions_clicked()
+        } then {
+            should_ask_permissions()
+        }
+    }
 
     @Test
     fun test_create_dont_ask_firsts_experiences() {
@@ -256,6 +314,13 @@ class ExplorePresenterTest {
                 .willReturn(Flowable.just(Result(listOf(), error = Exception(), action = action)))
         }
 
+        fun permissions() {
+            BDDMockito.given(mockView.hasLocationPermission()).willReturn(true)
+        }
+
+        fun no_permissions() {
+            BDDMockito.given(mockView.hasLocationPermission()).willReturn(false)
+        }
         fun create_presenter() {
             presenter.create()
         }
@@ -280,6 +345,18 @@ class ExplorePresenterTest {
             presenter.onSearchSettingsResult(
                     SearchSettingsModel(searchWord, SearchSettingsModel.LocationOption.SELECTED,
                             latitude, longitude, selectedLatitude, selectedLongitude))
+        }
+
+        fun permissions_accepted() {
+            presenter.onPermissionsAccepted()
+        }
+
+        fun permissions_denied() {
+            presenter.onPermissionsDenied()
+        }
+
+        fun retry_permissions_clicked() {
+            presenter.onRetryPermissions()
         }
 
         fun should_show_view_loader() {
@@ -366,6 +443,22 @@ class ExplorePresenterTest {
                     SearchSettingsModel(searchWord, SearchSettingsModel.LocationOption.SELECTED,
                             latitude, longitude, selectedLatitude, selectedLongitude)
             )
+        }
+
+        fun should_ask_permissions() {
+            BDDMockito.then(mockView).should().askPermissions()
+        }
+
+        fun should_show_accepted_permissions_views() {
+            BDDMockito.then(mockView).should().showAcceptedPermissionsViews()
+        }
+
+        fun should_ask_last_known_location() {
+            BDDMockito.then(mockView).should().askLastKnownLocation()
+        }
+
+        fun should_show_denied_permissions_views() {
+            BDDMockito.then(mockView).should().showDeniedPermissionsViews()
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

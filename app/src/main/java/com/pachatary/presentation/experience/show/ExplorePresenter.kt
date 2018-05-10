@@ -21,8 +21,10 @@ class ExplorePresenter @Inject constructor(private val repository: ExperienceRep
 
     init {
         Flowable.combineLatest<Unit, Request.Params, Request.Params>(
-                getFirstExperiencesPublishSubject.toFlowable(BackpressureStrategy.LATEST).replay(1).autoConnect(),
-                searchParamsChangedPublishSubject.toFlowable(BackpressureStrategy.LATEST).replay(1).autoConnect(),
+                getFirstExperiencesPublishSubject.toFlowable(BackpressureStrategy.LATEST)
+                        .replay(1).autoConnect(),
+                searchParamsChangedPublishSubject.toFlowable(BackpressureStrategy.LATEST)
+                        .replay(1).autoConnect(),
                 BiFunction { _, params: Request.Params -> params })
                 .subscribe { repository.getFirstExperiences(ExperienceRepoSwitch.Kind.EXPLORE, it) }
     }
@@ -33,6 +35,21 @@ class ExplorePresenter @Inject constructor(private val repository: ExperienceRep
 
     fun create() {
         connectToExperiences()
+        if (view.hasLocationPermission()) onPermissionsAccepted()
+        else view.askPermissions()
+    }
+
+    fun onPermissionsAccepted() {
+        view.showAcceptedPermissionsViews()
+        view.askLastKnownLocation()
+    }
+
+    fun onPermissionsDenied() {
+        view.showDeniedPermissionsViews()
+    }
+
+    fun onRetryPermissions() {
+        view.askPermissions()
     }
 
     fun onRetryClick() {

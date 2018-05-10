@@ -46,4 +46,29 @@
         android:src="@android:drawable/ic_menu_search"
         android:tint="@color/black" />
 
+    <LinearLayout
+        android:id="@+id/experiences_no_permissions_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:orientation="vertical"
+        android:visibility="invisible">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:text="We need to know your aproximate location in order to show experiences near your"/>
+
+        <Button
+            android:id="@+id/experiences_retry_permission_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Allow permissions"/>
+
+    </LinearLayout>
+
 </RelativeLayout>
