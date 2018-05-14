@@ -3,7 +3,7 @@ package com.pachatary.presentation.experience.show
 import com.pachatary.data.experience.Experience
 import com.pachatary.presentation.common.view.LoaderView
 
-interface ExploreView : LoaderView {
+interface PersonsExperiencesView : LoaderView {
 
     fun showRetry()
     fun hideRetry()
@@ -11,11 +11,4 @@ interface ExploreView : LoaderView {
     fun hidePaginationLoader()
     fun showExperienceList(experienceList: List<Experience>)
     fun navigateToExperience(experienceId: String)
-    fun navigateToSearchSettings(searchSettingsModel: SearchSettingsModel)
-    fun hasLocationPermission(): Boolean
-    fun showAcceptedPermissionsViews()
-    fun askLastKnownLocation()
-    fun askPermissions()
-    fun showDeniedPermissionsViews()
-    fun navigateToPersonsExperiences(username: String)
 }

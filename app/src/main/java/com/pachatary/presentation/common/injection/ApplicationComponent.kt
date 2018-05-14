@@ -41,4 +41,5 @@ interface ApplicationComponent {
     fun inject(welcomeActivity: WelcomeActivity)
     fun inject(askLoginEmailActivity: AskLoginEmailActivity)
     fun inject(loginActivity: LoginActivity)
+    fun inject(personsExperienceActivity: PersonsExperienceActivity)
 }

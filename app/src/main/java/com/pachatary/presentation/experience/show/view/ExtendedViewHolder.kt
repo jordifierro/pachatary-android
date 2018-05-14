@@ -9,7 +9,8 @@ import com.pachatary.R
 import com.pachatary.data.experience.Experience
 import com.squareup.picasso.Picasso
 
-class ExtendedViewHolder(view: View, val onClick: (String) -> Unit)
+class ExtendedViewHolder(view: View, val onClick: (String) -> Unit,
+                         val onUsernameClick: (String) -> Unit)
     : RecyclerView.ViewHolder(view), View.OnClickListener {
 
     private val titleView: TextView = view.findViewById(R.id.experience_title)
@@ -33,6 +34,9 @@ class ExtendedViewHolder(view: View, val onClick: (String) -> Unit)
         this.experienceId = experience.id
         titleView.text = experience.title
         authorView.text = "by " + experience.authorUsername
+        authorView.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(v: View?) { onUsernameClick.invoke(experience.authorUsername) }
+        })
         descriptionView.text = experience.description
         savesCountView.text = experience.savesCount.toString()
         Picasso.with(pictureView.context)

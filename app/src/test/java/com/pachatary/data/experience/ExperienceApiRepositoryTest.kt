@@ -34,6 +34,17 @@ class ExperienceApiRepositoryTest {
         }
     }
 
+    @Test
+    fun test_get_other_person_s_experiences() {
+        given {
+            a_web_server_that_returns_get_experiences()
+        } whenn {
+            persons_experiences_are_requested("others.username")
+        } then {
+            request_should_get_person_experiences("others.username")
+            response_should_experience_list_and_next_url()
+        }
+    }
 
     @Test
     fun test_get_explore_experiences_with_params() {
@@ -210,6 +221,13 @@ class ExperienceApiRepositoryTest {
 
         fun my_experiences_are_requested() {
             repository.myExperiencesFlowable()
+                    .subscribeOn(Schedulers.trampoline())
+                    .subscribe(testListSubscriber)
+            testListSubscriber.awaitCount(1)
+        }
+
+        fun persons_experiences_are_requested(username: String) {
+            repository.personsExperienceFlowable(username)
                     .subscribeOn(Schedulers.trampoline())
                     .subscribe(testListSubscriber)
             testListSubscriber.awaitCount(1)

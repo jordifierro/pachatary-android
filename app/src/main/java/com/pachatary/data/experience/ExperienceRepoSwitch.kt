@@ -4,26 +4,29 @@ import com.pachatary.data.common.Request
 import com.pachatary.data.common.Result
 import com.pachatary.data.common.ResultCacheFactory
 import io.reactivex.Flowable
-import io.reactivex.functions.Function3
+import io.reactivex.functions.Function4
 
 class ExperienceRepoSwitch(resultCacheFactory: ResultCacheFactory<Experience>,
                            requesterFactory: ExperienceRequesterFactory) {
 
     enum class Modification { ADD_OR_UPDATE_LIST, UPDATE_LIST, REPLACE_RESULT }
-    enum class Kind { MINE, SAVED, EXPLORE }
+    enum class Kind { MINE, SAVED, EXPLORE, PERSONS }
 
     val mineResultCache = resultCacheFactory.create()
     private val savedResultCache = resultCacheFactory.create()
     private val exploreResultCache = resultCacheFactory.create()
+    private val personsResultCache = resultCacheFactory.create()
     private val mineActionObserver = requesterFactory.create(mineResultCache, Kind.MINE)
     private val savedActionObserver = requesterFactory.create(savedResultCache, Kind.SAVED)
     private val exploreActionObserver = requesterFactory.create(exploreResultCache, Kind.EXPLORE)
+    private val personsActionObserver = requesterFactory.create(personsResultCache, Kind.PERSONS)
 
     fun getResultFlowable(kind: Kind) =
             when(kind) {
                 Kind.MINE -> mineResultCache.resultFlowable
                 Kind.SAVED -> savedResultCache.resultFlowable
                 Kind.EXPLORE -> exploreResultCache.resultFlowable
+                Kind.PERSONS -> personsResultCache.resultFlowable
             }
 
     fun modifyResult(kind: Kind, modification: Modification,
@@ -39,12 +42,14 @@ class ExperienceRepoSwitch(resultCacheFactory: ResultCacheFactory<Experience>,
             Flowable.combineLatest(getResultFlowable(Kind.MINE),
                                    getResultFlowable(Kind.SAVED),
                                    getResultFlowable(Kind.EXPLORE),
-                    Function3 { a: Result<List<Experience>>,
-                                b: Result<List<Experience>>, c: Result<List<Experience>> ->
+                                   getResultFlowable(Kind.PERSONS),
+                    Function4 { a: Result<List<Experience>>, b: Result<List<Experience>>,
+                                c: Result<List<Experience>>, d: Result<List<Experience>> ->
                         var datas = setOf<Experience>()
                         datas = datas.union(a.data!!)
                         datas = datas.union(b.data!!)
                         datas = datas.union(c.data!!)
+                        datas = datas.union(d.data!!)
                         Result(datas.toList()) })
                     .map { Result(it.data?.first { it.id == experienceId }) }
 
@@ -54,6 +59,7 @@ class ExperienceRepoSwitch(resultCacheFactory: ResultCacheFactory<Experience>,
             Kind.MINE -> mineActionObserver.onNext(Request(action, requestParams))
             Kind.SAVED -> savedActionObserver.onNext(Request(action, requestParams))
             Kind.EXPLORE -> exploreActionObserver.onNext(Request(action, requestParams))
+            Kind.PERSONS -> personsActionObserver.onNext(Request(action, requestParams))
         }
     }
 
@@ -62,5 +68,6 @@ class ExperienceRepoSwitch(resultCacheFactory: ResultCacheFactory<Experience>,
                 Kind.MINE -> mineResultCache
                 Kind.SAVED -> savedResultCache
                 Kind.EXPLORE -> exploreResultCache
+                Kind.PERSONS -> personsResultCache
             }
 }

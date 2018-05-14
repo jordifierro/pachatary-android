@@ -10,6 +10,7 @@ class ExtendedListAdapter(private val inflater: LayoutInflater,
                           var experienceList: List<Experience>,
                           var inProgress: Boolean,
                           val onClick: (String) -> Unit,
+                          val onUsernameClick: (String) -> Unit,
                           private val onLastItemShown: () -> Unit)
                                                 : RecyclerView.Adapter<ExtendedViewHolder>() {
 
@@ -24,7 +25,7 @@ class ExtendedListAdapter(private val inflater: LayoutInflater,
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExtendedViewHolder {
         return ExtendedViewHolder(inflater.inflate(R.layout.item_extended_experience_list,
-                parent, false), onClick)
+                parent, false), onClick, onUsernameClick)
     }
 
     override fun getItemCount(): Int {

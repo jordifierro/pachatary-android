@@ -19,6 +19,10 @@ interface ExperienceApi {
     @GET("/experiences/?saved=true")
     fun savedExperiences(): Flowable<Result<PaginatedListMapper<Experience, ExperienceMapper>>>
 
+    @GET("/experiences/")
+    fun personsExperiences(@Query("username") username: String)
+        : Flowable<Result<PaginatedListMapper<Experience, ExperienceMapper>>>
+
     @GET
     fun paginateExperiences(@Url url: String)
             : Flowable<Result<PaginatedListMapper<Experience, ExperienceMapper>>>

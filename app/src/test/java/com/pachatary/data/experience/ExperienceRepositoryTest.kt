@@ -16,8 +16,10 @@ import org.mockito.MockitoAnnotations
 class ExperienceRepositoryTest {
 
     @Test
-    fun test_experiences_flowable_returns_result_flowable_from_switcher_for_mine_and_explore() {
-        for (kind in listOf(ExperienceRepoSwitch.Kind.MINE, ExperienceRepoSwitch.Kind.EXPLORE)) {
+    fun test_experiences_flowable_returns_result_flowable_for_mine_explore_and_persons() {
+        for (kind in listOf(ExperienceRepoSwitch.Kind.MINE,
+                            ExperienceRepoSwitch.Kind.EXPLORE,
+                            ExperienceRepoSwitch.Kind.PERSONS)) {
             given {
                 a_flowable()
                 kind_of_experiences(kind)
@@ -48,7 +50,7 @@ class ExperienceRepositoryTest {
     }
 
     @Test
-    fun test_experience_flowable_returns_swichers_one() {
+    fun test_experience_flowable_returns_switchers_one() {
         given {
             an_experience_flowable()
             an_experience_id()
@@ -90,7 +92,7 @@ class ExperienceRepositoryTest {
     }
 
     @Test
-    fun test_updload_experience_picture_call_upload_picture_experience_and_update_mine() {
+    fun test_upload_experience_picture_call_upload_picture_experience_and_update_mine() {
         given {
             an_experience_id()
             an_image_cropped_string()
@@ -102,7 +104,7 @@ class ExperienceRepositoryTest {
     }
 
     @Test
-    fun test_save_experience_call_save_experience_and_updates_saved_and_explore() {
+    fun test_save_experience_call_save_experience_and_updates_saved_explore_and_persons() {
         given {
             an_experience_id()
             an_experience_repo_that_returns_a_publisher_when_save_is_called()
@@ -112,7 +114,7 @@ class ExperienceRepositoryTest {
             save_experience_is_called()
         } then {
             should_call_api_repo_save_experience()
-            should_modify_experience_to_saved_and_update_saved_and_explore_cache()
+            should_modify_experience_to_saved_and_update_saved_explore_and_persons_cache()
             should_subscribe_to_publisher_returned_by_api()
         }
     }
@@ -128,7 +130,7 @@ class ExperienceRepositoryTest {
             unsave_experience_is_called()
         } then {
             should_call_api_repo_unsave_experience()
-            should_modify_experience_to_unsaved_and_update_saved_and_explore_cache()
+            should_modify_experience_to_unsaved_and_update_saved_explore_and_persons_cache()
             should_subscribe_to_publisher_returned_by_api()
         }
     }
@@ -264,7 +266,8 @@ class ExperienceRepositoryTest {
         }
 
         fun repo_switch_that_returns_that_flowable_for_that_kind() {
-            BDDMockito.given(mockExperiencesRepoSwitch.getResultFlowable(kind)).willReturn(experiencesFlowable)
+            BDDMockito.given(mockExperiencesRepoSwitch.getResultFlowable(kind))
+                    .willReturn(experiencesFlowable)
         }
 
         fun experiences_flowable_is_called() {
@@ -363,7 +366,7 @@ class ExperienceRepositoryTest {
             BDDMockito.then(mockApiRepository).should().saveExperience(false, experienceId)
         }
 
-        fun should_modify_experience_to_saved_and_update_saved_and_explore_cache() {
+        fun should_modify_experience_to_saved_and_update_saved_explore_and_persons_cache() {
             BDDMockito.then(mockExperiencesRepoSwitch).should()
                     .modifyResult(ExperienceRepoSwitch.Kind.SAVED,
                                   ExperienceRepoSwitch.Modification.ADD_OR_UPDATE_LIST,
@@ -378,9 +381,16 @@ class ExperienceRepositoryTest {
                                                                 .isSaved(true)
                                                       .savesCount(nonSavedExperience.savesCount + 1)
                                                                 .build()))
+            BDDMockito.then(mockExperiencesRepoSwitch).should()
+                    .modifyResult(ExperienceRepoSwitch.Kind.PERSONS,
+                            ExperienceRepoSwitch.Modification.UPDATE_LIST,
+                            list = listOf(nonSavedExperience.builder()
+                                    .isSaved(true)
+                                    .savesCount(nonSavedExperience.savesCount + 1)
+                                    .build()))
         }
 
-        fun should_modify_experience_to_unsaved_and_update_saved_and_explore_cache() {
+        fun should_modify_experience_to_unsaved_and_update_saved_explore_and_persons_cache() {
             BDDMockito.then(mockExperiencesRepoSwitch).should()
                     .modifyResult(ExperienceRepoSwitch.Kind.SAVED,
                             ExperienceRepoSwitch.Modification.ADD_OR_UPDATE_LIST,
@@ -390,6 +400,13 @@ class ExperienceRepositoryTest {
                                     .build()))
             BDDMockito.then(mockExperiencesRepoSwitch).should()
                     .modifyResult(ExperienceRepoSwitch.Kind.EXPLORE,
+                            ExperienceRepoSwitch.Modification.UPDATE_LIST,
+                            list = listOf(savedExperience.builder()
+                                    .isSaved(false)
+                                    .savesCount(savedExperience.savesCount - 1)
+                                    .build()))
+            BDDMockito.then(mockExperiencesRepoSwitch).should()
+                    .modifyResult(ExperienceRepoSwitch.Kind.PERSONS,
                             ExperienceRepoSwitch.Modification.UPDATE_LIST,
                             list = listOf(savedExperience.builder()
                                     .isSaved(false)

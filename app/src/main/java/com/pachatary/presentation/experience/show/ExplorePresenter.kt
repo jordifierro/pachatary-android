@@ -111,6 +111,10 @@ class ExplorePresenter @Inject constructor(private val repository: ExperienceRep
         view.navigateToSearchSettings(searchSettingsModel)
     }
 
+    fun onUsernameClicked(username: String) {
+        view.navigateToPersonsExperiences(username)
+    }
+
     fun onSearchSettingsResult(searchSettingsModel: SearchSettingsModel) {
         this.searchSettingsModel = searchSettingsModel
         val newSearchParams =

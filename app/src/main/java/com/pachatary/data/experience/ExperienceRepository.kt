@@ -47,7 +47,7 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
                                     .savesCount(it.data.savesCount + modifier)
                                     .build()) }
                 .take(1)
-                .subscribe(addOrUpdateToSavedAndUpdateToExploreExperiences)
+                .subscribe(addOrUpdateToSavedAndUpdateToExploreAndPersonsExperiences)
         apiRepository.saveExperience(save = save, experienceId = experienceId).subscribe()
     }
 
@@ -57,10 +57,12 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
                 ExperienceRepoSwitch.Modification.ADD_OR_UPDATE_LIST,
                 list = listOf(experienceResult.data!!)) }
 
-    private val addOrUpdateToSavedAndUpdateToExploreExperiences =
+    private val addOrUpdateToSavedAndUpdateToExploreAndPersonsExperiences =
         { experiencesList: List<Experience> ->
             repoSwitch.modifyResult(ExperienceRepoSwitch.Kind.EXPLORE,
                 ExperienceRepoSwitch.Modification.UPDATE_LIST, list = experiencesList)
+            repoSwitch.modifyResult(ExperienceRepoSwitch.Kind.PERSONS,
+                    ExperienceRepoSwitch.Modification.UPDATE_LIST, list = experiencesList)
             repoSwitch.modifyResult(ExperienceRepoSwitch.Kind.SAVED,
                 ExperienceRepoSwitch.Modification.ADD_OR_UPDATE_LIST, list = experiencesList) }
 }

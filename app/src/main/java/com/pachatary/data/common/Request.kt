@@ -8,5 +8,6 @@ data class Request(val action: Action, val params: Params? = null) {
 
     data class Params(val word: String? = null,
                       val latitude: Double? = null,
-                      val longintude: Double? = null)
+                      val longitude: Double? = null,
+                      val username: String? = null)
 }

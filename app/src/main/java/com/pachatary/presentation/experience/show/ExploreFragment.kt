@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
-import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -65,7 +64,9 @@ class ExploreFragment : Fragment(), ExploreView {
         recyclerView = view.findViewById(R.id.experiences_recyclerview)
         recyclerView.layoutManager = GridLayoutManager(activity, 1)
         recyclerView.adapter = ExtendedListAdapter(layoutInflater, listOf(), false,
-                { id -> presenter.onExperienceClick(id) }, { presenter.lastExperienceShown() })
+                { id -> presenter.onExperienceClick(id) },
+                { username -> presenter.onUsernameClicked(username) },
+                { presenter.lastExperienceShown() })
         noPermissionsLayout = view.findViewById(R.id.experiences_no_permissions_layout)
         retryPermissionButton = view.findViewById(R.id.experiences_retry_permission_button)
         retryPermissionButton.setOnClickListener { presenter.onRetryPermissions() }
@@ -160,5 +161,9 @@ class ExploreFragment : Fragment(), ExploreView {
                 return
             }
         }
+    }
+
+    override fun navigateToPersonsExperiences(username: String) {
+        startActivity(PersonsExperienceActivity.newIntent(activity!!.applicationContext, username))
     }
 }

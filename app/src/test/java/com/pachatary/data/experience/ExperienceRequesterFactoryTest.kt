@@ -50,7 +50,7 @@ class ExperienceRequesterFactoryTest {
         for (kind in ExperienceRepoSwitch.Kind.values()) {
             given {
                 a_kind(kind)
-                a_search_params()
+                a_request_params()
                 a_result_cache_that_return_initial_result()
                 an_api_repo_that_returns_two_experiences()
             } whenn {
@@ -68,7 +68,7 @@ class ExperienceRequesterFactoryTest {
     fun test_get_firsts_after_search_params_changed_reset_and_acts_like_normal_get_firsts() {
         given {
             a_kind(ExperienceRepoSwitch.Kind.EXPLORE)
-            a_search_params()
+            a_request_params()
             a_result_cache_that_returns_paginated_search()
             an_api_repo_that_returns_two_experiences()
         } whenn {
@@ -200,7 +200,7 @@ class ExperienceRequesterFactoryTest {
         lateinit var experienceB: Experience
         var nextUrl = ""
         val exception = Exception()
-        var searchParams: Request.Params? = null
+        var requestParams: Request.Params? = null
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
@@ -213,8 +213,8 @@ class ExperienceRequesterFactoryTest {
             this.kind = kind
         }
 
-        fun a_search_params() {
-            searchParams = Request.Params("culture", 2.8, -4.3)
+        fun a_request_params() {
+            requestParams = Request.Params("culture", 2.8, -4.3, "usr.nm")
         }
 
         fun a_next_url() {
@@ -259,7 +259,11 @@ class ExperienceRequesterFactoryTest {
                             .willReturn(Flowable.just(Result(listOf(experienceA, experienceB))))
                 ExperienceRepoSwitch.Kind.EXPLORE ->
                     BDDMockito.given(mockApiRepository.exploreExperiencesFlowable(
-                        searchParams!!.word, searchParams!!.latitude, searchParams!!.longintude))
+                        requestParams!!.word, requestParams!!.latitude, requestParams!!.longitude))
+                            .willReturn(Flowable.just(Result(listOf(experienceA, experienceB))))
+                ExperienceRepoSwitch.Kind.PERSONS ->
+                    BDDMockito.given(
+                            mockApiRepository.personsExperienceFlowable(requestParams!!.username!!))
                             .willReturn(Flowable.just(Result(listOf(experienceA, experienceB))))
             }
         }
@@ -302,7 +306,7 @@ class ExperienceRequesterFactoryTest {
         }
 
         fun emit_get_firsts() {
-            requesterObserver.onNext(Request(Request.Action.GET_FIRSTS, searchParams))
+            requesterObserver.onNext(Request(Request.Action.GET_FIRSTS, requestParams))
         }
 
         fun paginate() {
@@ -319,7 +323,7 @@ class ExperienceRequesterFactoryTest {
         fun should_emit_loading_through_replace_result_cache() {
             val result = replaceResultObserver.events.get(0).get(0) as Result<List<Experience>>
             assertEquals(Result(listOf<Experience>(), inProgress = true,
-                                action = Request.Action.GET_FIRSTS, params = searchParams), result)
+                                action = Request.Action.GET_FIRSTS, params = requestParams), result)
         }
 
         fun should_emit_loading_through_replace_result_cache_with_last_event_paginate() {
@@ -344,7 +348,9 @@ class ExperienceRequesterFactoryTest {
                     BDDMockito.then(mockApiRepository).should().savedExperiencesFlowable()
                 ExperienceRepoSwitch.Kind.EXPLORE ->
                     BDDMockito.then(mockApiRepository).should().exploreExperiencesFlowable(
-                            searchParams!!.word, searchParams!!.latitude, searchParams!!.longintude)
+                        requestParams!!.word, requestParams!!.latitude, requestParams!!.longitude)
+                ExperienceRepoSwitch.Kind.PERSONS -> BDDMockito.then(mockApiRepository).should()
+                            .personsExperienceFlowable(requestParams!!.username!!)
             }
         }
 
@@ -355,7 +361,7 @@ class ExperienceRequesterFactoryTest {
         fun should_replace_result_with_that_two_experiences_and_last_event_get_firsts() {
             val result = replaceResultObserver.events.get(0).get(1) as Result<List<Experience>>
             assertEquals(Result(listOf(experienceA, experienceB),
-                                action = Request.Action.GET_FIRSTS, params = searchParams), result)
+                                action = Request.Action.GET_FIRSTS, params = requestParams), result)
         }
 
         fun should_replace_result_with_that_two_experiences_and_last_event_paginate() {

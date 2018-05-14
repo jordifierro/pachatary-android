@@ -79,7 +79,7 @@ class ExperienceRepoSwitchTest {
     }
 
     @Test
-    fun test_get_experience_flowable_joins_three_caches_and_filters_experience_by_id() {
+    fun test_get_experience_flowable_joins_four_caches_and_filters_experience_by_id() {
         given {
             an_experience_id()
             an_experience_with_that_id()
@@ -99,7 +99,7 @@ class ExperienceRepoSwitchTest {
                 given {
                     a_kind(kind)
                     an_action(action)
-                    a_search_params()
+                    a_request_params()
                 } whenn {
                     initialize_switch()
                     execute_action()
@@ -139,9 +139,17 @@ class ExperienceRepoSwitchTest {
         var resultExploreCache = ResultCacheFactory.ResultCache(replaceResultExploreObserver,
                 addOrUpdateExploreObserver, updateExploreObserver, resultExploreFlowable)
 
+        val addOrUpdatePersonsObserver = TestObserver.create<List<Experience>>()
+        val updatePersonsObserver = TestObserver.create<List<Experience>>()
+        val replaceResultPersonsObserver = TestObserver.create<Result<List<Experience>>>()
+        var resultPersonsFlowable = Flowable.empty<Result<List<Experience>>>()
+        var resultPersonsCache = ResultCacheFactory.ResultCache(replaceResultPersonsObserver,
+                addOrUpdatePersonsObserver, updatePersonsObserver, resultPersonsFlowable)
+
         val testMineActionObserver = TestObserver.create<Request>()
         val testSavedActionObserver = TestObserver.create<Request>()
         val testExploreActionObserver = TestObserver.create<Request>()
+        val testPersonsActionObserver = TestObserver.create<Request>()
 
         var kind = ExperienceRepoSwitch.Kind.MINE
         var action = Request.Action.GET_FIRSTS
@@ -152,7 +160,7 @@ class ExperienceRepoSwitchTest {
         var experienceId = ""
         lateinit var experience: Experience
         lateinit var resultExperienceFlowable: Flowable<Result<Experience>>
-        lateinit var searchParams: Request.Params
+        lateinit var requestParams: Request.Params
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
@@ -166,10 +174,13 @@ class ExperienceRepoSwitchTest {
                     addOrUpdateSavedObserver, updateSavedObserver, resultSavedFlowable)
             resultExploreCache = ResultCacheFactory.ResultCache(replaceResultExploreObserver,
                     addOrUpdateExploreObserver, updateExploreObserver, resultExploreFlowable)
+            resultPersonsCache = ResultCacheFactory.ResultCache(replaceResultPersonsObserver,
+                    addOrUpdatePersonsObserver, updatePersonsObserver, resultPersonsFlowable)
             BDDMockito.given(resultCacheFactory.create())
                     .willReturn(resultMineCache)
                     .willReturn(resultSavedCache)
                     .willReturn(resultExploreCache)
+                    .willReturn(resultPersonsCache)
             BDDMockito.given(
                     requesterFactory.create(resultMineCache, ExperienceRepoSwitch.Kind.MINE))
                     .willReturn(testMineActionObserver)
@@ -179,6 +190,9 @@ class ExperienceRepoSwitchTest {
             BDDMockito.given(requesterFactory.create(resultExploreCache,
                     ExperienceRepoSwitch.Kind.EXPLORE))
                     .willReturn(testExploreActionObserver)
+            BDDMockito.given(requesterFactory.create(resultPersonsCache,
+                    ExperienceRepoSwitch.Kind.PERSONS))
+                    .willReturn(testPersonsActionObserver)
 
             switch = ExperienceRepoSwitch(resultCacheFactory, requesterFactory)
         }
@@ -191,8 +205,8 @@ class ExperienceRepoSwitchTest {
             experience = Experience(experienceId, "t", "", null, true, true, "")
         }
 
-        fun a_search_params() {
-            searchParams = Request.Params("c", 8.0, -9.1)
+        fun a_request_params() {
+            requestParams = Request.Params("c", 8.0, -9.1, "usr.nm")
         }
 
         fun some_result_flowables_that_emit_different_and_repeated_experiences() {
@@ -201,6 +215,9 @@ class ExperienceRepoSwitchTest {
             resultSavedFlowable = Flowable.just(Result(listOf(experience,
                     Experience("4", "", "", null, true, false, ""))))
             resultExploreFlowable = Flowable.just(Result(listOf(
+                    Experience("4", "", "", null, true, false, ""),
+                    Experience("4", "", "", null, true, false, ""))))
+            resultPersonsFlowable = Flowable.just(Result(listOf(
                     Experience("4", "", "", null, true, false, ""),
                     Experience("4", "", "", null, true, false, ""))))
         }
@@ -239,7 +256,7 @@ class ExperienceRepoSwitchTest {
         }
 
         fun execute_action() {
-            switch.executeAction(kind, action, searchParams)
+            switch.executeAction(kind, action, requestParams)
         }
 
         fun result_should_be_kind_result_flowable() {
@@ -248,6 +265,8 @@ class ExperienceRepoSwitchTest {
                 ExperienceRepoSwitch.Kind.SAVED -> assertEquals(resultSavedFlowable, resultFlowable)
                 ExperienceRepoSwitch.Kind.EXPLORE ->
                     assertEquals(resultExploreFlowable, resultFlowable)
+                ExperienceRepoSwitch.Kind.PERSONS ->
+                    assertEquals(resultPersonsFlowable, resultFlowable)
             }
         }
 
@@ -264,6 +283,10 @@ class ExperienceRepoSwitchTest {
                 ExperienceRepoSwitch.Kind.EXPLORE -> {
                     addOrUpdateExploreObserver.awaitCount(1)
                     addOrUpdateExploreObserver.assertValue(experienceList)
+                }
+                ExperienceRepoSwitch.Kind.PERSONS -> {
+                    addOrUpdatePersonsObserver.awaitCount(1)
+                    addOrUpdatePersonsObserver.assertValue(experienceList)
                 }
             }
         }
@@ -282,6 +305,10 @@ class ExperienceRepoSwitchTest {
                     updateExploreObserver.awaitCount(1)
                     updateExploreObserver.assertValue(experienceList)
                 }
+                ExperienceRepoSwitch.Kind.PERSONS -> {
+                    updatePersonsObserver.awaitCount(1)
+                    updatePersonsObserver.assertValue(experienceList)
+                }
             }
         }
 
@@ -299,6 +326,10 @@ class ExperienceRepoSwitchTest {
                     replaceResultExploreObserver.awaitCount(1)
                     replaceResultExploreObserver.assertValue(experiencesResult)
                 }
+                ExperienceRepoSwitch.Kind.PERSONS -> {
+                    replaceResultPersonsObserver.awaitCount(1)
+                    replaceResultPersonsObserver.assertValue(experiencesResult)
+                }
             }
         }
 
@@ -314,15 +345,19 @@ class ExperienceRepoSwitchTest {
             when (kind) {
                 ExperienceRepoSwitch.Kind.MINE -> {
                     testMineActionObserver.awaitCount(1)
-                    testMineActionObserver.assertValue(Request(action, searchParams))
+                    testMineActionObserver.assertValue(Request(action, requestParams))
                 }
                 ExperienceRepoSwitch.Kind.SAVED -> {
                     testSavedActionObserver.awaitCount(1)
-                    testSavedActionObserver.assertValue(Request(action, searchParams))
+                    testSavedActionObserver.assertValue(Request(action, requestParams))
                 }
                 ExperienceRepoSwitch.Kind.EXPLORE -> {
                     testExploreActionObserver.awaitCount(1)
-                    testExploreActionObserver.assertValue(Request(action, searchParams))
+                    testExploreActionObserver.assertValue(Request(action, requestParams))
+                }
+                ExperienceRepoSwitch.Kind.PERSONS -> {
+                    testPersonsActionObserver.awaitCount(1)
+                    testPersonsActionObserver.assertValue(Request(action, requestParams))
                 }
             }
         }
