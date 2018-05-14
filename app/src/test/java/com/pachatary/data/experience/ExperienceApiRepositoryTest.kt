@@ -29,7 +29,7 @@ class ExperienceApiRepositoryTest {
         } whenn {
             my_experiences_are_requested()
         } then {
-            request_should_get_experiences(mine = true)
+            request_should_get_person_experiences("self")
             response_should_experience_list_and_next_url()
         }
     }
@@ -66,7 +66,7 @@ class ExperienceApiRepositoryTest {
         } whenn {
             saved_experiences_are_requested()
         } then {
-            request_should_get_experiences(saved = true)
+            request_should_get_saved_experiences()
             response_should_experience_list_and_next_url()
         }
     }
@@ -266,15 +266,19 @@ class ExperienceApiRepositoryTest {
             assertEquals("", request.getBody().readUtf8())
         }
 
-        fun request_should_get_experiences(mine: Boolean = false, saved: Boolean = false) {
+        fun request_should_get_person_experiences(username: String) {
             val request = mockWebServer.takeRequest()
-            if (saved) assertEquals("/experiences/?saved=true", request.path)
-            else if (mine) assertEquals("/experiences/?mine=true", request.path)
-            else assertEquals("/experiences/?mine=false", request.path)
+            assertEquals("/experiences/?username=" + username, request.path)
             assertEquals("GET", request.getMethod())
             assertEquals("", request.getBody().readUtf8())
         }
 
+        fun request_should_get_saved_experiences() {
+            val request = mockWebServer.takeRequest()
+            assertEquals("/experiences/?saved=true", request.path)
+            assertEquals("GET", request.getMethod())
+            assertEquals("", request.getBody().readUtf8())
+        }
         fun request_should_search_experiences(word: String? = null, latitude: Double? = null,
                                               longitude: Double? = null) {
             val request = mockWebServer.takeRequest()

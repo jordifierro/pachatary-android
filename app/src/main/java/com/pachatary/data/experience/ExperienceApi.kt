@@ -13,7 +13,7 @@ interface ExperienceApi {
                            @Query("longitude") longitude: Double?)
             : Flowable<Result<PaginatedListMapper<Experience, ExperienceMapper>>>
 
-    @GET("/experiences/?mine=true")
+    @GET("/experiences/?username=self")
     fun myExperiences(): Flowable<Result<PaginatedListMapper<Experience, ExperienceMapper>>>
 
     @GET("/experiences/?saved=true")
