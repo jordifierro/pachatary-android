@@ -21,6 +21,7 @@
         <activity
             android:name="com.pachatary.presentation.main.MainActivity"
             android:label="@string/app_name"
+            android:screenOrientation="portrait"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,18 +31,22 @@
         <activity
             android:name="com.pachatary.presentation.scene.show.ExperienceMapActivity"
             android:label="@string/title_activity_experience_map"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="com.pachatary.presentation.scene.edition.CreateSceneActivity"
             android:label="@string/title_activity_create_scene"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="com.pachatary.presentation.common.edition.EditTitleAndDescriptionActivity"
             android:label="@string/title_activity_edit_title_and_description"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="com.pachatary.presentation.common.edition.SelectLocationActivity"
             android:label="@string/title_activity_select_location"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
@@ -50,21 +55,26 @@
         <activity
             android:name="com.pachatary.presentation.scene.edition.EditSceneActivity"
             android:label="@string/title_activity_edit_scene"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="com.pachatary.presentation.experience.edition.CreateExperienceActivity"
             android:label="@string/title_activity_create_experience"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="com.pachatary.presentation.experience.edition.EditExperienceActivity"
             android:label="@string/title_activity_edit_experience"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="com.pachatary.presentation.register.RegisterActivity"
             android:label="@string/title_register_activity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name="com.pachatary.presentation.register.ConfirmEmailActivity"
             android:label="@string/title_confirm_email_activity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter android:label="@string/filter_view_confirm_email_activity">
                 <action android:name="android.intent.action.VIEW" />
@@ -82,20 +92,25 @@
         <activity
             android:name=".presentation.scene.show.SceneListActivity"
             android:label="@string/title_scenes_list_activity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".presentation.experience.show.SearchSettingsActivity"
             android:label="@string/title_search_settings_activity"
+            android:screenOrientation="portrait"
             android:excludeFromRecents="true"
             android:theme="@style/Theme.AppCompat.Light.Dialog" />
         <activity android:name=".presentation.main.WelcomeActivity"
             android:label="@string/title_welcome_activity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".presentation.login.AskLoginEmailActivity"
-            android:label="@string/title_welcome_activity"
+            android:label="@string/title_ask_login_email_activity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name="com.pachatary.presentation.login.LoginActivity"
             android:label="@string/title_login_activity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter android:label="@string/filter_view_login_activity">
                 <action android:name="android.intent.action.VIEW" />
@@ -112,6 +127,7 @@
         </activity>
         <activity android:name=".presentation.experience.show.PersonsExperienceActivity"
             android:label="@string/title_persons_experiences"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
