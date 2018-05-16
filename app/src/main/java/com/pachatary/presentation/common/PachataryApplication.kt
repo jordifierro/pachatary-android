@@ -1,18 +1,18 @@
 package com.pachatary.presentation.common
 
-import android.app.Application
+import android.support.multidex.MultiDexApplication
+import com.facebook.stetho.Stetho
+import com.jakewharton.picasso.OkHttp3Downloader
 import com.pachatary.BuildConfig
 import com.pachatary.data.common.injection.DataModule
 import com.pachatary.presentation.common.injection.ApplicationComponent
 import com.pachatary.presentation.common.injection.ApplicationModule
 import com.pachatary.presentation.common.injection.DaggerApplicationComponent
-import com.facebook.stetho.Stetho
-import com.jakewharton.picasso.OkHttp3Downloader
 import com.squareup.picasso.Picasso
 import net.gotev.uploadservice.UploadService
 import net.gotev.uploadservice.okhttp.OkHttpStack
 
-class PachataryApplication : Application() {
+class PachataryApplication : MultiDexApplication() {
 
     companion object {
         lateinit var injector: ApplicationComponent

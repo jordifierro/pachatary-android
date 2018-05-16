@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'io.fabric'
 
 def appPropertiesFile = rootProject.file('app/app.properties')
 def appProperties = new Properties()
@@ -39,6 +40,7 @@ android {
             buildConfigField 'String', 'API_URL', '"' + appProperties['devApiUrl'] + '"'
             buildConfigField 'String', 'MAPBOX_ACCESS_TOKEN', '"' + appProperties['devMapboxAccessToken'] + '"'
             buildConfigField 'String', 'CLIENT_SECRET_KEY', '"' + appProperties['devClientSecretKey'] + '"'
+            multiDexEnabled true
         }
         release {
             resValue 'string', 'app_name', 'Pachatary'
@@ -48,6 +50,7 @@ android {
             buildConfigField 'String', 'MAPBOX_ACCESS_TOKEN', '"' + appProperties['mapboxAccessToken'] + '"'
             buildConfigField 'String', 'CLIENT_SECRET_KEY', '"' + appProperties['clientSecretKey'] + '"'
             minifyEnabled true
+            multiDexEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.config
         }
@@ -94,6 +97,9 @@ dependencies {
     implementation 'net.gotev:uploadservice:3.4'
     implementation 'net.gotev:uploadservice-okhttp:3.4'
     implementation 'com.google.android.gms:play-services-location:15.0.0'
+
+    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.1'
+    implementation 'com.android.support:multidex:1.0.1'
 }
 
 apply plugin: 'com.google.gms.google-services'
