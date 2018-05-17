@@ -5,10 +5,7 @@ import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import com.pachatary.BuildConfig
-import com.pachatary.data.auth.AuthApiRepository
-import com.pachatary.data.auth.AuthHttpInterceptor
-import com.pachatary.data.auth.AuthRepository
-import com.pachatary.data.auth.AuthStorageRepository
+import com.pachatary.data.auth.*
 import com.pachatary.data.common.ResultCacheFactory
 import com.pachatary.data.experience.*
 import com.pachatary.data.scene.Scene
@@ -35,10 +32,17 @@ class DataModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(authHttpInterceptor: AuthHttpInterceptor) =
+    fun provideClientVersionHttpInterceptor() =
+            ClientVersionHttpInterceptor(BuildConfig.VERSION_CODE)
+
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(authHttpInterceptor: AuthHttpInterceptor,
+                            clientVersionHttpInterceptor: ClientVersionHttpInterceptor) =
             OkHttpClient.Builder()
                   .addNetworkInterceptor(StethoInterceptor())
                   .addInterceptor(authHttpInterceptor)
+                  .addInterceptor(clientVersionHttpInterceptor)
                   .build()
 
     @Provides

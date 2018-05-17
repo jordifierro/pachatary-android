@@ -14,14 +14,6 @@ import org.mockito.Mockito.mock
 class AuthHttpInterceptorTest {
 
     @Test
-    @Throws(Exception::class)
-    fun testHttpInterceptor() {
-
-
-
-    }
-
-    @Test
     fun when_request_is_made_adds_authorization_header() {
         given {
             a_web_server_that_returns_mock_response()
