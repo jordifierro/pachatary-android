@@ -19,6 +19,7 @@ import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.*
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -37,12 +38,19 @@ class DataModule {
 
     @Provides
     @Singleton
+    fun provideAcceptLanguageHttpInterceptor() =
+            AcceptLanguageHttpInterceptor(Locale.getDefault().toString())
+
+    @Provides
+    @Singleton
     fun provideOkHttpClient(authHttpInterceptor: AuthHttpInterceptor,
-                            clientVersionHttpInterceptor: ClientVersionHttpInterceptor) =
+                            clientVersionHttpInterceptor: ClientVersionHttpInterceptor,
+                            acceptLanguageHttpInterceptor: AcceptLanguageHttpInterceptor) =
             OkHttpClient.Builder()
                   .addNetworkInterceptor(StethoInterceptor())
                   .addInterceptor(authHttpInterceptor)
                   .addInterceptor(clientVersionHttpInterceptor)
+                  .addInterceptor(acceptLanguageHttpInterceptor)
                   .build()
 
     @Provides
