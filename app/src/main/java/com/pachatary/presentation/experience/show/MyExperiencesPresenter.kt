@@ -69,7 +69,7 @@ class MyExperiencesPresenter @Inject constructor(
 
                                             if (it.isSuccess())
                                                 view.showExperienceList(it.data!!)
-                                        })
+                                        }, { throw it })
         experiencesRepository.getFirstExperiences(ExperienceRepoSwitch.Kind.MINE)
     }
 

@@ -73,7 +73,7 @@ class ExperienceMapPresenter @Inject constructor(private val repository: SceneRe
                     view.setTitle(it.data.title)
                     if (it.data.isMine) view.showEditButton()
                     else view.showSaveButton(isSaved = it.data.isSaved)
-                }})
+                }}, { throw it })
     }
 
     private fun connectToScenes() {
@@ -83,7 +83,7 @@ class ExperienceMapPresenter @Inject constructor(private val repository: SceneRe
                 scenesFlowable(),
                 BiFunction { _: Any, scenesResult: Result<List<Scene>> -> scenesResult })
                 .subscribe({ view.showScenesOnMap(it.data!!)
-                    view.hideLoader() })
+                    view.hideLoader() }, { throw it })
     }
 
     private fun mapLoadedFlowable() = view.mapLoadedFlowable()

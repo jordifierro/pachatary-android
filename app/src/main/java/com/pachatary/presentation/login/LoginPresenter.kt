@@ -33,6 +33,6 @@ class LoginPresenter @Inject constructor(private val authRepository: AuthReposit
                     } else if (it.isInProgress()) {
                         view.showLoader()
                     }
-                })
+                }, { throw it })
     }
 }

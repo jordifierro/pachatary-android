@@ -60,7 +60,7 @@ class SavedPresenter @Inject constructor(private val repository: ExperienceRepos
 
                                               if (it.isSuccess())
                                                   view.showExperienceList(it.data!!)
-                                          })
+                                          }, { throw it })
         repository.getFirstExperiences(ExperienceRepoSwitch.Kind.SAVED)
     }
 

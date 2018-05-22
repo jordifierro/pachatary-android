@@ -35,7 +35,7 @@ class ExperienceRequesterFactory(val apiRepository: ExperienceApiRepository) {
                                             .action(Request.Action.GET_FIRSTS)
                                             .params(it.first.params)
                                             .build())
-                            })
+                                    }, { throw it })
                         }
                     }
                     else if (it.first.action == Request.Action.PAGINATE) {
@@ -65,10 +65,10 @@ class ExperienceRequesterFactory(val apiRepository: ExperienceApiRepository) {
                                                 .build()
                                     }
                                 resultCache.replaceResultObserver.onNext(newResult)
-                            })
+                            }, { throw it })
                         }
                     }
-                })
+                }, { throw it })
         return actionsSubject
     }
 

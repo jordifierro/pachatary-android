@@ -63,7 +63,7 @@ class CreateScenePresenter @Inject constructor(private val sceneRepository: Scen
         sceneRepository.createScene(sceneToCreate)
                 .subscribeOn(schedulerProvider.subscriber())
                 .observeOn(schedulerProvider.observer())
-                .subscribe({ onSceneCreatedCorrectly(it.data!!) })
+                .subscribe({ onSceneCreatedCorrectly(it.data!!) }, { throw it })
     }
 
     fun onSelectLocationCanceled() {

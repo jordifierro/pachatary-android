@@ -1,5 +1,6 @@
 package com.pachatary.presentation.experience.edition
 
+import android.annotation.SuppressLint
 import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.OnLifecycleEvent
@@ -24,6 +25,7 @@ class CreateExperiencePresenter @Inject constructor(private val experienceReposi
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun destroy() {}
 
+    @SuppressLint("CheckResult")
     fun onTitleAndDescriptionEdited(title: String, description: String) {
         this.title = title
         this.description = description
@@ -31,7 +33,7 @@ class CreateExperiencePresenter @Inject constructor(private val experienceReposi
         experienceRepository.createExperience(newExperience)
                 .subscribeOn(schedulerProvider.subscriber())
                 .observeOn(schedulerProvider.observer())
-                .subscribe({ onExperienceCreatedCorrectly(it.data!!) })
+                .subscribe({ onExperienceCreatedCorrectly(it.data!!) }, { throw it })
     }
 
     fun onEditTitleAndDescriptionCanceled() {

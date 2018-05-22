@@ -1,5 +1,6 @@
 package com.pachatary.data.scene
 
+import android.annotation.SuppressLint
 import com.pachatary.data.common.ResultCacheFactory
 import com.pachatary.data.common.Result
 import io.reactivex.Flowable
@@ -8,12 +9,13 @@ class SceneRepository(val apiRepository: SceneApiRepository, val cacheFactory: R
 
     private val scenesCacheHashMap: HashMap<String, ResultCacheFactory.ResultCache<Scene>> = HashMap()
 
+    @SuppressLint("CheckResult")
     fun scenesFlowable(experienceId: String): Flowable<Result<List<Scene>>> {
         if (scenesCacheHashMap.get(experienceId) == null) {
             val cache = cacheFactory.create()
             scenesCacheHashMap.put(experienceId, cache)
             apiRepository.scenesRequestFlowable(experienceId)
-                    .subscribe({ cache.addOrUpdateObserver.onNext(it.data!!) })
+                    .subscribe({ cache.addOrUpdateObserver.onNext(it.data!!) }, { throw it })
         }
         return scenesCacheHashMap.get(experienceId)!!.resultFlowable
     }

@@ -99,7 +99,7 @@ class ExplorePresenter @Inject constructor(private val repository: ExperienceRep
 
                                               if (it.isSuccess())
                                                   view.showExperienceList(it.data!!)
-                                          })
+                                          }, { throw it })
         getFirstExperiencesPublishSubject.onNext(Unit)
     }
 

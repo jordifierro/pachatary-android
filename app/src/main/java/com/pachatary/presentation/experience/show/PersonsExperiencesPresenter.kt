@@ -70,7 +70,7 @@ class PersonsExperiencesPresenter @Inject constructor(private val repository: Ex
 
                                               if (it.isSuccess())
                                                   view.showExperienceList(it.data!!)
-                                          })
+                                          }, { throw it })
         repository.getFirstExperiences(ExperienceRepoSwitch.Kind.PERSONS,
                                        Request.Params(username = this.username))
     }

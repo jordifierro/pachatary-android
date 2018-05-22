@@ -1,5 +1,6 @@
 package com.pachatary.presentation.register
 
+import android.annotation.SuppressLint
 import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.OnLifecycleEvent
@@ -12,6 +13,7 @@ class ConfirmEmailPresenter @Inject constructor(private val authRepository: Auth
 
     lateinit var view: ConfirmEmailView
 
+    @SuppressLint("CheckResult")
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun create() {
         view.showLoader()
@@ -27,6 +29,6 @@ class ConfirmEmailPresenter @Inject constructor(private val authRepository: Auth
                         view.showMessage(it.error!!.message!!)
                         view.finish()
                     }
-                })
+                }, { throw it })
     }
 }

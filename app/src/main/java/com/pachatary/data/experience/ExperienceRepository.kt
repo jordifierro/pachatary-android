@@ -47,8 +47,9 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
                                     .savesCount(it.data.savesCount + modifier)
                                     .build()) }
                 .take(1)
-                .subscribe(addOrUpdateToSavedAndUpdateToExploreAndPersonsExperiences)
-        apiRepository.saveExperience(save = save, experienceId = experienceId).subscribe()
+                .subscribe(addOrUpdateToSavedAndUpdateToExploreAndPersonsExperiences, { throw it })
+        apiRepository.saveExperience(save = save, experienceId = experienceId)
+                .subscribe({}, { throw it } )
     }
 
     internal val addOrUpdateExperienceToMine =

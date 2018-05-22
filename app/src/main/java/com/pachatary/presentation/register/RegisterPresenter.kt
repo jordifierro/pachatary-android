@@ -1,5 +1,6 @@
 package com.pachatary.presentation.register
 
+import android.annotation.SuppressLint
 import android.arch.lifecycle.LifecycleObserver
 import com.pachatary.data.auth.AuthRepository
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
@@ -10,6 +11,7 @@ class RegisterPresenter @Inject constructor(private val authRepository: AuthRepo
 
     lateinit var view: RegisterView
 
+    @SuppressLint("CheckResult")
     fun doneButtonClick() {
         view.showLoader()
         view.blockDoneButton(true)
@@ -23,6 +25,6 @@ class RegisterPresenter @Inject constructor(private val authRepository: AuthRepo
                         view.showMessage("Successfully registered!\n Check your email to finalize the process")
                         view.finish()
                     } else view.showMessage(it.error!!.message!!)
-                })
+                }, { throw it })
     }
 }
