@@ -26,8 +26,7 @@ import kotlinx.android.synthetic.main.activity_select_location.*
 import java.util.*
 import javax.inject.Inject
 import android.view.inputmethod.InputMethodManager.HIDE_NOT_ALWAYS
-
-
+import java.io.IOException
 
 
 class SelectLocationActivity : AppCompatActivity(), SelectLocationView {
@@ -132,6 +131,7 @@ class SelectLocationActivity : AppCompatActivity(), SelectLocationView {
                 if (latLongList.size > 0)
                     emitter.onNext(Pair(latLongList[0].latitude, latLongList[0].longitude))
                 emitter.onComplete()
+            } catch (ioe: IOException) { emitter.onComplete()
             } catch (e: Exception) { emitter.onError(e) }
         }, BackpressureStrategy.LATEST)
     }
