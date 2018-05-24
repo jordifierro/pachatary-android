@@ -24,5 +24,10 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
         setSupportActionBar(toolbar)
+
+        findViewById<Button>(R.id.settings_privacy_button)
+            .setOnClickListener { startActivity(WebViewActivity.newPrivacyPolicyIntent(this)) }
+        findViewById<Button>(R.id.settings_terms_button)
+            .setOnClickListener { startActivity(WebViewActivity.newTermsAndConditionsIntent(this)) }
     }
 }

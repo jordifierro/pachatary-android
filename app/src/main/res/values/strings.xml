@@ -63,4 +63,7 @@
     <string name="title_settings_activity">Settings</string>
     <string name="settings_privacy_policy">Privacy policy</string>
     <string name="settings_terms_and_conditions">Terms and conditions</string>
+
+    <string name="title_webview_privacy">Privacy Policy</string>
+    <string name="title_webview_terms">Terms and conditions</string>
 </resources>

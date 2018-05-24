@@ -133,6 +133,10 @@
             android:label="@string/title_settings_activity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".presentation.main.WebViewActivity"
+            android:label="@string/title_settings_activity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>
