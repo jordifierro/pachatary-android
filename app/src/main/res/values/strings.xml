@@ -17,7 +17,12 @@
     <string name="title_activity_create_experience">Create experience</string>
     <string name="title_scenes_list_activity">Scenes</string>
     <string name="title_search_settings_activity">Search</string>
+
     <string name="title_welcome_activity">Welcome</string>
+    <string name="welcome_legal1_text">By clicking start new adventure you accept our </string>
+    <string name="welcome_legal2_text"><u>privacy policy</u></string>
+    <string name="welcome_legal3_text">&#160;and&#160;</string>
+    <string name="welcome_legal4_text"><u>terms and conditions</u></string>
 
     <string name="retry">Retry</string>
 

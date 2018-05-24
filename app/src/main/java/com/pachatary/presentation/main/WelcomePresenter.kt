@@ -43,4 +43,12 @@ class WelcomePresenter @Inject constructor(private val authRepository: AuthRepos
         view.navigateToAskLogin()
         view.finish()
     }
+
+    fun onPrivacyPolicyClick() {
+        view.navigateToPrivacyPolicy()
+    }
+
+    fun onTermsAndConditionsClick() {
+        view.navigateToTermsAndConditions()
+    }
 }

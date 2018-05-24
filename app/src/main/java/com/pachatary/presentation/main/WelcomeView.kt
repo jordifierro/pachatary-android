@@ -10,4 +10,6 @@ interface WelcomeView : LoaderView {
     fun disableButtons()
     fun enableButtons()
     fun navigateToAskLogin()
+    fun navigateToPrivacyPolicy()
+    fun navigateToTermsAndConditions()
 }

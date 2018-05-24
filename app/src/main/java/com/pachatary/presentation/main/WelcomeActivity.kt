@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.Button
 import android.widget.ProgressBar
+import android.widget.TextView
 import android.widget.Toast
 import com.pachatary.R
 import com.pachatary.presentation.common.PachataryApplication
@@ -35,6 +36,10 @@ class WelcomeActivity : AppCompatActivity(), WelcomeView {
         startButton.setOnClickListener { presenter.onStartClick() }
         loginButton = findViewById(R.id.welcome_login_button)
         loginButton.setOnClickListener { presenter.onLoginClick() }
+        findViewById<TextView>(R.id.welcome_legal2_textview)
+                .setOnClickListener { presenter.onPrivacyPolicyClick() }
+        findViewById<TextView>(R.id.welcome_legal4_textview)
+                .setOnClickListener { presenter.onTermsAndConditionsClick() }
 
         PachataryApplication.injector.inject(this)
         presenter.view = this
@@ -69,5 +74,13 @@ class WelcomeActivity : AppCompatActivity(), WelcomeView {
 
     override fun hideLoader() {
         progressBar.visibility = View.INVISIBLE
+    }
+
+    override fun navigateToPrivacyPolicy() {
+        startActivity(WebViewActivity.newPrivacyPolicyIntent(this))
+    }
+
+    override fun navigateToTermsAndConditions() {
+        startActivity(WebViewActivity.newTermsAndConditionsIntent(this))
     }
 }

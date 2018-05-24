@@ -60,7 +60,28 @@ class WelcomePresenterTest {
             should_navigate_to_ask_login()
             should_finish_view()
         }
+    }
 
+    @Test
+    fun test_on_privacy_policy_click_navigates_to_privacy_policy() {
+        given {
+            nothing()
+        } whenn {
+            on_privacy_policy_click()
+        } then {
+            should_navigate_to_privacy_policy()
+        }
+    }
+
+    @Test
+    fun test_on_terms_and_conditions_click_navigates_to_privacy_policy() {
+        given {
+            nothing()
+        } whenn {
+            on_terms_and_conditions_click()
+        } then {
+            should_navigate_to_terms_and_conditions()
+        }
     }
 
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
@@ -104,6 +125,14 @@ class WelcomePresenterTest {
             presenter.onLoginClick()
         }
 
+        fun on_privacy_policy_click() {
+            presenter.onPrivacyPolicyClick()
+        }
+
+        fun on_terms_and_conditions_click() {
+            presenter.onTermsAndConditionsClick()
+        }
+
         fun should_show_loader() {
             BDDMockito.then(mockView).should().showLoader()
         }
@@ -134,6 +163,14 @@ class WelcomePresenterTest {
 
         fun should_navigate_to_ask_login() {
             BDDMockito.then(mockView).should().navigateToAskLogin()
+        }
+
+        fun should_navigate_to_privacy_policy() {
+            BDDMockito.then(mockView).should().navigateToPrivacyPolicy()
+        }
+
+        fun should_navigate_to_terms_and_conditions() {
+            BDDMockito.then(mockView).should().navigateToTermsAndConditions()
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)
