@@ -46,4 +46,8 @@ class MainPresenter @Inject constructor(private val authRepository: AuthReposito
     fun onUpgradeDialogClick() {
         view.navigateToUpgradeApp()
     }
+
+    fun onSettingsClick() {
+        view.navigateToSettings()
+    }
 }

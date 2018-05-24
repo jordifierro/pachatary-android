@@ -8,6 +8,8 @@ import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.view.Menu
+import android.view.MenuItem
 import com.pachatary.R
 import com.pachatary.presentation.common.PachataryApplication
 import com.pachatary.presentation.experience.show.ExploreFragment
@@ -39,6 +41,16 @@ class MainActivity : AppCompatActivity(), MainView {
         lifecycle.addObserver(presenter)
 
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        if (item!!.itemId == R.id.settings) presenter.onSettingsClick()
+        return super.onOptionsItemSelected(item)
     }
 
     override fun selectTab(type: MainView.ExperiencesViewType) {
@@ -140,5 +152,9 @@ class MainActivity : AppCompatActivity(), MainView {
     override fun navigateToUpgradeApp() {
         //TODO
         finish()
+    }
+
+    override fun navigateToSettings() {
+        startActivity(SettingsActivity.newIntent(this))
     }
 }

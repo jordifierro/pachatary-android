@@ -12,4 +12,5 @@ interface MainView {
     fun navigateToWelcome()
     fun showUpgradeDialog()
     fun navigateToUpgradeApp()
+    fun navigateToSettings()
 }

@@ -116,6 +116,17 @@ class MainPresenterTest {
         }
     }
 
+    @Test
+    fun test_on_settings_click_navigates_to_settings() {
+        given {
+            nothing()
+        } whenn {
+            settings_click()
+        } then {
+            should_navigate_to_settings()
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
@@ -177,6 +188,10 @@ class MainPresenterTest {
             presenter.onUpgradeDialogClick()
         }
 
+        fun settings_click() {
+            presenter.onSettingsClick()
+        }
+
         fun should_call_auth_repo_has_person_credentials() {
             then(mockAuthRepository).should().hasPersonCredentials()
         }
@@ -215,6 +230,10 @@ class MainPresenterTest {
 
         fun should_navigate_to_upgrade_app() {
             BDDMockito.then(mockView).should().navigateToUpgradeApp()
+        }
+
+        fun should_navigate_to_settings() {
+            BDDMockito.then(mockView).should().navigateToSettings()
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)
