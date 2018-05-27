@@ -49,10 +49,12 @@
 -keepattributes Signature
 # Retain declared checked exceptions for use by a Proxy instance.
 -keepattributes Exceptions
+-keepattributes InnerClasses
 # Mappers
 -keep class com.pachatary.data.auth.AuthTokenMapper { *; }
 -keep class com.pachatary.data.auth.ClientExceptionMapper { *; }
 -keep class com.pachatary.data.auth.ClientVersionsMapper { *; }
+-keep class com.pachatary.data.auth.ClientVersionsMapper$AndroidClient { *; }
 -keep class com.pachatary.data.auth.PersonMapper { *; }
 -keep class com.pachatary.data.auth.PairPersonAuthTokenMapper { *; }
 -keep class com.pachatary.data.common.PaginatedListMapper { *; }
