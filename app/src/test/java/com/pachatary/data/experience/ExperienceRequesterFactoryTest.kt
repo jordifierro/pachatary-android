@@ -15,9 +15,14 @@ import org.mockito.MockitoAnnotations
 
 class ExperienceRequesterFactoryTest {
 
+    val requesterKindValues = arrayListOf(ExperienceRepoSwitch.Kind.MINE,
+                                          ExperienceRepoSwitch.Kind.SAVED,
+                                          ExperienceRepoSwitch.Kind.EXPLORE,
+                                          ExperienceRepoSwitch.Kind.PERSONS)
+
     @Test
     fun test_get_firsts_does_nothing_when_result_loading() {
-        for (kind in ExperienceRepoSwitch.Kind.values()) {
+        for (kind in requesterKindValues) {
             given {
                 a_kind(kind)
                 a_result_cache_that_return_loading_result()
@@ -32,7 +37,7 @@ class ExperienceRequesterFactoryTest {
 
     @Test
     fun test_get_firsts_does_nothing_when_result_has_been_initialized_and_has_no_errors() {
-        for (kind in ExperienceRepoSwitch.Kind.values()) {
+        for (kind in requesterKindValues) {
             given {
                 a_kind(kind)
                 a_result_cache_that_return_success_not_initial_result()
@@ -47,7 +52,7 @@ class ExperienceRequesterFactoryTest {
 
     @Test
     fun test_get_firsts_emits_loading_and_calls_api_to_emit_its_result() {
-        for (kind in ExperienceRepoSwitch.Kind.values()) {
+        for (kind in requesterKindValues) {
             given {
                 a_kind(kind)
                 a_request_params()
@@ -83,7 +88,7 @@ class ExperienceRequesterFactoryTest {
 
     @Test
     fun test_paginate_does_nothing_if_not_there_are_more_elements() {
-        for (kind in ExperienceRepoSwitch.Kind.values()) {
+        for (kind in requesterKindValues) {
             given {
                 a_kind(kind)
                 a_result_cache_that_return_result_that_has_no_more_elements()
@@ -98,7 +103,7 @@ class ExperienceRequesterFactoryTest {
 
     @Test
     fun test_paginate_does_nothing_if_in_progress() {
-        for (kind in ExperienceRepoSwitch.Kind.values()) {
+        for (kind in requesterKindValues) {
             given {
                 a_kind(kind)
                 a_result_cache_that_return_loading_result()
@@ -113,7 +118,7 @@ class ExperienceRequesterFactoryTest {
 
     @Test
     fun test_paginate_does_nothing_if_error_getting_firsts() {
-        for (kind in ExperienceRepoSwitch.Kind.values()) {
+        for (kind in requesterKindValues) {
             given {
                 a_kind(kind)
                 a_result_cache_that_return_error_getting_firsts()
@@ -128,7 +133,7 @@ class ExperienceRequesterFactoryTest {
 
     @Test
     fun test_paginate_emits_in_progress_and_calls_next_url_when_initialized_and_success() {
-        for (kind in ExperienceRepoSwitch.Kind.values()) {
+        for (kind in requesterKindValues) {
             given {
                 a_kind(kind)
                 a_next_url()
@@ -147,7 +152,7 @@ class ExperienceRequesterFactoryTest {
 
     @Test
     fun test_paginate_emits_in_progress_and_calls_next_url_after_pagination_error_when_success() {
-        for (kind in ExperienceRepoSwitch.Kind.values()) {
+        for (kind in requesterKindValues) {
             given {
                 a_kind(kind)
                 a_next_url()
@@ -166,7 +171,7 @@ class ExperienceRequesterFactoryTest {
 
     @Test
     fun test_paginate_emits_error_with_previous_data_when_api_returns_error() {
-        for (kind in ExperienceRepoSwitch.Kind.values()) {
+        for (kind in requesterKindValues) {
             given {
                 a_kind(kind)
                 a_next_url()

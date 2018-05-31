@@ -1,5 +1,6 @@
 package com.pachatary.data.experience
 
+import android.annotation.SuppressLint
 import com.pachatary.data.common.Request
 import com.pachatary.data.common.Result
 import io.reactivex.Flowable
@@ -24,6 +25,15 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
 
     fun experienceFlowable(experienceId: String): Flowable<Result<Experience>> =
         repoSwitch.getExperienceFlowable(experienceId)
+                .flatMap {
+            if (it.isError() && it.error is ExperienceRepoSwitch.NotCachedExperienceException)
+                    apiRepository.experienceFlowable(experienceId)
+                            .doOnNext { if (it.isSuccess())
+                                repoSwitch.modifyResult(ExperienceRepoSwitch.Kind.OTHER,
+                                        ExperienceRepoSwitch.Modification.ADD_OR_UPDATE_LIST,
+                                        listOf(it.data!!)) }
+            else Flowable.just(it)
+                }
 
     fun createExperience(experience: Experience): Flowable<Result<Experience>> {
         return apiRepository.createExperience(experience).doOnNext(addOrUpdateExperienceToMine)
@@ -38,8 +48,9 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
                 experienceId, croppedImageUriString, addOrUpdateExperienceToMine)
     }
 
+    @SuppressLint("CheckResult")
     fun saveExperience(experienceId: String, save: Boolean) {
-        val disposable = experienceFlowable(experienceId)
+        experienceFlowable(experienceId)
                 .map {
                     val modifier = if (save) 1 else -1
                     listOf(it.data!!.builder()
@@ -47,7 +58,8 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
                                     .savesCount(it.data.savesCount + modifier)
                                     .build()) }
                 .take(1)
-                .subscribe(addOrUpdateToSavedAndUpdateToExploreAndPersonsExperiences, { throw it })
+                .subscribe(addOrUpdateToSavedAndUpdateToExplorePersonsAndOtherExperiences,
+                           { throw it })
         apiRepository.saveExperience(save = save, experienceId = experienceId)
                 .subscribe({}, { throw it } )
     }
@@ -58,11 +70,13 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
                 ExperienceRepoSwitch.Modification.ADD_OR_UPDATE_LIST,
                 list = listOf(experienceResult.data!!)) }
 
-    private val addOrUpdateToSavedAndUpdateToExploreAndPersonsExperiences =
+    private val addOrUpdateToSavedAndUpdateToExplorePersonsAndOtherExperiences =
         { experiencesList: List<Experience> ->
             repoSwitch.modifyResult(ExperienceRepoSwitch.Kind.EXPLORE,
                 ExperienceRepoSwitch.Modification.UPDATE_LIST, list = experiencesList)
             repoSwitch.modifyResult(ExperienceRepoSwitch.Kind.PERSONS,
+                    ExperienceRepoSwitch.Modification.UPDATE_LIST, list = experiencesList)
+            repoSwitch.modifyResult(ExperienceRepoSwitch.Kind.OTHER,
                     ExperienceRepoSwitch.Modification.UPDATE_LIST, list = experiencesList)
             repoSwitch.modifyResult(ExperienceRepoSwitch.Kind.SAVED,
                 ExperienceRepoSwitch.Modification.ADD_OR_UPDATE_LIST, list = experiencesList) }

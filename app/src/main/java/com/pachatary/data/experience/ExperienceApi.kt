@@ -30,13 +30,19 @@ interface ExperienceApi {
     @FormUrlEncoded
     @POST("/experiences/")
     fun createExperience(@Field("title") title: String,
-                         @Field("description") description: String): Flowable<Result<ExperienceMapper>>
+                         @Field("description") description: String)
+                                                                : Flowable<Result<ExperienceMapper>>
+
+    @GET("/experiences/{experience_id}")
+    fun getExperience(@Path("experience_id") experience_id: String)
+                                                                : Flowable<Result<ExperienceMapper>>
 
     @FormUrlEncoded
     @PATCH("/experiences/{id}")
     fun editExperience(@Path("id") id: String,
                        @Field("title") title: String,
-                       @Field("description") description: String): Flowable<Result<ExperienceMapper>>
+                       @Field("description") description: String)
+                                                                : Flowable<Result<ExperienceMapper>>
 
     @POST("/experiences/{id}/save/")
     fun saveExperience(@Path("id") experienceId: String): Flowable<Result<Void>>

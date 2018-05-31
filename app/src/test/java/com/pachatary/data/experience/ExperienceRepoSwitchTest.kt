@@ -79,7 +79,7 @@ class ExperienceRepoSwitchTest {
     }
 
     @Test
-    fun test_get_experience_flowable_joins_four_caches_and_filters_experience_by_id() {
+    fun test_get_experience_flowable_joins_five_caches_and_filters_experience_by_id() {
         given {
             an_experience_id()
             an_experience_with_that_id()
@@ -92,6 +92,19 @@ class ExperienceRepoSwitchTest {
         }
     }
 
+    @Test
+    fun test_get_experience_flowable_when_experience_not_cached_emits_not_cache_error() {
+        given {
+            an_experience_id()
+            an_experience_with_that_id()
+            some_result_flowables_that_dont_emit_the_experience()
+        } whenn {
+            initialize_switch()
+            get_experience_flowable_for_that_id()
+        } then {
+            should_return_result_with_not_cached_error()
+        }
+    }
     @Test
     fun test_execute_action_emits_through_appropiate_observer() {
         for (kind in ExperienceRepoSwitch.Kind.values()) {
@@ -146,6 +159,13 @@ class ExperienceRepoSwitchTest {
         var resultPersonsCache = ResultCacheFactory.ResultCache(replaceResultPersonsObserver,
                 addOrUpdatePersonsObserver, updatePersonsObserver, resultPersonsFlowable)
 
+        val addOrUpdateOtherObserver = TestObserver.create<List<Experience>>()
+        val updateOtherObserver = TestObserver.create<List<Experience>>()
+        val replaceResultOtherObserver = TestObserver.create<Result<List<Experience>>>()
+        var resultOtherFlowable = Flowable.empty<Result<List<Experience>>>()
+        var resultOtherCache = ResultCacheFactory.ResultCache(replaceResultOtherObserver,
+                addOrUpdateOtherObserver, updateOtherObserver, resultOtherFlowable)
+
         val testMineActionObserver = TestObserver.create<Request>()
         val testSavedActionObserver = TestObserver.create<Request>()
         val testExploreActionObserver = TestObserver.create<Request>()
@@ -176,11 +196,14 @@ class ExperienceRepoSwitchTest {
                     addOrUpdateExploreObserver, updateExploreObserver, resultExploreFlowable)
             resultPersonsCache = ResultCacheFactory.ResultCache(replaceResultPersonsObserver,
                     addOrUpdatePersonsObserver, updatePersonsObserver, resultPersonsFlowable)
+            resultOtherCache = ResultCacheFactory.ResultCache(replaceResultOtherObserver,
+                    addOrUpdateOtherObserver, updateOtherObserver, resultOtherFlowable)
             BDDMockito.given(resultCacheFactory.create())
                     .willReturn(resultMineCache)
                     .willReturn(resultSavedCache)
                     .willReturn(resultExploreCache)
                     .willReturn(resultPersonsCache)
+                    .willReturn(resultOtherCache)
             BDDMockito.given(
                     requesterFactory.create(resultMineCache, ExperienceRepoSwitch.Kind.MINE))
                     .willReturn(testMineActionObserver)
@@ -220,6 +243,22 @@ class ExperienceRepoSwitchTest {
             resultPersonsFlowable = Flowable.just(Result(listOf(
                     Experience("4", "", "", null, true, false, ""),
                     Experience("4", "", "", null, true, false, ""))))
+            resultOtherFlowable = Flowable.just(Result(listOf(
+                    Experience("3", "", "", null, true, false, ""))))
+        }
+
+        fun some_result_flowables_that_dont_emit_the_experience() {
+            resultMineFlowable = Flowable.just(Result(listOf(
+                    Experience("1", "", "", null, true, false, ""))))
+            resultSavedFlowable = Flowable.just(Result(listOf(
+                    Experience("4", "", "", null, true, false, ""))))
+            resultExploreFlowable = Flowable.just(Result(listOf(
+                    Experience("4", "", "", null, true, false, ""),
+                    Experience("3", "", "", null, true, false, ""))))
+            resultPersonsFlowable = Flowable.just(Result(listOf(
+                    Experience("6", "", "", null, true, false, ""),
+                    Experience("4", "", "", null, true, false, ""))))
+            resultOtherFlowable = Flowable.just(Result(listOf()))
         }
 
         fun a_kind(kind: ExperienceRepoSwitch.Kind) {
@@ -267,6 +306,7 @@ class ExperienceRepoSwitchTest {
                     assertEquals(resultExploreFlowable, resultFlowable)
                 ExperienceRepoSwitch.Kind.PERSONS ->
                     assertEquals(resultPersonsFlowable, resultFlowable)
+                ExperienceRepoSwitch.Kind.OTHER -> assertEquals(resultOtherFlowable, resultFlowable)
             }
         }
 
@@ -287,6 +327,10 @@ class ExperienceRepoSwitchTest {
                 ExperienceRepoSwitch.Kind.PERSONS -> {
                     addOrUpdatePersonsObserver.awaitCount(1)
                     addOrUpdatePersonsObserver.assertValue(experienceList)
+                }
+                ExperienceRepoSwitch.Kind.OTHER -> {
+                    addOrUpdateOtherObserver.awaitCount(1)
+                    addOrUpdateOtherObserver.assertValue(experienceList)
                 }
             }
         }
@@ -309,6 +353,10 @@ class ExperienceRepoSwitchTest {
                     updatePersonsObserver.awaitCount(1)
                     updatePersonsObserver.assertValue(experienceList)
                 }
+                ExperienceRepoSwitch.Kind.OTHER -> {
+                    updateOtherObserver.awaitCount(1)
+                    updateOtherObserver.assertValue(experienceList)
+                }
             }
         }
 
@@ -330,6 +378,10 @@ class ExperienceRepoSwitchTest {
                     replaceResultPersonsObserver.awaitCount(1)
                     replaceResultPersonsObserver.assertValue(experiencesResult)
                 }
+                ExperienceRepoSwitch.Kind.OTHER -> {
+                    replaceResultOtherObserver.awaitCount(1)
+                    replaceResultOtherObserver.assertValue(experiencesResult)
+                }
             }
         }
 
@@ -339,6 +391,19 @@ class ExperienceRepoSwitchTest {
             resultExperienceFlowable.subscribe(testSubscriber)
             testSubscriber.awaitCount(1)
             testSubscriber.assertValue(Result(experience))
+        }
+
+        fun should_return_result_with_not_cached_error() {
+            assertEquals(resultMineFlowable, switch.mineResultCache.resultFlowable)
+            val testSubscriber = TestSubscriber.create<Result<Experience>>()
+            resultExperienceFlowable.subscribe(testSubscriber)
+            testSubscriber.awaitCount(1)
+            val result = testSubscriber.events[0][0] as Result<Experience>
+            assertEquals(result.error, ExperienceRepoSwitch.NotCachedExperienceException())
+            assertEquals(result, Result<Experience>(null,
+                    error = ExperienceRepoSwitch.NotCachedExperienceException()))
+            testSubscriber.assertValue(Result<Experience>(null,
+                    error = ExperienceRepoSwitch.NotCachedExperienceException()))
         }
 
         fun should_emit_that_action_through_kind_action_observer() {
@@ -359,6 +424,7 @@ class ExperienceRepoSwitchTest {
                     testPersonsActionObserver.awaitCount(1)
                     testPersonsActionObserver.assertValue(Request(action, requestParams))
                 }
+                ExperienceRepoSwitch.Kind.OTHER -> {}
             }
         }
 

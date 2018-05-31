@@ -82,6 +82,7 @@ class ExperienceRequesterFactory(val apiRepository: ExperienceApiRepository) {
                     requestParams!!.word, requestParams.latitude, requestParams.longitude)
             ExperienceRepoSwitch.Kind.PERSONS ->
                 return apiRepository.personsExperienceFlowable(requestParams!!.username!!)
+            ExperienceRepoSwitch.Kind.OTHER -> return Flowable.empty()
         }
     }
 }

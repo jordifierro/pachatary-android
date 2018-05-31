@@ -88,7 +88,7 @@ class DataModule {
     @Singleton
     fun provideExperienceRepoSwitch(experienceCacheFactory: ResultCacheFactory<Experience>,
                                     requesterFactory: ExperienceRequesterFactory) =
-            ExperienceRepoSwitch(experienceCacheFactory, requesterFactory)
+        ExperienceRepoSwitch(experienceCacheFactory, requesterFactory)
 
     @Provides
     @Singleton

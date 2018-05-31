@@ -109,7 +109,7 @@ class ExperienceApiRepositoryTest {
     }
 
     @Test
-    fun test_patch_experiences() {
+    fun test_patch_experience() {
         given {
             an_experience()
             a_web_server_that_returns_patch_experiences()
@@ -118,6 +118,19 @@ class ExperienceApiRepositoryTest {
         } then {
             request_should_patch_experience_attrs()
             response_should_parse_experience()
+        }
+    }
+
+    @Test
+    fun test_patch_experiences() {
+        given {
+            an_experience_id()
+            a_web_server_that_returns_get_experience()
+        } whenn {
+            experience_flowable()
+        } then {
+            request_should_get_experience()
+            response_should_parse_inprogress_result_and_experience()
         }
     }
 
@@ -178,9 +191,14 @@ class ExperienceApiRepositoryTest {
                 .build(),
                 Schedulers.trampoline(), mockContext, mockAuthHttpInterceptor)
         lateinit var experience: Experience
+        var experienceId = ""
         var url = ""
         lateinit var jsonObject: JsonObject
         lateinit var resultExperience: Experience
+
+        fun an_experience_id() {
+            experienceId = "8"
+        }
 
         fun a_url() {
             url = "/some-url"
@@ -209,6 +227,12 @@ class ExperienceApiRepositoryTest {
         fun a_web_server_that_returns_patch_experiences() {
             mockWebServer.enqueue(MockResponse().setResponseCode(201).setBody(
                 ExperienceApiRepositoryTest::class.java.getResource("/api/PATCH_experience_id.json").readText()))
+        }
+
+        fun a_web_server_that_returns_get_experience() {
+            mockWebServer.enqueue(MockResponse().setResponseCode(201).setBody(
+                    ExperienceApiRepositoryTest::class.java.getResource("/api/GET_experience_id.json").readText()))
+
         }
 
         fun a_web_server_that_returns_201() {
@@ -260,6 +284,11 @@ class ExperienceApiRepositoryTest {
 
         fun experience_is_edited() {
             repository.editExperience(experience).subscribe(testSubscriber)
+            testSubscriber.awaitCount(1)
+        }
+
+        fun experience_flowable() {
+            repository.experienceFlowable(experienceId).subscribe(testSubscriber)
             testSubscriber.awaitCount(1)
         }
 
@@ -324,6 +353,13 @@ class ExperienceApiRepositoryTest {
             assertEquals("title=T&description=desc", request.getBody().readUtf8())
         }
 
+        fun request_should_get_experience() {
+            val request = mockWebServer.takeRequest()
+            assertEquals("/experiences/" + experienceId, request.path)
+            assertEquals("GET", request.getMethod())
+            assertEquals("", request.getBody().readUtf8())
+        }
+
         fun request_should_post_experience_id_save() {
             val request = mockWebServer.takeRequest()
             assertEquals("/experiences/" + experience.id + "/save/", request.path)
@@ -370,6 +406,25 @@ class ExperienceApiRepositoryTest {
         fun response_should_parse_experience() {
             val receivedResult = testSubscriber.events.get(0).get(0) as Result<*>
             val receivedExperience = receivedResult.data as Experience
+
+            assertEquals("4", receivedExperience.id)
+            assertEquals("Plaça", receivedExperience.title)
+            assertEquals("", receivedExperience.description)
+            assertEquals("https://experiences/00df.small.jpeg", receivedExperience.picture!!.smallUrl)
+            assertEquals("https://experiences/00df.medium.jpeg", receivedExperience.picture!!.mediumUrl)
+            assertEquals("https://experiences/00df.large.jpeg", receivedExperience.picture!!.largeUrl)
+            assertEquals(true, receivedExperience.isMine)
+            assertEquals(false, receivedExperience.isSaved)
+            assertEquals("usr.nm", receivedExperience.authorUsername)
+            assertEquals(5, receivedExperience.savesCount)
+        }
+
+        fun response_should_parse_inprogress_result_and_experience() {
+            val firstResult = testSubscriber.events.get(0).get(0) as Result<*>
+            assertEquals(firstResult, Result<Experience>(null, inProgress = true))
+
+            val secondResult = testSubscriber.events.get(0).get(1) as Result<*>
+            val receivedExperience = secondResult.data as Experience
 
             assertEquals("4", receivedExperience.id)
             assertEquals("Plaça", receivedExperience.title)
