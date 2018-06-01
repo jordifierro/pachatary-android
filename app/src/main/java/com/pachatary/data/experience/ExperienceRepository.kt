@@ -64,6 +64,9 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
                 .subscribe({}, { throw it } )
     }
 
+    fun translateShareId(experienceShareId: String): Flowable<Result<String>> =
+        apiRepository.translateShareId(experienceShareId)
+
     internal val addOrUpdateExperienceToMine =
         { experienceResult: Result<Experience> ->
             repoSwitch.modifyResult(ExperienceRepoSwitch.Kind.MINE,

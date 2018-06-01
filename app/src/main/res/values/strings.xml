@@ -71,4 +71,8 @@
 
     <string name="title_webview_privacy">Privacy Policy</string>
     <string name="title_webview_terms">Terms and conditions</string>
+
+    <string name="title_experience_router_title">Experience</string>
+    <string name="filter_view_experience_router_activity">Open experience</string>
+
 </resources>

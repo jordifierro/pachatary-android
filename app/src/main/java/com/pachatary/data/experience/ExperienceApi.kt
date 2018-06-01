@@ -34,8 +34,12 @@ interface ExperienceApi {
                                                                 : Flowable<Result<ExperienceMapper>>
 
     @GET("/experiences/{experience_id}")
-    fun getExperience(@Path("experience_id") experience_id: String)
+    fun getExperience(@Path("experience_id") experienceId: String)
                                                                 : Flowable<Result<ExperienceMapper>>
+
+    @GET("/experiences/{experience_share_id}/id")
+    fun translateShareId(@Path("experience_share_id") experienceShareId: String)
+                                                              : Flowable<Result<ExperienceIdMapper>>
 
     @FormUrlEncoded
     @PATCH("/experiences/{id}")

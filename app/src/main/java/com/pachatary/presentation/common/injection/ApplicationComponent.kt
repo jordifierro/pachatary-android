@@ -5,6 +5,7 @@ import com.pachatary.presentation.common.edition.EditTitleAndDescriptionActivity
 import com.pachatary.presentation.common.edition.SelectLocationActivity
 import com.pachatary.presentation.experience.edition.CreateExperienceActivity
 import com.pachatary.presentation.experience.edition.EditExperienceActivity
+import com.pachatary.presentation.experience.router.ExperienceRouterActivity
 import com.pachatary.presentation.experience.show.*
 import com.pachatary.presentation.login.AskLoginEmailActivity
 import com.pachatary.presentation.login.LoginActivity
@@ -42,4 +43,5 @@ interface ApplicationComponent {
     fun inject(askLoginEmailActivity: AskLoginEmailActivity)
     fun inject(loginActivity: LoginActivity)
     fun inject(personsExperienceActivity: PersonsExperienceActivity)
+    fun inject(experienceRouterActivity: ExperienceRouterActivity)
 }

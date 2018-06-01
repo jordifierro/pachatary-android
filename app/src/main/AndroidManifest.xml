@@ -143,6 +143,26 @@
             android:label="@string/title_settings_activity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name="com.pachatary.presentation.experience.router.ExperienceRouterActivity"
+            android:label="@string/title_experience_router_title"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter android:label="@string/filter_view_experience_router_activity">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Accepts URIs that begin with "https://pachatary.com -->
+                <data android:scheme="https"
+                    android:host="@string/https_deeplink_host"
+                    android:pathPattern="/e/..*" />
+                <data android:scheme="http"
+                    android:host="@string/https_deeplink_host"
+                    android:pathPattern="/e/..*" />
+                <data android:scheme="app"
+                    android:host="@string/app_deeplink_host"
+                    android:pathPattern="/experiences/..*" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

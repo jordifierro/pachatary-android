@@ -73,6 +73,12 @@ class ExperienceApiRepository (retrofit: Retrofit, @Named("io") val scheduler: S
                     .subscribeOn(scheduler)
     }
 
+    fun translateShareId(experienceShareId: String): Flowable<Result<String>> =
+            experienceApi.translateShareId(experienceShareId)
+                    .subscribeOn(scheduler)
+                    .compose(NetworkParserFactory.getTransformer())
+                    .startWith(Result<String>(null, inProgress = true))
+
     fun uploadExperiencePicture(experienceId: String, croppedImageUriString: String,
                                 delegate: (resultExperience: Result<Experience>) -> Unit) {
         try {
