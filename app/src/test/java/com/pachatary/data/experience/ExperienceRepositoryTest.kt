@@ -181,6 +181,19 @@ class ExperienceRepositoryTest {
         }
     }
 
+    @Test
+    fun test_translate_share_id_returns_apis_flowable() {
+        given {
+            an_experience_share_id()
+            an_api_repo_that_returns_string_flowable_when_translate_share_id()
+        } whenn {
+            translate_share_id()
+        } then {
+            should_call_api_repo_translate_share_id_with_share_id()
+            should_return_string_flowable()
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().start(func)
 
     @Suppress("UNCHECKED_CAST")
@@ -199,14 +212,21 @@ class ExperienceRepositoryTest {
         lateinit var savedExperience: Experience
         lateinit var experience: Experience
         var experienceId = ""
+        var experienceShareId = ""
         var croppedImageString = ""
         lateinit var searchParams: Request.Params
+        lateinit var stringFlowable: Flowable<Result<String>>
+        lateinit var stringFlowableResult: Flowable<Result<String>>
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
             repository = ExperienceRepository(mockApiRepository, mockExperiencesRepoSwitch)
 
             return this
+        }
+
+        fun an_experience_share_id() {
+            experienceShareId = "sd34ErT5"
         }
 
         fun a_search_params() {
@@ -252,6 +272,12 @@ class ExperienceRepositoryTest {
         fun an_api_repo_that_return_that_experience_on_get() {
             BDDMockito.given(mockApiRepository.experienceFlowable(experienceId))
                     .willReturn(Flowable.just(Result(experience)))
+        }
+
+        fun an_api_repo_that_returns_string_flowable_when_translate_share_id() {
+            stringFlowable = Flowable.empty()
+            BDDMockito.given(mockApiRepository.translateShareId(experienceShareId))
+                    .willReturn(stringFlowable)
         }
 
         fun a_saved_experience() {
@@ -318,6 +344,10 @@ class ExperienceRepositoryTest {
 
         fun get_more_experiences_is_called() {
             repository.getMoreExperiences(kind)
+        }
+
+        fun translate_share_id() {
+            stringFlowableResult = repository.translateShareId(experienceShareId)
         }
 
         fun upload_experience_picture_is_called() {
@@ -488,6 +518,14 @@ class ExperienceRepositoryTest {
             resultExperienceFlowable.subscribe(testExperienceSubscriber)
             testExperienceSubscriber.awaitCount(1)
             testExperienceSubscriber.assertValue(Result(experience))
+        }
+
+        fun should_call_api_repo_translate_share_id_with_share_id() {
+            BDDMockito.then(mockApiRepository).should().translateShareId(experienceShareId)
+        }
+
+        fun should_return_string_flowable() {
+            assertEquals(stringFlowableResult, stringFlowable)
         }
 
         infix fun start(func: ScenarioMaker.() -> Unit) = buildScenario().given(func)

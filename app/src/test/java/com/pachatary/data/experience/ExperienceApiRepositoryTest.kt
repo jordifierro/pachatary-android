@@ -122,7 +122,7 @@ class ExperienceApiRepositoryTest {
     }
 
     @Test
-    fun test_patch_experiences() {
+    fun test_get_experience() {
         given {
             an_experience_id()
             a_web_server_that_returns_get_experience()
@@ -131,6 +131,19 @@ class ExperienceApiRepositoryTest {
         } then {
             request_should_get_experience()
             response_should_parse_inprogress_result_and_experience()
+        }
+    }
+
+    @Test
+    fun test_translate_experience_share_id() {
+        given {
+            an_experience_share_id()
+            a_web_server_that_returns_get_experience_share_id_id()
+        } whenn {
+            translate_experience_share_id()
+        } then {
+            request_should_get_experience_share_id_id()
+            response_should_parse_inprogress_result_and_experience_id()
         }
     }
 
@@ -177,6 +190,7 @@ class ExperienceApiRepositoryTest {
 
         val testListSubscriber = TestSubscriber<Result<List<Experience>>>()
         val testSubscriber = TestSubscriber<Result<Experience>>()
+        val testStringSubscriber = TestSubscriber<Result<String>>()
         val testEmptySubscriber = TestSubscriber<Result<Void>>()
         val mockContext = mock(Context::class.java)
         val mockAuthHttpInterceptor = mock(AuthHttpInterceptor::class.java)
@@ -192,12 +206,17 @@ class ExperienceApiRepositoryTest {
                 Schedulers.trampoline(), mockContext, mockAuthHttpInterceptor)
         lateinit var experience: Experience
         var experienceId = ""
+        var experienceShareId = ""
         var url = ""
         lateinit var jsonObject: JsonObject
         lateinit var resultExperience: Experience
 
         fun an_experience_id() {
             experienceId = "8"
+        }
+
+        fun an_experience_share_id() {
+            experienceShareId = "aD43ReE9"
         }
 
         fun a_url() {
@@ -211,7 +230,8 @@ class ExperienceApiRepositoryTest {
 
         fun a_web_server_that_returns_get_experiences() {
             mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(
-                    ExperienceApiRepositoryTest::class.java.getResource("/api/GET_experiences.json").readText()))
+                    ExperienceApiRepositoryTest::class.java.getResource(
+                            "/api/GET_experiences.json").readText()))
         }
 
         fun an_experience() {
@@ -221,18 +241,26 @@ class ExperienceApiRepositoryTest {
 
         fun a_web_server_that_returns_post_experiences() {
             mockWebServer.enqueue(MockResponse().setResponseCode(201).setBody(
-                ExperienceApiRepositoryTest::class.java.getResource("/api/POST_experiences.json").readText()))
+                ExperienceApiRepositoryTest::class.java.getResource(
+                        "/api/POST_experiences.json").readText()))
         }
 
         fun a_web_server_that_returns_patch_experiences() {
             mockWebServer.enqueue(MockResponse().setResponseCode(201).setBody(
-                ExperienceApiRepositoryTest::class.java.getResource("/api/PATCH_experience_id.json").readText()))
+                ExperienceApiRepositoryTest::class.java.getResource(
+                        "/api/PATCH_experience_id.json").readText()))
         }
 
         fun a_web_server_that_returns_get_experience() {
             mockWebServer.enqueue(MockResponse().setResponseCode(201).setBody(
-                    ExperienceApiRepositoryTest::class.java.getResource("/api/GET_experience_id.json").readText()))
+                    ExperienceApiRepositoryTest::class.java.getResource(
+                            "/api/GET_experience_id.json").readText()))
+        }
 
+        fun a_web_server_that_returns_get_experience_share_id_id() {
+            mockWebServer.enqueue(MockResponse().setResponseCode(201).setBody(
+                    ExperienceApiRepositoryTest::class.java.getResource(
+                            "/api/GET_experiences_experience_share_id_id.json").readText()))
         }
 
         fun a_web_server_that_returns_201() {
@@ -292,13 +320,20 @@ class ExperienceApiRepositoryTest {
             testSubscriber.awaitCount(1)
         }
 
+        fun translate_experience_share_id() {
+            repository.translateShareId(experienceShareId).subscribe(testStringSubscriber)
+            testStringSubscriber.awaitCount(1)
+        }
+
         fun experience_is_saved() {
-            repository.saveExperience(save = true, experienceId = experience.id).subscribe(testEmptySubscriber)
+            repository.saveExperience(save = true, experienceId = experience.id)
+                    .subscribe(testEmptySubscriber)
             testEmptySubscriber.awaitCount(1)
         }
 
         fun experience_is_unsaved() {
-            repository.saveExperience(save = false, experienceId = experience.id).subscribe(testEmptySubscriber)
+            repository.saveExperience(save = false, experienceId = experience.id)
+                    .subscribe(testEmptySubscriber)
             testEmptySubscriber.awaitCount(1)
         }
 
@@ -335,7 +370,6 @@ class ExperienceApiRepositoryTest {
                     latitude.toString() + "&longitude=" + longitude.toString(), request.path)
             assertEquals("GET", request.getMethod())
             assertEquals("", request.getBody().readUtf8())
-
         }
 
         fun request_should_post_experience_attrs() {
@@ -371,6 +405,13 @@ class ExperienceApiRepositoryTest {
             val request = mockWebServer.takeRequest()
             assertEquals("/experiences/" + experience.id + "/save/", request.path)
             assertEquals("DELETE", request.getMethod())
+            assertEquals("", request.getBody().readUtf8())
+        }
+
+        fun request_should_get_experience_share_id_id() {
+            val request = mockWebServer.takeRequest()
+            assertEquals("/experiences/" + experienceShareId + "/id", request.path)
+            assertEquals("GET", request.getMethod())
             assertEquals("", request.getBody().readUtf8())
         }
 
@@ -410,9 +451,12 @@ class ExperienceApiRepositoryTest {
             assertEquals("4", receivedExperience.id)
             assertEquals("Plaça", receivedExperience.title)
             assertEquals("", receivedExperience.description)
-            assertEquals("https://experiences/00df.small.jpeg", receivedExperience.picture!!.smallUrl)
-            assertEquals("https://experiences/00df.medium.jpeg", receivedExperience.picture!!.mediumUrl)
-            assertEquals("https://experiences/00df.large.jpeg", receivedExperience.picture!!.largeUrl)
+            assertEquals("https://experiences/00df.small.jpeg",
+                         receivedExperience.picture!!.smallUrl)
+            assertEquals("https://experiences/00df.medium.jpeg",
+                         receivedExperience.picture!!.mediumUrl)
+            assertEquals("https://experiences/00df.large.jpeg",
+                         receivedExperience.picture!!.largeUrl)
             assertEquals(true, receivedExperience.isMine)
             assertEquals(false, receivedExperience.isSaved)
             assertEquals("usr.nm", receivedExperience.authorUsername)
@@ -429,9 +473,12 @@ class ExperienceApiRepositoryTest {
             assertEquals("4", receivedExperience.id)
             assertEquals("Plaça", receivedExperience.title)
             assertEquals("", receivedExperience.description)
-            assertEquals("https://experiences/00df.small.jpeg", receivedExperience.picture!!.smallUrl)
-            assertEquals("https://experiences/00df.medium.jpeg", receivedExperience.picture!!.mediumUrl)
-            assertEquals("https://experiences/00df.large.jpeg", receivedExperience.picture!!.largeUrl)
+            assertEquals("https://experiences/00df.small.jpeg",
+                         receivedExperience.picture!!.smallUrl)
+            assertEquals("https://experiences/00df.medium.jpeg",
+                         receivedExperience.picture!!.mediumUrl)
+            assertEquals("https://experiences/00df.large.jpeg",
+                         receivedExperience.picture!!.largeUrl)
             assertEquals(true, receivedExperience.isMine)
             assertEquals(false, receivedExperience.isSaved)
             assertEquals("usr.nm", receivedExperience.authorUsername)
@@ -447,13 +494,20 @@ class ExperienceApiRepositoryTest {
             assertEquals("4", resultExperience.id)
             assertEquals("Plaça", resultExperience.title)
             assertEquals("", resultExperience.description)
-            assertEquals("https://experiences/00df.small.jpeg", resultExperience.picture!!.smallUrl)
-            assertEquals("https://experiences/00df.medium.jpeg", resultExperience.picture!!.mediumUrl)
-            assertEquals("https://experiences/00df.large.jpeg", resultExperience.picture!!.largeUrl)
+            assertEquals("https://experiences/00df.small.jpeg",
+                         resultExperience.picture!!.smallUrl)
+            assertEquals("https://experiences/00df.medium.jpeg",
+                         resultExperience.picture!!.mediumUrl)
+            assertEquals("https://experiences/00df.large.jpeg",
+                         resultExperience.picture!!.largeUrl)
             assertEquals(true, resultExperience.isMine)
             assertEquals(false, resultExperience.isSaved)
             assertEquals("usr.nm", resultExperience.authorUsername)
             assertEquals(5, resultExperience.savesCount)
+        }
+
+        fun response_should_parse_inprogress_result_and_experience_id() {
+            testStringSubscriber.assertValues(Result(null, inProgress = true), Result("43"))
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = apply(func)

@@ -47,10 +47,6 @@ class ExperienceRouterActivity : AppCompatActivity(), ExperienceRouterView {
         progressBar.visibility = View.INVISIBLE
     }
 
-    override fun showSuccessMessage() {
-        Toast.makeText(this, "Login successful!", Toast.LENGTH_LONG).show()
-    }
-
     override fun showErrorMessage() {
         Toast.makeText(this, "Some error occurred. Connect to internet and retry",
                        Toast.LENGTH_LONG).show()
