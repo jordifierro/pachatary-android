@@ -25,6 +25,14 @@ class ExperienceRouterPresenter @Inject constructor(
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun create() {
+        getCredentialsAndTranslateShareId()
+    }
+
+    fun onRetryClick() {
+        getCredentialsAndTranslateShareId()
+    }
+
+    private fun getCredentialsAndTranslateShareId() {
         if (authRepository.hasPersonCredentials()) translateExperienceShareId()
         else getPersonInvitation()
     }
@@ -36,14 +44,17 @@ class ExperienceRouterPresenter @Inject constructor(
                 .subscribe {
                     if (it.isSuccess()) {
                         view.hideLoader()
+                        view.hideRetryView()
                         translateExperienceShareId()
                     }
                     else if (it.isError()) {
                         view.showErrorMessage()
                         view.hideLoader()
+                        view.showRetryView()
                     }
                     else if (it.isInProgress()) {
                         view.showLoader()
+                        view.hideRetryView()
                     }
                 }
     }
@@ -53,7 +64,20 @@ class ExperienceRouterPresenter @Inject constructor(
         experienceRepository.translateShareId(experienceShareId)
                 .observeOn(mainScheduler)
                 .subscribe {
-                    if (it.isSuccess()) view.navigateToExperience(it.data!!)
+                    if (it.isSuccess()) {
+                        view.hideLoader()
+                        view.hideRetryView()
+                        view.navigateToExperience(it.data!!)
+                    }
+                    else if (it.isError()) {
+                        view.showErrorMessage()
+                        view.hideLoader()
+                        view.showRetryView()
+                    }
+                    else if (it.isInProgress()) {
+                        view.showLoader()
+                        view.hideRetryView()
+                    }
                 }
     }
 }

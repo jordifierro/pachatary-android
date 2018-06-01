@@ -6,6 +6,8 @@ interface ExperienceRouterView : LoaderView {
 
     fun showSuccessMessage()
     fun showErrorMessage()
+    fun showRetryView()
+    fun hideRetryView()
     fun navigateToExperience(experienceId: String)
     fun finish()
 }

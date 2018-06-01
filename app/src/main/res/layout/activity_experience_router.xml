@@ -29,4 +29,18 @@
         android:layout_centerInParent="true"
         android:visibility="invisible" />
 
+    <ImageView
+        android:id="@+id/experience_router_retry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:padding="50dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@drawable/ic_refresh"
+        android:tint="@color/grey"
+        android:contentDescription="@string/retry"
+        android:visibility="gone"
+        tools:visibility="invisible" />
+
 </RelativeLayout>

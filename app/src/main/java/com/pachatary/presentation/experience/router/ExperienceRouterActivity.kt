@@ -3,6 +3,7 @@ package com.pachatary.presentation.experience.router
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.Toast
 import com.pachatary.R
@@ -16,6 +17,7 @@ import javax.inject.Inject
 class ExperienceRouterActivity : AppCompatActivity(), ExperienceRouterView {
 
     lateinit var progressBar: ProgressBar
+    lateinit var retryView: ImageView
     lateinit var experienceShareId: String
 
     @Inject
@@ -29,6 +31,8 @@ class ExperienceRouterActivity : AppCompatActivity(), ExperienceRouterView {
         experienceShareId = intent.data.pathSegments[1]
 
         progressBar = findViewById(R.id.experience_router_progressbar)
+        retryView = findViewById(R.id.experience_router_retry)
+        retryView.setOnClickListener { presenter.onRetryClick() }
 
         PachataryApplication.injector.inject(this)
         presenter.setViewAndExperienceShareId(this, experienceShareId)
@@ -48,7 +52,16 @@ class ExperienceRouterActivity : AppCompatActivity(), ExperienceRouterView {
     }
 
     override fun showErrorMessage() {
-        Toast.makeText(this, "Some error occurred", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, "Some error occurred. Connect to internet and retry",
+                       Toast.LENGTH_LONG).show()
+    }
+
+    override fun showRetryView() {
+        retryView.visibility = View.VISIBLE
+    }
+
+    override fun hideRetryView() {
+        retryView.visibility = View.INVISIBLE
     }
 
     override fun navigateToExperience(experienceId: String) {
