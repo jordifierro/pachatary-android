@@ -41,7 +41,7 @@ class ExperienceRouterPresenter @Inject constructor(
     private fun getPersonInvitation() {
         authRepository.getPersonInvitation()
                 .observeOn(mainScheduler)
-                .subscribe {
+                .subscribe({
                     if (it.isSuccess()) {
                         view.hideLoader()
                         view.hideRetryView()
@@ -56,14 +56,14 @@ class ExperienceRouterPresenter @Inject constructor(
                         view.showLoader()
                         view.hideRetryView()
                     }
-                }
+                }, { throw it })
     }
 
     @SuppressLint("CheckResult")
     private fun translateExperienceShareId() {
         experienceRepository.translateShareId(experienceShareId)
                 .observeOn(mainScheduler)
-                .subscribe {
+                .subscribe({
                     if (it.isSuccess()) {
                         view.hideLoader()
                         view.hideRetryView()
@@ -79,6 +79,6 @@ class ExperienceRouterPresenter @Inject constructor(
                         view.showLoader()
                         view.hideRetryView()
                     }
-                }
+                }, { throw it })
     }
 }
