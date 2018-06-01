@@ -224,10 +224,6 @@ class ExperienceMapPresenterTest {
             BDDMockito.given(mockView.mapLoadedFlowable()).willReturn(Flowable.just(false))
         }
 
-        fun an_experience() {
-            experienceA = Experience(id = "1", title = "A", description = "", picture = null)
-        }
-
         fun a_mine_experience() {
             experienceA = Experience(id = "1", title = "A", description = "", picture = null, isMine = true)
         }

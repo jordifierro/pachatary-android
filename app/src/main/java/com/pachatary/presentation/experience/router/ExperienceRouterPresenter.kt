@@ -68,6 +68,7 @@ class ExperienceRouterPresenter @Inject constructor(
                         view.hideLoader()
                         view.hideRetryView()
                         view.navigateToExperience(it.data!!)
+                        view.finish()
                     }
                     else if (it.isError()) {
                         view.showErrorMessage()

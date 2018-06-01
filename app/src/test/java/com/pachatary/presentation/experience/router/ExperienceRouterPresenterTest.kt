@@ -99,6 +99,7 @@ class ExperienceRouterPresenterTest {
 
             should_call_translate_share_id()
             should_navigate_to_experience("7")
+            should_finish_view()
         }
     }
 
@@ -144,6 +145,7 @@ class ExperienceRouterPresenterTest {
             should_hide_loader()
             should_hide_retry_view()
             should_navigate_to_experience("7")
+            should_finish_view()
         }
     }
 
@@ -230,6 +232,7 @@ class ExperienceRouterPresenterTest {
 
             should_call_translate_share_id()
             should_navigate_to_experience("7")
+            should_finish_view()
         }
     }
 
@@ -275,6 +278,7 @@ class ExperienceRouterPresenterTest {
             should_hide_loader()
             should_hide_retry_view()
             should_navigate_to_experience("7")
+            should_finish_view()
         }
     }
 
@@ -355,6 +359,10 @@ class ExperienceRouterPresenterTest {
 
         fun should_navigate_to_experience(experienceId: String) {
             BDDMockito.then(mockView).should().navigateToExperience(experienceId)
+        }
+
+        fun should_finish_view() {
+            BDDMockito.then(mockView).should().finish()
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)
