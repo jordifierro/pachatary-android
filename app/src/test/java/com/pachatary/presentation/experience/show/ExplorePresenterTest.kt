@@ -208,6 +208,28 @@ class ExplorePresenterTest {
         }
     }
 
+    @Test
+    fun test_on_location_click_navigates_to_select_location_with_previous_latitude_and_longitude() {
+        given {
+            last_location_known(5.4, -9.0)
+        } whenn {
+            location_click()
+        } then {
+            should_navigate_to_select_location_with(5.4, -9.0)
+        }
+    }
+
+    @Test
+    fun test_on_location_selected_get_firsts_experiences_with_that_location() {
+        given {
+            last_location_known(5.4, -9.0)
+        } whenn {
+            location_selected(0.1, 3.3)
+        } then {
+            should_call_repo_get_firsts_experiences(latitude = 0.1, longitude = 3.3)
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
@@ -289,6 +311,14 @@ class ExplorePresenterTest {
             presenter.searchClick(text)
         }
 
+        fun location_click() {
+            presenter.locationClick()
+        }
+
+        fun location_selected(latitude: Double, longitude: Double) {
+            presenter.onLocationSelected(latitude, longitude)
+        }
+
         fun should_show_view_loader() {
             then(mockView).should().showLoader()
         }
@@ -366,6 +396,10 @@ class ExplorePresenterTest {
 
         fun should_ask_last_known_location() {
             BDDMockito.then(mockView).should().askLastKnownLocation()
+        }
+
+        fun should_navigate_to_select_location_with(latitude: Double, longitude: Double) {
+            BDDMockito.then(mockView).should().navigateToSelectLocation(latitude, longitude)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

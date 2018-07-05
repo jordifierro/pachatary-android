@@ -103,4 +103,14 @@ class ExplorePresenter @Inject constructor(private val repository: ExperienceRep
         searchText = text
         getFirstsExperiences()
     }
+
+    fun locationClick() {
+        view.navigateToSelectLocation(latitude, longitude)
+    }
+
+    fun onLocationSelected(latitude: Double, longitude: Double) {
+        this.latitude = latitude
+        this.longitude = longitude
+        getFirstsExperiences()
+    }
 }

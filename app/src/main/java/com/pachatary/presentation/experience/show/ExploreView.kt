@@ -15,4 +15,5 @@ interface ExploreView : LoaderView {
     fun askLastKnownLocation()
     fun askPermissions()
     fun navigateToPersonsExperiences(username: String)
+    fun navigateToSelectLocation(latitude: Double?, longitude: Double?)
 }
