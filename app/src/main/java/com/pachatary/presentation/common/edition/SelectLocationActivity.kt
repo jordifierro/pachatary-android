@@ -1,11 +1,15 @@
 package com.pachatary.presentation.common.edition
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.arch.lifecycle.LifecycleRegistry
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.PointF
 import android.location.Geocoder
+import android.location.Location
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.inputmethod.InputMethodManager
@@ -26,10 +30,14 @@ import kotlinx.android.synthetic.main.activity_select_location.*
 import java.util.*
 import javax.inject.Inject
 import android.view.inputmethod.InputMethodManager.HIDE_NOT_ALWAYS
+import android.widget.ImageButton
+import com.pachatary.presentation.common.location.LocationUtils
 import java.io.IOException
 
 
 class SelectLocationActivity : AppCompatActivity(), SelectLocationView {
+
+    val PERMISSIONS_DIALOG = 1
 
     @Inject
     lateinit var presenter: SelectLocationPresenter
@@ -39,6 +47,7 @@ class SelectLocationActivity : AppCompatActivity(), SelectLocationView {
     lateinit var doneButton: Button
     lateinit var searchButton: Button
     lateinit var searchEditText: EditText
+    lateinit var locateButton: ImageButton
 
     lateinit var initialLocationType: SelectLocationPresenter.LocationType
     var initialLatitude = 0.0
@@ -88,6 +97,8 @@ class SelectLocationActivity : AppCompatActivity(), SelectLocationView {
                                                  InputMethodManager.HIDE_NOT_ALWAYS)
             presenter.searchButtonClick(searchEditText.text.toString())
         }
+        locateButton = findViewById(R.id.select_location_locate_button)
+        locateButton.setOnClickListener { presenter.locateClick() }
 
         PachataryApplication.injector.inject(this)
         presenter.setViewAndInitialLocation(view = this, initialLatitude = initialLatitude,
@@ -138,10 +149,36 @@ class SelectLocationActivity : AppCompatActivity(), SelectLocationView {
 
     override fun moveMapToPoint(latitude: Double, longitude: Double) {
         mapView.getMapAsync { mapboxMap ->
-            this.mapboxMap.cameraPosition = CameraPosition.Builder()
-                    .target(LatLng(latitude, longitude))
-                    .zoom(SelectLocationView.ZoomLevel.NEAR.zoom)
-                    .build()
+            val newCameraPosition = CameraPosition.Builder()
+                                        .target(LatLng(latitude, longitude))
+                                        .build()
+            this.mapboxMap.animateCamera({ _ -> newCameraPosition })
+        }
+    }
+
+    override fun hasLocationPermission() = LocationUtils.checkLocationPermission(this)
+
+    override fun askLocation() {
+        LocationUtils.addListenerToLocation(this) { location: Location ->
+            presenter.onLocationFound(location.latitude, location.longitude)
+        }
+    }
+
+    @SuppressLint("NewApi")
+    override fun askLocationPermission() {
+        requestPermissions(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), PERMISSIONS_DIALOG)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>, grantResults: IntArray) {
+        when (requestCode) {
+            PERMISSIONS_DIALOG -> {
+                if ((grantResults.isNotEmpty()
+                                && grantResults[0] == PackageManager.PERMISSION_GRANTED))
+                    presenter.onLocationPermissionAccepted()
+                else presenter.onLocationPermissionDenied()
+                return
+            }
         }
     }
 

@@ -78,6 +78,68 @@ class SelectLocationPresenterTest {
         }
     }
 
+    @Test
+    fun test_locate_click_when_no_permissions_asks_permissions() {
+        given {
+            an_unknown_initial_location()
+            presenter_initialized_with_this_location()
+            no_location_permission()
+        } whenn {
+            locate_click()
+        } then {
+            should_ask_location_permissions()
+        }
+    }
+
+    @Test
+    fun test_locate_click_when_permissions_ask_location() {
+        given {
+            an_unknown_initial_location()
+            presenter_initialized_with_this_location()
+            location_permission()
+        } whenn {
+            locate_click()
+        } then {
+            should_ask_location()
+        }
+    }
+
+    @Test
+    fun test_on_permission_accepted_ask_location() {
+        given {
+            an_unknown_initial_location()
+            presenter_initialized_with_this_location()
+        } whenn {
+            location_permission_accepted()
+        } then {
+            should_ask_location()
+        }
+    }
+
+    @Test
+    fun test_on_permission_denied_does_nothing() {
+        given {
+            an_unknown_initial_location()
+            presenter_initialized_with_this_location()
+        } whenn {
+            location_permission_denied()
+        } then {
+            should_do_nothing()
+        }
+    }
+
+    @Test
+    fun test_on_location_found_moves_camera_to_point() {
+        given {
+            an_unknown_initial_location()
+            presenter_initialized_with_this_location()
+        } whenn {
+            location_found(8.5, 2.3)
+        } then {
+            should_move_camera_to_point(8.5, 2.3)
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
@@ -131,6 +193,14 @@ class SelectLocationPresenterTest {
             address = "My point address, 123"
         }
 
+        fun no_location_permission() {
+            BDDMockito.given(mockView.hasLocationPermission()).willReturn(false)
+        }
+
+        fun location_permission() {
+            BDDMockito.given(mockView.hasLocationPermission()).willReturn(true)
+        }
+
         fun presenter_initialized_with_this_location() {
             presenter = SelectLocationPresenter(SchedulerProvider(Schedulers.trampoline(), Schedulers.trampoline()))
             presenter.setViewAndInitialLocation(mockView, initialLatitude, initialLongitude, initialLocationType)
@@ -148,6 +218,22 @@ class SelectLocationPresenterTest {
 
         fun search_button_is_clicked_with_that_address() {
             presenter.searchButtonClick(address)
+        }
+
+        fun locate_click() {
+            presenter.locateClick()
+        }
+
+        fun location_permission_accepted() {
+            presenter.onLocationPermissionAccepted()
+        }
+
+        fun location_permission_denied() {
+            presenter.onLocationPermissionDenied()
+        }
+
+        fun location_found(latitude: Double, longitude: Double) {
+            presenter.onLocationFound(latitude, longitude)
         }
 
         fun finish_should_be_called_with_latitude_and_longitude() {
@@ -174,6 +260,22 @@ class SelectLocationPresenterTest {
         }
 
         fun view_should_move_map_to_that_latitude_and_longitude_point() {
+            BDDMockito.then(mockView).should().moveMapToPoint(latitude, longitude)
+        }
+
+        fun should_ask_location_permissions() {
+            BDDMockito.then(mockView).should().askLocationPermission()
+        }
+
+        fun should_ask_location() {
+            BDDMockito.then(mockView).should().askLocation()
+        }
+
+        fun should_do_nothing() {
+            BDDMockito.verifyZeroInteractions(mockView)
+        }
+
+        fun should_move_camera_to_point(latitude: Double, longitude: Double) {
             BDDMockito.then(mockView).should().moveMapToPoint(latitude, longitude)
         }
 

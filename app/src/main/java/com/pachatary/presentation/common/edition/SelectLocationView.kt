@@ -12,4 +12,7 @@ interface SelectLocationView {
     fun finishWith(latitude: Double, longitude: Double)
     fun geocodeAddress(address: String) : Flowable<Pair<Double, Double>>
     fun moveMapToPoint(latitude: Double, longitude: Double)
+    fun hasLocationPermission(): Boolean
+    fun askLocation()
+    fun askLocationPermission()
 }

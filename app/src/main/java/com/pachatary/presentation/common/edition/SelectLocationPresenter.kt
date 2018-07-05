@@ -1,5 +1,6 @@
 package com.pachatary.presentation.common.edition
 
+import android.annotation.SuppressLint
 import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.OnLifecycleEvent
@@ -43,10 +44,26 @@ class SelectLocationPresenter @Inject constructor(val schedulerProvider: Schedul
         view.finishWith(latitude = view.latitude(), longitude = view.longitude())
     }
 
+    @SuppressLint("CheckResult")
     fun searchButtonClick(searchText: String) {
         view.geocodeAddress(searchText)
                 .observeOn(schedulerProvider.observer())
                 .subscribeOn(schedulerProvider.subscriber())
                 .subscribe { view.moveMapToPoint(it.first, it.second) }
     }
+
+    fun locateClick() {
+        if (view.hasLocationPermission()) view.askLocation()
+        else view.askLocationPermission()
+    }
+
+    fun onLocationPermissionAccepted() {
+        view.askLocation()
+    }
+
+    fun onLocationFound(latitude: Double, longitude: Double) {
+        view.moveMapToPoint(latitude, longitude)
+    }
+
+    fun onLocationPermissionDenied() { }
 }

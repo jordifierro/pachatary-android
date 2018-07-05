@@ -17,6 +17,7 @@
         mapbox:mapbox_styleUrl="mapbox://styles/mapbox/streets-v10"/>
 
     <RelativeLayout
+        android:id="@+id/select_location_search_relativelayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
@@ -37,6 +38,16 @@
             android:text="SEARCH" />
 
     </RelativeLayout>
+
+
+    <ImageButton
+        android:id="@+id/select_location_locate_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/select_location_search_relativelayout"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        app:srcCompat="@drawable/ic_navigation_black_24dp" />
 
     <ImageView
         android:layout_width="wrap_content"
