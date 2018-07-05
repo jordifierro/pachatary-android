@@ -14,7 +14,7 @@
         android:id="@+id/select_location_mapview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        mapbox:mapbox_styleUrl="mapbox://styles/mapbox/streets-v10"/>
+        mapbox:mapbox_styleUrl="@string/mapbox_style_light" />
 
     <RelativeLayout
         android:id="@+id/select_location_search_relativelayout"

@@ -22,7 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="invisible"
-        mapbox:mapbox_styleUrl="mapbox://styles/mapbox/streets-v10"/>
+        mapbox:mapbox_styleUrl="@string/mapbox_style_light" />
 
 </RelativeLayout>
 

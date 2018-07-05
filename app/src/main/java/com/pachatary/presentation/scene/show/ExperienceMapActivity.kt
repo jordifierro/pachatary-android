@@ -3,15 +3,19 @@ package com.pachatary.presentation.scene.show
 import android.arch.lifecycle.LifecycleRegistry
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.Toast
 import com.mapbox.mapboxsdk.Mapbox
+import com.mapbox.mapboxsdk.annotations.IconFactory
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -88,6 +92,18 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView {
 
     override fun mapLoadedFlowable(): Flowable<Any> = mapLoadedReplaySubject.toFlowable(BackpressureStrategy.LATEST)
 
+    private fun getBitmap(drawableRes: Int): Bitmap {
+        val drawable = getResources().getDrawable(drawableRes)
+        val canvas = Canvas()
+        val bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(),
+                drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888)
+        canvas.setBitmap(bitmap)
+        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight())
+        drawable.draw(canvas)
+
+        return bitmap
+    }
+
     override fun showScenesOnMap(scenes: List<Scene>) {
         if (scenes.isNotEmpty()) {
             markersHashMap.clear()
@@ -98,6 +114,10 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView {
                 val latLng = LatLng(scene.latitude, scene.longitude)
                 val markerViewOptions = MarkerViewOptions().position(latLng)
                 markerViewOptions.title(scene.title)
+
+                val icon = IconFactory.getInstance(this).fromBitmap(getBitmap(R.drawable.map_marker_icon))
+                markerViewOptions.icon(icon)
+
                 mapboxMap.addMarker(markerViewOptions)
                 markersHashMap.put(markerViewOptions.marker.id, scene.id)
 
