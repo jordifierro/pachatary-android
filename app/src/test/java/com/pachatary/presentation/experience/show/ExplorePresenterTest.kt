@@ -33,14 +33,13 @@ class ExplorePresenterTest {
     }
 
     @Test
-    fun test_create_with_permissions_show_views_and_ask_last_known_location() {
+    fun test_create_with_permissions_asks_last_known_location() {
         given {
             permissions()
             an_experience_repo_that_returns_in_progress(Request.Action.GET_FIRSTS)
         } whenn {
             create_presenter()
         } then {
-            should_show_accepted_permissions_views()
             should_ask_last_known_location()
         }
     }
@@ -52,30 +51,7 @@ class ExplorePresenterTest {
         } whenn {
             permissions_accepted()
         } then {
-            should_show_accepted_permissions_views()
             should_ask_last_known_location()
-        }
-    }
-
-    @Test
-    fun test_on_permissions_denied_shows_no_permissions_views() {
-        given {
-            nothing()
-        } whenn {
-            permissions_denied()
-        } then {
-            should_show_denied_permissions_views()
-        }
-    }
-
-    @Test
-    fun test_on_retry_permissions_click_shows_permissions_dialog() {
-        given {
-            nothing()
-        } whenn {
-            retry_permissions_clicked()
-        } then {
-            should_ask_permissions()
         }
     }
 
@@ -170,7 +146,6 @@ class ExplorePresenterTest {
 
     }
 
-
     @Test
     fun test_create_when_response_error_shows_retry_if_last_event_get_firsts() {
         given {
@@ -221,52 +196,19 @@ class ExplorePresenterTest {
         }
     }
 
-    @Test
-    fun test_last_location_found_and_search_click_navigates_with_correct_params() {
-        given {
-            an_experience_repo_that_returns_in_progress(Request.Action.GET_FIRSTS)
-        } whenn {
-            create_presenter()
-            last_location_known()
-            on_search_click()
-        } then {
-            should_call_repo_get_firsts_experiences()
-            should_navigate_with_location_option_current_and_current_locations()
-        }
-    }
-
-    @Test
-    fun test_search_settings_result_uses_it_to_call_api_and_navigate_to_search_again_if_search() {
-        given {
-            an_experience_repo_that_returns_in_progress(Request.Action.GET_FIRSTS)
-        } whenn {
-            create_presenter()
-            last_location_known()
-            a_search_word()
-            a_selected_latitude_and_longitude()
-            on_search_result()
-            on_search_click()
-        } then {
-            should_call_repo_get_firsts_experiences_and_again_with_new_search_settings()
-            should_navigate_with_new_settings()
-        }
-    }
-
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
 
         lateinit var presenter: ExplorePresenter
         @Mock lateinit var mockView: ExploreView
-        @Mock lateinit var mockRepository: ExperienceRepository
-        lateinit var experienceA: Experience
-        lateinit var experienceB: Experience
-        lateinit var testObservable: PublishSubject<Result<List<Experience>>>
+        @Mock
+        private lateinit var mockRepository: ExperienceRepository
+        private lateinit var experienceA: Experience
+        private lateinit var experienceB: Experience
+        private lateinit var testObservable: PublishSubject<Result<List<Experience>>>
         val latitude = 4.8
         val longitude = -0.3
-        lateinit var searchWord: String
-        var selectedLatitude: Double = 0.0
-        var selectedLongitude: Double = 0.0
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
@@ -279,15 +221,6 @@ class ExplorePresenterTest {
         }
 
         fun nothing() {}
-
-        fun a_search_word() {
-            searchWord = "culture"
-        }
-
-        fun a_selected_latitude_and_longitude() {
-            selectedLatitude = 0.12
-            selectedLongitude = -1.99
-        }
 
         fun an_experience() {
             experienceA = Experience(id = "1", title = "A", description = "", picture = null)
@@ -337,26 +270,8 @@ class ExplorePresenterTest {
             presenter.onExperienceClick(experienceId)
         }
 
-        fun on_search_click() {
-            presenter.onSearchClick()
-        }
-
-        fun on_search_result() {
-            presenter.onSearchSettingsResult(
-                    SearchSettingsModel(searchWord, SearchSettingsModel.LocationOption.SELECTED,
-                            latitude, longitude, selectedLatitude, selectedLongitude))
-        }
-
         fun permissions_accepted() {
             presenter.onPermissionsAccepted()
-        }
-
-        fun permissions_denied() {
-            presenter.onPermissionsDenied()
-        }
-
-        fun retry_permissions_clicked() {
-            presenter.onRetryPermissions()
         }
 
         fun should_show_view_loader() {
@@ -425,40 +340,12 @@ class ExplorePresenterTest {
             assertFalse(testObservable.hasObservers())
         }
 
-        fun should_navigate_with_location_option_current_and_current_locations() {
-            BDDMockito.then(mockView).should().navigateToSearchSettings(
-                    SearchSettingsModel("", SearchSettingsModel.LocationOption.CURRENT,
-                            latitude, longitude, latitude, longitude)
-            )
-        }
-
-        fun should_call_repo_get_firsts_experiences_and_again_with_new_search_settings() {
-            then(mockRepository).should()
-                    .getFirstExperiences(ExperienceRepoSwitch.Kind.EXPLORE,
-                            Request.Params(searchWord, selectedLatitude, selectedLongitude))
-        }
-
-        fun should_navigate_with_new_settings() {
-            BDDMockito.then(mockView).should().navigateToSearchSettings(
-                    SearchSettingsModel(searchWord, SearchSettingsModel.LocationOption.SELECTED,
-                            latitude, longitude, selectedLatitude, selectedLongitude)
-            )
-        }
-
         fun should_ask_permissions() {
             BDDMockito.then(mockView).should().askPermissions()
         }
 
-        fun should_show_accepted_permissions_views() {
-            BDDMockito.then(mockView).should().showAcceptedPermissionsViews()
-        }
-
         fun should_ask_last_known_location() {
             BDDMockito.then(mockView).should().askLastKnownLocation()
-        }
-
-        fun should_show_denied_permissions_views() {
-            BDDMockito.then(mockView).should().showDeniedPermissionsViews()
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

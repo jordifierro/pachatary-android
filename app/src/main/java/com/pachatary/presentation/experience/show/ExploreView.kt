@@ -11,11 +11,8 @@ interface ExploreView : LoaderView {
     fun hidePaginationLoader()
     fun showExperienceList(experienceList: List<Experience>)
     fun navigateToExperience(experienceId: String)
-    fun navigateToSearchSettings(searchSettingsModel: SearchSettingsModel)
     fun hasLocationPermission(): Boolean
-    fun showAcceptedPermissionsViews()
     fun askLastKnownLocation()
     fun askPermissions()
-    fun showDeniedPermissionsViews()
     fun navigateToPersonsExperiences(username: String)
 }

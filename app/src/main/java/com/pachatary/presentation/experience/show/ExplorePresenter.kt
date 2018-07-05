@@ -15,23 +15,13 @@ import javax.inject.Inject
 class ExplorePresenter @Inject constructor(private val repository: ExperienceRepository,
                                            private val schedulerProvider: SchedulerProvider)
                                                                                : LifecycleObserver {
-    val getFirstExperiencesPublishSubject = PublishSubject.create<Unit>()
-    val searchParamsChangedPublishSubject = PublishSubject.create<Request.Params>()
-    lateinit var searchSettingsModel: SearchSettingsModel
-
-    init {
-        Flowable.combineLatest<Unit, Request.Params, Request.Params>(
-                getFirstExperiencesPublishSubject.toFlowable(BackpressureStrategy.LATEST)
-                        .replay(1).autoConnect(),
-                searchParamsChangedPublishSubject.toFlowable(BackpressureStrategy.LATEST)
-                        .replay(1).autoConnect(),
-                BiFunction { _, params: Request.Params -> params })
-                .subscribe { repository.getFirstExperiences(ExperienceRepoSwitch.Kind.EXPLORE, it) }
-    }
-
     lateinit var view: ExploreView
 
     private var experiencesDisposable: Disposable? = null
+
+    var latitude: Double? = null
+    var longitude: Double? = null
+    var searchText: String? = null
 
     fun create() {
         connectToExperiences()
@@ -40,20 +30,20 @@ class ExplorePresenter @Inject constructor(private val repository: ExperienceRep
     }
 
     fun onPermissionsAccepted() {
-        view.showAcceptedPermissionsViews()
         view.askLastKnownLocation()
     }
 
     fun onPermissionsDenied() {
-        view.showDeniedPermissionsViews()
+        getFirstsExperiences()
     }
 
-    fun onRetryPermissions() {
-        view.askPermissions()
+    fun getFirstsExperiences() {
+        repository.getFirstExperiences(ExperienceRepoSwitch.Kind.EXPLORE,
+                Request.Params(searchText, latitude, longitude))
     }
 
     fun onRetryClick() {
-        getFirstExperiencesPublishSubject.onNext(Unit)
+        getFirstsExperiences()
     }
 
     fun onExperienceClick(experienceId: String) {
@@ -65,10 +55,9 @@ class ExplorePresenter @Inject constructor(private val repository: ExperienceRep
     }
 
     fun onLastLocationFound(latitude: Double, longitude: Double) {
-        searchParamsChangedPublishSubject.onNext(Request.Params(null, latitude, longitude))
-        if (!::searchSettingsModel.isInitialized) searchSettingsModel =
-                SearchSettingsModel("", SearchSettingsModel.LocationOption.CURRENT,
-                                    latitude, longitude, latitude, longitude)
+        this.latitude = latitude
+        this.longitude = longitude
+        getFirstsExperiences()
     }
 
     private fun connectToExperiences() {
@@ -100,30 +89,13 @@ class ExplorePresenter @Inject constructor(private val repository: ExperienceRep
                                               if (it.isSuccess())
                                                   view.showExperienceList(it.data!!)
                                           }, { throw it })
-        getFirstExperiencesPublishSubject.onNext(Unit)
     }
 
     fun destroy() {
         experiencesDisposable?.dispose()
     }
 
-    fun onSearchClick() {
-        view.navigateToSearchSettings(searchSettingsModel)
-    }
-
     fun onUsernameClicked(username: String) {
         view.navigateToPersonsExperiences(username)
-    }
-
-    fun onSearchSettingsResult(searchSettingsModel: SearchSettingsModel) {
-        this.searchSettingsModel = searchSettingsModel
-        val newSearchParams =
-            if (searchSettingsModel.locationOption == SearchSettingsModel.LocationOption.CURRENT)
-                Request.Params(searchSettingsModel.searchText,
-                        searchSettingsModel.currentLatitude, searchSettingsModel.currentLongitude)
-            else
-                Request.Params(searchSettingsModel.searchText,
-                        searchSettingsModel.selectedLatitude, searchSettingsModel.selectedLongitude)
-        searchParamsChangedPublishSubject.onNext(newSearchParams)
     }
 }

@@ -97,12 +97,6 @@
             android:label="@string/title_scenes_list_activity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".presentation.experience.show.SearchSettingsActivity"
-            android:label="@string/title_search_settings_activity"
-            android:screenOrientation="portrait"
-            android:excludeFromRecents="true"
-            android:theme="@style/Theme.AppCompat.Light.Dialog" />
         <activity android:name=".presentation.main.WelcomeActivity"
             android:label="@string/title_welcome_activity"
             android:screenOrientation="portrait"
