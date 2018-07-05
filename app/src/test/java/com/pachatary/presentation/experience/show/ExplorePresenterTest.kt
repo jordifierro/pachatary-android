@@ -62,18 +62,19 @@ class ExplorePresenterTest {
         } whenn {
             create_presenter()
         } then {
+            should_call_repo_explore_experiences()
             should_not_call_repo_get_firsts_experiences()
         }
     }
 
     @Test
-    fun test_on_retry_click_dont_calls_get_firsts_experiences_again() {
+    fun test_on_retry_click_calls_get_firsts_experiences_again() {
         given {
             nothing()
         } whenn {
             retry_clicked()
         } then {
-            should_not_call_repo_get_firsts_experiences()
+            should_call_repo_get_firsts_experiences()
         }
     }
 
@@ -83,9 +84,9 @@ class ExplorePresenterTest {
             an_experience_repo_that_returns_in_progress(Request.Action.GET_FIRSTS)
         } whenn {
             create_presenter()
-            last_location_known()
+            last_location_known(latitude = 1.3, longitude = -4.5)
         } then {
-            should_call_repo_get_firsts_experiences()
+            should_call_repo_get_firsts_experiences(text = null, latitude = 1.3, longitude = -4.5)
         }
     }
 
@@ -95,9 +96,9 @@ class ExplorePresenterTest {
             nothing()
         } whenn {
             retry_clicked()
-            last_location_known()
+            last_location_known(latitude = 1.3, longitude = -4.5)
         } then {
-            should_call_repo_get_firsts_experiences()
+            should_call_repo_get_firsts_experiences(text = null, latitude = 1.3, longitude = -4.5)
         }
     }
 
@@ -196,6 +197,17 @@ class ExplorePresenterTest {
         }
     }
 
+    @Test
+    fun test_on_search_button_click_get_firsts_experience_with_search_text() {
+        given {
+            nothing()
+        } whenn {
+            search_button_click_with_text("museums")
+        } then {
+            should_call_repo_get_firsts_experiences(text = "museums")
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
@@ -207,8 +219,6 @@ class ExplorePresenterTest {
         private lateinit var experienceA: Experience
         private lateinit var experienceB: Experience
         private lateinit var testObservable: PublishSubject<Result<List<Experience>>>
-        val latitude = 4.8
-        val longitude = -0.3
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
@@ -254,6 +264,7 @@ class ExplorePresenterTest {
         fun no_permissions() {
             BDDMockito.given(mockView.hasLocationPermission()).willReturn(false)
         }
+
         fun create_presenter() {
             presenter.create()
         }
@@ -262,7 +273,7 @@ class ExplorePresenterTest {
             presenter.onRetryClick()
         }
 
-        fun last_location_known() {
+        fun last_location_known(latitude: Double, longitude: Double) {
             presenter.onLastLocationFound(latitude, longitude)
         }
 
@@ -272,6 +283,10 @@ class ExplorePresenterTest {
 
         fun permissions_accepted() {
             presenter.onPermissionsAccepted()
+        }
+
+        fun search_button_click_with_text(text: String) {
+            presenter.searchClick(text)
         }
 
         fun should_show_view_loader() {
@@ -302,20 +317,25 @@ class ExplorePresenterTest {
             then(mockView).should().hideRetry()
         }
 
-        fun should_call_repo_get_firsts_experiences() {
+        fun should_call_repo_get_firsts_experiences(text: String? = null,
+                                                    latitude: Double? = null,
+                                                    longitude: Double? = null) {
             then(mockRepository).should()
                     .getFirstExperiences(ExperienceRepoSwitch.Kind.EXPLORE,
-                                         Request.Params(null, latitude, longitude))
+                                         Request.Params(text, latitude, longitude))
         }
 
         fun should_show_empty_experiences() {
             BDDMockito.then(mockView).should().showExperienceList(listOf())
         }
 
+        fun should_call_repo_explore_experiences() {
+            BDDMockito.then(mockRepository).should()
+                    .experiencesFlowable(ExperienceRepoSwitch.Kind.EXPLORE)
+        }
+
         fun should_not_call_repo_get_firsts_experiences() {
-            then(mockRepository).should(Mockito.never())
-                    .getFirstExperiences(ExperienceRepoSwitch.Kind.EXPLORE,
-                                         Request.Params(null, latitude, longitude))
+            Mockito.verifyNoMoreInteractions(mockRepository)
         }
 
         fun should_navigate_to_experience(experienceId: String) {

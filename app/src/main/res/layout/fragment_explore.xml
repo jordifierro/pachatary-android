@@ -9,10 +9,29 @@
     tools:context="com.pachatary.presentation.main.MainActivity"
     tools:showIn="@layout/activity_main">
 
+    <EditText
+        android:id="@+id/experiences_search_edittext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/experiences_search_button"
+        android:layout_toStartOf="@+id/experiences_search_button"
+        android:inputType="text" />
+
+    <ImageButton
+        android:id="@+id/experiences_search_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        app:srcCompat="@drawable/ic_search_black_24dp" />
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/experiences_recyclerview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:layout_below="@+id/experiences_search_edittext"/>
 
     <ProgressBar
         android:id="@+id/experiences_progressbar"

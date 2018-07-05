@@ -10,9 +10,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.ProgressBar
+import android.widget.*
 import com.pachatary.R
 import com.pachatary.data.experience.Experience
 import com.pachatary.presentation.common.PachataryApplication
@@ -36,6 +34,8 @@ class ExploreFragment : Fragment(), ExploreView {
     private lateinit var recyclerView: RecyclerView
     private lateinit var progressBar: ProgressBar
     private lateinit var retryIcon: ImageView
+    private lateinit var searchButton: ImageButton
+    private lateinit var searchEditText: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,6 +57,9 @@ class ExploreFragment : Fragment(), ExploreView {
                 { id -> presenter.onExperienceClick(id) },
                 { username -> presenter.onUsernameClicked(username) },
                 { presenter.lastExperienceShown() })
+        searchEditText = view.findViewById(R.id.experiences_search_edittext)
+        searchButton = view.findViewById(R.id.experiences_search_button)
+        searchButton.setOnClickListener { presenter.searchClick(searchEditText.text.toString()) }
 
         presenter.create()
         return view

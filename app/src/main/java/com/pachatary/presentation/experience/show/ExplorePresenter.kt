@@ -98,4 +98,9 @@ class ExplorePresenter @Inject constructor(private val repository: ExperienceRep
     fun onUsernameClicked(username: String) {
         view.navigateToPersonsExperiences(username)
     }
+
+    fun searchClick(text: String) {
+        searchText = text
+        getFirstsExperiences()
+    }
 }
