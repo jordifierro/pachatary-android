@@ -1,5 +1,7 @@
 package com.pachatary.presentation.common
 
+import android.content.Context
+import android.support.multidex.MultiDex
 import android.support.multidex.MultiDexApplication
 import com.facebook.stetho.Stetho
 import com.jakewharton.picasso.OkHttp3Downloader
@@ -35,5 +37,11 @@ class PachataryApplication : MultiDexApplication() {
 
         UploadService.NAMESPACE = BuildConfig.APPLICATION_ID
         UploadService.HTTP_STACK = OkHttpStack()
+    }
+
+    override fun attachBaseContext(base: Context?) {
+        super.attachBaseContext(base)
+
+        if (BuildConfig.DEBUG) MultiDex.install(this)
     }
 }
