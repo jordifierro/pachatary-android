@@ -6,6 +6,7 @@ import com.pachatary.data.common.Result
 import com.pachatary.data.experience.ExperienceApiRepositoryTest
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
@@ -21,195 +22,198 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class SceneApiRepositoryTest {
 
-    val mockContext = mock(Context::class.java)
-    val mockAuthHttpInterceptor = mock(AuthHttpInterceptor::class.java)
-    val mockWebServer = MockWebServer()
-    var repository = SceneApiRepository(Retrofit.Builder()
-            .baseUrl(mockWebServer.url("/"))
-            .addConverterFactory(GsonConverterFactory.create(
-                    GsonBuilder().setFieldNamingPolicy(
-                            FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                            .create()))
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .build(),
-            Schedulers.trampoline(), mockContext, mockAuthHttpInterceptor)
-
     @Test
-    fun testGetScenesRequest() {
-        val testSubscriber = TestSubscriber<Result<List<Scene>>>()
-        mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(
-                ExperienceApiRepositoryTest::class.java.getResource("/api/GET_scenes_?experience.json").readText()))
-
-        repository.scenesRequestFlowable("7").subscribe(testSubscriber)
-        testSubscriber.awaitCount(1)
-
-        val request = mockWebServer.takeRequest()
-        assertEquals("/scenes/?experience=7", request.getPath())
-        assertEquals("GET", request.getMethod())
-        assertEquals("", request.getBody().readUtf8())
+    fun test_get_scenes() {
+        given {
+            a_web_server_that_returns(200, "GET_scenes_?experience")
+        } whenn {
+            scenes_request_flowable_for(experienceId = "8")
+        } then {
+            should_request_get_scene_for(experienceId = "8")
+            should_response_parse_scenes_list()
+        }
     }
 
     @Test
-    fun testGetScenesResponseSuccess() {
-        val testSubscriber = TestSubscriber<Result<List<Scene>>>()
-        mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(
-                ExperienceApiRepositoryTest::class.java.getResource("/api/GET_scenes_?experience.json").readText()))
-
-        repository.scenesRequestFlowable(experienceId = "").subscribe(testSubscriber)
-        testSubscriber.awaitCount(1)
-
-        assertEquals(0, testSubscriber.events.get(1).size)
-        assertEquals(1, testSubscriber.events.get(0).size)
-
-        val receivedResult = testSubscriber.events.get(0).get(0) as Result<*>
-        val receivedScenes = receivedResult.data as List<*>
-
-        val firstScene = receivedScenes[0] as Scene
-        assertEquals("4", firstScene.id)
-        assertEquals("Plaça", firstScene.title)
-        assertEquals("", firstScene.description)
-        assertEquals("https://scenes/00df.small.jpeg", firstScene.picture!!.smallUrl)
-        assertEquals("https://scenes/00df.medium.jpeg", firstScene.picture!!.mediumUrl)
-        assertEquals("https://scenes/00df.large.jpeg", firstScene.picture!!.largeUrl)
-        assertEquals(41.364679, firstScene.latitude, 1e-15)
-        assertEquals(2.135489, firstScene.longitude, 1e-15)
-        assertEquals("5", firstScene.experienceId)
-
-        val secondScene = receivedScenes[1] as Scene
-        assertEquals("3", secondScene.id)
-        assertEquals("Barri", secondScene.title)
-        assertEquals("Lorem ipsum dolor sit amet", secondScene.description)
-        assertNull(secondScene.picture)
-        assertEquals(41.392682, secondScene.latitude, 1e-15)
-        assertEquals(2.144423, secondScene.longitude, 1e-15)
-        assertEquals("5", secondScene.experienceId)
+    fun test_create_scene() {
+        given {
+            an_scene()
+            a_web_server_that_returns(201, "POST_scenes")
+        } whenn {
+            create_scene_with_that_scene()
+        } then {
+            should_call_with_that_scene_params(path = "/scenes/", method = "POST")
+            should_return_parsed_scene_response()
+        }
     }
 
     @Test
-    fun testGetScenesRetriesThriceAndCrashes() {
-        val testSubscriber = TestSubscriber<Result<List<Scene>>>()
-        mockWebServer.enqueue(MockResponse().setResponseCode(500))
-        mockWebServer.enqueue(MockResponse().setResponseCode(500))
-        mockWebServer.enqueue(MockResponse().setResponseCode(500))
-        mockWebServer.enqueue(MockResponse().setResponseCode(500))
-        mockWebServer.enqueue(MockResponse().setResponseCode(500))
-
-        repository.scenesRequestFlowable(experienceId = "").subscribe(testSubscriber)
-        testSubscriber.awaitCount(3)
-
-        assertEquals(1, testSubscriber.events.get(1).size)
-        assertEquals(0, testSubscriber.events.get(0).size)
-    }
-
-    @Test
-    fun testCreateSceneRequest() {
-        val testSubscriber = TestSubscriber<Result<Scene>>()
-        mockWebServer.enqueue(MockResponse().setResponseCode(201).setBody(
-                ExperienceApiRepositoryTest::class.java.getResource("/api/POST_scenes.json").readText()))
-        val scene = Scene(id = "1", title = "T", description = "desc",
-                          latitude = 1.0, longitude = -2.3, experienceId = "3", picture = null)
-
-        repository.createScene(scene).subscribe(testSubscriber)
-        testSubscriber.awaitCount(1)
-
-        val request = mockWebServer.takeRequest()
-        assertEquals("/scenes/", request.getPath())
-        assertEquals("POST", request.getMethod())
-        assertEquals("title=T&description=desc&latitude=1.0&longitude=-2.3&experience_id=3",
-                     request.getBody().readUtf8())
-    }
-
-    @Test
-    fun testCreateSceneResponseSuccess() {
-        val testSubscriber = TestSubscriber<Result<Scene>>()
-        mockWebServer.enqueue(MockResponse().setResponseCode(201).setBody(
-                ExperienceApiRepositoryTest::class.java.getResource("/api/POST_scenes.json").readText()))
-
-        val scene = Scene(id = "1", title = "T", description = "desc",
-                latitude = 1.0, longitude = -2.3, experienceId = "3", picture = null)
-
-        repository.createScene(scene).subscribe(testSubscriber)
-        testSubscriber.awaitCount(1)
-
-        assertEquals(0, testSubscriber.events.get(1).size)
-        assertEquals(1, testSubscriber.events.get(0).size)
-
-        val receivedResult = testSubscriber.events.get(0).get(0) as Result<*>
-        val receivedScene = receivedResult.data as Scene
-
-        assertEquals("4", receivedScene.id)
-        assertEquals("Plaça", receivedScene.title)
-        assertEquals("", receivedScene.description)
-        assertEquals("https://scenes/00df.small.jpeg", receivedScene.picture!!.smallUrl)
-        assertEquals("https://scenes/00df.medium.jpeg", receivedScene.picture!!.mediumUrl)
-        assertEquals("https://scenes/00df.large.jpeg", receivedScene.picture!!.largeUrl)
-        assertEquals(41.364679, receivedScene.latitude, 1e-15)
-        assertEquals(2.135489, receivedScene.longitude, 1e-15)
-        assertEquals("5", receivedScene.experienceId)
-    }
-
-    @Test
-    fun testEditSceneRequest() {
-        val testSubscriber = TestSubscriber<Result<Scene>>()
-        mockWebServer.enqueue(MockResponse().setResponseCode(201).setBody(
-                ExperienceApiRepositoryTest::class.java.getResource("/api/PATCH_scene_id.json").readText()))
-        val scene = Scene(id = "1", title = "T", description = "desc",
-                          latitude = 1.0, longitude = -2.3, experienceId = "3", picture = null)
-
-        repository.editScene(scene).subscribe(testSubscriber)
-        testSubscriber.awaitCount(1)
-
-        val request = mockWebServer.takeRequest()
-        assertEquals("/scenes/1", request.getPath())
-        assertEquals("PATCH", request.getMethod())
-        assertEquals("title=T&description=desc&latitude=1.0&longitude=-2.3&experience_id=3",
-                request.getBody().readUtf8())
-    }
-
-    @Test
-    fun testEditSceneResponseSuccess() {
-        val testSubscriber = TestSubscriber<Result<Scene>>()
-        mockWebServer.enqueue(MockResponse().setResponseCode(201).setBody(
-                ExperienceApiRepositoryTest::class.java.getResource("/api/PATCH_scene_id.json").readText()))
-
-        val scene = Scene(id = "1", title = "T", description = "desc",
-                          latitude = 1.0, longitude = -2.3, experienceId = "3", picture = null)
-
-        repository.editScene(scene).subscribe(testSubscriber)
-        testSubscriber.awaitCount(1)
-
-        assertEquals(0, testSubscriber.events.get(1).size)
-        assertEquals(1, testSubscriber.events.get(0).size)
-
-        val receivedResult = testSubscriber.events.get(0).get(0) as Result<*>
-        val receivedScene = receivedResult.data as Scene
-
-        assertEquals("4", receivedScene.id)
-        assertEquals("Plaça", receivedScene.title)
-        assertEquals("", receivedScene.description)
-        assertEquals("https://scenes/00df.small.jpeg", receivedScene.picture!!.smallUrl)
-        assertEquals("https://scenes/00df.medium.jpeg", receivedScene.picture!!.mediumUrl)
-        assertEquals("https://scenes/00df.large.jpeg", receivedScene.picture!!.largeUrl)
-        assertEquals(41.364679, receivedScene.latitude, 1e-15)
-        assertEquals(2.135489, receivedScene.longitude, 1e-15)
-        assertEquals("5", receivedScene.experienceId)
+    fun test_edit_scene() {
+        given {
+            a_web_server_that_returns(201, "PATCH_scene_id")
+            an_scene(id = "7")
+        } whenn {
+            edit_scene_with_that_scene()
+        } then {
+            should_call_with_that_scene_params(path = "/scenes/7", method = "PATCH")
+            should_return_parsed_scene_response()
+        }
     }
 
     @Test
     fun test_upload_picture_scene_parser() {
-        val jsonObject = JsonParser().parse(ExperienceApiRepositoryTest::class.java
-                .getResource("/api/POST_scenes.json").readText()).asJsonObject
+        given {
+            a_json_object_from_POST_scenes_response()
+        } whenn {
+            parse_that_scene_json()
+        } then {
+            should_response_parsed_scene()
+        }
+    }
 
-        val parsedScene = repository.parseSceneJson(jsonObject)
+    private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
-        assertEquals("4", parsedScene.id)
-        assertEquals("Plaça", parsedScene.title)
-        assertEquals("", parsedScene.description)
-        assertEquals("https://scenes/00df.small.jpeg", parsedScene.picture!!.smallUrl)
-        assertEquals("https://scenes/00df.medium.jpeg", parsedScene.picture!!.mediumUrl)
-        assertEquals("https://scenes/00df.large.jpeg", parsedScene.picture!!.largeUrl)
-        assertEquals(41.364679, parsedScene.latitude, 1e-15)
-        assertEquals(2.135489, parsedScene.longitude, 1e-15)
-        assertEquals("5", parsedScene.experienceId)
+    class ScenarioMaker {
+        val mockContext = mock(Context::class.java)
+        val mockAuthHttpInterceptor = mock(AuthHttpInterceptor::class.java)
+        val mockWebServer = MockWebServer()
+        var repository = SceneApiRepository(Retrofit.Builder()
+                .baseUrl(mockWebServer.url("/"))
+                .addConverterFactory(GsonConverterFactory.create(
+                        GsonBuilder().setFieldNamingPolicy(
+                                FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                                .create()))
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .build(),
+                Schedulers.trampoline(), mockContext, mockAuthHttpInterceptor)
+        val testSceneListSubscriber = TestSubscriber<Result<List<Scene>>>()
+        val testSceneSubscriber = TestSubscriber<Result<Scene>>()
+        lateinit var scene: Scene
+        lateinit var jsonObject: JsonObject
+        lateinit var parsedResult: Scene
+
+        fun buildScenario(): ScenarioMaker {
+            return this
+        }
+
+        fun an_scene(id: String = "1") {
+            scene = Scene(id = id, title = "T", description = "desc",
+                          latitude = 1.0, longitude = -2.3, experienceId = "3", picture = null)
+        }
+
+        fun a_web_server_that_returns(statusCode: Int, jsonResponseFilename: String) {
+            mockWebServer.enqueue(MockResponse()
+                    .setResponseCode(statusCode)
+                    .setBody(ExperienceApiRepositoryTest::class.java
+                            .getResource("/api/" + jsonResponseFilename + ".json").readText()))
+        }
+
+        fun a_json_object_from_POST_scenes_response() {
+            jsonObject = JsonParser().parse(ExperienceApiRepositoryTest::class.java
+                    .getResource("/api/POST_scenes.json").readText()).asJsonObject
+        }
+
+
+        fun scenes_request_flowable_for(experienceId: String) {
+            repository.scenesRequestFlowable(experienceId).subscribe(testSceneListSubscriber)
+        }
+
+        fun create_scene_with_that_scene() {
+            repository.createScene(scene).subscribe(testSceneSubscriber)
+        }
+
+        fun edit_scene_with_that_scene() {
+            repository.editScene(scene).subscribe(testSceneSubscriber)
+        }
+
+        fun parse_that_scene_json() {
+            parsedResult = repository.parseSceneJson(jsonObject)
+        }
+
+        fun should_request_get_scene_for(experienceId: String) {
+            val request = mockWebServer.takeRequest()
+            assertEquals("/scenes/?experience=" + experienceId, request.getPath())
+            assertEquals("GET", request.getMethod())
+            assertEquals("", request.getBody().readUtf8())
+        }
+
+        fun should_call_with_that_scene_params(path: String, method: String) {
+            val request = mockWebServer.takeRequest()
+            assertEquals(path, request.getPath())
+            assertEquals(method, request.getMethod())
+            assertEquals("title=" + scene.title +
+                         "&description=" + scene.description +
+                         "&latitude=" + scene.latitude +
+                         "&longitude=" + scene.longitude +
+                         "&experience_id=" + scene.experienceId,
+                    request.getBody().readUtf8())
+        }
+
+        fun should_response_parse_scenes_list() {
+            testSceneListSubscriber.awaitCount(1)
+
+            assertEquals(0, testSceneListSubscriber.events.get(1).size)
+            assertEquals(1, testSceneListSubscriber.events.get(0).size)
+
+            val receivedResult = testSceneListSubscriber.events.get(0).get(0) as Result<*>
+            val receivedScenes = receivedResult.data as List<*>
+
+            val firstScene = receivedScenes[0] as Scene
+            assertEquals("4", firstScene.id)
+            assertEquals("Plaça", firstScene.title)
+            assertEquals("", firstScene.description)
+            assertEquals("https://scenes/00df.small.jpeg", firstScene.picture!!.smallUrl)
+            assertEquals("https://scenes/00df.medium.jpeg", firstScene.picture!!.mediumUrl)
+            assertEquals("https://scenes/00df.large.jpeg", firstScene.picture!!.largeUrl)
+            assertEquals(41.364679, firstScene.latitude, 1e-15)
+            assertEquals(2.135489, firstScene.longitude, 1e-15)
+            assertEquals("5", firstScene.experienceId)
+
+            val secondScene = receivedScenes[1] as Scene
+            assertEquals("3", secondScene.id)
+            assertEquals("Barri", secondScene.title)
+            assertEquals("Lorem ipsum dolor sit amet", secondScene.description)
+            assertNull(secondScene.picture)
+            assertEquals(41.392682, secondScene.latitude, 1e-15)
+            assertEquals(2.144423, secondScene.longitude, 1e-15)
+            assertEquals("5", secondScene.experienceId)
+
+        }
+
+        fun should_return_parsed_scene_response() {
+            testSceneSubscriber.awaitCount(1)
+
+            assertEquals(0, testSceneSubscriber.events.get(1).size)
+            assertEquals(1, testSceneSubscriber.events.get(0).size)
+
+            val receivedResult = testSceneSubscriber.events.get(0).get(0) as Result<*>
+            val receivedScene = receivedResult.data as Scene
+
+            assertEquals("4", receivedScene.id)
+            assertEquals("Plaça", receivedScene.title)
+            assertEquals("", receivedScene.description)
+            assertEquals("https://scenes/00df.small.jpeg", receivedScene.picture!!.smallUrl)
+            assertEquals("https://scenes/00df.medium.jpeg", receivedScene.picture!!.mediumUrl)
+            assertEquals("https://scenes/00df.large.jpeg", receivedScene.picture!!.largeUrl)
+            assertEquals(41.364679, receivedScene.latitude, 1e-15)
+            assertEquals(2.135489, receivedScene.longitude, 1e-15)
+            assertEquals("5", receivedScene.experienceId)
+        }
+
+        fun should_response_parsed_scene() {
+            assertEquals("4", parsedResult.id)
+            assertEquals("Plaça", parsedResult.title)
+            assertEquals("", parsedResult.description)
+            assertEquals("https://scenes/00df.small.jpeg", parsedResult.picture!!.smallUrl)
+            assertEquals("https://scenes/00df.medium.jpeg", parsedResult.picture!!.mediumUrl)
+            assertEquals("https://scenes/00df.large.jpeg", parsedResult.picture!!.largeUrl)
+            assertEquals(41.364679, parsedResult.latitude, 1e-15)
+            assertEquals(2.135489, parsedResult.longitude, 1e-15)
+            assertEquals("5", parsedResult.experienceId)
+        }
+
+        infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)
+        infix fun whenn(func: ScenarioMaker.() -> Unit) = apply(func)
+        infix fun then(func: ScenarioMaker.() -> Unit) = apply(func)
     }
 }
