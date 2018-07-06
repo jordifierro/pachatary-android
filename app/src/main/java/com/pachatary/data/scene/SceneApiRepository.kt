@@ -10,26 +10,22 @@ import com.pachatary.data.auth.AuthHttpInterceptor
 import com.pachatary.data.common.NetworkParserFactory
 import com.pachatary.data.common.Result
 import com.pachatary.data.picture.Picture
-import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Scheduler
-import io.reactivex.subjects.PublishSubject
 import net.gotev.uploadservice.*
-import org.json.JSONObject
 import retrofit2.Retrofit
 import javax.inject.Named
 
 
-class SceneApiRepository(retrofit: Retrofit, @Named("io") val scheduler: Scheduler,
+class SceneApiRepository(retrofit: Retrofit, @Named("io") val ioScheduler: Scheduler,
                          val context: Context, val authHttpInterceptor: AuthHttpInterceptor) {
 
     private val sceneApi: SceneApi = retrofit.create(SceneApi::class.java)
 
     fun scenesRequestFlowable(experienceId: String): Flowable<Result<List<Scene>>> =
-        PublishSubject.create<Any>().startWith(Any())
-                            .flatMap { sceneApi.scenes(experienceId).subscribeOn(scheduler).toObservable() }
-                            .toFlowable(BackpressureStrategy.LATEST)
-                            .compose(NetworkParserFactory.getListTransformer())
+        sceneApi.scenes(experienceId)
+                .subscribeOn(ioScheduler)
+                .compose(NetworkParserFactory.getListTransformer())
 
     fun createScene(scene: Scene): Flowable<Result<Scene>> =
         sceneApi.createScene(title = scene.title, description = scene.description,
