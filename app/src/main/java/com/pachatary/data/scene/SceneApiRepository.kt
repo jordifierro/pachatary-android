@@ -26,6 +26,7 @@ class SceneApiRepository(retrofit: Retrofit, @Named("io") val ioScheduler: Sched
         sceneApi.scenes(experienceId)
                 .subscribeOn(ioScheduler)
                 .compose(NetworkParserFactory.getListTransformer())
+                .startWith(Result(listOf(), inProgress = true))
 
     fun createScene(scene: Scene): Flowable<Result<Scene>> =
         sceneApi.createScene(title = scene.title, description = scene.description,

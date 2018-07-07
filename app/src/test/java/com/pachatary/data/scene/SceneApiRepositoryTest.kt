@@ -30,7 +30,7 @@ class SceneApiRepositoryTest {
             scenes_request_flowable_for(experienceId = "8")
         } then {
             should_request_get_scene_for(experienceId = "8")
-            should_response_parse_scenes_list()
+            should_response_inprogress_and_parsed_scenes_list()
         }
     }
 
@@ -149,14 +149,17 @@ class SceneApiRepositoryTest {
                     request.getBody().readUtf8())
         }
 
-        fun should_response_parse_scenes_list() {
+        fun should_response_inprogress_and_parsed_scenes_list() {
             testSceneListSubscriber.awaitCount(1)
 
             assertEquals(0, testSceneListSubscriber.events.get(1).size)
-            assertEquals(1, testSceneListSubscriber.events.get(0).size)
+            assertEquals(2, testSceneListSubscriber.events.get(0).size)
 
-            val receivedResult = testSceneListSubscriber.events.get(0).get(0) as Result<*>
-            val receivedScenes = receivedResult.data as List<*>
+            val firstResult = testSceneListSubscriber.events.get(0).get(0) as Result<*>
+            assertEquals(Result(listOf<Scene>(), inProgress = true), firstResult)
+
+            val secondResult = testSceneListSubscriber.events.get(0).get(1) as Result<*>
+            val receivedScenes = secondResult.data as List<*>
 
             val firstScene = receivedScenes[0] as Scene
             assertEquals("4", firstScene.id)
