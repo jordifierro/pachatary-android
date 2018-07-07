@@ -15,7 +15,7 @@ class SceneRepository(val apiRepository: SceneApiRepository, val cacheFactory: R
             val cache = cacheFactory.create()
             scenesCacheHashMap.put(experienceId, cache)
             apiRepository.scenesRequestFlowable(experienceId)
-                    .subscribe({ cache.addOrUpdateObserver.onNext(it.data!!) }, { throw it })
+                    .subscribe({ cache.replaceResultObserver.onNext(it)}, { throw it })
         }
         return scenesCacheHashMap.get(experienceId)!!.resultFlowable
     }

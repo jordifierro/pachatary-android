@@ -80,7 +80,7 @@ class ExperienceMapPresenter @Inject constructor(private val repository: SceneRe
         view.showLoader()
         scenesDisposable = Flowable.combineLatest(
                 mapLoadedFlowable(),
-                scenesFlowable(),
+                scenesFlowable().filter { !it.isInProgress() },
                 BiFunction { _: Any, scenesResult: Result<List<Scene>> -> scenesResult })
                 .subscribe({ view.showScenesOnMap(it.data!!)
                     view.hideLoader() }, { throw it })
