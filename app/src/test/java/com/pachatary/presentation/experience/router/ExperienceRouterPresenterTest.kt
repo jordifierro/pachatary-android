@@ -3,6 +3,9 @@ package com.pachatary.presentation.experience.router
 import com.pachatary.data.auth.AuthRepository
 import com.pachatary.data.auth.AuthToken
 import com.pachatary.data.common.Result
+import com.pachatary.data.common.ResultError
+import com.pachatary.data.common.ResultInProgress
+import com.pachatary.data.common.ResultSuccess
 import com.pachatary.data.experience.ExperienceRepository
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
@@ -309,16 +312,23 @@ class ExperienceRouterPresenterTest {
                                                           error: Exception? = null) {
             var authToken: AuthToken? = null
             if (success) authToken = AuthToken("a", "r")
+            var result: Result<AuthToken>? = null
+            if (success) result = ResultSuccess(authToken)
+            else if (inProgress) result = ResultInProgress()
+            else if (error != null) result = ResultError(error)
             BDDMockito.given(mockAuthRepository.getPersonInvitation()).willReturn(
-                            Flowable.just(Result(authToken, inProgress = inProgress, error = error)))
+                            Flowable.just(result))
         }
 
         fun an_experience_repo_that_returns_on_translate(experienceId: String? = null,
                                                          inProgress: Boolean = false,
                                                          error: Exception? = null) {
+            var result: Result<String>? = null
+            if (experienceId != null) result = ResultSuccess(experienceId)
+            else if (inProgress) result = ResultInProgress()
+            else if (error != null) result = ResultError(error)
             BDDMockito.given(mockExperienceRepository.translateShareId(experienceShareId))
-                    .willReturn(Flowable.just(
-                            Result(experienceId, inProgress = inProgress, error = error)))
+                    .willReturn(Flowable.just(result))
         }
 
         fun create_presenter() {

@@ -117,7 +117,7 @@ class ResultCacheFactoryTest {
         }
 
         fun a_new_list_is_emitted_through_replace() {
-            cache.replaceResultObserver.onNext(Result(newScenes))
+            cache.replaceResultObserver.onNext(ResultSuccess(newScenes))
         }
 
         fun another_observer_subscribes_to_flowable() {
@@ -153,7 +153,7 @@ class ResultCacheFactoryTest {
             testSubscriber.awaitCount(1)
 
             val result = testSubscriber.events.get(0).get(0) as Result<*>
-            assertEquals(Result<List<Scene>>(listOf(), action = Request.Action.NONE), result)
+            assertEquals(ResultSuccess<List<Scene>>(listOf(), action = Request.Action.NONE), result)
         }
 
         fun this_other_observer_should_received_second_emitted_list() {

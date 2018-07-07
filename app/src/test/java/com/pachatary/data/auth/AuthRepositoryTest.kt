@@ -1,6 +1,9 @@
 package com.pachatary.data.auth
 
 import com.pachatary.data.common.Result
+import com.pachatary.data.common.ResultError
+import com.pachatary.data.common.ResultInProgress
+import com.pachatary.data.common.ResultSuccess
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
@@ -276,13 +279,12 @@ class AuthRepositoryTest {
         }
 
         fun a_result_error() {
-            resultError = Result(null,
-                                 error = ClientException(source = "s", code = "c", message = "m"))
+            resultError = ResultError(ClientException(source = "s", code = "c", message = "m"))
         }
 
         fun an_auth_api_that_returns_a_flowable_with_that_person() {
             BDDMockito.given(authApiRepository.register(username, email))
-                    .willReturn(Flowable.just(Result(person)))
+                    .willReturn(Flowable.just(ResultSuccess(person)))
         }
 
         fun an_auth_api_that_returns_a_flowable_with_that_result_error() {
@@ -292,7 +294,7 @@ class AuthRepositoryTest {
 
         fun an_auth_api_that_returns_a_flowable_with_that_person_on_confirm_email() {
             BDDMockito.given(authApiRepository.confirmEmail(confirmationToken))
-                    .willReturn(Flowable.just(Result(person)))
+                    .willReturn(Flowable.just(ResultSuccess(person)))
         }
 
         fun an_auth_api_that_returns_a_flowable_with_that_result_error_on_confirm_email() {
@@ -313,27 +315,27 @@ class AuthRepositoryTest {
         fun an_auth_api_that_returns_a_flowable_with_auth_token() {
             authToken = AuthToken("A", "R")
             BDDMockito.given(authApiRepository.getPersonInvitation()).willReturn(
-                    Flowable.just(Result(authToken)))
+                    Flowable.just(ResultSuccess(authToken)))
         }
 
         fun an_auth_api_that_returns_person_and_auth_token_when_login() {
             BDDMockito.given(authApiRepository.login(loginToken))
-                    .willReturn(Flowable.just(Result(Pair(person, authToken))))
+                    .willReturn(Flowable.just(ResultSuccess(Pair(person, authToken))))
         }
 
         fun an_api_that_returns_error_client_version() {
             BDDMockito.given(authApiRepository.clientVersions())
-                    .willReturn(Flowable.just(Result<Int>(null, error = Exception())))
+                    .willReturn(Flowable.just(ResultError(Exception())))
         }
 
         fun an_api_that_returns_min_client_version(minClientVersion: Int) {
             BDDMockito.given(authApiRepository.clientVersions())
-                    .willReturn(Flowable.just(Result(minClientVersion)))
+                    .willReturn(Flowable.just(ResultSuccess(minClientVersion)))
         }
 
         fun an_api_that_returns_in_progress_client_version() {
             BDDMockito.given(authApiRepository.clientVersions())
-                    .willReturn(Flowable.just(Result<Int>(null, inProgress = true)))
+                    .willReturn(Flowable.just(ResultInProgress()))
         }
 
         fun has_person_credentials() {
@@ -377,7 +379,7 @@ class AuthRepositoryTest {
         }
 
         fun should_return_auth_token_flowable() {
-            testAuthTokenSubscriber.assertResult(Result(authToken))
+            testAuthTokenSubscriber.assertResult(ResultSuccess(authToken))
         }
 
         fun should_save_auth_token_on_auth_storage_repository() {
@@ -432,7 +434,7 @@ class AuthRepositoryTest {
         }
 
         fun should_receive_person() {
-            testPersonSubscriber.assertResult(Result(person))
+            testPersonSubscriber.assertResult(ResultSuccess(person))
         }
 
         fun should_call_storage_repo_to_save_person() {
@@ -457,7 +459,7 @@ class AuthRepositoryTest {
 
         fun should_receive_person_and_auth_token() {
             testPersonAuthTokenSubscriber.awaitCount(1)
-            testPersonAuthTokenSubscriber.assertResult(Result(Pair(person, authToken)))
+            testPersonAuthTokenSubscriber.assertResult(ResultSuccess(Pair(person, authToken)))
         }
 
         fun should_save_person_and_auth_token_to_storage_repo() {

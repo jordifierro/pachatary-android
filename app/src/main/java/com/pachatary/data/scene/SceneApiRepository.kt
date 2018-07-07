@@ -9,6 +9,8 @@ import com.pachatary.BuildConfig
 import com.pachatary.data.auth.AuthHttpInterceptor
 import com.pachatary.data.common.NetworkParserFactory
 import com.pachatary.data.common.Result
+import com.pachatary.data.common.ResultInProgress
+import com.pachatary.data.common.ResultSuccess
 import com.pachatary.data.picture.Picture
 import io.reactivex.Flowable
 import io.reactivex.Scheduler
@@ -26,7 +28,7 @@ class SceneApiRepository(retrofit: Retrofit, @Named("io") val ioScheduler: Sched
         sceneApi.scenes(experienceId)
                 .subscribeOn(ioScheduler)
                 .compose(NetworkParserFactory.getListTransformer())
-                .startWith(Result(listOf(), inProgress = true))
+                .startWith(ResultInProgress())
 
     fun createScene(scene: Scene): Flowable<Result<Scene>> =
         sceneApi.createScene(title = scene.title, description = scene.description,
@@ -58,7 +60,7 @@ class SceneApiRepository(retrofit: Retrofit, @Named("io") val ioScheduler: Sched
                                                  serverResponse: ServerResponse) {
                             val jsonScene =
                                     JsonParser().parse(serverResponse.bodyAsString).asJsonObject
-                            delegate(Result(parseSceneJson(jsonScene)))
+                            delegate(ResultSuccess(parseSceneJson(jsonScene)))
                         }
                     })
                     .startUpload()

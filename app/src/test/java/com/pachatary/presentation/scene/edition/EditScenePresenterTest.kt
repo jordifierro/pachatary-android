@@ -1,6 +1,7 @@
 package com.pachatary.presentation.scene.edition
 
 import com.pachatary.data.common.Result
+import com.pachatary.data.common.ResultSuccess
 import com.pachatary.data.scene.Scene
 import com.pachatary.data.scene.SceneRepository
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
@@ -227,12 +228,12 @@ class EditScenePresenterTest {
             an_edited_scene()
 
             BDDMockito.given(mockRepository.editScene(scene = sentEditedScene))
-                    .willReturn(Flowable.just(Result<Scene>(receivedEditedScene!!)))
+                    .willReturn(Flowable.just(ResultSuccess(receivedEditedScene!!)))
         }
 
         fun an_scene_repository_that_returns_scene() {
             BDDMockito.given(mockRepository.sceneFlowable(experienceId, sceneId))
-                    .willReturn(Flowable.just(Result(scene)))
+                    .willReturn(Flowable.just(ResultSuccess(scene)))
         }
 
         fun presenter_is_created() {

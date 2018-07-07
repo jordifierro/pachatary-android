@@ -21,7 +21,9 @@ class SceneRepository(val apiRepository: SceneApiRepository, val cacheFactory: R
     }
 
     fun sceneFlowable(experienceId: String, sceneId: String): Flowable<Result<Scene>> =
-        scenesFlowable(experienceId).map { Result(data = it.data?.first { it.id == sceneId }, error = it.error) }
+        scenesFlowable(experienceId).map {
+            Result(it.status, data = it.data?.first { it.id == sceneId }, error = it.error)
+        }
 
     fun createScene(scene: Scene): Flowable<Result<Scene>> {
         return apiRepository.createScene(scene).doOnNext(emitThroughAddOrUpdate)

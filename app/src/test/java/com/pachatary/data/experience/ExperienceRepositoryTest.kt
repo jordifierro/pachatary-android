@@ -2,6 +2,8 @@ package com.pachatary.data.experience
 
 import com.pachatary.data.common.Request
 import com.pachatary.data.common.Result
+import com.pachatary.data.common.ResultError
+import com.pachatary.data.common.ResultSuccess
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.subjects.PublishSubject
@@ -261,17 +263,17 @@ class ExperienceRepositoryTest {
 
         fun an_experience_repo_that_returns_that_experience_when_create() {
             BDDMockito.given(mockApiRepository.createExperience(experience))
-                    .willReturn(Flowable.just(Result(experience)))
+                    .willReturn(Flowable.just(ResultSuccess(experience)))
         }
 
         fun an_experience_repo_that_returns_that_experience_when_edit() {
             BDDMockito.given(mockApiRepository.editExperience(experience))
-                    .willReturn(Flowable.just(Result(experience)))
+                    .willReturn(Flowable.just(ResultSuccess(experience)))
         }
 
         fun an_api_repo_that_return_that_experience_on_get() {
             BDDMockito.given(mockApiRepository.experienceFlowable(experienceId))
-                    .willReturn(Flowable.just(Result(experience)))
+                    .willReturn(Flowable.just(ResultSuccess(experience)))
         }
 
         fun an_api_repo_that_returns_string_flowable_when_translate_share_id() {
@@ -289,7 +291,7 @@ class ExperienceRepositoryTest {
         }
 
         fun a_flowable_that_returns_that_experiences() {
-            experiencesFlowable = Flowable.just(Result(listOf(savedExperience, nonSavedExperience)))
+            experiencesFlowable = Flowable.just(ResultSuccess(listOf(savedExperience, nonSavedExperience)))
         }
 
         fun kind_of_experiences(kind: ExperienceRepoSwitch.Kind) {
@@ -307,18 +309,18 @@ class ExperienceRepositoryTest {
 
         fun a_repo_switch_that_returns_not_cached_exception() {
             BDDMockito.given(mockExperiencesRepoSwitch.getExperienceFlowable(experienceId))
-                    .willReturn(Flowable.just(Result<Experience>(null,
-                            error = ExperienceRepoSwitch.NotCachedExperienceException())))
+                    .willReturn(Flowable.just(
+                            ResultError(ExperienceRepoSwitch.NotCachedExperienceException())))
         }
 
         fun a_repo_switch_that_returns_non_saved_experience_when_call_with_experience_id() {
             BDDMockito.given(mockExperiencesRepoSwitch.getExperienceFlowable(experienceId))
-                    .willReturn(Flowable.just(Result(nonSavedExperience)))
+                    .willReturn(Flowable.just(ResultSuccess(nonSavedExperience)))
         }
 
         fun a_repo_switch_that_returns_saved_experience_when_call_with_experience_id() {
             BDDMockito.given(mockExperiencesRepoSwitch.getExperienceFlowable(experienceId))
-                    .willReturn(Flowable.just(Result(savedExperience)))
+                    .willReturn(Flowable.just(ResultSuccess(savedExperience)))
         }
 
         fun repo_switch_that_returns_that_flowable_for_that_kind() {
@@ -517,7 +519,7 @@ class ExperienceRepositoryTest {
         fun should_return_that_experience() {
             resultExperienceFlowable.subscribe(testExperienceSubscriber)
             testExperienceSubscriber.awaitCount(1)
-            testExperienceSubscriber.assertValue(Result(experience))
+            testExperienceSubscriber.assertValue(ResultSuccess(experience))
         }
 
         fun should_call_api_repo_translate_share_id_with_share_id() {

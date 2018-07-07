@@ -9,6 +9,8 @@ import com.pachatary.BuildConfig
 import com.pachatary.data.auth.AuthHttpInterceptor
 import com.pachatary.data.common.NetworkParserFactory
 import com.pachatary.data.common.Result
+import com.pachatary.data.common.ResultInProgress
+import com.pachatary.data.common.ResultSuccess
 import com.pachatary.data.picture.Picture
 import io.reactivex.Flowable
 import io.reactivex.Scheduler
@@ -52,7 +54,7 @@ class ExperienceApiRepository (retrofit: Retrofit, @Named("io") val scheduler: S
             experienceApi.getExperience(experienceId)
                     .subscribeOn(scheduler)
                     .compose(NetworkParserFactory.getTransformer())
-                    .startWith(Result<Experience>(null, inProgress = true))
+                    .startWith(ResultInProgress())
 
     fun createExperience(experience: Experience): Flowable<Result<Experience>> =
             experienceApi.createExperience(title = experience.title, description = experience.description)
@@ -77,7 +79,7 @@ class ExperienceApiRepository (retrofit: Retrofit, @Named("io") val scheduler: S
             experienceApi.translateShareId(experienceShareId)
                     .subscribeOn(scheduler)
                     .compose(NetworkParserFactory.getTransformer())
-                    .startWith(Result<String>(null, inProgress = true))
+                    .startWith(ResultInProgress())
 
     fun uploadExperiencePicture(experienceId: String, croppedImageUriString: String,
                                 delegate: (resultExperience: Result<Experience>) -> Unit) {
@@ -97,7 +99,7 @@ class ExperienceApiRepository (retrofit: Retrofit, @Named("io") val scheduler: S
                         override fun onCompleted(context: Context, uploadInfo: UploadInfo,
                                                  serverResponse: ServerResponse) {
                             val jsonExperience = JsonParser().parse(serverResponse.bodyAsString).asJsonObject
-                            delegate(Result(parseExperienceJson(jsonExperience)))
+                            delegate(ResultSuccess(parseExperienceJson(jsonExperience)))
                         }
                     })
                     .startUpload()

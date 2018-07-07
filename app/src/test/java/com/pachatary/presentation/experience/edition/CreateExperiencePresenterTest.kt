@@ -1,6 +1,7 @@
 package com.pachatary.presentation.experience.edition
 
 import com.pachatary.data.common.Result
+import com.pachatary.data.common.ResultSuccess
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.experience.ExperienceRepository
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
@@ -149,7 +150,7 @@ class CreateExperiencePresenterTest {
             a_created_experience()
 
             BDDMockito.given(mockRepository.createExperience(experience = sentCreatedExperience!!))
-                    .willReturn(Flowable.just(Result<Experience>(receivedCreatedExperience!!)))
+                    .willReturn(Flowable.just(ResultSuccess(receivedCreatedExperience!!)))
         }
 
         fun presenter_is_created() {

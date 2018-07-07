@@ -7,6 +7,8 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.pachatary.data.auth.AuthHttpInterceptor
 import com.pachatary.data.common.Result
+import com.pachatary.data.common.ResultInProgress
+import com.pachatary.data.common.ResultSuccess
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
 import okhttp3.mockwebserver.MockResponse
@@ -465,7 +467,7 @@ class ExperienceApiRepositoryTest {
 
         fun response_should_parse_inprogress_result_and_experience() {
             val firstResult = testSubscriber.events.get(0).get(0) as Result<*>
-            assertEquals(firstResult, Result<Experience>(null, inProgress = true))
+            assertEquals(firstResult, ResultInProgress<Experience>())
 
             val secondResult = testSubscriber.events.get(0).get(1) as Result<*>
             val receivedExperience = secondResult.data as Experience
@@ -487,7 +489,7 @@ class ExperienceApiRepositoryTest {
 
         fun response_should_parse_empty_body() {
             val receivedResult = testEmptySubscriber.events.get(0).get(0) as Result<*>
-            assertEquals(Result(null), receivedResult)
+            assertEquals(ResultSuccess<Void>(), receivedResult)
         }
 
         fun result_should_be_experience_parsed_correctly() {
@@ -507,7 +509,7 @@ class ExperienceApiRepositoryTest {
         }
 
         fun response_should_parse_inprogress_result_and_experience_id() {
-            testStringSubscriber.assertValues(Result(null, inProgress = true), Result("43"))
+            testStringSubscriber.assertValues(ResultInProgress(), ResultSuccess("43"))
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = apply(func)

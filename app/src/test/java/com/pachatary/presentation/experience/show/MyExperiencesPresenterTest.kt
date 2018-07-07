@@ -1,8 +1,7 @@
 package com.pachatary.presentation.experience.show
 
 import com.pachatary.data.auth.AuthRepository
-import com.pachatary.data.common.Request
-import com.pachatary.data.common.Result
+import com.pachatary.data.common.*
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.experience.ExperienceRepoSwitch
 import com.pachatary.data.experience.ExperienceRepository
@@ -281,19 +280,18 @@ class MyExperiencesPresenterTest {
         fun an_experience_repo_that_returns_both_on_my_experiences_flowable() {
             given(mockExperiencesRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.MINE))
                     .willReturn(Flowable.just(
-                            Result<List<Experience>>(arrayListOf(experienceA, experienceB))))
+                            ResultSuccess(listOf(experienceA, experienceB))))
         }
 
         fun an_experience_repo_that_returns_exception(action: Request.Action) {
             given(mockExperiencesRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.MINE))
-                    .willReturn(Flowable.just(Result<List<Experience>>(null, error = Exception(),
-                            action = action)))
+                    .willReturn(Flowable.just(ResultError(Exception(), action = action)))
         }
 
         fun an_experience_repo_that_returns_in_progress(action: Request.Action) {
             given(mockExperiencesRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.MINE))
                     .willReturn(Flowable.just(
-                        Result<List<Experience>>(null, inProgress = true, action = action)))
+                        ResultInProgress(action = action)))
         }
 
         fun an_auth_repo_that_returns_true_on_can_create_content() {

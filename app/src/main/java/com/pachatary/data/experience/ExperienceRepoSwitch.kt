@@ -1,8 +1,6 @@
 package com.pachatary.data.experience
 
-import com.pachatary.data.common.Request
-import com.pachatary.data.common.Result
-import com.pachatary.data.common.ResultCacheFactory
+import com.pachatary.data.common.*
 import io.reactivex.Flowable
 import io.reactivex.functions.Function5
 
@@ -57,10 +55,10 @@ class ExperienceRepoSwitch(resultCacheFactory: ResultCacheFactory<Experience>,
                         datas = datas.union(c.data!!)
                         datas = datas.union(d.data!!)
                         datas = datas.union(e.data!!)
-                        Result(datas.toList()) })
-                    .map { Result(it.data?.filter { it.id == experienceId }) }
-                    .map { if (it.data!!.isNotEmpty()) Result(it.data[0])
-                           else Result<Experience>(null, error = NotCachedExperienceException()) }
+                        ResultSuccess(datas.toList()) })
+                    .map { ResultSuccess(it.data?.filter { it.id == experienceId }) }
+                    .map { if (it.data!!.isNotEmpty()) ResultSuccess(it.data[0])
+                           else ResultError(NotCachedExperienceException()) }
 
 
     fun executeAction(kind: Kind, action: Request.Action, requestParams: Request.Params? = null) {

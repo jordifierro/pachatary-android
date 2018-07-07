@@ -2,6 +2,7 @@ package com.pachatary.data.scene
 
 import com.pachatary.data.common.ResultCacheFactory
 import com.pachatary.data.common.Result
+import com.pachatary.data.common.ResultSuccess
 import io.reactivex.Flowable
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
@@ -187,7 +188,7 @@ class SceneRepositoryTest {
             addOrUpdateObserver = TestObserver.create()
             updateObserver = TestObserver.create()
             replaceResultObserver = TestObserver.create()
-            scenesFlowable = Flowable.just(Result(listOf(sceneA, sceneB)))
+            scenesFlowable = Flowable.just(ResultSuccess(listOf(sceneA, sceneB)))
             BDDMockito.given(mockScenesCacheFactory.create()).willReturn(
                     ResultCacheFactory.ResultCache(replaceResultObserver, addOrUpdateObserver,
                             updateObserver, scenesFlowable))
@@ -195,13 +196,13 @@ class SceneRepositoryTest {
 
         fun an_api_repo_that_returns_scenes_flowable_with_an_scene() {
             scene = Scene("2", "T", "d", null, 0.0, 0.0, "1")
-            apiScenesFlowable = Flowable.just(Result(listOf(scene)))
+            apiScenesFlowable = Flowable.just(ResultSuccess(listOf(scene)))
 
             BDDMockito.given(mockApiRepository.scenesRequestFlowable(experienceId)).willReturn(apiScenesFlowable)
         }
 
         fun an_api_repo_that_returns_created_scene() {
-            val createdSceneFlowable = Flowable.just(Result(scene))
+            val createdSceneFlowable = Flowable.just(ResultSuccess(scene))
             BDDMockito.given(mockApiRepository.createScene(scene)).willReturn(createdSceneFlowable)
         }
 
@@ -234,7 +235,7 @@ class SceneRepositoryTest {
         }
 
         fun delegate_is_called_with_scene() {
-            repository.emitThroughAddOrUpdate.invoke(Result(scene))
+            repository.emitThroughAddOrUpdate.invoke(ResultSuccess(scene))
         }
 
         fun should_return_flowable_created_by_factory() {

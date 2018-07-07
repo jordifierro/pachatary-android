@@ -3,6 +3,9 @@ package com.pachatary.data.auth
 import com.pachatary.data.common.Result
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
+import com.pachatary.data.common.ResultError
+import com.pachatary.data.common.ResultInProgress
+import com.pachatary.data.common.ResultSuccess
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
 import okhttp3.mockwebserver.MockResponse
@@ -280,41 +283,41 @@ class AuthApiRepositoryTest {
         }
 
         fun response_should_be_first_in_progress_then_auth_token() {
-            testAuthTokenSubscriber.assertResult(Result(null, inProgress = true),
-                                                 Result(AuthToken("868a2b9a", "9017c7e7")))
+            testAuthTokenSubscriber.assertResult(ResultInProgress(),
+                                                 ResultSuccess(AuthToken("868a2b9a", "9017c7e7")))
         }
 
         fun response_should_be_person() {
             testRegisterSubscriber.assertResult(
-                    Result(Person(isRegistered = true, username = "user.name",
-                                  email = "test@mail.com", isEmailConfirmed = false)))
+                    ResultSuccess(Person(isRegistered = true, username = "user.name",
+                                         email = "test@mail.com", isEmailConfirmed = false)))
         }
 
         fun response_should_be_error() {
-            testRegisterSubscriber.assertResult(Result(null,
-                    error = ClientException(source = "username", code = "not_allowed",
-                                            message = "Username not allowed")))
+            testRegisterSubscriber.assertResult(
+                    ResultError(ClientException(source = "username", code = "not_allowed",
+                                                message = "Username not allowed")))
         }
 
         fun response_should_be_invalid_confirmation_token_error() {
-            testRegisterSubscriber.assertResult(Result(null,
-                    error = ClientException(source = "confirmation_token", code = "invalid",
-                            message = "Invalid confirmation token")))
+            testRegisterSubscriber.assertResult(
+                    ResultError(ClientException(source = "confirmation_token", code = "invalid",
+                                                message = "Invalid confirmation token")))
         }
 
         fun response_should_be_in_progress_and_success() {
-            testAskLoginEmailSubscriber.assertResult(Result(null, inProgress = true), Result(null))
+            testAskLoginEmailSubscriber.assertResult(ResultInProgress(), ResultSuccess())
         }
 
         fun response_should_be_in_progress_and_success_with_person_and_auth_token() {
-            testLoginSubscriber.assertResult(Result(null, inProgress = true),
-                    Result(Pair(Person(true, "user.name", "email@example.com", true),
-                                AuthToken("A_T_12345", "R_T_67890"))))
+            testLoginSubscriber.assertResult(ResultInProgress(),
+                    ResultSuccess(Pair(Person(true, "user.name", "email@example.com", true),
+                                       AuthToken("A_T_12345", "R_T_67890"))))
         }
 
         fun response_should_return_inprogress_and_3() {
             testClientVersionsSubscriber.assertResult(
-                    Result(null, inProgress = true), Result(3))
+                    ResultInProgress(), ResultSuccess(3))
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = apply(func)

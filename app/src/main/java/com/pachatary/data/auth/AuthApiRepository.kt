@@ -2,6 +2,8 @@ package com.pachatary.data.auth
 
 import com.pachatary.data.common.NetworkParserFactory
 import com.pachatary.data.common.Result
+import com.pachatary.data.common.ResultInProgress
+import com.pachatary.data.common.Status
 import io.reactivex.Flowable
 import io.reactivex.Scheduler
 import retrofit2.Retrofit
@@ -16,7 +18,7 @@ class AuthApiRepository (retrofit: Retrofit, private val clientSecretKey: String
         authApi.createPersonResource(clientSecretKey = clientSecretKey)
                 .subscribeOn(ioScheduler)
                 .compose(NetworkParserFactory.getTransformer())
-                .startWith(Result<AuthToken>(null, inProgress = true))
+                .startWith(ResultInProgress())
 
     fun register(username: String, email: String): Flowable<Result<Person>> =
         authApi.register(username = username, email = email)
@@ -32,18 +34,18 @@ class AuthApiRepository (retrofit: Retrofit, private val clientSecretKey: String
         authApi.askLoginEmail(email)
                 .subscribeOn(ioScheduler)
                 .compose(NetworkParserFactory.getVoidTransformer())
-                .startWith(Result<Void>(null, inProgress = true))
+                .startWith(ResultInProgress())
 
     fun login(loginToken: String): Flowable<Result<Pair<Person, AuthToken>>> =
         authApi.login(loginToken)
                 .subscribeOn(ioScheduler)
                 .compose(NetworkParserFactory.getErrorTransformer(
                         { ClientExceptionMapper(it).toError() }))
-                .startWith(Result<Pair<Person, AuthToken>>(null, inProgress = true))
+                .startWith(ResultInProgress())
 
     fun clientVersions(): Flowable<Result<Int>> =
             authApi.clientVersions()
                     .subscribeOn(ioScheduler)
                     .compose(NetworkParserFactory.getTransformer())
-                    .startWith(Result<Int>(null, inProgress = true))
+                    .startWith(ResultInProgress())
 }

@@ -4,6 +4,9 @@ import com.pachatary.data.auth.AuthRepository
 import com.pachatary.data.auth.AuthToken
 import com.pachatary.data.auth.Person
 import com.pachatary.data.common.Result
+import com.pachatary.data.common.ResultError
+import com.pachatary.data.common.ResultInProgress
+import com.pachatary.data.common.ResultSuccess
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 import org.junit.Test
@@ -81,17 +84,17 @@ class LoginPresenterTest {
 
         fun an_auth_repo_that_returns_loading_result_when_login() {
             BDDMockito.given(mockAuthRepository.login(loginToken))
-                .willReturn(Flowable.just(Result<Pair<Person, AuthToken>>(null, inProgress = true)))
+                .willReturn(Flowable.just(ResultInProgress()))
         }
 
         fun an_auth_repo_that_returns_success_result_when_login() {
             BDDMockito.given(mockAuthRepository.login(loginToken))
-                    .willReturn(Flowable.just(Result<Pair<Person, AuthToken>>(null)))
+                    .willReturn(Flowable.just(ResultSuccess()))
         }
 
         fun an_auth_repo_that_returns_error_result_when_login() {
             BDDMockito.given(mockAuthRepository.login(loginToken)).willReturn(
-                    Flowable.just(Result<Pair<Person, AuthToken>>(null, error = Exception())))
+                    Flowable.just(ResultError(Exception())))
         }
 
         fun on_create_presenter() {

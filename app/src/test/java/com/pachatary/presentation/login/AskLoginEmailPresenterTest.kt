@@ -2,6 +2,9 @@ package com.pachatary.presentation.login
 
 import com.pachatary.data.auth.AuthRepository
 import com.pachatary.data.common.Result
+import com.pachatary.data.common.ResultError
+import com.pachatary.data.common.ResultInProgress
+import com.pachatary.data.common.ResultSuccess
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 import org.junit.Test
@@ -78,17 +81,17 @@ class AskLoginEmailPresenterTest {
 
         fun an_auth_repo_that_returns_loading_result_when_ask_login_email() {
             BDDMockito.given(mockAuthRepository.askLoginEmail(email))
-                    .willReturn(Flowable.just(Result<Void>(null, inProgress = true)))
+                    .willReturn(Flowable.just(ResultInProgress()))
         }
 
         fun an_auth_repo_that_returns_success_result_when_ask_login_email() {
             BDDMockito.given(mockAuthRepository.askLoginEmail(email))
-                    .willReturn(Flowable.just(Result<Void>(null)))
+                    .willReturn(Flowable.just(ResultSuccess()))
         }
 
         fun an_auth_repo_that_returns_error_result_when_ask_login_email() {
             BDDMockito.given(mockAuthRepository.askLoginEmail(email))
-                    .willReturn(Flowable.just(Result<Void>(null, error = Exception())))
+                    .willReturn(Flowable.just(ResultError(Exception())))
         }
 
         fun on_ask_click() {

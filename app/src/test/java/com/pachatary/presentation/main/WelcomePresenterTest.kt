@@ -3,6 +3,9 @@ package com.pachatary.presentation.main
 import com.pachatary.data.auth.AuthRepository
 import com.pachatary.data.auth.AuthToken
 import com.pachatary.data.common.Result
+import com.pachatary.data.common.ResultError
+import com.pachatary.data.common.ResultInProgress
+import com.pachatary.data.common.ResultSuccess
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 import org.junit.Test
@@ -104,17 +107,17 @@ class WelcomePresenterTest {
 
         fun an_auth_repo_that_returns_loading_result_when_get_invitation_called() {
             BDDMockito.given(mockAuthRepository.getPersonInvitation())
-                    .willReturn(Flowable.just(Result<AuthToken>(null, inProgress = true)))
+                    .willReturn(Flowable.just(ResultInProgress()))
         }
 
         fun an_auth_repo_that_returns_success_result_when_get_invitation_called() {
             BDDMockito.given(mockAuthRepository.getPersonInvitation())
-                    .willReturn(Flowable.just(Result(AuthToken("a", "r"))))
+                    .willReturn(Flowable.just(ResultSuccess(AuthToken("a", "r"))))
         }
 
         fun an_auth_repo_that_returns_error_result_when_get_invitation_called() {
             BDDMockito.given(mockAuthRepository.getPersonInvitation())
-                    .willReturn(Flowable.just(Result<AuthToken>(null, error = Exception())))
+                    .willReturn(Flowable.just(ResultError(Exception())))
         }
 
         fun on_start_click() {

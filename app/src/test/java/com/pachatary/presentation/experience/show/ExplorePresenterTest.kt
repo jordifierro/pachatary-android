@@ -1,7 +1,6 @@
 package com.pachatary.presentation.experience.show
 
-import com.pachatary.data.common.Request
-import com.pachatary.data.common.Result
+import com.pachatary.data.common.*
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.experience.ExperienceRepoSwitch
 import com.pachatary.data.experience.ExperienceRepository
@@ -265,18 +264,18 @@ class ExplorePresenterTest {
         fun an_experience_repo_that_returns_both_on_my_experiences_flowable() {
             BDDMockito.given(
                     mockRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.EXPLORE))
-                    .willReturn(Flowable.just(Result<List<Experience>>(
-                            arrayListOf(experienceA, experienceB))))
+                    .willReturn(Flowable.just(ResultSuccess(listOf(experienceA, experienceB))))
         }
 
         fun an_experience_repo_that_returns_in_progress(action: Request.Action) {
             BDDMockito.given(mockRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.EXPLORE))
-                    .willReturn(Flowable.just(Result(listOf(), inProgress = true, action = action)))
+                    .willReturn(Flowable.just(ResultInProgress(listOf(), action = action)))
         }
 
         fun an_experience_repo_that_returns_exception(action: Request.Action) {
             BDDMockito.given(mockRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.EXPLORE))
-                .willReturn(Flowable.just(Result(listOf(), error = Exception(), action = action)))
+                .willReturn(Flowable.just(
+                        ResultError(Exception(), data = listOf(), action = action)))
         }
 
         fun permissions() {

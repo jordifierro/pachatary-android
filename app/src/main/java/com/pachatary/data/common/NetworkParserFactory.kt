@@ -28,7 +28,7 @@ class NetworkParserFactory {
 
         private val parse =
                 { rxJavaResult: retrofit2.adapter.rxjava2.Result<out ToDomainMapper<T>> ->
-                        Result(data = rxJavaResult.response()!!.body()!!.toDomain()) }
+                        ResultSuccess(rxJavaResult.response()!!.body()!!.toDomain()) }
     }
 
     class ListResultTransformer<T>(private val errorMapper: ((String) -> ClientException)? = null)
@@ -42,8 +42,7 @@ class NetworkParserFactory {
 
         private val parse =
             { rxJavaResult: retrofit2.adapter.rxjava2.Result<out List<ToDomainMapper<T>>> ->
-                Result(data = rxJavaResult.response()!!.body()!!.map { it.toDomain()!! },
-                       error = null) }
+                ResultSuccess(rxJavaResult.response()!!.body()!!.map { it.toDomain()!! }) }
     }
 
     class PaginatedListResultTransformer<T, U: ToDomainMapper<T>>(
@@ -58,8 +57,8 @@ class NetworkParserFactory {
 
         private val parse =
             { rxJavaResult: retrofit2.adapter.rxjava2.Result<out PaginatedListMapper<T, U>> ->
-                Result(data = rxJavaResult.response()!!.body()!!.results.map { it.toDomain() },
-                       nextUrl = rxJavaResult.response()!!.body()!!.nextUrl, error = null) }
+                ResultSuccess(rxJavaResult.response()!!.body()!!.results.map { it.toDomain() },
+                              nextUrl = rxJavaResult.response()!!.body()!!.nextUrl) }
     }
 
     class VoidTransformer : FlowableTransformer<retrofit2.adapter.rxjava2.Result<Void>,
@@ -80,15 +79,15 @@ class NetworkParserFactory {
                 upstream: Flowable<retrofit2.adapter.rxjava2.Result<out T>>): Publisher<Result<U>> =
             upstream.map {
                 if (it.isError) {
-                    if (it.error() is UnknownHostException) Result<U>(null, error = it.error())
+                    if (it.error() is UnknownHostException)
+                        ResultError(it.error() as UnknownHostException)
                     else throw it.error()!!
                 }
                 else if (it.response()!!.isSuccessful.not()) {
                     if (errorMapper == null) throw Exception(it.response()!!.errorBody()!!.string())
-                    else Result<U>(data = null,
-                            error = errorMapper.invoke(it.response()!!.errorBody()!!.string()))
+                    else ResultError(errorMapper.invoke(it.response()!!.errorBody()!!.string()))
                 } else if (!emptyBody && parser != null) { parser.invoke(it) }
-                else Result<U>(null)
+                else ResultSuccess()
             }
             .retry(2)
     }

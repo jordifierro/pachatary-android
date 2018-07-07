@@ -1,6 +1,7 @@
 package com.pachatary.presentation.scene.show
 
 import com.pachatary.data.common.Result
+import com.pachatary.data.common.ResultSuccess
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.experience.ExperienceRepository
 import com.pachatary.data.scene.Scene
@@ -155,12 +156,12 @@ class SceneListPresenterTest {
 
         fun an_scene_repo_that_returns_that_scene() {
             given(mockRepository.scenesFlowable(experienceId = experienceId))
-                    .willReturn(Flowable.just(Result<List<Scene>>(arrayListOf(scene))))
+                    .willReturn(Flowable.just(ResultSuccess(listOf(scene))))
         }
 
         fun an_experience_repo_that_returns_that_experience() {
             given(mockExperienceRepository.experienceFlowable(experienceId = experienceId))
-                    .willReturn(Flowable.just(Result(experience)))
+                    .willReturn(Flowable.just(ResultSuccess(experience)))
         }
 
         fun presenter_set_view_and_create_with_experience_and_scene_id() {

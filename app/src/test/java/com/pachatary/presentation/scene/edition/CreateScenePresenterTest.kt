@@ -1,6 +1,7 @@
 package com.pachatary.presentation.scene.edition
 
 import com.pachatary.data.common.Result
+import com.pachatary.data.common.ResultSuccess
 import com.pachatary.data.scene.Scene
 import com.pachatary.data.scene.SceneRepository
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
@@ -226,7 +227,7 @@ class CreateScenePresenterTest {
             a_created_scene()
 
             BDDMockito.given(mockRepository.createScene(scene = sentCreatedScene!!))
-                    .willReturn(Flowable.just(Result<Scene>(receivedCreatedScene!!)))
+                    .willReturn(Flowable.just(ResultSuccess(receivedCreatedScene!!)))
         }
 
         fun presenter_is_created() {

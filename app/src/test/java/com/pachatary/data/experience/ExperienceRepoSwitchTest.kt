@@ -1,8 +1,6 @@
 package com.pachatary.data.experience
 
-import com.pachatary.data.common.Request
-import com.pachatary.data.common.Result
-import com.pachatary.data.common.ResultCacheFactory
+import com.pachatary.data.common.*
 import io.reactivex.Flowable
 import io.reactivex.observers.TestObserver
 import io.reactivex.subscribers.TestSubscriber
@@ -233,32 +231,34 @@ class ExperienceRepoSwitchTest {
         }
 
         fun some_result_flowables_that_emit_different_and_repeated_experiences() {
-            resultMineFlowable = Flowable.just(Result(listOf(experience,
+            resultMineFlowable = Flowable.just(ResultSuccess(listOf(
+                    experience,
                     Experience("1", "", "", null, true, false, ""))))
-            resultSavedFlowable = Flowable.just(Result(listOf(experience,
+            resultSavedFlowable = Flowable.just(ResultSuccess(listOf(
+                    experience,
                     Experience("4", "", "", null, true, false, ""))))
-            resultExploreFlowable = Flowable.just(Result(listOf(
+            resultExploreFlowable = Flowable.just(ResultSuccess(listOf(
                     Experience("4", "", "", null, true, false, ""),
                     Experience("4", "", "", null, true, false, ""))))
-            resultPersonsFlowable = Flowable.just(Result(listOf(
+            resultPersonsFlowable = Flowable.just(ResultSuccess(listOf(
                     Experience("4", "", "", null, true, false, ""),
                     Experience("4", "", "", null, true, false, ""))))
-            resultOtherFlowable = Flowable.just(Result(listOf(
+            resultOtherFlowable = Flowable.just(ResultSuccess(listOf(
                     Experience("3", "", "", null, true, false, ""))))
         }
 
         fun some_result_flowables_that_dont_emit_the_experience() {
-            resultMineFlowable = Flowable.just(Result(listOf(
+            resultMineFlowable = Flowable.just(ResultSuccess(listOf(
                     Experience("1", "", "", null, true, false, ""))))
-            resultSavedFlowable = Flowable.just(Result(listOf(
+            resultSavedFlowable = Flowable.just(ResultSuccess(listOf(
                     Experience("4", "", "", null, true, false, ""))))
-            resultExploreFlowable = Flowable.just(Result(listOf(
+            resultExploreFlowable = Flowable.just(ResultSuccess(listOf(
                     Experience("4", "", "", null, true, false, ""),
                     Experience("3", "", "", null, true, false, ""))))
-            resultPersonsFlowable = Flowable.just(Result(listOf(
+            resultPersonsFlowable = Flowable.just(ResultSuccess(listOf(
                     Experience("6", "", "", null, true, false, ""),
                     Experience("4", "", "", null, true, false, ""))))
-            resultOtherFlowable = Flowable.just(Result(listOf()))
+            resultOtherFlowable = Flowable.just(ResultSuccess(listOf()))
         }
 
         fun a_kind(kind: ExperienceRepoSwitch.Kind) {
@@ -275,7 +275,7 @@ class ExperienceRepoSwitchTest {
         }
 
         fun a_result_with_that_list() {
-            experiencesResult = Result(experienceList)
+            experiencesResult = ResultSuccess(experienceList)
         }
 
         fun a_modification(modification: ExperienceRepoSwitch.Modification) {
@@ -390,7 +390,7 @@ class ExperienceRepoSwitchTest {
             val testSubscriber = TestSubscriber.create<Result<Experience>>()
             resultExperienceFlowable.subscribe(testSubscriber)
             testSubscriber.awaitCount(1)
-            testSubscriber.assertValue(Result(experience))
+            testSubscriber.assertValue(ResultSuccess(experience))
         }
 
         fun should_return_result_with_not_cached_error() {
@@ -400,10 +400,10 @@ class ExperienceRepoSwitchTest {
             testSubscriber.awaitCount(1)
             val result = testSubscriber.events[0][0] as Result<Experience>
             assertEquals(result.error, ExperienceRepoSwitch.NotCachedExperienceException())
-            assertEquals(result, Result<Experience>(null,
-                    error = ExperienceRepoSwitch.NotCachedExperienceException()))
-            testSubscriber.assertValue(Result<Experience>(null,
-                    error = ExperienceRepoSwitch.NotCachedExperienceException()))
+            assertEquals(result, ResultError<Experience>(
+                    ExperienceRepoSwitch.NotCachedExperienceException()))
+            testSubscriber.assertValue(
+                    ResultError(ExperienceRepoSwitch.NotCachedExperienceException()))
         }
 
         fun should_emit_that_action_through_kind_action_observer() {

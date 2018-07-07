@@ -1,8 +1,6 @@
 package com.pachatary.data.experience
 
-import com.pachatary.data.common.Request
-import com.pachatary.data.common.Result
-import com.pachatary.data.common.ResultCacheFactory
+import com.pachatary.data.common.*
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Observer
@@ -24,10 +22,9 @@ class ExperienceRequesterFactory(val apiRepository: ExperienceApiRepository) {
                         if ((!it.second.isInProgress() &&
                                 (!it.second.hasBeenInitialized() || it.second.isError()))
                         || it.first.params != it.second.params) {
-                            resultCache.replaceResultObserver.onNext(Result(listOf(),
-                                    inProgress = true,
-                                    action = Request.Action.GET_FIRSTS,
-                                    params = it.first.params))
+                            resultCache.replaceResultObserver.onNext(
+                                    ResultInProgress(listOf(), action = Request.Action.GET_FIRSTS,
+                                                     params = it.first.params))
                             apiCallFlowable(apiRepository, kind, it.first.params)
                                     .subscribe({ apiResult ->
                                 resultCache.replaceResultObserver.onNext(
@@ -45,7 +42,7 @@ class ExperienceRequesterFactory(val apiRepository: ExperienceApiRepository) {
                                 it.second.hasMoreElements()) {
                             resultCache.replaceResultObserver.onNext(
                                     it.second.builder()
-                                                .inProgress(true)
+                                                .status(Status.IN_PROGRESS)
                                                 .action(Request.Action.PAGINATE)
                                                 .error(null)
                                             .build())
@@ -54,8 +51,9 @@ class ExperienceRequesterFactory(val apiRepository: ExperienceApiRepository) {
                                 val newResult =
                                     if (apiResult.isError()) {
                                         it.second.builder()
-                                                .action(Request.Action.PAGINATE)
+                                                .status(Status.ERROR)
                                                 .error(apiResult.error)
+                                                .action(Request.Action.PAGINATE)
                                                 .build()
                                     } else {
                                         apiResult.builder()

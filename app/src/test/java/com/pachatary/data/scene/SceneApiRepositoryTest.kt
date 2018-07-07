@@ -8,6 +8,7 @@ import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import com.pachatary.data.common.ResultInProgress
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
 import okhttp3.mockwebserver.MockResponse
@@ -156,7 +157,7 @@ class SceneApiRepositoryTest {
             assertEquals(2, testSceneListSubscriber.events.get(0).size)
 
             val firstResult = testSceneListSubscriber.events.get(0).get(0) as Result<*>
-            assertEquals(Result(listOf<Scene>(), inProgress = true), firstResult)
+            assertEquals(ResultInProgress<List<Scene>>(), firstResult)
 
             val secondResult = testSceneListSubscriber.events.get(0).get(1) as Result<*>
             val receivedScenes = secondResult.data as List<*>

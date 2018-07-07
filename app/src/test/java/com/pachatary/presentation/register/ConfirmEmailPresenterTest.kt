@@ -4,6 +4,8 @@ import com.pachatary.data.auth.AuthRepository
 import com.pachatary.data.auth.ClientException
 import com.pachatary.data.auth.Person
 import com.pachatary.data.common.Result
+import com.pachatary.data.common.ResultError
+import com.pachatary.data.common.ResultSuccess
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
@@ -76,13 +78,12 @@ class ConfirmEmailPresenterTest {
 
         fun an_auth_repo_that_returns_a_flowable_with_a_person() {
             BDDMockito.given(mockAuthRepo.confirmEmail(confirmationToken))
-                    .willReturn(Flowable.just(Result(
-                            Person(true, "u", "e", false))))
+                    .willReturn(Flowable.just(ResultSuccess(Person(true, "u", "e", false))))
         }
 
         fun an_auth_repo_that_returns_a_flowable_with_that_error() {
             BDDMockito.given(mockAuthRepo.confirmEmail(confirmationToken))
-                    .willReturn(Flowable.just(Result<Person>(null, error = clientError)))
+                    .willReturn(Flowable.just(ResultError(clientError!!)))
         }
 
         fun error_should_be_shown() {

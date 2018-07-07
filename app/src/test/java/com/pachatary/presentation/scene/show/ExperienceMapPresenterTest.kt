@@ -1,6 +1,7 @@
 package com.pachatary.presentation.scene.show
 
 import com.pachatary.data.common.Result
+import com.pachatary.data.common.ResultSuccess
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.experience.ExperienceRepository
 import com.pachatary.data.scene.Scene
@@ -209,7 +210,7 @@ class ExperienceMapPresenterTest {
 
         fun repository_with_those_two_scenes() {
             BDDMockito.given(mockRepository.scenesFlowable(experienceId = "5"))
-                    .willReturn(Flowable.just(Result(Arrays.asList(sceneA!!, sceneB!!))))
+                    .willReturn(Flowable.just(ResultSuccess(listOf(sceneA!!, sceneB!!))))
         }
 
         fun repository_with_no_scenes() {
@@ -238,7 +239,7 @@ class ExperienceMapPresenterTest {
 
         fun experience_repo_with_that_experience() {
             BDDMockito.given(mockExperienceRepository.experienceFlowable(experienceId = "5"))
-                    .willReturn(Flowable.just(Result(experienceA)))
+                    .willReturn(Flowable.just(ResultSuccess(experienceA)))
         }
 
         fun experience_repo_with_no_experiences() {
