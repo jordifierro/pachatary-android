@@ -58,22 +58,46 @@ class SceneRepositoryTest {
     }
 
     @Test
-    fun test_same_experience_scenes_flowable_call_returns_same_flowable() {
+    fun test_scenes_flowable_calls_api_when_cached_result_is_error() {
         given {
             an_experience_id()
-            a_second_experience_id()
-            an_scenes_cache_factory_that_returns_cache()
-            an_scenes_cache_factory_that_returns_another_cache_when_called_again()
+            an_scenes_cache_factory_that_returns_cache_with_error()
             an_api_repo_that_returns_scenes_flowable_with_an_scene()
-            an_api_repo_that_returns_scenes_flowable_with_an_scene_for_second_experience()
         } whenn {
             scenes_flowable_is_called_with_experience_id()
-            scenes_flowable_is_called_with_second_experience_id()
-            scenes_flowable_is_called_with_experience_id_again()
+            scenes_flowable_is_called_with_experience_id()
         } then {
-            first_result_should_be_first_scenes_flowable()
-            second_result_should_be_second_scenes_flowable()
-            third_result_should_be_first_scenes_flowable()
+            should_return_empty_flowable()
+            should_connect_api_scenes_flowable_twice()
+        }
+    }
+
+    @Test
+    fun test_repo_caches_caches() {
+        given {
+            an_scenes_cache_factory_that_returns_cache_with(ResultSuccess(listOf(
+                    Scene(id = "8", title = "", description = "", picture = null,
+                          latitude = 0.2, longitude = 0.5, experienceId = "9"))))
+            an_api_repo_that_returns_scenes_flowable_with(experienceId = "1",
+                    result = ResultSuccess(listOf(Scene(id = "9", title = "", description = "",
+                            picture = null, latitude = 0.6, longitude = 0.9, experienceId = "7"))))
+        } whenn {
+            scenes_flowable(experienceId = "1")
+            scenes_flowable(experienceId = "1")
+            scenes_flowable(experienceId = "1")
+        } then {
+            should_emit_through_replace(ofCache = 1, result = ResultSuccess(listOf(
+                    Scene(id = "9", title = "", description = "", picture = null,
+                          latitude = 0.6, longitude = 0.9, experienceId = "7"))))
+            should_return_flowable_with(ofResult = 1, result = ResultSuccess(listOf(
+                    Scene(id = "8", title = "", description = "", picture = null,
+                          latitude = 0.2, longitude = 0.5, experienceId = "9"))))
+            should_return_flowable_with(ofResult = 2, result = ResultSuccess(listOf(
+                    Scene(id = "8", title = "", description = "", picture = null,
+                            latitude = 0.2, longitude = 0.5, experienceId = "9"))))
+            should_return_flowable_with(ofResult = 3, result = ResultSuccess(listOf(
+                    Scene(id = "8", title = "", description = "", picture = null,
+                            latitude = 0.2, longitude = 0.5, experienceId = "9"))))
         }
     }
 
@@ -129,7 +153,7 @@ class SceneRepositoryTest {
         }
     }
 
-    private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
+    private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().buildScenario().given(func)
 
     class ScenarioMaker {
         lateinit var repository: SceneRepository
@@ -155,6 +179,8 @@ class SceneRepositoryTest {
         lateinit var thirdScenesFlowableResult: Flowable<Result<List<Scene>>>
         lateinit var sceneFlowableResult: Flowable<Result<Scene>>
         lateinit var createdSceneFlowableResult: Flowable<Result<Scene>>
+        var scenesResultFlowables = mutableListOf<Flowable<Result<List<Scene>>>>()
+        var caches = mutableListOf<ResultCacheFactory.ResultCache<Scene>>()
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
@@ -165,10 +191,6 @@ class SceneRepositoryTest {
 
         fun an_experience_id() {
             experienceId = "1"
-        }
-
-        fun a_second_experience_id() {
-            secondExperienceId = "2"
         }
 
         fun an_scene_id() {
@@ -197,16 +219,16 @@ class SceneRepositoryTest {
                                                         updateObserver, scenesFlowable))
         }
 
-        fun an_scenes_cache_factory_that_returns_another_cache_when_called_again() {
-            secondAddOrUpdateObserver = TestObserver.create()
-            secondAddOrUpdateObserver.onSubscribe(secondAddOrUpdateObserver)
-            secondUpdateObserver = TestObserver.create()
-            secondReplaceResultObserver = TestObserver.create()
-            secondReplaceResultObserver.onSubscribe(secondReplaceResultObserver)
-            secondScenesFlowable = Flowable.never()
-            BDDMockito.given(mockScenesCacheFactory.create()).willReturn(
-                    ResultCacheFactory.ResultCache(secondReplaceResultObserver,
-                            secondAddOrUpdateObserver, secondUpdateObserver, secondScenesFlowable))
+        fun an_scenes_cache_factory_that_returns_cache_with(result: Result<List<Scene>>) {
+            addOrUpdateObserver = TestObserver.create()
+            addOrUpdateObserver.onSubscribe(addOrUpdateObserver)
+            updateObserver = TestObserver.create()
+            replaceResultObserver = TestObserver.create()
+            replaceResultObserver.onSubscribe(replaceResultObserver)
+            scenesFlowable = Flowable.just(result).replay(1).autoConnect()
+            caches.add(ResultCacheFactory.ResultCache(replaceResultObserver, addOrUpdateObserver,
+                                                      updateObserver, scenesFlowable))
+            BDDMockito.given(mockScenesCacheFactory.create()).willReturn(caches.last())
         }
 
         fun an_scenes_cache_factory_that_returns_cache_with_several_scenes() {
@@ -219,6 +241,17 @@ class SceneRepositoryTest {
             replaceResultObserver = TestObserver.create()
             replaceResultObserver.onSubscribe(replaceResultObserver)
             scenesFlowable = Flowable.just(ResultSuccess(listOf(sceneA, sceneB)))
+            BDDMockito.given(mockScenesCacheFactory.create()).willReturn(
+                    ResultCacheFactory.ResultCache(replaceResultObserver, addOrUpdateObserver,
+                            updateObserver, scenesFlowable))
+        }
+
+        fun an_scenes_cache_factory_that_returns_cache_with_error() {
+            addOrUpdateObserver = TestObserver.create()
+            updateObserver = TestObserver.create()
+            replaceResultObserver = TestObserver.create()
+            replaceResultObserver.onSubscribe(replaceResultObserver)
+            scenesFlowable = Flowable.just(resultError)
             BDDMockito.given(mockScenesCacheFactory.create()).willReturn(
                     ResultCacheFactory.ResultCache(replaceResultObserver, addOrUpdateObserver,
                             updateObserver, scenesFlowable))
@@ -241,30 +274,27 @@ class SceneRepositoryTest {
                         .willReturn(Flowable.just(resultError))
         }
 
+        fun an_api_repo_that_returns_scenes_flowable_with(experienceId: String,
+                                                          result: Result<List<Scene>>) {
+            BDDMockito.given(mockApiRepository.scenesRequestFlowable(experienceId))
+                    .willReturn(Flowable.just(result))
+        }
+
         fun an_api_repo_that_returns_created_scene() {
             val createdSceneFlowable = Flowable.just(ResultSuccess(scene))
             BDDMockito.given(mockApiRepository.createScene(scene)).willReturn(createdSceneFlowable)
-        }
-
-        fun an_api_repo_that_returns_scenes_flowable_with_an_scene_for_second_experience() {
-            BDDMockito.given(mockApiRepository.scenesRequestFlowable(secondExperienceId))
-                    .willReturn(apiScenesFlowable)
         }
 
         fun scenes_flowable_is_called_with_experience_id() {
             scenesFlowableResult = repository.scenesFlowable(experienceId)
         }
 
+        fun scenes_flowable(experienceId: String) {
+            scenesResultFlowables.add(repository.scenesFlowable(experienceId))
+        }
+
         fun scene_flowable_is_called_with_experience_and_scene_id() {
             sceneFlowableResult = repository.sceneFlowable(experienceId, sceneId)
-        }
-
-        fun scenes_flowable_is_called_with_second_experience_id() {
-            secondScenesFlowableResult = repository.scenesFlowable(secondExperienceId)
-        }
-
-        fun scenes_flowable_is_called_with_experience_id_again() {
-            thirdScenesFlowableResult = repository.scenesFlowable(experienceId)
         }
 
         fun create_scene_is_called() {
@@ -286,18 +316,6 @@ class SceneRepositoryTest {
         fun should_connect_api_scenes_flowable_on_next_to_replace_all_scenes_observer() {
             replaceResultObserver.onComplete()
             replaceResultObserver.assertResult(ResultSuccess(listOf(scene)))
-        }
-
-        fun first_result_should_be_first_scenes_flowable() {
-            Assert.assertEquals(scenesFlowable, scenesFlowableResult)
-        }
-
-        fun second_result_should_be_second_scenes_flowable() {
-            Assert.assertEquals(secondScenesFlowable, secondScenesFlowableResult)
-        }
-
-        fun third_result_should_be_first_scenes_flowable() {
-            Assert.assertEquals(scenesFlowable, thirdScenesFlowableResult)
         }
 
         fun only_scene_with_scene_id_should_be_received() {
@@ -340,7 +358,34 @@ class SceneRepositoryTest {
             else if (status == Status.ERROR) replaceResultObserver.assertResult(resultError)
         }
 
-        infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)
+        fun should_return_empty_flowable() {
+            val testSceneListSubscriber = TestSubscriber<Result<List<Scene>>>()
+            scenesFlowableResult.subscribe(testSceneListSubscriber)
+            testSceneListSubscriber.awaitTerminalEvent()
+            testSceneListSubscriber.assertComplete()
+            testSceneListSubscriber.assertNoValues()
+        }
+
+        fun should_connect_api_scenes_flowable_twice() {
+            replaceResultObserver.onComplete()
+            replaceResultObserver.assertResult(ResultSuccess(listOf(scene)),
+                                               ResultSuccess(listOf(scene)))
+        }
+
+        fun should_emit_through_replace(ofCache: Int, result: Result<List<Scene>>) {
+            val replaceCacheObserver = caches[ofCache - 1].replaceResultObserver as TestObserver
+            replaceCacheObserver.onComplete()
+            replaceCacheObserver.assertResult(result)
+        }
+
+        fun should_return_flowable_with(ofResult: Int, result: Result<List<Scene>>) {
+            val testSceneListSubscriber = TestSubscriber<Result<List<Scene>>>()
+            scenesResultFlowables[ofResult - 1].subscribe(testSceneListSubscriber)
+            testSceneListSubscriber.awaitCount(1)
+            testSceneListSubscriber.assertResult(result)
+        }
+
+        infix fun given(func: ScenarioMaker.() -> Unit) = apply(func)
         infix fun whenn(func: ScenarioMaker.() -> Unit) = apply(func)
         infix fun then(func: ScenarioMaker.() -> Unit) = apply(func)
     }

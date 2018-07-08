@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import com.pachatary.data.common.ResultCacheFactory
 import com.pachatary.data.common.Result
 import io.reactivex.Flowable
+import io.reactivex.functions.BiFunction
 
 class SceneRepository(val apiRepository: SceneApiRepository, val cacheFactory: ResultCacheFactory<Scene>) {
 
@@ -14,10 +15,27 @@ class SceneRepository(val apiRepository: SceneApiRepository, val cacheFactory: R
         if (scenesCacheHashMap.get(experienceId) == null) {
             val cache = cacheFactory.create()
             scenesCacheHashMap.put(experienceId, cache)
-            apiRepository.scenesRequestFlowable(experienceId)
-                    .subscribe({ cache.replaceResultObserver.onNext(it)}, { throw it })
+            requestScenes(experienceId)
+            return scenesCacheHashMap.get(experienceId)!!.resultFlowable
         }
-        return scenesCacheHashMap.get(experienceId)!!.resultFlowable
+        else {
+            return scenesCacheHashMap.get(experienceId)!!.resultFlowable
+                    .zipWith(Flowable.range(0, Int.MAX_VALUE),
+                             BiFunction<Result<List<Scene>>, Int, Pair<Int, Result<List<Scene>>>>
+                             { result, index -> Pair(index, result) })
+                    .filter { if (it.first == 0 && it.second.isError()) {
+                                  requestScenes(experienceId)
+                                  false
+                              } else true }
+                    .map { it.second }
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun requestScenes(experienceId: String) {
+        apiRepository.scenesRequestFlowable(experienceId)
+                .subscribe({ scenesCacheHashMap.get(experienceId)!!
+                        .replaceResultObserver.onNext(it)}, { throw it })
     }
 
     fun sceneFlowable(experienceId: String, sceneId: String): Flowable<Result<Scene>> =
