@@ -240,11 +240,8 @@ class ExperienceRepoSwitchTest {
             resultExploreFlowable = Flowable.just(ResultSuccess(listOf(
                     Experience("4", "", "", null, true, false, ""),
                     Experience("4", "", "", null, true, false, ""))))
-            resultPersonsFlowable = Flowable.just(ResultSuccess(listOf(
-                    Experience("4", "", "", null, true, false, ""),
-                    Experience("4", "", "", null, true, false, ""))))
-            resultOtherFlowable = Flowable.just(ResultSuccess(listOf(
-                    Experience("3", "", "", null, true, false, ""))))
+            resultPersonsFlowable = Flowable.just(ResultError(Exception()))
+            resultOtherFlowable = Flowable.just(ResultInProgress())
         }
 
         fun some_result_flowables_that_dont_emit_the_experience() {

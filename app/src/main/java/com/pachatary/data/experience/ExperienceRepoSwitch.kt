@@ -50,11 +50,11 @@ class ExperienceRepoSwitch(resultCacheFactory: ResultCacheFactory<Experience>,
                                 c: Result<List<Experience>>, d: Result<List<Experience>>,
                                 e: Result<List<Experience>> ->
                         var datas = setOf<Experience>()
-                        datas = datas.union(a.data!!)
-                        datas = datas.union(b.data!!)
-                        datas = datas.union(c.data!!)
-                        datas = datas.union(d.data!!)
-                        datas = datas.union(e.data!!)
+                        if (a.data != null) datas = datas.union(a.data)
+                        if (b.data != null) datas = datas.union(b.data)
+                        if (c.data != null) datas = datas.union(c.data)
+                        if (d.data != null) datas = datas.union(d.data)
+                        if (e.data != null) datas = datas.union(e.data)
                         ResultSuccess(datas.toList()) })
                     .map { ResultSuccess(it.data?.filter { it.id == experienceId }) }
                     .map { if (it.data!!.isNotEmpty()) ResultSuccess(it.data[0])
