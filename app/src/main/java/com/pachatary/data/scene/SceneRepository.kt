@@ -3,6 +3,7 @@ package com.pachatary.data.scene
 import android.annotation.SuppressLint
 import com.pachatary.data.common.ResultCacheFactory
 import com.pachatary.data.common.Result
+import com.pachatary.data.common.Status
 import io.reactivex.Flowable
 import io.reactivex.functions.BiFunction
 
@@ -40,22 +41,28 @@ class SceneRepository(val apiRepository: SceneApiRepository, val cacheFactory: R
 
     fun sceneFlowable(experienceId: String, sceneId: String): Flowable<Result<Scene>> =
         scenesFlowable(experienceId).map {
-            Result(it.status, data = it.data?.first { it.id == sceneId }, error = it.error)
+            Result(it.status, data = it.data!!.first { it.id == sceneId }, error = it.error)
         }
 
-    fun createScene(scene: Scene): Flowable<Result<Scene>> {
-        return apiRepository.createScene(scene).doOnNext(emitThroughAddOrUpdate)
-    }
+    fun createScene(scene: Scene): Flowable<Result<Scene>> =
+        apiRepository.createScene(scene)
+                .doOnNext(emitThroughAddOrUpdate)
 
-    fun editScene(scene: Scene): Flowable<Result<Scene>> {
-        return apiRepository.editScene(scene).doOnNext(emitThroughAddOrUpdate)
-    }
+    fun editScene(scene: Scene): Flowable<Result<Scene>> =
+        apiRepository.editScene(scene)
+                .doOnNext(emitThroughAddOrUpdate)
 
     fun uploadScenePicture(sceneId: String, croppedImageUriString: String) {
-        apiRepository.uploadScenePicture(sceneId, croppedImageUriString, emitThroughAddOrUpdate)
+        apiRepository.uploadScenePicture(sceneId, croppedImageUriString)
+                .doOnNext(emitThroughAddOrUpdate)
+                .subscribe()
     }
 
-    internal val emitThroughAddOrUpdate = { resultScene: Result<Scene> ->
-        scenesCacheHashMap.get(resultScene.data!!.experienceId)!!.addOrUpdateObserver.onNext(
-                listOf(resultScene.data)) }
+    internal val emitThroughAddOrUpdate =
+            { resultScene: Result<Scene> ->
+                if (resultScene.status == Status.SUCCESS) {
+                    scenesCacheHashMap.get(resultScene.data!!.experienceId)!!
+                            .addOrUpdateObserver.onNext(listOf(resultScene.data))
+                }
+            }
 }
