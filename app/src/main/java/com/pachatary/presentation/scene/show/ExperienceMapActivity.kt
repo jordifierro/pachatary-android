@@ -5,14 +5,10 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.os.Build
 import android.os.Bundle
-import android.support.design.widget.FloatingActionButton
-import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.ProgressBar
-import android.widget.Toast
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.annotations.IconFactory
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions
@@ -29,7 +25,6 @@ import com.pachatary.presentation.scene.edition.CreateSceneActivity
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.subjects.ReplaySubject
-import kotlinx.android.synthetic.main.activity_experience_map.*
 import java.util.*
 import javax.inject.Inject
 
@@ -40,20 +35,17 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView {
     lateinit var presenter: ExperienceMapPresenter
 
     lateinit var mapView: MapView
-    lateinit var mapboxMap: MapboxMap
+    private lateinit var mapboxMap: MapboxMap
     lateinit var progressBar: ProgressBar
-    lateinit var createSceneButton: FloatingActionButton
-    lateinit var saveExperienceButton: FloatingActionButton
-    lateinit var unsaveExperienceButton: FloatingActionButton
 
-    val mapLoadedReplaySubject: ReplaySubject<Any> = ReplaySubject.create()
+    private val mapLoadedReplaySubject: ReplaySubject<Any> = ReplaySubject.create()
 
-    val registry: LifecycleRegistry = LifecycleRegistry(this)
+    private val registry: LifecycleRegistry = LifecycleRegistry(this)
 
-    val markersHashMap: HashMap<Long, String> = HashMap()
+    private val markersHashMap: HashMap<Long, String> = HashMap()
 
     companion object {
-        private val EXPERIENCE_ID = "experienceId"
+        private const val EXPERIENCE_ID = "experience_id"
 
         fun newIntent(context: Context, experienceId: String): Intent {
             val intent = Intent(context, ExperienceMapActivity::class.java)
@@ -66,17 +58,10 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView {
         super.onCreate(savedInstanceState)
         Mapbox.getInstance(this, BuildConfig.MAPBOX_ACCESS_TOKEN)
         setContentView(R.layout.activity_experience_map)
-        setSupportActionBar(toolbar)
 
         progressBar = findViewById(R.id.scenes_progressbar)
         mapView = findViewById(R.id.mapView)
         mapView.onCreate(savedInstanceState)
-        createSceneButton = findViewById(R.id.create_new_scene_button)
-        createSceneButton.setOnClickListener { presenter.onCreateSceneClick() }
-        saveExperienceButton = findViewById(R.id.save_experience_button)
-        saveExperienceButton.setOnClickListener { presenter.onSaveExperienceClick() }
-        unsaveExperienceButton = findViewById(R.id.unsave_experience_button)
-        unsaveExperienceButton.setOnClickListener { presenter.onUnsaveExperienceClick() }
 
         PachataryApplication.injector.inject(this)
         presenter.setView(this, intent.getStringExtra(EXPERIENCE_ID))
@@ -132,7 +117,7 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView {
             }
 
             mapboxMap.setOnInfoWindowClickListener {
-                marker ->  presenter.onSceneClick(markersHashMap.get(marker.id)!!)
+                marker ->  presenter.onSceneClick(markersHashMap[marker.id]!!)
                 false
             }
             mapboxMap.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBoundsBuilder.build(), 50, 150, 50, 150))
@@ -140,53 +125,8 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView {
         mapView.visibility = View.VISIBLE
     }
 
-    override fun setTitle(title: String) {
-        supportActionBar?.title = title
-    }
-
-    override fun navigateToScene(experienceId: String, isExperienceMine: Boolean, sceneId: String) {
-        startActivity(SceneListActivity.newIntent(context = this, experienceId = experienceId,
-                                                  showEditableIfItsMine = isExperienceMine))
-    }
-
     override fun navigateToCreateScene(experienceId: String) {
         startActivity(CreateSceneActivity.newIntent(context = this, experienceId = experienceId))
-    }
-
-    override fun showEditButton() {
-        createSceneButton.visibility = View.VISIBLE
-        saveExperienceButton.visibility = View.INVISIBLE
-        unsaveExperienceButton.visibility = View.INVISIBLE
-    }
-
-    override fun showSaveButton(isSaved: Boolean) {
-        createSceneButton.visibility = View.INVISIBLE
-        if (isSaved) {
-            unsaveExperienceButton.visibility = View.VISIBLE
-            saveExperienceButton.visibility = View.INVISIBLE
-        }
-        else {
-            saveExperienceButton.visibility = View.VISIBLE
-            unsaveExperienceButton.visibility = View.INVISIBLE
-        }
-    }
-
-    override fun showUnsaveDialog() {
-        val builder: AlertDialog.Builder
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            builder = AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
-        else builder = AlertDialog.Builder(this)
-        builder.setTitle(R.string.dialog_title_unsave_experience)
-                .setMessage(R.string.dialog_question_unsave_experience)
-                .setPositiveButton(android.R.string.yes, { _, _ -> presenter.onConfirmUnsaveExperience() })
-                .setNegativeButton(android.R.string.no, { _, _ -> presenter.onCancelUnsaveExperience() })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show()
-    }
-
-    override fun showSavedMessage() {
-        val message = this.resources.getString(R.string.message_experience_saved)
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
     override fun showLoader() {

@@ -14,14 +14,12 @@ import io.reactivex.functions.BiFunction
 import javax.inject.Inject
 
 class ExperienceMapPresenter @Inject constructor(private val repository: SceneRepository,
-                                                 private val experienceRepository: ExperienceRepository,
-                                                 private val schedulerProvider: SchedulerProvider) : LifecycleObserver {
+                                                 private val schedulerProvider: SchedulerProvider)
+                                                                               : LifecycleObserver {
 
     lateinit var view: ExperienceMapView
     lateinit var experienceId: String
-    var isExperienceMine = false
 
-    private var experienceDisposable: Disposable? = null
     private var scenesDisposable: Disposable? = null
 
     fun setView(view: ExperienceMapView, experienceId: String) {
@@ -31,49 +29,16 @@ class ExperienceMapPresenter @Inject constructor(private val repository: SceneRe
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun create() {
-        connectToExperience()
         connectToScenes()
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun destroy() {
-        experienceDisposable?.dispose()
         scenesDisposable?.dispose()
     }
 
     fun onSceneClick(sceneId: String) {
-        view.navigateToScene(experienceId = experienceId, isExperienceMine = isExperienceMine, sceneId = sceneId)
-    }
-
-    fun onCreateSceneClick() {
-        view.navigateToCreateScene(this.experienceId)
-    }
-
-    fun onSaveExperienceClick() {
-        experienceRepository.saveExperience(experienceId = experienceId, save = true)
-        view.showSavedMessage()
-    }
-
-    fun onUnsaveExperienceClick() {
-        view.showUnsaveDialog()
-    }
-
-    fun onConfirmUnsaveExperience() {
-        experienceRepository.saveExperience(experienceId = experienceId, save = false)
-    }
-
-    fun onCancelUnsaveExperience() {}
-
-    private fun connectToExperience() {
-        experienceDisposable = experienceRepository.experienceFlowable(experienceId)
-                .subscribeOn(schedulerProvider.subscriber())
-                .observeOn(schedulerProvider.observer())
-                .subscribe({ if (it.isSuccess()) {
-                    isExperienceMine = it.data!!.isMine
-                    view.setTitle(it.data.title)
-                    if (it.data.isMine) view.showEditButton()
-                    else view.showSaveButton(isSaved = it.data.isSaved)
-                }}, { throw it })
+        //TODO
     }
 
     private fun connectToScenes() {

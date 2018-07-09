@@ -17,7 +17,6 @@ import org.junit.Test
 import org.mockito.BDDMockito
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import java.util.*
 
 class ExperienceMapPresenterTest {
 
@@ -27,7 +26,6 @@ class ExperienceMapPresenterTest {
             two_scenes()
             repository_with_those_two_scenes()
             map_is_loaded_correctly()
-            experience_repo_with_no_experiences()
         } whenn {
             presenter_is_created()
         } then {
@@ -38,81 +36,9 @@ class ExperienceMapPresenterTest {
     }
 
     @Test
-    fun testCreateGetsExperienceSetsTitleAndShowEditButtonWhenExperienceIsMine() {
-        given {
-            a_mine_experience()
-            experience_repo_with_that_experience()
-            repository_with_no_scenes()
-            map_not_loaded()
-        } whenn {
-            presenter_is_created()
-        } then {
-            view_should_show_experience_title()
-            view_should_show_edit_button()
-        }
-    }
-
-    @Test
-    fun testCreateGetsExperienceSetsTitleAndShowUnsaveButtonWhenExperienceIsSaved() {
-        given {
-            a_saved_experience()
-            experience_repo_with_that_experience()
-            repository_with_no_scenes()
-            map_not_loaded()
-        } whenn {
-            presenter_is_created()
-        } then {
-            view_should_show_experience_title()
-            view_should_show_unsave_button()
-        }
-    }
-
-    @Test
-    fun testCreateGetsExperienceSetsTitleAndShowSaveButtonWhenExperienceIsUnsaved() {
-        given {
-            an_unsaved_experience()
-            experience_repo_with_that_experience()
-            repository_with_no_scenes()
-            map_not_loaded()
-        } whenn {
-            presenter_is_created()
-        } then {
-            view_should_show_experience_title()
-            view_should_show_save_button()
-        }
-    }
-
-    @Test
-    fun testNavigatesToSceneOnSceneClick() {
-        given {
-            a_mine_experience()
-            experience_repo_with_that_experience()
-            repository_with_no_scenes()
-            map_not_loaded()
-            an_scene()
-        } whenn {
-            presenter_is_created()
-            this_scene_is_clicked()
-        } then {
-            view_should_navigate_to_that_scene_with_experience_id_and_is_mine_true()
-        }
-    }
-
-    @Test
-    fun testNavigatesToCreateSceneClick() {
-        given {
-            nothing()
-        } whenn {
-            create_scene_button_is_clicked()
-        } then {
-            view_should_navigate_to_create_scene_with_experience_id()
-        }
-    }
-
-    @Test
     fun testUnsubscribenOnDestroy() {
         given {
-            scenes_experiences_and_map_observables()
+            scenes_and_map_observables()
         } then {
             those_observables_should_have_no_observers()
         } whenn {
@@ -126,70 +52,24 @@ class ExperienceMapPresenterTest {
         }
     }
 
-    @Test
-    fun test_on_save_experience_click_call_api_repo_save_and_shows_saved_message() {
-        given {
-            nothing()
-        } whenn {
-            on_save_experience_clicked()
-        } then {
-            should_call_api_repo_save_with_experience_id()
-            should_make_view_show_saved_message()
-        }
-    }
-
-    @Test
-    fun test_on_unsave_experience_click_shows_confirm_dialog() {
-        given {
-            nothing()
-        } whenn {
-            on_unsave_experience_clicked()
-        } then {
-            should_show_confirm_dialog()
-        }
-    }
-
-    @Test
-    fun test_on_unsave_experience_confirm_call_api_unsave() {
-        given {
-            nothing()
-        } whenn {
-            on_unsave_experience_confirmation()
-        } then {
-            should_call_api_repo_unsave_experience()
-        }
-    }
-
-    @Test
-    fun test_on_unsave_experience_cancel_does_nothing() {
-        given {
-            nothing()
-        } whenn {
-            on_unsave_experience_cancel()
-        } then {
-            nothing()
-        }
-    }
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
         private lateinit var presenter: ExperienceMapPresenter
         @Mock private lateinit var mockView: ExperienceMapView
         @Mock lateinit var mockRepository: SceneRepository
-        @Mock lateinit var mockExperienceRepository: ExperienceRepository
         val experienceId = "5"
         var sceneA: Scene? = null
         var sceneB: Scene? = null
-        var experienceA: Experience? = null
         var scenesObservable = PublishSubject.create<Result<List<Scene>>>()
-        var experienceObservable = PublishSubject.create<Result<Experience>>()
         var mapObservable = PublishSubject.create<Any>()
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
-            val testSchedulerProvider = SchedulerProvider(Schedulers.trampoline(), Schedulers.trampoline())
-            presenter = ExperienceMapPresenter(repository = mockRepository, experienceRepository = mockExperienceRepository,
-                    schedulerProvider = testSchedulerProvider)
+            val testSchedulerProvider = SchedulerProvider(Schedulers.trampoline(),
+                                                          Schedulers.trampoline())
+            presenter = ExperienceMapPresenter(repository = mockRepository,
+                                               schedulerProvider = testSchedulerProvider)
             presenter.setView(view = mockView, experienceId = experienceId)
 
             return this
@@ -213,44 +93,13 @@ class ExperienceMapPresenterTest {
                     .willReturn(Flowable.just(ResultSuccess(listOf(sceneA!!, sceneB!!))))
         }
 
-        fun repository_with_no_scenes() {
-            BDDMockito.given(mockRepository.scenesFlowable("5")).willReturn(Flowable.never())
-        }
-
         fun map_is_loaded_correctly() {
             BDDMockito.given(mockView.mapLoadedFlowable()).willReturn(Flowable.just(true))
         }
 
-        fun map_not_loaded() {
-            BDDMockito.given(mockView.mapLoadedFlowable()).willReturn(Flowable.just(false))
-        }
-
-        fun a_mine_experience() {
-            experienceA = Experience(id = "1", title = "A", description = "", picture = null, isMine = true)
-        }
-
-        fun a_saved_experience() {
-            experienceA = Experience(id = "1", title = "A", description = "", picture = null, isSaved = true)
-        }
-
-        fun an_unsaved_experience() {
-            experienceA = Experience(id = "1", title = "A", description = "", picture = null)
-        }
-
-        fun experience_repo_with_that_experience() {
-            BDDMockito.given(mockExperienceRepository.experienceFlowable(experienceId = "5"))
-                    .willReturn(Flowable.just(ResultSuccess(experienceA)))
-        }
-
-        fun experience_repo_with_no_experiences() {
-            BDDMockito.given(mockExperienceRepository.experienceFlowable("5")).willReturn(Flowable.never())
-        }
-
-        fun scenes_experiences_and_map_observables() {
+        fun scenes_and_map_observables() {
             BDDMockito.given(mockRepository.scenesFlowable(experienceId = experienceId))
                     .willReturn(scenesObservable.toFlowable(BackpressureStrategy.LATEST))
-            BDDMockito.given(mockExperienceRepository.experienceFlowable(experienceId = experienceId))
-                    .willReturn(experienceObservable.toFlowable(BackpressureStrategy.LATEST))
             BDDMockito.given(mockView.mapLoadedFlowable()).willReturn(mapObservable.toFlowable(BackpressureStrategy.LATEST))
         }
 
@@ -260,30 +109,6 @@ class ExperienceMapPresenterTest {
 
         fun presenter_is_destroyed() {
             presenter.destroy()
-        }
-
-        fun this_scene_is_clicked() {
-            presenter.onSceneClick(sceneId = sceneA!!.id)
-        }
-
-        fun create_scene_button_is_clicked() {
-            presenter.onCreateSceneClick()
-        }
-
-        fun on_save_experience_clicked() {
-            presenter.onSaveExperienceClick()
-        }
-
-        fun on_unsave_experience_clicked() {
-            presenter.onUnsaveExperienceClick()
-        }
-
-        fun on_unsave_experience_confirmation() {
-            presenter.onConfirmUnsaveExperience()
-        }
-
-        fun on_unsave_experience_cancel() {
-            presenter.onCancelUnsaveExperience()
         }
 
         fun view_should_show_loader() {
@@ -298,57 +123,14 @@ class ExperienceMapPresenterTest {
             BDDMockito.then(mockView).should().showScenesOnMap(arrayListOf(sceneA!!, sceneB!!))
         }
 
-        fun view_should_show_experience_title() {
-            BDDMockito.then(mockView).should().setTitle(title = experienceA!!.title)
-        }
-
-        fun view_should_navigate_to_that_scene_with_experience_id_and_is_mine_true() {
-            BDDMockito.then(mockView).should()
-                    .navigateToScene(experienceId = experienceId, isExperienceMine = true, sceneId = sceneA!!.id)
-        }
-
-        fun view_should_navigate_to_create_scene_with_experience_id() {
-            BDDMockito.then(mockView).should().navigateToCreateScene(experienceId = experienceId)
-        }
-
         fun those_observables_should_have_observers() {
             assertTrue(scenesObservable.hasObservers())
-            assertTrue(experienceObservable.hasObservers())
             assertTrue(mapObservable.hasObservers())
         }
 
         fun those_observables_should_have_no_observers() {
             assertFalse(scenesObservable.hasObservers())
-            assertFalse(experienceObservable.hasObservers())
             assertFalse(mapObservable.hasObservers())
-        }
-
-        fun view_should_show_edit_button() {
-            BDDMockito.then(mockView).should().showEditButton()
-        }
-
-        fun view_should_show_unsave_button() {
-            BDDMockito.then(mockView).should().showSaveButton(true)
-        }
-
-        fun view_should_show_save_button() {
-            BDDMockito.then(mockView).should().showSaveButton(false)
-        }
-
-        fun should_call_api_repo_save_with_experience_id() {
-            BDDMockito.then(mockExperienceRepository).should().saveExperience(experienceId, true)
-        }
-
-        fun should_make_view_show_saved_message() {
-            BDDMockito.then(mockView).should().showSavedMessage()
-        }
-
-        fun should_show_confirm_dialog() {
-            BDDMockito.then(mockView).should().showUnsaveDialog()
-        }
-
-        fun should_call_api_repo_unsave_experience() {
-            BDDMockito.then(mockExperienceRepository).should().saveExperience(experienceId, false)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)
