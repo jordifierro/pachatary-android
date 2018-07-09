@@ -90,4 +90,8 @@ class SceneListPresenter @Inject constructor(private val sceneRepository: SceneR
     }
 
     fun onCancelUnsaveExperience() {}
+
+    fun onSceneSelectedOnMap(selectedSceneId: String) {
+        view.scrollToScene(selectedSceneId)
+    }
 }

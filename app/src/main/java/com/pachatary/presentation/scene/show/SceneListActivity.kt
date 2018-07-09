@@ -1,5 +1,6 @@
 package com.pachatary.presentation.scene.show
 
+import android.app.Activity
 import android.arch.lifecycle.LifecycleRegistry
 import android.content.Context
 import android.content.Intent
@@ -38,6 +39,7 @@ class SceneListActivity : AppCompatActivity(), SceneListView {
     private val registry: LifecycleRegistry = LifecycleRegistry(this)
 
     companion object {
+        private const val MAP_INTENT = 1
         private const val EXPERIENCE_ID = "experienceId"
         private const val SHOW_EDITABLE_IF_ITS_MINE = "show_editable_if_its_mine"
 
@@ -116,7 +118,7 @@ class SceneListActivity : AppCompatActivity(), SceneListView {
     }
 
     override fun navigateToExperienceMap(experienceId: String) {
-        startActivity(ExperienceMapActivity.newIntent(this, experienceId))
+        startActivityForResult(ExperienceMapActivity.newIntent(this, experienceId), MAP_INTENT)
     }
 
     override fun showUnsaveDialog() {
@@ -135,6 +137,17 @@ class SceneListActivity : AppCompatActivity(), SceneListView {
     override fun showSavedMessage() {
         val message = this.resources.getString(R.string.message_experience_saved)
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == MAP_INTENT && resultCode == Activity.RESULT_OK) {
+            val selectedSceneId = data!!.getStringExtra(ExperienceMapActivity.SCENE_ID)
+            presenter.onSceneSelectedOnMap(selectedSceneId)
+        }
+    }
+
+    override fun scrollToScene(sceneId: String) {
+        (recyclerView.adapter as ExperienceSceneListAdapter).scrollToScene(sceneId)
     }
 
     override fun getLifecycle(): LifecycleRegistry = registry
@@ -208,6 +221,24 @@ class SceneListActivity : AppCompatActivity(), SceneListView {
         override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
             super.onAttachedToRecyclerView(recyclerView)
             this.recyclerView = recyclerView
+        }
+
+        fun scrollToScene(sceneId: String) {
+            if (scenes.count { it.id == sceneId } > 0) {
+                val selectedPosition = scenes.indexOfFirst { it.id == sceneId }
+                val smoothScroller = object : LinearSmoothScroller(recyclerView.context) {
+                    override fun getVerticalSnapPreference(): Int {
+                        return LinearSmoothScroller.SNAP_TO_START
+                    }
+                }
+                smoothScroller.targetPosition = selectedPosition + 1
+                Handler().postDelayed({
+                    try {
+                        this.recyclerView.layoutManager.startSmoothScroll(smoothScroller)
+                    } catch (e: Exception) {
+                    }
+                }, 100)
+            }
         }
     }
 

@@ -15,4 +15,5 @@ interface SceneListView {
     fun navigateToExperienceMap(experienceId: String)
     fun showUnsaveDialog()
     fun showSavedMessage()
+    fun scrollToScene(sceneId: String)
 }

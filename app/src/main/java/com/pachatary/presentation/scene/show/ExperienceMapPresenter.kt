@@ -38,7 +38,7 @@ class ExperienceMapPresenter @Inject constructor(private val repository: SceneRe
     }
 
     fun onSceneClick(sceneId: String) {
-        //TODO
+        view.finishWithSceneId(sceneId)
     }
 
     private fun connectToScenes() {

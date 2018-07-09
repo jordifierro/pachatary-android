@@ -184,6 +184,17 @@ class SceneListPresenterTest {
         }
     }
 
+    @Test
+    fun test_on_scene_selected_on_map_scrolls_to_scene() {
+        given {
+
+        } whenn {
+            scene_selected_on_map("3")
+        } then {
+            should_scroll_to_scene("3")
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
@@ -230,6 +241,10 @@ class SceneListPresenterTest {
 
         fun edit_experience_click() {
             presenter.onEditExperienceClick()
+        }
+
+        fun scene_selected_on_map(sceneId: String) {
+            presenter.onSceneSelectedOnMap(sceneId)
         }
 
         fun map_button_click() {
@@ -286,6 +301,10 @@ class SceneListPresenterTest {
 
         fun unsave_confirmation() {
             presenter.onConfirmUnsaveExperience()
+        }
+
+        fun should_scroll_to_scene(sceneId: String) {
+            BDDMockito.then(mockView).should().scrollToScene(sceneId)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

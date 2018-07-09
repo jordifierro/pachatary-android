@@ -1,5 +1,6 @@
 package com.pachatary.presentation.scene.show
 
+import android.app.Activity
 import android.arch.lifecycle.LifecycleRegistry
 import android.content.Context
 import android.content.Intent
@@ -46,6 +47,7 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView {
 
     companion object {
         private const val EXPERIENCE_ID = "experience_id"
+        const val SCENE_ID = "scene_id"
 
         fun newIntent(context: Context, experienceId: String): Intent {
             val intent = Intent(context, ExperienceMapActivity::class.java)
@@ -127,6 +129,14 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView {
 
     override fun navigateToCreateScene(experienceId: String) {
         startActivity(CreateSceneActivity.newIntent(context = this, experienceId = experienceId))
+    }
+
+    override fun finishWithSceneId(sceneId: String) {
+        val resultIntent = Intent()
+        resultIntent.putExtra(SCENE_ID, sceneId)
+
+        setResult(Activity.RESULT_OK, resultIntent)
+        finish()
     }
 
     override fun showLoader() {

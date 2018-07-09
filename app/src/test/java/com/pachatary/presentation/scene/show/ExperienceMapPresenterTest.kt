@@ -52,6 +52,17 @@ class ExperienceMapPresenterTest {
         }
     }
 
+    @Test
+    fun test_on_scene_click_finishes_with_scene_id() {
+        given {
+
+        } whenn {
+            scene_click("8")
+        } then {
+            should_finish_with_scene_id("8")
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
@@ -111,6 +122,10 @@ class ExperienceMapPresenterTest {
             presenter.destroy()
         }
 
+        fun scene_click(sceneId: String) {
+            presenter.onSceneClick(sceneId)
+        }
+
         fun view_should_show_loader() {
             BDDMockito.then(mockView).should().showLoader()
         }
@@ -131,6 +146,10 @@ class ExperienceMapPresenterTest {
         fun those_observables_should_have_no_observers() {
             assertFalse(scenesObservable.hasObservers())
             assertFalse(mapObservable.hasObservers())
+        }
+
+        fun should_finish_with_scene_id(sceneId: String) {
+            BDDMockito.then(mockView).should().finishWithSceneId(sceneId)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)
