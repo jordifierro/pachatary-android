@@ -156,6 +156,10 @@
                     android:pathPattern="/experiences/..*" />
             </intent-filter>
         </activity>
+        <activity android:name=".presentation.common.edition.PickAndCropImageActivity"
+            android:label="@string/title_pick_and_crop_image_activity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

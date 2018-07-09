@@ -2,6 +2,7 @@ package com.pachatary.presentation.common.injection
 
 import com.pachatary.data.common.injection.DataModule
 import com.pachatary.presentation.common.edition.EditTitleAndDescriptionActivity
+import com.pachatary.presentation.common.edition.PickAndCropImageActivity
 import com.pachatary.presentation.common.edition.SelectLocationActivity
 import com.pachatary.presentation.experience.edition.CreateExperienceActivity
 import com.pachatary.presentation.experience.edition.EditExperienceActivity
@@ -46,4 +47,5 @@ interface ApplicationComponent {
     fun inject(loginActivity: LoginActivity)
     fun inject(personsExperienceActivity: PersonsExperienceActivity)
     fun inject(experienceRouterActivity: ExperienceRouterActivity)
+    fun inject(pickAndCropImageActivity: PickAndCropImageActivity)
 }

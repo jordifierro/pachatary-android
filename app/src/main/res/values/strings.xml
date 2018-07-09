@@ -75,4 +75,13 @@
     <string name="title_experience_router_title">Experience</string>
     <string name="filter_view_experience_router_activity">Open experience</string>
 
+    <string name="title_pick_and_crop_image_activity">Pick and crop image</string>
+    <string name="pick_and_crop_image_recover_dialog_title">Storage Permissions Required</string>
+    <string name="pick_and_crop_image_recover_dialog_message">Picture is needed to create content.
+        To select an image you need to grant read and write storage access permissions.
+        Would you like to open settings to modify app's permissions?</string>
+    <string name="pick_and_crop_image_explanation_dialog_title">Storage Permissions Required</string>
+    <string name="pick_and_crop_image_explanation_dialog_message">Picture is needed to create content.
+        To select an image you need to grant read and write storage access permissions.
+        Would you like to grant that permissions?</string>
 </resources>
