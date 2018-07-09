@@ -5,8 +5,14 @@ import com.pachatary.data.scene.Scene
 
 interface SceneListView {
 
-    fun showExperienceScenesAndScrollToSelectedIfFirstTime(experience: Experience, scenes: List<Scene>,
-                                                           selectedSceneId: String)
     fun navigateToEditScene(sceneId: String, experienceId: String)
     fun navigateToEditExperience(experienceId: String)
+    fun showExperience(experience: Experience)
+    fun showScenes(scenes: List<Scene>)
+    fun showLoadingExperience()
+    fun showLoadingScenes()
+    fun showRetry()
+    fun navigateToExperienceMap(experienceId: String)
+    fun showUnsaveDialog()
+    fun showSavedMessage()
 }

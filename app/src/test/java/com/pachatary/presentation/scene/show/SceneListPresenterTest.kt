@@ -1,6 +1,8 @@
 package com.pachatary.presentation.scene.show
 
+import com.pachatary.data.*
 import com.pachatary.data.common.Result
+import com.pachatary.data.common.ResultInProgress
 import com.pachatary.data.common.ResultSuccess
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.experience.ExperienceRepository
@@ -21,77 +23,164 @@ import org.mockito.MockitoAnnotations
 
 class SceneListPresenterTest {
 
+    enum class SceneListPresenterAction {
+        CREATE, RETRY
+    }
+
     @Test
-    fun test_presenter_loads_experience_and_scenes_and_show_them_scrolling_to_selected_one() {
-        given {
-            an_experience_id()
-            an_scene_id()
-            an_experience()
-            an_scene()
-            an_scene_repo_that_returns_that_scene()
-            an_experience_repo_that_returns_that_experience()
-        } whenn {
-            presenter_set_view_and_create_with_experience_and_scene_id()
-        } then {
-            should_call_scene_repo_get_scenes_with_experience_id()
-            should_call_experience_repo_with_experience_id()
-            should_show_experience_scenes_and_scroll_to_scene()
+    fun test_experience_response_error() {
+        for (action in SceneListPresenterAction.values()) {
+            given {
+                an_experience_repo_that_returns(DummyResultError(), forExperienceId = "4")
+                an_scene_repo_that_returns(forExperienceId = "4")
+                a_presenter_with(experienceId = "4")
+            } whenn {
+                presenter_action(action)
+            } then {
+                should_show_retry()
+            }
         }
     }
 
     @Test
-    fun test_presenter_navigates_to_edit_experience() {
+    fun test_experience_response_inprogress() {
+        for (action in SceneListPresenterAction.values()) {
+            given {
+                an_experience_repo_that_returns(ResultInProgress(), forExperienceId = "4")
+                an_scene_repo_that_returns(forExperienceId = "4")
+                a_presenter_with(experienceId = "4")
+            } whenn {
+                presenter_action(action)
+            } then {
+                should_show_loading_experience()
+            }
+        }
+    }
+
+    @Test
+    fun test_experience_response_success() {
+        for (action in SceneListPresenterAction.values()) {
+            given {
+                an_experience_repo_that_returns(ExperienceResultSuccess("4"), forExperienceId = "4")
+                an_scene_repo_that_returns(forExperienceId = "4")
+                a_presenter_with(experienceId = "4")
+            } whenn {
+                presenter_action(action)
+            } then {
+                should_show_experience(DummyExperience("4"))
+            }
+        }
+    }
+
+    @Test
+    fun test_scene_response_error() {
+        for (action in SceneListPresenterAction.values()) {
+            given {
+                an_experience_repo_that_returns(forExperienceId = "4")
+                an_scene_repo_that_returns(DummyResultError(), forExperienceId = "4")
+                a_presenter_with(experienceId = "4")
+            } whenn {
+                presenter_action(action)
+            } then {
+                should_show_retry()
+            }
+        }
+    }
+
+    @Test
+    fun test_scene_response_inprogress() {
+        for (action in SceneListPresenterAction.values()) {
+            given {
+                an_experience_repo_that_returns(forExperienceId = "4")
+                an_scene_repo_that_returns(ResultInProgress(), forExperienceId = "4")
+                a_presenter_with(experienceId = "4")
+            } whenn {
+                presenter_action(action)
+            } then {
+                should_show_loading_scenes()
+            }
+        }
+    }
+
+    @Test
+    fun test_scene_response_success() {
+        for (action in SceneListPresenterAction.values()) {
+            given {
+                an_experience_repo_that_returns(forExperienceId = "4")
+                an_scene_repo_that_returns(ScenesListResultSuccess("6", "7"), forExperienceId = "4")
+                a_presenter_with(experienceId = "4")
+            } whenn {
+                presenter_action(action)
+            } then {
+                should_show_scenes(listOf(DummyScene("6"), DummyScene("7")))
+            }
+        }
+    }
+
+    @Test
+    fun test_save() {
         given {
-            an_experience_id()
-            an_scene_id()
-            an_experience()
-            an_scene()
-            an_scene_repo_that_returns_that_scene()
-            an_experience_repo_that_returns_that_experience()
+            a_presenter_with(experienceId = "4")
         } whenn {
-            presenter_set_view_and_create_with_experience_and_scene_id()
-            presenter_on_edit_experience_click("99")
+            save_experience(true)
         } then {
-            should_navigate_to_edit_experience("99")
+            should_call_repo_save("4", true)
+            should_show_saved_message()
+        }
+    }
+
+    @Test
+    fun test_unsave() {
+        given {
+            a_presenter_with(experienceId = "4")
+        } whenn {
+            save_experience(false)
+        } then {
+            should_ask_are_you_sure()
+        }
+    }
+
+    @Test
+    fun test_unsave_confirmation() {
+        given {
+            a_presenter_with(experienceId = "4")
+        } whenn {
+            unsave_confirmation()
+        } then {
+            should_call_repo_save("4", false)
+        }
+    }
+
+    @Test
+    fun test_edit_experience_click() {
+        given {
+            a_presenter_with(experienceId = "9")
+        } whenn {
+            edit_experience_click()
+        } then {
+            should_navigate_to_edit_experience("9")
         }
     }
 
     @Test
     fun test_presenter_navigates_to_edit_scene() {
         given {
-            an_experience_id()
-            an_scene_id()
-            an_experience()
-            an_scene()
-            an_scene_repo_that_returns_that_scene()
-            an_experience_repo_that_returns_that_experience()
+            a_presenter_with(experienceId = "4")
         } whenn {
-            presenter_set_view_and_create_with_experience_and_scene_id()
-            presenter_on_edit_scene_click("76")
+            edit_scene_click("7")
         } then {
-            should_navigate_to_edit_scene("76")
+            should_navigate_to_edit_scene("7", "4")
         }
     }
 
     @Test
-    fun test_unsubscribe_on_destroy() {
+    fun test_on_map_button_click() {
         given {
-            an_experience_id()
-            an_scene_id()
-            an_experience()
-            an_scene()
-            a_test_scenes_observable()
-            an_scene_repo_that_returns_that_observable()
-            a_test_experience_observable()
-            an_experience_repo_that_returns_that_observable()
+            a_presenter_with(experienceId = "5")
         } whenn {
-            presenter_set_view_and_create_with_experience_and_scene_id()
+            map_button_click()
         } then {
-            observable_should_have_observers()
-        } whenn {
-            presenter_destroy()
-        } then {
-            observable_should_have_no_observers()
+            should_navigate_to_map("5")
         }
     }
 
@@ -102,115 +191,101 @@ class SceneListPresenterTest {
         @Mock lateinit var mockView: SceneListView
         @Mock lateinit var mockRepository: SceneRepository
         @Mock lateinit var mockExperienceRepository: ExperienceRepository
-        lateinit var sceneId: String
-        lateinit var experienceId: String
-        lateinit var scene: Scene
-        lateinit var experience: Experience
-        lateinit var testScenesObservable: PublishSubject<Result<List<Scene>>>
-        lateinit var testExperienceObservable: PublishSubject<Result<Experience>>
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
             val testSchedulerProvider = SchedulerProvider(Schedulers.trampoline(), Schedulers.trampoline())
             presenter = SceneListPresenter(mockRepository, mockExperienceRepository, testSchedulerProvider)
+            presenter.view = mockView
 
             return this
         }
 
-        fun an_experience_id() {
-            experienceId = "8"
+        fun a_presenter_with(experienceId: String) {
+            presenter.experienceId = experienceId
         }
 
-        fun an_scene_id() {
-            sceneId = "5"
+        fun an_experience_repo_that_returns(vararg results: Result<Experience>,
+                                            forExperienceId: String) {
+            BDDMockito.given(mockExperienceRepository.experienceFlowable(forExperienceId))
+                    .willReturn(Flowable.fromArray(*results))
         }
 
-        fun an_experience() {
-            experience = Experience(id = "1", title = "A", description = "", picture = null, isMine = false)
+        fun an_scene_repo_that_returns(vararg results: Result<List<Scene>>,
+                                       forExperienceId: String) {
+            BDDMockito.given(mockRepository.scenesFlowable(forExperienceId))
+                    .willReturn(Flowable.fromArray(*results))
         }
 
-        fun an_scene() {
-            scene = Scene(id = "1", title = "A", description = "", picture = null,
-                          latitude = 0.0, longitude = 1.0, experienceId = experience.id)
+        fun presenter_action(action: SceneListPresenterAction) {
+            when (action) {
+                SceneListPresenterAction.CREATE -> presenter.create()
+                SceneListPresenterAction.RETRY -> presenter.onRetryClick()
+            }
         }
 
-        fun a_test_scenes_observable() {
-            testScenesObservable = PublishSubject.create<Result<List<Scene>>>()
-            assertFalse(testScenesObservable.hasObservers())
-        }
-
-        fun a_test_experience_observable() {
-            testExperienceObservable = PublishSubject.create<Result<Experience>>()
-            assertFalse(testExperienceObservable.hasObservers())
-        }
-
-        fun an_scene_repo_that_returns_that_observable() {
-            given(mockRepository.scenesFlowable(experienceId = experienceId))
-                    .willReturn(testScenesObservable.toFlowable(BackpressureStrategy.LATEST))
-        }
-
-        fun an_experience_repo_that_returns_that_observable() {
-            given(mockExperienceRepository.experienceFlowable(experienceId = experienceId))
-                    .willReturn(testExperienceObservable.toFlowable(BackpressureStrategy.LATEST))
-        }
-
-        fun an_scene_repo_that_returns_that_scene() {
-            given(mockRepository.scenesFlowable(experienceId = experienceId))
-                    .willReturn(Flowable.just(ResultSuccess(listOf(scene))))
-        }
-
-        fun an_experience_repo_that_returns_that_experience() {
-            given(mockExperienceRepository.experienceFlowable(experienceId = experienceId))
-                    .willReturn(Flowable.just(ResultSuccess(experience)))
-        }
-
-        fun presenter_set_view_and_create_with_experience_and_scene_id() {
-            presenter.setView(view = mockView, experienceId = experienceId,
-                              selectedSceneId = sceneId, isMine = experience.isMine)
-            presenter.create()
-        }
-
-        fun presenter_destroy() {
-            presenter.destroy()
-        }
-
-        fun presenter_on_edit_experience_click(experienceId: String) {
-            presenter.onEditExperienceClick(experienceId)
-        }
-
-        fun presenter_on_edit_scene_click(sceneId: String) {
+        fun edit_scene_click(sceneId: String) {
             presenter.onEditSceneClick(sceneId)
         }
 
-        fun should_call_scene_repo_get_scenes_with_experience_id() {
-            BDDMockito.then(mockRepository).should().scenesFlowable(this.experienceId)
+        fun edit_experience_click() {
+            presenter.onEditExperienceClick()
         }
 
-        fun should_call_experience_repo_with_experience_id() {
-            BDDMockito.then(mockExperienceRepository).should().experienceFlowable(this.experienceId)
+        fun map_button_click() {
+            presenter.onMapButtonClick()
         }
 
-        fun should_show_experience_scenes_and_scroll_to_scene() {
-            BDDMockito.then(mockView).should()
-                    .showExperienceScenesAndScrollToSelectedIfFirstTime(experience, arrayListOf(scene), this.sceneId)
-        }
-
-        fun observable_should_have_observers() {
-            assertTrue(testScenesObservable.hasObservers())
-            assertTrue(testExperienceObservable.hasObservers())
-        }
-
-        fun observable_should_have_no_observers() {
-            assertFalse(testScenesObservable.hasObservers())
-            assertFalse(testExperienceObservable.hasObservers())
+        fun save_experience(save: Boolean) {
+            presenter.onExperienceSave(save)
         }
 
         fun should_navigate_to_edit_experience(experienceId: String) {
             BDDMockito.then(mockView).should().navigateToEditExperience(experienceId)
         }
 
-        fun should_navigate_to_edit_scene(sceneId: String) {
-            BDDMockito.then(mockView).should().navigateToEditScene(sceneId, this.experienceId)
+        fun should_navigate_to_edit_scene(sceneId: String, experienceId: String) {
+            BDDMockito.then(mockView).should().navigateToEditScene(sceneId, experienceId)
+        }
+
+        fun should_show_retry() {
+            BDDMockito.then(mockView).should().showRetry()
+        }
+
+        fun should_show_loading_experience() {
+            BDDMockito.then(mockView).should().showLoadingExperience()
+        }
+
+        fun should_show_experience(experience: Experience) {
+            BDDMockito.then(mockView).should().showExperience(experience)
+        }
+
+        fun should_show_loading_scenes() {
+            BDDMockito.then(mockView).should().showLoadingScenes()
+        }
+
+        fun should_show_scenes(scenes: List<Scene>) {
+            BDDMockito.then(mockView).should().showScenes(scenes)
+        }
+
+        fun should_navigate_to_map(experienceId: String) {
+            BDDMockito.then(mockView).should().navigateToExperienceMap(experienceId)
+        }
+
+        fun should_call_repo_save(experienceId: String, save: Boolean) {
+            BDDMockito.then(mockExperienceRepository).should().saveExperience(experienceId, save)
+        }
+
+        fun should_show_saved_message() {
+            BDDMockito.then(mockView).should().showSavedMessage()
+        }
+
+        fun should_ask_are_you_sure() {
+            BDDMockito.then(mockView).should().showUnsaveDialog()
+        }
+
+        fun unsave_confirmation() {
+            presenter.onConfirmUnsaveExperience()
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

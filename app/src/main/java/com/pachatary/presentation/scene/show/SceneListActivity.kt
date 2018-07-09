@@ -3,9 +3,11 @@ package com.pachatary.presentation.scene.show
 import android.arch.lifecycle.LifecycleRegistry
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.support.design.widget.FloatingActionButton
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.LinearSmoothScroller
@@ -13,9 +15,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.RelativeLayout
-import android.widget.TextView
+import android.widget.*
 import com.pachatary.R
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.scene.Scene
@@ -33,21 +33,19 @@ class SceneListActivity : AppCompatActivity(), SceneListView {
     lateinit var presenter: SceneListPresenter
 
     private lateinit var recyclerView: RecyclerView
-    private var firstTime = true
+    private lateinit var retryButton: ImageView
 
     private val registry: LifecycleRegistry = LifecycleRegistry(this)
 
     companion object {
         private const val EXPERIENCE_ID = "experienceId"
-        private const val SELECTED_SCENE_ID = "selected_scene_id"
-        private const val IS_MINE = "is_mine"
+        private const val SHOW_EDITABLE_IF_ITS_MINE = "show_editable_if_its_mine"
 
         fun newIntent(context: Context, experienceId: String,
-                      selectedSceneId: String, isMine: Boolean): Intent {
+                      showEditableIfItsMine: Boolean = false): Intent {
             val intent = Intent(context, SceneListActivity::class.java)
             intent.putExtra(EXPERIENCE_ID, experienceId)
-            intent.putExtra(SELECTED_SCENE_ID, selectedSceneId)
-            intent.putExtra(IS_MINE, isMine)
+            intent.putExtra(SHOW_EDITABLE_IF_ITS_MINE, showEditableIfItsMine)
             return intent
         }
     }
@@ -59,27 +57,15 @@ class SceneListActivity : AppCompatActivity(), SceneListView {
 
         recyclerView = findViewById(R.id.scenes_recyclerview)
         recyclerView.layoutManager = LinearLayoutManager(this)
+        retryButton = findViewById(R.id.retry)
+        retryButton.setOnClickListener { presenter.onRetryClick() }
 
         PachataryApplication.injector.inject(this)
-        presenter.setView(view = this,
-                          experienceId = intent.getStringExtra(EXPERIENCE_ID),
-                          selectedSceneId = intent.getStringExtra(SELECTED_SCENE_ID),
-                          isMine = intent.getBooleanExtra(IS_MINE, false))
+        presenter.setView(view = this, experienceId = intent.getStringExtra(EXPERIENCE_ID))
         registry.addObserver(presenter)
-    }
 
-    override fun showExperienceScenesAndScrollToSelectedIfFirstTime(experience: Experience,
-                                                                    scenes: List<Scene>,
-                                                                    selectedSceneId: String) {
-        supportActionBar?.title = experience.title
-        if (firstTime) {
-            recyclerView.adapter = ExperienceSceneListAdapter(layoutInflater, experience.isMine,
-                                                              experience, scenes, presenter)
-            (recyclerView.adapter!! as ExperienceSceneListAdapter).scrollToSceneId(selectedSceneId)
-            firstTime = false
-        }
-        else (recyclerView.adapter!! as ExperienceSceneListAdapter)
-                .setExperienceAndScenes(experience, scenes)
+        recyclerView.adapter = ExperienceSceneListAdapter(layoutInflater,
+                intent.getBooleanExtra(SHOW_EDITABLE_IF_ITS_MINE, false), presenter)
     }
 
     override fun navigateToEditScene(sceneId: String, experienceId: String) {
@@ -90,106 +76,228 @@ class SceneListActivity : AppCompatActivity(), SceneListView {
         startActivity(EditExperienceActivity.newIntent(this, experienceId))
     }
 
+    override fun showExperience(experience: Experience) {
+        recyclerView.visibility = View.VISIBLE
+        retryButton.visibility = View.INVISIBLE
+
+        (recyclerView.adapter as ExperienceSceneListAdapter).experience = experience
+        (recyclerView.adapter as ExperienceSceneListAdapter).isExperienceInProgress = false
+        recyclerView.adapter.notifyDataSetChanged()
+    }
+
+    override fun showScenes(scenes: List<Scene>) {
+        recyclerView.visibility = View.VISIBLE
+        retryButton.visibility = View.INVISIBLE
+
+        (recyclerView.adapter as ExperienceSceneListAdapter).scenes = scenes
+        (recyclerView.adapter as ExperienceSceneListAdapter).areScenesInProgress = false
+        recyclerView.adapter.notifyDataSetChanged()
+    }
+
+    override fun showLoadingExperience() {
+        recyclerView.visibility = View.VISIBLE
+        retryButton.visibility = View.INVISIBLE
+
+        (recyclerView.adapter as ExperienceSceneListAdapter).isExperienceInProgress = true
+        recyclerView.adapter.notifyDataSetChanged()
+    }
+
+    override fun showLoadingScenes() {
+        recyclerView.visibility = View.VISIBLE
+        retryButton.visibility = View.INVISIBLE
+
+        (recyclerView.adapter as ExperienceSceneListAdapter).areScenesInProgress = true
+        recyclerView.adapter.notifyDataSetChanged()
+    }
+
+    override fun showRetry() {
+        recyclerView.visibility = View.INVISIBLE
+        retryButton.visibility = View.VISIBLE
+    }
+
+    override fun navigateToExperienceMap(experienceId: String) {
+        startActivity(ExperienceMapActivity.newIntent(this, experienceId))
+    }
+
+    override fun showUnsaveDialog() {
+        val builder: AlertDialog.Builder
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            builder = AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+        else builder = AlertDialog.Builder(this)
+        builder.setTitle(R.string.dialog_title_unsave_experience)
+                .setMessage(R.string.dialog_question_unsave_experience)
+                .setPositiveButton(android.R.string.yes, { _, _ -> presenter.onConfirmUnsaveExperience() })
+                .setNegativeButton(android.R.string.no, { _, _ -> presenter.onCancelUnsaveExperience() })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show()
+    }
+
+    override fun showSavedMessage() {
+        val message = this.resources.getString(R.string.message_experience_saved)
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
+
     override fun getLifecycle(): LifecycleRegistry = registry
 
-    class ExperienceSceneListAdapter(private val inflater: LayoutInflater, val isMine: Boolean,
-                                     var experience: Experience, private var sceneList: List<Scene>,
+    class ExperienceSceneListAdapter(private val inflater: LayoutInflater,
+                                     val showEditable: Boolean,
                                      val presenter: SceneListPresenter)
-        : RecyclerView.Adapter<ExperienceSceneViewHolder>() {
+        : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+        val LOADER_TYPE = 0
+        val EXPERIENCE_TYPE = 1
+        val SCENE_TYPE = 2
 
         lateinit var recyclerView: RecyclerView
+        var isExperienceInProgress = true
+        var areScenesInProgress = true
+        var experience: Experience? = null
+        var scenes: List<Scene> = listOf()
 
-        override fun onBindViewHolder(holder: ExperienceSceneViewHolder, position: Int) {
-            if (position == 0) holder.bind(experience)
-            else holder.bind(sceneList[position - 1])
+        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+            when (getItemViewType(position)) {
+                EXPERIENCE_TYPE -> {
+                    val experienceViewHolder = holder as ExperienceViewHolder
+                    experienceViewHolder.bind(experience!!)
+                }
+                SCENE_TYPE -> {
+                    val sceneViewHolder = holder as SceneViewHolder
+                    sceneViewHolder.bind(scenes[position-1])
+                }
+            }
         }
 
-        override fun getItemCount() = sceneList.size + 1
+        override fun getItemCount(): Int {
+            if (isExperienceInProgress && areScenesInProgress) return 1
+            else if (areScenesInProgress) return 2
+            else return scenes.size + 1
+        }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-            ExperienceSceneViewHolder(inflater.inflate(R.layout.item_experience_scene_list,
-                    parent, false), isMine,
-                    { presenter.onEditExperienceClick(it) }, {presenter.onEditSceneClick(it) })
+        override fun getItemViewType(position: Int): Int {
+            if (position == 0) {
+                if (isExperienceInProgress) return LOADER_TYPE
+                else return EXPERIENCE_TYPE
+            }
+            else {
+                if (areScenesInProgress) return SCENE_TYPE
+                else return SCENE_TYPE
+            }
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+            when (viewType) {
+                EXPERIENCE_TYPE -> {
+                    return ExperienceViewHolder(inflater.inflate(R.layout.item_experience, parent, false),
+                            showEditable, { presenter.onEditExperienceClick() },
+                            { save -> presenter.onExperienceSave(save) },
+                            { presenter.onMapButtonClick() })
+                }
+                SCENE_TYPE -> {
+                    var isEditable = false
+                    if (showEditable && experience != null && experience!!.isMine) isEditable = true
+
+                    return SceneViewHolder(inflater.inflate(R.layout.item_scene, parent, false),
+                            isEditable , { presenter.onEditSceneClick(it) })
+                }
+                else -> {
+                    return LoaderViewHolder(inflater.inflate(R.layout.item_loader, parent, false))
+                }
+            }
+        }
 
         override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
             super.onAttachedToRecyclerView(recyclerView)
             this.recyclerView = recyclerView
         }
-
-        fun scrollToSceneId(sceneId: String) {
-            val selectedPosition = sceneList.indexOfFirst { it.id == sceneId }
-            val smoothScroller = object : LinearSmoothScroller(recyclerView.context) {
-                override fun getVerticalSnapPreference(): Int {
-                    return LinearSmoothScroller.SNAP_TO_START
-                }
-            }
-            smoothScroller.targetPosition = selectedPosition + 1
-            Handler().postDelayed({
-                try { this.recyclerView.layoutManager.startSmoothScroll(smoothScroller) }
-                catch (e: Exception) {}
-            }, 100)
-        }
-
-        fun setExperienceAndScenes(experience: Experience, scenes: List<Scene>) {
-            this.experience = experience
-            this.sceneList = scenes
-            notifyDataSetChanged()
-        }
     }
 
-    class ExperienceSceneViewHolder(view: View, isMine: Boolean,
-                                    private val onEditExperienceClick: (String) -> Unit,
-                                    private val onEditSceneClick: (String) -> Unit)
+    class ExperienceViewHolder(view: View, private val showEditableIfItsMine: Boolean,
+                               private val onEditExperienceClick: () -> Unit,
+                               private val onSaveExperienceClick: (Boolean) -> Unit,
+                               private val onMapButtonClick: () -> Unit)
         : RecyclerView.ViewHolder(view), View.OnClickListener {
 
         private val titleView: TextView = view.findViewById(R.id.title)
         private val descriptionView: TextView = view.findViewById(R.id.description)
         private val pictureView: ImageView = view.findViewById(R.id.picture)
         private val editButton: FloatingActionButton = view.findViewById(R.id.edit_button)
-        private val savesCountAndAuthorLayout: RelativeLayout =
-                view.findViewById(R.id.saves_count_and_author)
+        private val saveButton: FloatingActionButton = view.findViewById(R.id.save_button)
+        private val unsaveButton: FloatingActionButton = view.findViewById(R.id.unsave_button)
         private val savesCountView: TextView = view.findViewById(R.id.saves_count)
         private val authorView: TextView = view.findViewById(R.id.author)
-        private var isScene = true
+        private val mapButton: Button = view.findViewById(R.id.map_button)
         lateinit var experienceId: String
-        lateinit var sceneId: String
-
-        init {
-            if (isMine) editButton.visibility = View.VISIBLE
-            else editButton.visibility = View.INVISIBLE
-        }
 
         fun bind(experience: Experience) {
-            this.isScene = false
             this.experienceId = experience.id
             titleView.text = experience.title
             descriptionView.text = experience.description
-            editButton.setOnClickListener { onEditButtonClick() }
-            savesCountAndAuthorLayout.visibility = View.VISIBLE
-            savesCountView.text = experience.savesCount.toString()
-            authorView.text = "by " + experience.authorUsername
+
+            editButton.setOnClickListener { onEditExperienceClick() }
+            saveButton.setOnClickListener { onSaveExperienceClick(true) }
+            unsaveButton.setOnClickListener { onSaveExperienceClick(false) }
+            if (showEditableIfItsMine && experience.isMine) {
+                editButton.visibility = View.VISIBLE
+                saveButton.visibility = View.GONE
+                unsaveButton.visibility = View.GONE
+            }
+            else if (!experience.isMine) {
+                editButton.visibility = View.GONE
+                if (experience.isSaved) {
+                    saveButton.visibility = View.INVISIBLE
+                    unsaveButton.visibility = View.VISIBLE
+                }
+                else {
+                    saveButton.visibility = View.VISIBLE
+                    unsaveButton.visibility = View.INVISIBLE
+
+                }
+            }
+            else {
+                editButton.visibility = View.GONE
+                saveButton.visibility = View.GONE
+                unsaveButton.visibility = View.GONE
+            }
+
+            savesCountView.text = experience.savesCount.toString() + " ★"
+            authorView.text = experience.authorUsername
             Picasso.with(pictureView.context)
                     .load(experience.picture?.mediumUrl)
                     .into(pictureView)
+            mapButton.setOnClickListener { onMapButtonClick() }
         }
 
+        override fun onClick(v: View?) {}
+    }
+
+    class SceneViewHolder(view: View, private val isEditable: Boolean,
+                          private val onEditSceneClick: (String) -> Unit)
+        : RecyclerView.ViewHolder(view), View.OnClickListener {
+
+        private val titleView: TextView = view.findViewById(R.id.title)
+        private val descriptionView: TextView = view.findViewById(R.id.description)
+        private val pictureView: ImageView = view.findViewById(R.id.picture)
+        private val editButton: FloatingActionButton = view.findViewById(R.id.edit_button)
+        lateinit var sceneId: String
+
         fun bind(scene: Scene) {
-            this.isScene = true
             this.sceneId = scene.id
             titleView.text = scene.title
             descriptionView.text = scene.description
-            savesCountAndAuthorLayout.visibility = View.GONE
-            editButton.setOnClickListener { onEditButtonClick() }
+            editButton.setOnClickListener { onEditSceneClick(this.sceneId) }
+            if (isEditable) editButton.visibility = View.VISIBLE
+            else editButton.visibility = View.GONE
             Picasso.with(pictureView.context)
                     .load(scene.picture?.mediumUrl)
                     .into(pictureView)
         }
 
         override fun onClick(view: View?) {}
+    }
 
-        private fun onEditButtonClick() {
-            if (isScene) onEditSceneClick(sceneId)
-            else onEditExperienceClick(experienceId)
-        }
+    class LoaderViewHolder(view: View)
+        : RecyclerView.ViewHolder(view), View.OnClickListener {
+
+        override fun onClick(view: View?) {}
     }
 }

@@ -8,7 +8,6 @@ import android.graphics.Canvas
 import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
-import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.View
@@ -147,7 +146,7 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView {
 
     override fun navigateToScene(experienceId: String, isExperienceMine: Boolean, sceneId: String) {
         startActivity(SceneListActivity.newIntent(context = this, experienceId = experienceId,
-                                                   selectedSceneId = sceneId, isMine = isExperienceMine))
+                                                  showEditableIfItsMine = isExperienceMine))
     }
 
     override fun navigateToCreateScene(experienceId: String) {

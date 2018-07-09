@@ -14,6 +14,7 @@ import com.pachatary.data.experience.Experience
 import com.pachatary.presentation.common.PachataryApplication
 import com.pachatary.presentation.experience.show.view.SquareListAdapter
 import com.pachatary.presentation.scene.show.ExperienceMapActivity
+import com.pachatary.presentation.scene.show.SceneListActivity
 import javax.inject.Inject
 
 class SavedFragment : Fragment(), SavedView {
@@ -85,6 +86,6 @@ class SavedFragment : Fragment(), SavedView {
     }
 
     override fun navigateToExperience(experienceId: String) {
-        startActivity(ExperienceMapActivity.newIntent(activity!!.applicationContext, experienceId))
+        startActivity(SceneListActivity.newIntent(activity!!.applicationContext, experienceId))
     }
 }

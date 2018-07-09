@@ -14,38 +14,45 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
 import javax.inject.Inject
 
-class SceneListPresenter @Inject constructor(private val repository: SceneRepository,
+class SceneListPresenter @Inject constructor(private val sceneRepository: SceneRepository,
                                              private val experienceRepository: ExperienceRepository,
                                              private val schedulerProvider: SchedulerProvider) : LifecycleObserver {
 
     lateinit var view: SceneListView
     lateinit var experienceId: String
-    lateinit var selectedSceneId: String
-    var isMine = false
 
     private var scenesDisposable: Disposable? = null
     private var experienceDisposable: Disposable? = null
 
-    fun setView(view: SceneListView, experienceId: String, selectedSceneId: String, isMine: Boolean) {
+    fun setView(view: SceneListView, experienceId: String) {
         this.view = view
         this.experienceId = experienceId
-        this.selectedSceneId = selectedSceneId
-        this.isMine = isMine
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun create() {
-        val experienceFlowable = experienceRepository.experienceFlowable(experienceId = this.experienceId)
-        val scenesFlowable = repository.scenesFlowable(experienceId = experienceId)
+        loadExperienceAndScenes()
+    }
 
-        experienceDisposable = Flowable.combineLatest(experienceFlowable, scenesFlowable,
-                BiFunction<Result<Experience>, Result<List<Scene>>, Pair<Experience, List<Scene>>>
-                                                                            { rE, rS -> Pair(rE.data!!, rS.data!!)})
-                .subscribeOn(schedulerProvider.subscriber())
+    private fun loadExperienceAndScenes() {
+        getExperience()
+        getScenes()
+    }
+
+    private fun getExperience() {
+        experienceDisposable = experienceRepository.experienceFlowable(experienceId)
                 .observeOn(schedulerProvider.observer())
-                .subscribe({ view.showExperienceScenesAndScrollToSelectedIfFirstTime(
-                                            it.first, it.second, this.selectedSceneId) },
-                           { throw it })
+                .subscribe { if (it.isSuccess()) view.showExperience(it.data!!)
+                             else if (it.isInProgress()) view.showLoadingExperience()
+                             else view.showRetry() }
+    }
+
+    private fun getScenes() {
+        scenesDisposable = sceneRepository.scenesFlowable(experienceId)
+                .observeOn(schedulerProvider.observer())
+                .subscribe { if (it.isSuccess()) view.showScenes(it.data!!)
+                             else if (it.isInProgress()) view.showLoadingScenes()
+                             else view.showRetry() }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
@@ -54,11 +61,33 @@ class SceneListPresenter @Inject constructor(private val repository: SceneReposi
         scenesDisposable?.dispose()
     }
 
-    fun onEditExperienceClick(experienceId: String) {
+    fun onEditExperienceClick() {
         view.navigateToEditExperience(experienceId)
     }
 
     fun onEditSceneClick(sceneId: String) {
         view.navigateToEditScene(sceneId, experienceId)
     }
+
+    fun onExperienceSave(save: Boolean) {
+        if (save) {
+            experienceRepository.saveExperience(experienceId, true)
+            view.showSavedMessage()
+        }
+        else (view.showUnsaveDialog())
+    }
+
+    fun onRetryClick() {
+        loadExperienceAndScenes()
+    }
+
+    fun onMapButtonClick() {
+        view.navigateToExperienceMap(experienceId)
+    }
+
+    fun onConfirmUnsaveExperience() {
+        experienceRepository.saveExperience(this.experienceId, false)
+    }
+
+    fun onCancelUnsaveExperience() {}
 }
