@@ -19,7 +19,7 @@ import com.pachatary.presentation.register.RegisterActivity
 import com.pachatary.presentation.scene.edition.CreateSceneActivity
 import com.pachatary.presentation.scene.edition.EditSceneActivity
 import com.pachatary.presentation.scene.show.ExperienceMapActivity
-import com.pachatary.presentation.scene.show.SceneListActivity
+import com.pachatary.presentation.scene.show.ExperienceScenesActivity
 import dagger.Component
 import javax.inject.Singleton
 
@@ -40,7 +40,7 @@ interface ApplicationComponent {
     fun inject(mainActivity: MainActivity)
     fun inject(registerActivity: RegisterActivity)
     fun inject(confirmEmailActivity: ConfirmEmailActivity)
-    fun inject(sceneListActivity: SceneListActivity)
+    fun inject(experienceScenesActivity: ExperienceScenesActivity)
     fun inject(welcomeActivity: WelcomeActivity)
     fun inject(askLoginEmailActivity: AskLoginEmailActivity)
     fun inject(loginActivity: LoginActivity)

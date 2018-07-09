@@ -3,33 +3,27 @@ package com.pachatary.presentation.scene.show
 import com.pachatary.data.*
 import com.pachatary.data.common.Result
 import com.pachatary.data.common.ResultInProgress
-import com.pachatary.data.common.ResultSuccess
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.experience.ExperienceRepository
 import com.pachatary.data.scene.Scene
 import com.pachatary.data.scene.SceneRepository
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
-import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.PublishSubject
-import junit.framework.Assert.assertFalse
-import junit.framework.Assert.assertTrue
 import org.junit.Test
 import org.mockito.BDDMockito
-import org.mockito.BDDMockito.given
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 
-class SceneListPresenterTest {
+class ExperienceScenesPresenterTest {
 
-    enum class SceneListPresenterAction {
+    enum class ExperienceScenesPresenterAction {
         CREATE, RETRY
     }
 
     @Test
     fun test_experience_response_error() {
-        for (action in SceneListPresenterAction.values()) {
+        for (action in ExperienceScenesPresenterAction.values()) {
             given {
                 an_experience_repo_that_returns(DummyResultError(), forExperienceId = "4")
                 an_scene_repo_that_returns(forExperienceId = "4")
@@ -44,7 +38,7 @@ class SceneListPresenterTest {
 
     @Test
     fun test_experience_response_inprogress() {
-        for (action in SceneListPresenterAction.values()) {
+        for (action in ExperienceScenesPresenterAction.values()) {
             given {
                 an_experience_repo_that_returns(ResultInProgress(), forExperienceId = "4")
                 an_scene_repo_that_returns(forExperienceId = "4")
@@ -59,7 +53,7 @@ class SceneListPresenterTest {
 
     @Test
     fun test_experience_response_success() {
-        for (action in SceneListPresenterAction.values()) {
+        for (action in ExperienceScenesPresenterAction.values()) {
             given {
                 an_experience_repo_that_returns(ExperienceResultSuccess("4"), forExperienceId = "4")
                 an_scene_repo_that_returns(forExperienceId = "4")
@@ -74,7 +68,7 @@ class SceneListPresenterTest {
 
     @Test
     fun test_scene_response_error() {
-        for (action in SceneListPresenterAction.values()) {
+        for (action in ExperienceScenesPresenterAction.values()) {
             given {
                 an_experience_repo_that_returns(forExperienceId = "4")
                 an_scene_repo_that_returns(DummyResultError(), forExperienceId = "4")
@@ -89,7 +83,7 @@ class SceneListPresenterTest {
 
     @Test
     fun test_scene_response_inprogress() {
-        for (action in SceneListPresenterAction.values()) {
+        for (action in ExperienceScenesPresenterAction.values()) {
             given {
                 an_experience_repo_that_returns(forExperienceId = "4")
                 an_scene_repo_that_returns(ResultInProgress(), forExperienceId = "4")
@@ -104,7 +98,7 @@ class SceneListPresenterTest {
 
     @Test
     fun test_scene_response_success() {
-        for (action in SceneListPresenterAction.values()) {
+        for (action in ExperienceScenesPresenterAction.values()) {
             given {
                 an_experience_repo_that_returns(forExperienceId = "4")
                 an_scene_repo_that_returns(ScenesListResultSuccess("6", "7"), forExperienceId = "4")
@@ -209,15 +203,15 @@ class SceneListPresenterTest {
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
-        lateinit var presenter: SceneListPresenter
-        @Mock lateinit var mockView: SceneListView
+        lateinit var presenter: ExperienceScenesPresenter
+        @Mock lateinit var mockView: ExperienceScenesView
         @Mock lateinit var mockRepository: SceneRepository
         @Mock lateinit var mockExperienceRepository: ExperienceRepository
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
             val testSchedulerProvider = SchedulerProvider(Schedulers.trampoline(), Schedulers.trampoline())
-            presenter = SceneListPresenter(mockRepository, mockExperienceRepository, testSchedulerProvider)
+            presenter = ExperienceScenesPresenter(mockRepository, mockExperienceRepository, testSchedulerProvider)
             presenter.view = mockView
 
             return this
@@ -239,10 +233,10 @@ class SceneListPresenterTest {
                     .willReturn(Flowable.fromArray(*results))
         }
 
-        fun presenter_action(action: SceneListPresenterAction) {
+        fun presenter_action(action: ExperienceScenesPresenterAction) {
             when (action) {
-                SceneListPresenterAction.CREATE -> presenter.create()
-                SceneListPresenterAction.RETRY -> presenter.onRetryClick()
+                ExperienceScenesPresenterAction.CREATE -> presenter.create()
+                ExperienceScenesPresenterAction.RETRY -> presenter.onRetryClick()
             }
         }
 

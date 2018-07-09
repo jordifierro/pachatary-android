@@ -3,28 +3,24 @@ package com.pachatary.presentation.scene.show
 import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.OnLifecycleEvent
-import com.pachatary.data.common.Result
-import com.pachatary.data.experience.Experience
 import com.pachatary.data.experience.ExperienceRepository
-import com.pachatary.data.scene.Scene
 import com.pachatary.data.scene.SceneRepository
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
-import io.reactivex.Flowable
 import io.reactivex.disposables.Disposable
-import io.reactivex.functions.BiFunction
 import javax.inject.Inject
 
-class SceneListPresenter @Inject constructor(private val sceneRepository: SceneRepository,
-                                             private val experienceRepository: ExperienceRepository,
-                                             private val schedulerProvider: SchedulerProvider) : LifecycleObserver {
+class ExperienceScenesPresenter @Inject constructor(
+        private val sceneRepository: SceneRepository,
+        private val experienceRepository: ExperienceRepository,
+        private val schedulerProvider: SchedulerProvider) : LifecycleObserver {
 
-    lateinit var view: SceneListView
+    lateinit var view: ExperienceScenesView
     lateinit var experienceId: String
 
     private var scenesDisposable: Disposable? = null
     private var experienceDisposable: Disposable? = null
 
-    fun setView(view: SceneListView, experienceId: String) {
+    fun setView(view: ExperienceScenesView, experienceId: String) {
         this.view = view
         this.experienceId = experienceId
     }

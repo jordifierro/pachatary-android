@@ -13,8 +13,7 @@ import com.pachatary.R
 import com.pachatary.data.experience.Experience
 import com.pachatary.presentation.common.PachataryApplication
 import com.pachatary.presentation.experience.show.view.ExtendedListAdapter
-import com.pachatary.presentation.scene.show.ExperienceMapActivity
-import com.pachatary.presentation.scene.show.SceneListActivity
+import com.pachatary.presentation.scene.show.ExperienceScenesActivity
 import kotlinx.android.synthetic.main.activity_persons_experiences.*
 import javax.inject.Inject
 
@@ -89,6 +88,6 @@ class PersonsExperienceActivity : AppCompatActivity(), PersonsExperiencesView {
     }
 
     override fun navigateToExperience(experienceId: String) {
-        startActivity(SceneListActivity.newIntent(this, experienceId))
+        startActivity(ExperienceScenesActivity.newIntent(this, experienceId))
     }
 }

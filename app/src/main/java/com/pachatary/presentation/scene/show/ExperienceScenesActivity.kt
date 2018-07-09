@@ -28,10 +28,10 @@ import kotlinx.android.synthetic.main.activity_scene_list.*
 import javax.inject.Inject
 
 
-class SceneListActivity : AppCompatActivity(), SceneListView {
+class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
 
     @Inject
-    lateinit var presenter: SceneListPresenter
+    lateinit var presenter: ExperienceScenesPresenter
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var retryButton: ImageView
@@ -45,7 +45,7 @@ class SceneListActivity : AppCompatActivity(), SceneListView {
 
         fun newIntent(context: Context, experienceId: String,
                       showEditableIfItsMine: Boolean = false): Intent {
-            val intent = Intent(context, SceneListActivity::class.java)
+            val intent = Intent(context, ExperienceScenesActivity::class.java)
             intent.putExtra(EXPERIENCE_ID, experienceId)
             intent.putExtra(SHOW_EDITABLE_IF_ITS_MINE, showEditableIfItsMine)
             return intent
@@ -66,7 +66,7 @@ class SceneListActivity : AppCompatActivity(), SceneListView {
         presenter.setView(view = this, experienceId = intent.getStringExtra(EXPERIENCE_ID))
         registry.addObserver(presenter)
 
-        recyclerView.adapter = ExperienceSceneListAdapter(layoutInflater,
+        recyclerView.adapter = ExperienceScenesAdapter(layoutInflater,
                 intent.getBooleanExtra(SHOW_EDITABLE_IF_ITS_MINE, false), presenter)
     }
 
@@ -82,8 +82,8 @@ class SceneListActivity : AppCompatActivity(), SceneListView {
         recyclerView.visibility = View.VISIBLE
         retryButton.visibility = View.INVISIBLE
 
-        (recyclerView.adapter as ExperienceSceneListAdapter).experience = experience
-        (recyclerView.adapter as ExperienceSceneListAdapter).isExperienceInProgress = false
+        (recyclerView.adapter as ExperienceScenesAdapter).experience = experience
+        (recyclerView.adapter as ExperienceScenesAdapter).isExperienceInProgress = false
         recyclerView.adapter.notifyDataSetChanged()
     }
 
@@ -91,8 +91,8 @@ class SceneListActivity : AppCompatActivity(), SceneListView {
         recyclerView.visibility = View.VISIBLE
         retryButton.visibility = View.INVISIBLE
 
-        (recyclerView.adapter as ExperienceSceneListAdapter).scenes = scenes
-        (recyclerView.adapter as ExperienceSceneListAdapter).areScenesInProgress = false
+        (recyclerView.adapter as ExperienceScenesAdapter).scenes = scenes
+        (recyclerView.adapter as ExperienceScenesAdapter).areScenesInProgress = false
         recyclerView.adapter.notifyDataSetChanged()
     }
 
@@ -100,7 +100,7 @@ class SceneListActivity : AppCompatActivity(), SceneListView {
         recyclerView.visibility = View.VISIBLE
         retryButton.visibility = View.INVISIBLE
 
-        (recyclerView.adapter as ExperienceSceneListAdapter).isExperienceInProgress = true
+        (recyclerView.adapter as ExperienceScenesAdapter).isExperienceInProgress = true
         recyclerView.adapter.notifyDataSetChanged()
     }
 
@@ -108,7 +108,7 @@ class SceneListActivity : AppCompatActivity(), SceneListView {
         recyclerView.visibility = View.VISIBLE
         retryButton.visibility = View.INVISIBLE
 
-        (recyclerView.adapter as ExperienceSceneListAdapter).areScenesInProgress = true
+        (recyclerView.adapter as ExperienceScenesAdapter).areScenesInProgress = true
         recyclerView.adapter.notifyDataSetChanged()
     }
 
@@ -148,14 +148,14 @@ class SceneListActivity : AppCompatActivity(), SceneListView {
     }
 
     override fun scrollToScene(sceneId: String) {
-        (recyclerView.adapter as ExperienceSceneListAdapter).scrollToScene(sceneId)
+        (recyclerView.adapter as ExperienceScenesAdapter).scrollToScene(sceneId)
     }
 
     override fun getLifecycle(): LifecycleRegistry = registry
 
-    class ExperienceSceneListAdapter(private val inflater: LayoutInflater,
-                                     val showEditable: Boolean,
-                                     val presenter: SceneListPresenter)
+    class ExperienceScenesAdapter(private val inflater: LayoutInflater,
+                                  val showEditable: Boolean,
+                                  val presenter: ExperienceScenesPresenter)
         : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         val LOADER_TYPE = 0

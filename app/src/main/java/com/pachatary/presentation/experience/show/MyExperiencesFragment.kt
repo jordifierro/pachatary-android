@@ -18,8 +18,7 @@ import com.pachatary.presentation.common.PachataryApplication
 import com.pachatary.presentation.experience.edition.CreateExperienceActivity
 import com.pachatary.presentation.experience.show.view.SquareListAdapter
 import com.pachatary.presentation.register.RegisterActivity
-import com.pachatary.presentation.scene.show.ExperienceMapActivity
-import com.pachatary.presentation.scene.show.SceneListActivity
+import com.pachatary.presentation.scene.show.ExperienceScenesActivity
 import javax.inject.Inject
 
 
@@ -102,7 +101,7 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
 
     override fun navigateToExperience(experienceId: String) {
         startActivity(
-                SceneListActivity.newIntent(activity!!.applicationContext, experienceId, true))
+                ExperienceScenesActivity.newIntent(activity!!.applicationContext, experienceId, true))
     }
 
     override fun navigateToCreateExperience() {

@@ -21,8 +21,7 @@ import com.pachatary.presentation.common.edition.SelectLocationPresenter
 import com.pachatary.presentation.common.location.LocationUtils
 import com.pachatary.presentation.experience.show.view.ExtendedListAdapter
 import com.pachatary.presentation.main.MainActivity
-import com.pachatary.presentation.scene.show.ExperienceMapActivity
-import com.pachatary.presentation.scene.show.SceneListActivity
+import com.pachatary.presentation.scene.show.ExperienceScenesActivity
 import javax.inject.Inject
 
 class ExploreFragment : Fragment(), ExploreView {
@@ -106,7 +105,7 @@ class ExploreFragment : Fragment(), ExploreView {
     }
 
     override fun navigateToExperience(experienceId: String) {
-        startActivity(SceneListActivity.newIntent(activity!!.applicationContext, experienceId))
+        startActivity(ExperienceScenesActivity.newIntent(activity!!.applicationContext, experienceId))
     }
 
     override fun hasLocationPermission() = LocationUtils.checkLocationPermission(activity!!)

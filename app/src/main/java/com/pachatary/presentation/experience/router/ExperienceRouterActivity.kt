@@ -8,9 +8,7 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import com.pachatary.R
 import com.pachatary.presentation.common.PachataryApplication
-import com.pachatary.presentation.main.MainActivity
-import com.pachatary.presentation.scene.show.ExperienceMapActivity
-import com.pachatary.presentation.scene.show.SceneListActivity
+import com.pachatary.presentation.scene.show.ExperienceScenesActivity
 import kotlinx.android.synthetic.main.activity_register.*
 import javax.inject.Inject
 
@@ -62,6 +60,6 @@ class ExperienceRouterActivity : AppCompatActivity(), ExperienceRouterView {
     }
 
     override fun navigateToExperience(experienceId: String) {
-        startActivity(SceneListActivity.newIntent(this, experienceId))
+        startActivity(ExperienceScenesActivity.newIntent(this, experienceId))
     }
 }
