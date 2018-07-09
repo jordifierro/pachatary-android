@@ -6,6 +6,7 @@ import android.arch.lifecycle.OnLifecycleEvent
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.experience.ExperienceRepository
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
+import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
 class EditExperiencePresenter @Inject constructor(private val experienceRepository: ExperienceRepository,
@@ -14,6 +15,8 @@ class EditExperiencePresenter @Inject constructor(private val experienceReposito
     lateinit var view: EditExperienceView
     lateinit var experienceId: String
     lateinit var experience: Experience
+    var getDisposable: Disposable? = null
+    var editDisposable: Disposable? = null
 
     fun setView(view: EditExperienceView, experienceId: String) {
         this.view = view
@@ -22,7 +25,7 @@ class EditExperiencePresenter @Inject constructor(private val experienceReposito
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun create() {
-        experienceRepository.experienceFlowable(experienceId)
+        getDisposable = experienceRepository.experienceFlowable(experienceId)
                 .observeOn(schedulerProvider.observer())
                 .subscribeOn(schedulerProvider.subscriber())
                 .take(1)
@@ -31,11 +34,14 @@ class EditExperiencePresenter @Inject constructor(private val experienceReposito
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-    fun destroy() {}
+    fun destroy() {
+        getDisposable?.dispose()
+        editDisposable?.dispose()
+    }
 
     fun onTitleAndDescriptionEdited(title: String, description: String) {
         experience = Experience(experience.id, title, description, experience.picture)
-        experienceRepository.editExperience(experience)
+        editDisposable = experienceRepository.editExperience(experience)
                 .subscribeOn(schedulerProvider.subscriber())
                 .observeOn(schedulerProvider.observer())
                 .subscribe { onExperienceEditedCorrectly(it.data!!) }

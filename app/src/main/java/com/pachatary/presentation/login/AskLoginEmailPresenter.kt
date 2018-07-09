@@ -1,9 +1,11 @@
 package com.pachatary.presentation.login
 
-import android.annotation.SuppressLint
+import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleObserver
+import android.arch.lifecycle.OnLifecycleEvent
 import com.pachatary.data.auth.AuthRepository
 import io.reactivex.Scheduler
+import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -13,9 +15,10 @@ class AskLoginEmailPresenter @Inject constructor(
 
     lateinit var view: AskLoginEmailView
 
-    @SuppressLint("CheckResult")
+    var disposable: Disposable? = null
+
     fun onAskClick(email: String) {
-        authRepository.askLoginEmail(email)
+        disposable = authRepository.askLoginEmail(email)
                 .observeOn(mainScheduler)
                 .subscribe {
                     if (it.isSuccess()) {
@@ -33,5 +36,10 @@ class AskLoginEmailPresenter @Inject constructor(
                         view.disableAskButton()
                     }
                 }
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+    fun destroy() {
+        disposable?.dispose()
     }
 }

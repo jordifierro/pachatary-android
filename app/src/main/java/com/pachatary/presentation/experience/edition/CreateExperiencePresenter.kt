@@ -7,6 +7,7 @@ import android.arch.lifecycle.OnLifecycleEvent
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.experience.ExperienceRepository
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
+import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
 class CreateExperiencePresenter @Inject constructor(private val experienceRepository: ExperienceRepository,
@@ -16,6 +17,7 @@ class CreateExperiencePresenter @Inject constructor(private val experienceReposi
     var title = ""
     var description = ""
     var createdExperience: Experience? = null
+    var disposable: Disposable? = null
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun create() {
@@ -23,14 +25,15 @@ class CreateExperiencePresenter @Inject constructor(private val experienceReposi
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-    fun destroy() {}
+    fun destroy() {
+        disposable?.dispose()
+    }
 
-    @SuppressLint("CheckResult")
     fun onTitleAndDescriptionEdited(title: String, description: String) {
         this.title = title
         this.description = description
         val newExperience = Experience(id = "", title = this.title, description = this.description, picture = null)
-        experienceRepository.createExperience(newExperience)
+        disposable = experienceRepository.createExperience(newExperience)
                 .subscribeOn(schedulerProvider.subscriber())
                 .observeOn(schedulerProvider.observer())
                 .subscribe({ onExperienceCreatedCorrectly(it.data!!) }, { throw it })

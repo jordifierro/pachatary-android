@@ -7,6 +7,7 @@ import android.arch.lifecycle.OnLifecycleEvent
 import com.pachatary.data.auth.AuthRepository
 import com.pachatary.data.experience.ExperienceRepository
 import io.reactivex.Scheduler
+import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -17,6 +18,7 @@ class ExperienceRouterPresenter @Inject constructor(
 
     lateinit var view: ExperienceRouterView
     lateinit var experienceShareId: String
+    var disposable: Disposable? = null
 
     fun setViewAndExperienceShareId(view: ExperienceRouterView, experienceShareId: String) {
         this.view = view
@@ -28,6 +30,11 @@ class ExperienceRouterPresenter @Inject constructor(
         getCredentialsAndTranslateShareId()
     }
 
+    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+    fun destroy() {
+        disposable?.dispose()
+    }
+
     fun onRetryClick() {
         getCredentialsAndTranslateShareId()
     }
@@ -37,9 +44,8 @@ class ExperienceRouterPresenter @Inject constructor(
         else getPersonInvitation()
     }
 
-    @SuppressLint("CheckResult")
     private fun getPersonInvitation() {
-        authRepository.getPersonInvitation()
+        disposable = authRepository.getPersonInvitation()
                 .observeOn(mainScheduler)
                 .subscribe({
                     if (it.isSuccess()) {

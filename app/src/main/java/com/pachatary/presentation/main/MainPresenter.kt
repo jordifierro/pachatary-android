@@ -6,6 +6,7 @@ import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.OnLifecycleEvent
 import com.pachatary.data.auth.AuthRepository
 import io.reactivex.Scheduler
+import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -15,8 +16,8 @@ class MainPresenter @Inject constructor(private val authRepository: AuthReposito
 
     lateinit var view: MainView
     val viewsStack = mutableListOf<MainView.ExperiencesViewType>()
+    var disposable: Disposable? = null
 
-    @SuppressLint("CheckResult")
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun create() {
         if (!authRepository.hasPersonCredentials()) {
@@ -25,10 +26,15 @@ class MainPresenter @Inject constructor(private val authRepository: AuthReposito
         }
         else {
             view.selectTab(MainView.ExperiencesViewType.SAVED)
-            authRepository.currentVersionHasExpired()
+            disposable = authRepository.currentVersionHasExpired()
                     .observeOn(mainScheduler)
                     .subscribe { hasExpired -> if (hasExpired == true) view.showUpgradeDialog() }
         }
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+    fun destroy() {
+        disposable?.dispose()
     }
 
     fun onTabClick(viewType: MainView.ExperiencesViewType) {

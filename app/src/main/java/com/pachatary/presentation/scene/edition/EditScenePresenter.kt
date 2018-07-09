@@ -7,6 +7,7 @@ import com.pachatary.data.scene.Scene
 import com.pachatary.data.scene.SceneRepository
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
 import com.pachatary.presentation.common.edition.SelectLocationPresenter
+import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
 class EditScenePresenter @Inject constructor(private val sceneRepository: SceneRepository,
@@ -16,6 +17,7 @@ class EditScenePresenter @Inject constructor(private val sceneRepository: SceneR
     lateinit var experienceId: String
     lateinit var sceneId: String
     lateinit var scene: Scene
+    var disposable: Disposable? = null
 
     fun setView(view: EditSceneView, experienceId: String, sceneId: String) {
         this.view = view
@@ -25,7 +27,7 @@ class EditScenePresenter @Inject constructor(private val sceneRepository: SceneR
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun create() {
-        sceneRepository.sceneFlowable(experienceId, sceneId)
+        disposable = sceneRepository.sceneFlowable(experienceId, sceneId)
                 .observeOn(schedulerProvider.observer())
                 .subscribeOn(schedulerProvider.subscriber())
                 .take(1)
@@ -34,7 +36,9 @@ class EditScenePresenter @Inject constructor(private val sceneRepository: SceneR
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-    fun destroy() {}
+    fun destroy() {
+        disposable?.dispose()
+    }
 
     fun onTitleAndDescriptionEdited(title: String, description: String) {
         scene = Scene(scene.id, title, description, scene.picture, scene.latitude, scene.longitude, scene.experienceId)

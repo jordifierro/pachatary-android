@@ -7,6 +7,7 @@ import com.pachatary.data.scene.Scene
 import com.pachatary.data.scene.SceneRepository
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
 import com.pachatary.presentation.common.edition.SelectLocationPresenter
+import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
 class CreateScenePresenter @Inject constructor(private val sceneRepository: SceneRepository,
@@ -22,6 +23,7 @@ class CreateScenePresenter @Inject constructor(private val sceneRepository: Scen
     var lastLocationFound = false
     var lastLatitude = 0.0
     var lastLongitude = 0.0
+    var disposable: Disposable? = null
 
     fun setView(view: CreateSceneView, experienceId: String) {
         this.view = view
@@ -34,7 +36,9 @@ class CreateScenePresenter @Inject constructor(private val sceneRepository: Scen
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-    fun destroy() {}
+    fun destroy() {
+        disposable?.dispose()
+    }
 
     fun onLastLocationFound(latitude: Double, longitude: Double) {
         lastLatitude = latitude
@@ -60,7 +64,7 @@ class CreateScenePresenter @Inject constructor(private val sceneRepository: Scen
         val sceneToCreate = Scene(id = "", title = title, description = description,
                                   latitude = latitude, longitude = longitude,
                                   experienceId = experienceId, picture = null)
-        sceneRepository.createScene(sceneToCreate)
+        disposable = sceneRepository.createScene(sceneToCreate)
                 .subscribeOn(schedulerProvider.subscriber())
                 .observeOn(schedulerProvider.observer())
                 .subscribe({ onSceneCreatedCorrectly(it.data!!) }, { throw it })
