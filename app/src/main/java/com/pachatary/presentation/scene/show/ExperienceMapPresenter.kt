@@ -19,12 +19,14 @@ class ExperienceMapPresenter @Inject constructor(private val repository: SceneRe
 
     lateinit var view: ExperienceMapView
     lateinit var experienceId: String
+    var showSceneId: String? = null
 
     private var scenesDisposable: Disposable? = null
 
-    fun setView(view: ExperienceMapView, experienceId: String) {
+    fun setView(view: ExperienceMapView, experienceId: String, showSceneId: String? = null) {
         this.view = view
         this.experienceId = experienceId
+        this.showSceneId = showSceneId
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
@@ -48,6 +50,7 @@ class ExperienceMapPresenter @Inject constructor(private val repository: SceneRe
                 scenesFlowable().filter { !it.isInProgress() },
                 BiFunction { _: Any, scenesResult: Result<List<Scene>> -> scenesResult })
                 .subscribe({ view.showScenesOnMap(it.data!!)
+                             if (showSceneId != null) view.selectScene(showSceneId!!)
                     view.hideLoader() }, { throw it })
     }
 

@@ -94,4 +94,8 @@ class SceneListPresenter @Inject constructor(private val sceneRepository: SceneR
     fun onSceneSelectedOnMap(selectedSceneId: String) {
         view.scrollToScene(selectedSceneId)
     }
+
+    fun onLocateSceneClick(sceneId: String) {
+        view.navigateToExperienceMap(experienceId, sceneId)
+    }
 }

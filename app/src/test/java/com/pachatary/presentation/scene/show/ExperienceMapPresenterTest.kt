@@ -16,6 +16,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.BDDMockito
 import org.mockito.Mock
+import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 
 class ExperienceMapPresenterTest {
@@ -32,6 +33,25 @@ class ExperienceMapPresenterTest {
             view_should_show_loader()
             view_should_hide_loader()
             view_should_show_scenes_on_map()
+            view_should_select_scene()
+        }
+    }
+
+    @Test
+    fun testCreateWaitsMapAndScenesAndShowsThemWhenNoShowSceneId() {
+        given {
+            two_scenes()
+            repository_with_those_two_scenes()
+            map_is_loaded_correctly()
+            set_show_scene_id_to_null()
+        } whenn {
+            presenter_is_created()
+        } then {
+            view_should_show_loader()
+            view_should_hide_loader()
+            view_should_show_scenes_on_map()
+            should_ask_map_flowable()
+            view_should_not_select_scene()
         }
     }
 
@@ -70,6 +90,7 @@ class ExperienceMapPresenterTest {
         @Mock private lateinit var mockView: ExperienceMapView
         @Mock lateinit var mockRepository: SceneRepository
         val experienceId = "5"
+        val sceneId = "7"
         var sceneA: Scene? = null
         var sceneB: Scene? = null
         var scenesObservable = PublishSubject.create<Result<List<Scene>>>()
@@ -81,7 +102,7 @@ class ExperienceMapPresenterTest {
                                                           Schedulers.trampoline())
             presenter = ExperienceMapPresenter(repository = mockRepository,
                                                schedulerProvider = testSchedulerProvider)
-            presenter.setView(view = mockView, experienceId = experienceId)
+            presenter.setView(view = mockView, experienceId = experienceId, showSceneId = sceneId)
 
             return this
         }
@@ -97,6 +118,10 @@ class ExperienceMapPresenterTest {
             an_scene()
             sceneB = Scene(id = "2", title = "B", description = "", picture = null,
                     latitude = 0.0, longitude = 0.0, experienceId = "5")
+        }
+
+        fun set_show_scene_id_to_null() {
+            presenter.showSceneId = null
         }
 
         fun repository_with_those_two_scenes() {
@@ -150,6 +175,18 @@ class ExperienceMapPresenterTest {
 
         fun should_finish_with_scene_id(sceneId: String) {
             BDDMockito.then(mockView).should().finishWithSceneId(sceneId)
+        }
+
+        fun view_should_select_scene() {
+            BDDMockito.then(mockView).should().selectScene(sceneId)
+        }
+
+        fun should_ask_map_flowable() {
+            BDDMockito.then(mockView).should().mapLoadedFlowable()
+        }
+
+        fun view_should_not_select_scene() {
+            Mockito.verifyNoMoreInteractions(mockView)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

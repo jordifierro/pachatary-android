@@ -117,8 +117,9 @@ class SceneListActivity : AppCompatActivity(), SceneListView {
         retryButton.visibility = View.VISIBLE
     }
 
-    override fun navigateToExperienceMap(experienceId: String) {
-        startActivityForResult(ExperienceMapActivity.newIntent(this, experienceId), MAP_INTENT)
+    override fun navigateToExperienceMap(experienceId: String, showSceneWithId: String?) {
+        startActivityForResult(ExperienceMapActivity.newIntent(this, experienceId, showSceneWithId),
+                               MAP_INTENT)
     }
 
     override fun showUnsaveDialog() {
@@ -210,7 +211,8 @@ class SceneListActivity : AppCompatActivity(), SceneListView {
                     if (showEditable && experience != null && experience!!.isMine) isEditable = true
 
                     return SceneViewHolder(inflater.inflate(R.layout.item_scene, parent, false),
-                            isEditable , { presenter.onEditSceneClick(it) })
+                            isEditable , { presenter.onEditSceneClick(it) },
+                            { presenter.onLocateSceneClick(it) })
                 }
                 else -> {
                     return LoaderViewHolder(inflater.inflate(R.layout.item_loader, parent, false))
@@ -302,13 +304,15 @@ class SceneListActivity : AppCompatActivity(), SceneListView {
     }
 
     class SceneViewHolder(view: View, private val isEditable: Boolean,
-                          private val onEditSceneClick: (String) -> Unit)
+                          private val onEditSceneClick: (String) -> Unit,
+                          private val onLocateSceneClick: (String) -> Unit)
         : RecyclerView.ViewHolder(view), View.OnClickListener {
 
         private val titleView: TextView = view.findViewById(R.id.title)
         private val descriptionView: TextView = view.findViewById(R.id.description)
         private val pictureView: ImageView = view.findViewById(R.id.picture)
         private val editButton: FloatingActionButton = view.findViewById(R.id.edit_button)
+        private val locateButton: ImageButton = view.findViewById(R.id.locate_button)
         lateinit var sceneId: String
 
         fun bind(scene: Scene) {
@@ -316,6 +320,7 @@ class SceneListActivity : AppCompatActivity(), SceneListView {
             titleView.text = scene.title
             descriptionView.text = scene.description
             editButton.setOnClickListener { onEditSceneClick(this.sceneId) }
+            locateButton.setOnClickListener { onLocateSceneClick(this.sceneId) }
             if (isEditable) editButton.visibility = View.VISIBLE
             else editButton.visibility = View.GONE
             Picasso.with(pictureView.context)

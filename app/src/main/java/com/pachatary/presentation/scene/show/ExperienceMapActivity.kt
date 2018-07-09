@@ -47,11 +47,13 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView {
 
     companion object {
         private const val EXPERIENCE_ID = "experience_id"
+        private const val SHOW_SCENE_ID = "show_scene_id"
         const val SCENE_ID = "scene_id"
 
-        fun newIntent(context: Context, experienceId: String): Intent {
+        fun newIntent(context: Context, experienceId: String, showSceneId: String? = null): Intent {
             val intent = Intent(context, ExperienceMapActivity::class.java)
             intent.putExtra(EXPERIENCE_ID, experienceId)
+            if (showSceneId != null) intent.putExtra(SHOW_SCENE_ID, showSceneId)
             return intent
         }
     }
@@ -66,7 +68,9 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView {
         mapView.onCreate(savedInstanceState)
 
         PachataryApplication.injector.inject(this)
-        presenter.setView(this, intent.getStringExtra(EXPERIENCE_ID))
+        presenter.setView(this,
+                          intent.getStringExtra(EXPERIENCE_ID),
+                          intent.getStringExtra(SHOW_SCENE_ID))
         registry.addObserver(presenter)
 
         mapView.getMapAsync { mapboxMap ->
@@ -125,6 +129,12 @@ class ExperienceMapActivity : AppCompatActivity(), ExperienceMapView {
             mapboxMap.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBoundsBuilder.build(), 50, 150, 50, 150))
         }
         mapView.visibility = View.VISIBLE
+    }
+
+    override fun selectScene(showSceneId: String) {
+        for (marker in mapboxMap.markers)
+            if (markersHashMap[marker.id] == showSceneId)
+                mapboxMap.selectMarker(marker)
     }
 
     override fun navigateToCreateScene(experienceId: String) {

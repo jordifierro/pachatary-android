@@ -12,7 +12,7 @@ interface SceneListView {
     fun showLoadingExperience()
     fun showLoadingScenes()
     fun showRetry()
-    fun navigateToExperienceMap(experienceId: String)
+    fun navigateToExperienceMap(experienceId: String, showSceneWithId: String? = null)
     fun showUnsaveDialog()
     fun showSavedMessage()
     fun scrollToScene(sceneId: String)

@@ -195,6 +195,17 @@ class SceneListPresenterTest {
         }
     }
 
+    @Test
+    fun test_on_scene_locate_click_navigate_to_map_with_show_scene_id() {
+        given {
+            a_presenter_with("9")
+        } whenn {
+            scene_locate("6")
+        } then {
+            should_navigate_to_map("9", showSceneId = "6")
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
@@ -247,6 +258,10 @@ class SceneListPresenterTest {
             presenter.onSceneSelectedOnMap(sceneId)
         }
 
+        fun scene_locate(sceneId: String) {
+            presenter.onLocateSceneClick(sceneId)
+        }
+
         fun map_button_click() {
             presenter.onMapButtonClick()
         }
@@ -283,8 +298,11 @@ class SceneListPresenterTest {
             BDDMockito.then(mockView).should().showScenes(scenes)
         }
 
-        fun should_navigate_to_map(experienceId: String) {
-            BDDMockito.then(mockView).should().navigateToExperienceMap(experienceId)
+        fun should_navigate_to_map(experienceId: String, showSceneId: String? = null) {
+            if (showSceneId == null) BDDMockito.then(mockView).should()
+                    .navigateToExperienceMap(experienceId)
+            else BDDMockito.then(mockView).should()
+                    .navigateToExperienceMap(experienceId, showSceneId)
         }
 
         fun should_call_repo_save(experienceId: String, save: Boolean) {
