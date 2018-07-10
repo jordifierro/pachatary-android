@@ -52,10 +52,11 @@ class SceneRepository(val apiRepository: SceneApiRepository, val cacheFactory: R
         apiRepository.editScene(scene)
                 .doOnNext(emitThroughAddOrUpdate)
 
+    @SuppressLint("CheckResult")
     fun uploadScenePicture(sceneId: String, croppedImageUriString: String) {
         apiRepository.uploadScenePicture(sceneId, croppedImageUriString)
                 .doOnNext(emitThroughAddOrUpdate)
-                .subscribe()
+                .subscribe({}, { throw it } )
     }
 
     internal val emitThroughAddOrUpdate =

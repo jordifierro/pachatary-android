@@ -7,14 +7,12 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.pachatary.BuildConfig
 import com.pachatary.data.auth.AuthHttpInterceptor
-import com.pachatary.data.common.NetworkParserFactory
-import com.pachatary.data.common.Result
-import com.pachatary.data.common.ResultInProgress
-import com.pachatary.data.common.ResultSuccess
+import com.pachatary.data.common.*
 import com.pachatary.data.picture.Picture
 import io.reactivex.*
 import net.gotev.uploadservice.*
 import retrofit2.Retrofit
+import java.net.UnknownHostException
 import javax.inject.Named
 
 
@@ -49,23 +47,29 @@ class SceneApiRepository(retrofit: Retrofit, @Named("io") val ioScheduler: Sched
                         BuildConfig.API_URL + "/scenes/" + sceneId + "/picture/")
                         .addFileToUpload(Uri.parse(croppedImageUriString).path, "picture")
                         .setNotificationConfig(UploadNotificationConfig())
-                        .setMaxRetries(2)
+                        .setMaxRetries(3)
                         .addHeader(authHeader.key, authHeader.value)
                         .setDelegate(object : UploadStatusDelegate {
-                            override fun onProgress(context: Context, uploadInfo: UploadInfo) {}
-                            override fun onError(context: Context, uploadInfo: UploadInfo,
-                                                 serverResponse: ServerResponse,
-                                                 exception: Exception) {
-                                emitter.onError(exception)
-                            }
-
-                            override fun onCancelled(context: Context, uploadInfo: UploadInfo) {
+                            override fun onCancelled(context: Context?, uploadInfo: UploadInfo?) {
                                 emitter.onComplete()
                             }
-                            override fun onCompleted(context: Context, uploadInfo: UploadInfo,
-                                                     serverResponse: ServerResponse) {
-                                val jsonScene =
-                                        JsonParser().parse(serverResponse.bodyAsString).asJsonObject
+
+                            override fun onProgress(context: Context?, uploadInfo: UploadInfo?) {}
+
+                            override fun onError(context: Context?, uploadInfo: UploadInfo?,
+                                                 serverResponse: ServerResponse?,
+                                                 exception: java.lang.Exception?) {
+                                if (exception is UnknownHostException) {
+                                    emitter.onNext(ResultError(exception))
+                                    emitter.onComplete()
+                                }
+                                else emitter.onError(exception!!)
+                            }
+
+                            override fun onCompleted(context: Context?, uploadInfo: UploadInfo?,
+                                                     serverResponse: ServerResponse?) {
+                                val jsonScene = JsonParser().parse(
+                                        serverResponse!!.bodyAsString).asJsonObject
                                 emitter.onNext(ResultSuccess(parseSceneJson(jsonScene)))
                                 emitter.onComplete()
                             }
@@ -76,7 +80,6 @@ class SceneApiRepository(retrofit: Retrofit, @Named("io") val ioScheduler: Sched
             }
         }, BackpressureStrategy.LATEST)
                 .subscribeOn(ioScheduler)
-                .retry(2)
                 .startWith(ResultInProgress())
 
     internal fun parseSceneJson(jsonScene: JsonObject): Scene {

@@ -7,10 +7,7 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.pachatary.BuildConfig
 import com.pachatary.data.auth.AuthHttpInterceptor
-import com.pachatary.data.common.NetworkParserFactory
-import com.pachatary.data.common.Result
-import com.pachatary.data.common.ResultInProgress
-import com.pachatary.data.common.ResultSuccess
+import com.pachatary.data.common.*
 import com.pachatary.data.picture.Picture
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -18,6 +15,7 @@ import io.reactivex.Scheduler
 import net.gotev.uploadservice.*
 import org.json.JSONObject
 import retrofit2.Retrofit
+import java.net.UnknownHostException
 import javax.inject.Named
 
 class ExperienceApiRepository (retrofit: Retrofit, @Named("io") val scheduler: Scheduler,
@@ -91,23 +89,29 @@ class ExperienceApiRepository (retrofit: Retrofit, @Named("io") val scheduler: S
                         BuildConfig.API_URL + "/experiences/" + experienceId + "/picture/")
                         .addFileToUpload(Uri.parse(croppedImageUriString).path, "picture")
                         .setNotificationConfig(UploadNotificationConfig())
-                        .setMaxRetries(2)
+                        .setMaxRetries(3)
                         .addHeader(authHeader.key, authHeader.value)
                         .setDelegate(object : UploadStatusDelegate {
-                            override fun onProgress(context: Context, uploadInfo: UploadInfo) {}
-                            override fun onError(context: Context, uploadInfo: UploadInfo,
-                                                 serverResponse: ServerResponse,
-                                                 exception: Exception) {
-                                emitter.onError(exception)
-                            }
-
-                            override fun onCancelled(context: Context, uploadInfo: UploadInfo) {
+                            override fun onCancelled(context: Context?, uploadInfo: UploadInfo?) {
                                 emitter.onComplete()
                             }
-                            override fun onCompleted(context: Context, uploadInfo: UploadInfo,
-                                                     serverResponse: ServerResponse) {
+
+                            override fun onProgress(context: Context?, uploadInfo: UploadInfo?) {}
+
+                            override fun onError(context: Context?, uploadInfo: UploadInfo?,
+                                                 serverResponse: ServerResponse?,
+                                                 exception: java.lang.Exception?) {
+                                if (exception is UnknownHostException) {
+                                    emitter.onNext(ResultError(exception))
+                                    emitter.onComplete()
+                                }
+                                else emitter.onError(exception!!)
+                            }
+
+                            override fun onCompleted(context: Context?, uploadInfo: UploadInfo?,
+                                                     serverResponse: ServerResponse?) {
                                 val jsonExperience = JsonParser().parse(
-                                        serverResponse.bodyAsString).asJsonObject
+                                        serverResponse!!.bodyAsString).asJsonObject
                                 emitter.onNext(ResultSuccess(parseExperienceJson(jsonExperience)))
                                 emitter.onComplete()
                             }
@@ -118,7 +122,6 @@ class ExperienceApiRepository (retrofit: Retrofit, @Named("io") val scheduler: S
             }
         }, BackpressureStrategy.LATEST)
                 .subscribeOn(scheduler)
-                .retry(2)
                 .startWith(ResultInProgress())
 
     internal fun parseExperienceJson(jsonExperience: JsonObject): Experience {
