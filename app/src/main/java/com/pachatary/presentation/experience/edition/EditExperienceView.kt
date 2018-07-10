@@ -2,8 +2,7 @@ package com.pachatary.presentation.experience.edition
 
 interface EditExperienceView {
     fun navigateToEditTitleAndDescription(initialTitle: String = "", initialDescription: String = "")
-    fun navigateToPickImage()
-    fun navigateToCropImage(selectedImageUriString: String)
+    fun navigateToSelectImage()
     fun askUserToEditPicture()
     fun finish()
 }

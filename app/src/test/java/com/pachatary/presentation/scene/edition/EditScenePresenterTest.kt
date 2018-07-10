@@ -1,11 +1,10 @@
 package com.pachatary.presentation.scene.edition
 
-import com.pachatary.data.common.Result
 import com.pachatary.data.common.ResultSuccess
 import com.pachatary.data.scene.Scene
 import com.pachatary.data.scene.SceneRepository
-import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
 import com.pachatary.presentation.common.edition.SelectLocationPresenter
+import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 import org.junit.Assert
@@ -99,34 +98,12 @@ class EditScenePresenterTest {
             presenter_is_created()
             select_location_canceled()
         } then {
-            presenter_should_navigate_to_edit_title_and_description_with_initial_scene_values_twice()
+            should_navigate_to_edit_title_and_description_with_initial_scene_values_twice()
         }
     }
 
     @Test
-    fun on_image_picked_presenter_should_navigate_to_crop_image() {
-        given {
-            an_image_introduced_by_user()
-        } whenn {
-            image_is_picked()
-        } then {
-            presenter_should_navigate_to_crop_that_image()
-        }
-    }
-
-    @Test
-    fun on_pick_image_canceled_presenter_should_finsh_view() {
-        given {
-            nothing()
-        } whenn {
-            pick_image_is_canceled()
-        } then {
-            presenter_should_finish_view()
-        }
-    }
-
-    @Test
-    fun on_image_cropped_presenter_should_upload_image_and_finish_view() {
+    fun on_image_selected_presenter_should_upload_image_and_finish_view() {
         given {
             a_title_introduced_by_user()
             a_description_introduced_by_user()
@@ -135,26 +112,26 @@ class EditScenePresenterTest {
             an_scene()
             an_scene_repository_that_returns_scene()
             an_scene_repository_that_returns_edited_scene()
-            an_image_cropped_by_user()
+            an_image_selected_by_user()
         } whenn {
             presenter_is_created()
             title_and_description_are_edited()
             location_is_selected()
-            image_is_cropped()
+            image_is_selected()
         } then {
-            presenter_should_upload_that_cropped_image_with_created_scene_id()
+            presenter_should_upload_that_selected_image_with_created_scene_id()
             presenter_should_finish_view()
         }
     }
 
     @Test
-    fun on_crop_image_canceled_presenter_should_navigate_to_pick_image() {
+    fun on_select_image_canceled_presenter_should_navigate_to_pick_image() {
         given {
             nothing()
         } whenn {
-            crop_image_canceled()
+            select_image_canceled()
         } then {
-            presenter_should_navigate_to_pick_image()
+            presenter_should_finish_view()
         }
     }
 
@@ -172,12 +149,12 @@ class EditScenePresenterTest {
         var userLatitude = 0.0
         var userLongitude = 0.0
         var image = ""
-        var croppedImage = ""
         var receivedEditedScene: Scene? = null
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
-            val testSchedulerProvider = SchedulerProvider(Schedulers.trampoline(), Schedulers.trampoline())
+            val testSchedulerProvider = SchedulerProvider(Schedulers.trampoline(),
+                                                          Schedulers.trampoline())
             presenter = EditScenePresenter(mockRepository, testSchedulerProvider)
             presenter.setView(mockView, experienceId, sceneId)
 
@@ -202,12 +179,8 @@ class EditScenePresenterTest {
             userLongitude = -0.3
         }
 
-        fun an_image_introduced_by_user() {
-            image = "image_uri_string"
-        }
-
-        fun an_image_cropped_by_user() {
-            croppedImage = "another_iamge_uri_string"
+        fun an_image_selected_by_user() {
+            image = "another_iamge_uri_string"
         }
 
         fun an_scene() {
@@ -222,9 +195,10 @@ class EditScenePresenterTest {
         }
 
         fun an_scene_repository_that_returns_edited_scene() {
-            val sentEditedScene = Scene(id = sceneId, title = userTitle, description = userDescription,
-                                     latitude = userLatitude, longitude = userLongitude,
-                                     experienceId = experienceId, picture = null)
+            val sentEditedScene = Scene(id = sceneId, title = userTitle,
+                                        description = userDescription, latitude = userLatitude,
+                                        longitude = userLongitude, experienceId = experienceId,
+                                        picture = null)
             an_edited_scene()
 
             BDDMockito.given(mockRepository.editScene(scene = sentEditedScene))
@@ -256,26 +230,19 @@ class EditScenePresenterTest {
             presenter.onSelectLocationCanceled()
         }
 
-        fun image_is_picked() {
-            presenter.onImagePicked(image)
+        fun image_is_selected() {
+            presenter.onSelectImageSuccess(image)
         }
 
-        fun pick_image_is_canceled() {
-            presenter.onPickImageCanceled()
-        }
-
-        fun image_is_cropped() {
-            presenter.onImageCropped(croppedImage)
-        }
-
-        fun crop_image_canceled() {
-            presenter.onCropImageCanceled()
+        fun select_image_canceled() {
+            presenter.onSelectImageCanceled()
         }
 
 
         fun presenter_should_edit_scene_on_repo() {
-            val editedScene = Scene(id = sceneId, title = userTitle, description = userDescription, picture = null,
-                                    latitude = userLatitude, longitude = userLongitude, experienceId = experienceId)
+            val editedScene = Scene(id = sceneId, title = userTitle, description = userDescription,
+                                    picture = null, latitude = userLatitude,
+                                    longitude = userLongitude, experienceId = experienceId)
             BDDMockito.then(mockRepository).should().editScene(editedScene)
         }
 
@@ -296,24 +263,18 @@ class EditScenePresenterTest {
         }
 
         fun presenter_should_navigate_to_select_location_with_scene_initial_position() {
-            BDDMockito.then(mockView).should().navigateToSelectLocation(scene.latitude, scene.longitude,
-                                                                        SelectLocationPresenter.LocationType.SPECIFIC)
+            BDDMockito.then(mockView).should()
+                    .navigateToSelectLocation(scene.latitude, scene.longitude,
+                                              SelectLocationPresenter.LocationType.SPECIFIC)
         }
 
         fun presenter_should_finish_view() {
             BDDMockito.then(mockView).should().finish()
         }
 
-        fun presenter_should_navigate_to_pick_image() {
-            BDDMockito.then(mockView).should().navigateToPickImage()
-        }
-
-        fun presenter_should_navigate_to_crop_that_image() {
-            BDDMockito.then(mockView).should().navigateToCropImage(image)
-        }
-
-        fun presenter_should_upload_that_cropped_image_with_created_scene_id() {
-            BDDMockito.then(mockRepository).should().uploadScenePicture(receivedEditedScene!!.id, croppedImage)
+        fun presenter_should_upload_that_selected_image_with_created_scene_id() {
+            BDDMockito.then(mockRepository).should()
+                    .uploadScenePicture(receivedEditedScene!!.id, image)
         }
 
         fun presenter_should_request_scene_to_the_repo() {
@@ -321,10 +282,11 @@ class EditScenePresenterTest {
         }
 
         fun presenter_should_navigate_to_edit_title_and_description_with_initial_scene_values() {
-            BDDMockito.then(mockView).should().navigateToEditTitleAndDescription(scene.title, scene.description)
+            BDDMockito.then(mockView).should()
+                    .navigateToEditTitleAndDescription(scene.title, scene.description)
         }
 
-        fun presenter_should_navigate_to_edit_title_and_description_with_initial_scene_values_twice() {
+        fun should_navigate_to_edit_title_and_description_with_initial_scene_values_twice() {
             BDDMockito.then(mockView).should(Mockito.times(2))
                     .navigateToEditTitleAndDescription(scene.title, scene.description)
         }

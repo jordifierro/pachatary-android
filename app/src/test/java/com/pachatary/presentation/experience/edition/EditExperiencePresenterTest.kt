@@ -1,6 +1,5 @@
 package com.pachatary.presentation.experience.edition
 
-import com.pachatary.data.common.Result
 import com.pachatary.data.common.ResultSuccess
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.experience.ExperienceRepository
@@ -35,7 +34,7 @@ class EditExperiencePresenterTest {
         } whenn {
             presenter_is_created()
         } then {
-            presenter_should_navigate_to_edit_title_and_description_with_initial_experience_values()
+            should_navigate_to_edit_title_and_description_with_initial_experience_values()
         }
     }
 
@@ -71,54 +70,32 @@ class EditExperiencePresenterTest {
     }
 
     @Test
-    fun on_image_picked_presenter_should_navigate_to_crop_image() {
-        given {
-            an_image_introduced_by_user()
-        } whenn {
-            image_is_picked()
-        } then {
-            presenter_should_navigate_to_crop_that_image()
-        }
-    }
-
-    @Test
-    fun on_pick_image_canceled_presenter_should_finsh_view() {
-        given {
-            nothing()
-        } whenn {
-            pick_image_is_canceled()
-        } then {
-            presenter_should_finish_view()
-        }
-    }
-
-    @Test
-    fun on_image_cropped_presenter_should_upload_image_and_finish_view() {
+    fun on_image_selectd_presenter_should_upload_image_and_finish_view() {
         given {
             a_title_introduced_by_user()
             a_description_introduced_by_user()
             an_experience()
             an_experience_repository_that_returns_experience()
             an_experience_repository_that_returns_edited_experience()
-            an_image_cropped_by_user()
+            an_image_selected_by_user()
         } whenn {
             presenter_is_created()
             title_and_description_are_edited()
-            image_is_cropped()
+            image_is_selected()
         } then {
-            presenter_should_upload_that_cropped_image_with_created_experience_id()
+            presenter_should_upload_that_selected_image_with_created_experience_id()
             presenter_should_finish_view()
         }
     }
 
     @Test
-    fun on_crop_image_canceled_presenter_should_navigate_to_pick_image() {
+    fun on_select_image_canceled_presenter_should_finish() {
         given {
             nothing()
         } whenn {
-            crop_image_canceled()
+            select_image_canceled()
         } then {
-            presenter_should_navigate_to_pick_image()
+            presenter_should_finish_view()
         }
     }
 
@@ -133,12 +110,12 @@ class EditExperiencePresenterTest {
         var userTitle = ""
         var userDescription = ""
         var image = ""
-        var croppedImage = ""
         var receivedEditedExperience: Experience? = null
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
-            val testSchedulerProvider = SchedulerProvider(Schedulers.trampoline(), Schedulers.trampoline())
+            val testSchedulerProvider = SchedulerProvider(Schedulers.trampoline(),
+                                                          Schedulers.trampoline())
             presenter = EditExperiencePresenter(mockRepository, testSchedulerProvider)
             presenter.setView(mockView, experienceId)
 
@@ -155,16 +132,13 @@ class EditExperiencePresenterTest {
             userDescription = "Some description"
         }
 
-        fun an_image_introduced_by_user() {
+        fun an_image_selected_by_user() {
             image = "image_uri_string"
         }
 
-        fun an_image_cropped_by_user() {
-            croppedImage = "another_iamge_uri_string"
-        }
-
         fun an_experience() {
-            experience = Experience(id = experienceId, title = "Title", description = "description", picture = null)
+            experience = Experience(id = experienceId, title = "Title",
+                                    description = "description", picture = null)
         }
 
         fun an_edited_experience() {
@@ -173,8 +147,8 @@ class EditExperiencePresenterTest {
         }
 
         fun an_experience_repository_that_returns_edited_experience() {
-            val sentEditedExperience = Experience(id = experienceId, title = userTitle, description = userDescription,
-                                                  picture = null)
+            val sentEditedExperience = Experience(id = experienceId, title = userTitle,
+                                                  description = userDescription, picture = null)
             an_edited_experience()
 
             BDDMockito.given(mockRepository.editExperience(experience = sentEditedExperience))
@@ -198,22 +172,13 @@ class EditExperiencePresenterTest {
             presenter.onEditTitleAndDescriptionCanceled()
         }
 
-        fun image_is_picked() {
-            presenter.onImagePicked(image)
+        fun image_is_selected() {
+            presenter.onSelectImageSuccess(image)
         }
 
-        fun pick_image_is_canceled() {
-            presenter.onPickImageCanceled()
+        fun select_image_canceled() {
+            presenter.onSelectImageCancel()
         }
-
-        fun image_is_cropped() {
-            presenter.onImageCropped(croppedImage)
-        }
-
-        fun crop_image_canceled() {
-            presenter.onCropImageCanceled()
-        }
-
 
         fun presenter_should_edit_experience_on_repo() {
             val editedExperience = Experience(id = experienceId, title = userTitle,
@@ -241,25 +206,18 @@ class EditExperiencePresenterTest {
             BDDMockito.then(mockView).should().finish()
         }
 
-        fun presenter_should_navigate_to_pick_image() {
-            BDDMockito.then(mockView).should().navigateToPickImage()
-        }
-
-        fun presenter_should_navigate_to_crop_that_image() {
-            BDDMockito.then(mockView).should().navigateToCropImage(image)
-        }
-
-        fun presenter_should_upload_that_cropped_image_with_created_experience_id() {
+        fun presenter_should_upload_that_selected_image_with_created_experience_id() {
             BDDMockito.then(mockRepository).should()
-                    .uploadExperiencePicture(receivedEditedExperience!!.id, croppedImage)
+                    .uploadExperiencePicture(receivedEditedExperience!!.id, image)
         }
 
         fun presenter_should_request_experience_to_the_repo() {
             BDDMockito.then(mockRepository).should().experienceFlowable(experienceId)
         }
 
-        fun presenter_should_navigate_to_edit_title_and_description_with_initial_experience_values() {
-            BDDMockito.then(mockView).should().navigateToEditTitleAndDescription(experience.title, experience.description)
+        fun should_navigate_to_edit_title_and_description_with_initial_experience_values() {
+            BDDMockito.then(mockView).should()
+                    .navigateToEditTitleAndDescription(experience.title, experience.description)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

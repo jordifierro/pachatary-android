@@ -11,13 +11,15 @@ import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
 class EditScenePresenter @Inject constructor(private val sceneRepository: SceneRepository,
-                                             private val schedulerProvider: SchedulerProvider): LifecycleObserver {
+                                             private val schedulerProvider: SchedulerProvider)
+                                                                               : LifecycleObserver {
 
     lateinit var view: EditSceneView
     lateinit var experienceId: String
     lateinit var sceneId: String
     lateinit var scene: Scene
     var disposable: Disposable? = null
+    var editDisposable: Disposable? = null
 
     fun setView(view: EditSceneView, experienceId: String, sceneId: String) {
         this.view = view
@@ -38,6 +40,7 @@ class EditScenePresenter @Inject constructor(private val sceneRepository: SceneR
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun destroy() {
         disposable?.dispose()
+        editDisposable?.dispose()
     }
 
     fun onTitleAndDescriptionEdited(title: String, description: String) {
@@ -51,7 +54,7 @@ class EditScenePresenter @Inject constructor(private val sceneRepository: SceneR
 
     fun onLocationSelected(latitude: Double, longitude: Double) {
         scene = Scene(scene.id, scene.title, scene.description, scene.picture, latitude, longitude, scene.experienceId)
-        sceneRepository.editScene(scene)
+        editDisposable = sceneRepository.editScene(scene)
                 .subscribeOn(schedulerProvider.subscriber())
                 .observeOn(schedulerProvider.observer())
                 .subscribe { onSceneEditedCorrectly(it.data!!) }
@@ -61,30 +64,22 @@ class EditScenePresenter @Inject constructor(private val sceneRepository: SceneR
         view.navigateToEditTitleAndDescription(scene.title, scene.description)
     }
 
-    fun onSceneEditedCorrectly(scene: Scene) {
+    private fun onSceneEditedCorrectly(scene: Scene) {
         this.scene = scene
         view.askUserToEditPicture()
     }
 
     fun onAskUserEditPictureResponse(userWantsToEditPicture: Boolean) {
-        if (userWantsToEditPicture) view.navigateToPickImage()
+        if (userWantsToEditPicture) view.navigateToSelectImage()
         else view.finish()
     }
 
-    fun onImagePicked(selectedImageUriString: String) {
-        view.navigateToCropImage(selectedImageUriString)
-    }
-
-    fun onPickImageCanceled() {
+    fun onSelectImageSuccess(selectedImageUriString: String) {
+        sceneRepository.uploadScenePicture(scene.id, selectedImageUriString)
         view.finish()
     }
 
-    fun onImageCropped(croppedImageUriString: String) {
-        sceneRepository.uploadScenePicture(scene.id, croppedImageUriString)
+    fun onSelectImageCanceled() {
         view.finish()
-    }
-
-    fun onCropImageCanceled() {
-        view.navigateToPickImage()
     }
 }

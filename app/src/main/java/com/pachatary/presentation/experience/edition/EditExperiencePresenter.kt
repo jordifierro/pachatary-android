@@ -57,24 +57,16 @@ class EditExperiencePresenter @Inject constructor(private val experienceReposito
     }
 
     fun onAskUserEditPictureResponse(userWantsToEditPicture: Boolean) {
-        if (userWantsToEditPicture) view.navigateToPickImage()
+        if (userWantsToEditPicture) view.navigateToSelectImage()
         else view.finish()
     }
 
-    fun onImagePicked(selectedImageUriString: String) {
-        view.navigateToCropImage(selectedImageUriString)
-    }
-
-    fun onPickImageCanceled() {
+    fun onSelectImageSuccess(selectedImageUriString: String) {
+        experienceRepository.uploadExperiencePicture(experience.id, selectedImageUriString)
         view.finish()
     }
 
-    fun onImageCropped(croppedImageUriString: String) {
-        experienceRepository.uploadExperiencePicture(experience.id, croppedImageUriString)
+    fun onSelectImageCancel() {
         view.finish()
-    }
-
-    fun onCropImageCanceled() {
-        view.navigateToPickImage()
     }
 }
