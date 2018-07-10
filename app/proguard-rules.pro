@@ -75,3 +75,26 @@
 -dontwarn com.yalantis.ucrop**
 -keep class com.yalantis.ucrop** { *; }
 -keep interface com.yalantis.ucrop** { *; }
+
+# Mapbox
+-keep class com.mapbox.geojson.** { *; }
+-keep class com.google.gson.* { *; }
+-dontnote com.google.gson.internal.UnsafeAllocator
+
+-keep class com.mapbox.mapboxsdk.** { *; }
+-keep interface com.mapbox.mapboxsdk.* { *; }
+-keep class com.mapbox.mapboxsdk.maps.* { *; }
+-keep interface com.mapbox.mapboxsdk.maps.* { *; }
+-keep class com.mapbox.mapboxsdk.maps.Telemetry. { *; }
+-keep class com.mapbox.mapboxsdk.plugins.locationlayer. { *; }
+-keep interface com.mapbox.mapboxsdk.plugins.locationlayer. { *; }
+
+-dontwarn com.google.auto.value.**
+
+-dontwarn com.mapzen.android.lost.api**
+
+-dontwarn com.mapbox.mapboxsdk.plugins.locationlayer.**
+-dontwarn okhttp3.internal.platform.ConscryptPlatform.**
+
+-keep public class com.google.android.gms.* { public *; }
+-dontwarn com.google.android.gms.**
