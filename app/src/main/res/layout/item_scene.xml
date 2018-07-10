@@ -31,11 +31,13 @@
         android:layout_height="wrap_content"
         android:gravity="start"
         android:layout_margin="10dp"
-        android:textColor="@color/black"
-        android:textSize="20sp"
         android:layout_below="@id/picture"
         android:layout_toLeftOf="@+id/locate_button"
-        android:layout_toStartOf="@+id/locate_button" />
+        android:layout_toStartOf="@+id/locate_button"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:textColor="@color/black"
+        android:textSize="20sp" />
 
     <ImageButton
         android:id="@+id/locate_button"
