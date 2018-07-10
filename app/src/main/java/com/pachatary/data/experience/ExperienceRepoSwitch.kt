@@ -34,7 +34,8 @@ class ExperienceRepoSwitch(resultCacheFactory: ResultCacheFactory<Experience>,
     fun modifyResult(kind: Kind, modification: Modification,
                      list: List<Experience>? = null, result: Result<List<Experience>>? = null) {
         when (modification) {
-            Modification.ADD_OR_UPDATE_LIST -> resultCache(kind).addOrUpdateObserver.onNext(list!!)
+            Modification.ADD_OR_UPDATE_LIST -> resultCache(kind).addOrUpdateObserver.onNext(
+                    Pair(list!!, ResultCacheFactory.AddPosition.START))
             Modification.UPDATE_LIST -> resultCache(kind).updateObserver.onNext(list!!)
             Modification.REPLACE_RESULT -> resultCache(kind).replaceResultObserver.onNext(result!!)
         }

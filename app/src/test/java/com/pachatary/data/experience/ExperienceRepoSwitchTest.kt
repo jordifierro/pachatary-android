@@ -129,35 +129,40 @@ class ExperienceRepoSwitchTest {
         @Mock lateinit var requesterFactory: ExperienceRequesterFactory
         lateinit var switch: ExperienceRepoSwitch
 
-        val addOrUpdateMineObserver = TestObserver.create<List<Experience>>()
+        val addOrUpdateMineObserver = TestObserver.create<Pair<List<Experience>,
+                                                               ResultCacheFactory.AddPosition>>()
         val updateMineObserver = TestObserver.create<List<Experience>>()
         val replaceResultMineObserver = TestObserver.create<Result<List<Experience>>>()
         var resultMineFlowable = Flowable.empty<Result<List<Experience>>>()
         var resultMineCache = ResultCacheFactory.ResultCache(replaceResultMineObserver,
                 addOrUpdateMineObserver, updateMineObserver, resultMineFlowable)
 
-        val addOrUpdateSavedObserver = TestObserver.create<List<Experience>>()
+        val addOrUpdateSavedObserver = TestObserver.create<Pair<List<Experience>,
+                                                                ResultCacheFactory.AddPosition>>()
         val updateSavedObserver = TestObserver.create<List<Experience>>()
         val replaceResultSavedObserver = TestObserver.create<Result<List<Experience>>>()
         var resultSavedFlowable = Flowable.empty<Result<List<Experience>>>()
         var resultSavedCache = ResultCacheFactory.ResultCache(replaceResultSavedObserver,
                 addOrUpdateSavedObserver, updateSavedObserver, resultSavedFlowable)
 
-        val addOrUpdateExploreObserver = TestObserver.create<List<Experience>>()
+        val addOrUpdateExploreObserver = TestObserver.create<Pair<List<Experience>,
+                                                                  ResultCacheFactory.AddPosition>>()
         val updateExploreObserver = TestObserver.create<List<Experience>>()
         val replaceResultExploreObserver = TestObserver.create<Result<List<Experience>>>()
         var resultExploreFlowable = Flowable.empty<Result<List<Experience>>>()
         var resultExploreCache = ResultCacheFactory.ResultCache(replaceResultExploreObserver,
                 addOrUpdateExploreObserver, updateExploreObserver, resultExploreFlowable)
 
-        val addOrUpdatePersonsObserver = TestObserver.create<List<Experience>>()
+        val addOrUpdatePersonsObserver = TestObserver.create<Pair<List<Experience>,
+                                                                  ResultCacheFactory.AddPosition>>()
         val updatePersonsObserver = TestObserver.create<List<Experience>>()
         val replaceResultPersonsObserver = TestObserver.create<Result<List<Experience>>>()
         var resultPersonsFlowable = Flowable.empty<Result<List<Experience>>>()
         var resultPersonsCache = ResultCacheFactory.ResultCache(replaceResultPersonsObserver,
                 addOrUpdatePersonsObserver, updatePersonsObserver, resultPersonsFlowable)
 
-        val addOrUpdateOtherObserver = TestObserver.create<List<Experience>>()
+        val addOrUpdateOtherObserver = TestObserver.create<Pair<List<Experience>,
+                                                                ResultCacheFactory.AddPosition>>()
         val updateOtherObserver = TestObserver.create<List<Experience>>()
         val replaceResultOtherObserver = TestObserver.create<Result<List<Experience>>>()
         var resultOtherFlowable = Flowable.empty<Result<List<Experience>>>()
@@ -311,23 +316,28 @@ class ExperienceRepoSwitchTest {
             when (kind) {
                 ExperienceRepoSwitch.Kind.MINE -> {
                     addOrUpdateMineObserver.awaitCount(1)
-                    addOrUpdateMineObserver.assertValue(experienceList)
+                    addOrUpdateMineObserver.assertValue(
+                            Pair(experienceList, ResultCacheFactory.AddPosition.START))
                 }
                 ExperienceRepoSwitch.Kind.SAVED -> {
                     addOrUpdateSavedObserver.awaitCount(1)
-                    addOrUpdateSavedObserver.assertValue(experienceList)
+                    addOrUpdateSavedObserver.assertValue(
+                            Pair(experienceList, ResultCacheFactory.AddPosition.START))
                 }
                 ExperienceRepoSwitch.Kind.EXPLORE -> {
                     addOrUpdateExploreObserver.awaitCount(1)
-                    addOrUpdateExploreObserver.assertValue(experienceList)
+                    addOrUpdateExploreObserver.assertValue(
+                            Pair(experienceList, ResultCacheFactory.AddPosition.START))
                 }
                 ExperienceRepoSwitch.Kind.PERSONS -> {
                     addOrUpdatePersonsObserver.awaitCount(1)
-                    addOrUpdatePersonsObserver.assertValue(experienceList)
+                    addOrUpdatePersonsObserver.assertValue(
+                            Pair(experienceList, ResultCacheFactory.AddPosition.START))
                 }
                 ExperienceRepoSwitch.Kind.OTHER -> {
                     addOrUpdateOtherObserver.awaitCount(1)
-                    addOrUpdateOtherObserver.assertValue(experienceList)
+                    addOrUpdateOtherObserver.assertValue(
+                            Pair(experienceList, ResultCacheFactory.AddPosition.START))
                 }
             }
         }

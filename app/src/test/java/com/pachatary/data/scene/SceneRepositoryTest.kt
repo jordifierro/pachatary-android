@@ -172,7 +172,8 @@ class SceneRepositoryTest {
         }
 
         fun an_scenes_cache_factory_that_returns_cache_with(result: Result<List<Scene>>) {
-            val addOrUpdateObserver = TestObserver.create<List<Scene>>()
+            val addOrUpdateObserver = TestObserver.create<Pair<List<Scene>,
+                                                               ResultCacheFactory.AddPosition>>()
             addOrUpdateObserver.onSubscribe(addOrUpdateObserver)
             val updateObserver = TestObserver.create<List<Scene>>()
             val replaceResultObserver = TestObserver.create<Result<List<Scene>>>()
@@ -236,7 +237,10 @@ class SceneRepositoryTest {
         fun should_emit_through_cache_add_or_update(vararg scenes: List<Scene>, throughCache: Int = 1) {
             val addOrUpdateObserver = caches[throughCache - 1].addOrUpdateObserver as TestObserver
             addOrUpdateObserver.onComplete()
-            addOrUpdateObserver.assertResult(*scenes)
+
+            val calls = mutableListOf<Pair<List<Scene>, ResultCacheFactory.AddPosition>>()
+            for (scene in scenes) { calls.add(Pair(scene, ResultCacheFactory.AddPosition.START)) }
+            addOrUpdateObserver.assertResult(*calls.toTypedArray())
         }
 
         fun should_return_list_flowable_with(vararg results: Result<List<Scene>>, forResult: Int = 1) {

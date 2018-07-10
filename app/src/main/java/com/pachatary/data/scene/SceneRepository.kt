@@ -62,7 +62,8 @@ class SceneRepository(val apiRepository: SceneApiRepository, val cacheFactory: R
             { resultScene: Result<Scene> ->
                 if (resultScene.status == Status.SUCCESS) {
                     scenesCacheHashMap.get(resultScene.data!!.experienceId)!!
-                            .addOrUpdateObserver.onNext(listOf(resultScene.data))
+                            .addOrUpdateObserver.onNext(Pair(listOf(resultScene.data),
+                                                             ResultCacheFactory.AddPosition.START))
                 }
             }
 }

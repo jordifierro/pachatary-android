@@ -23,7 +23,8 @@ class ResultCacheFactoryTest {
     fun test_cache_caches_last_item_emitted() {
         given {
             a_created_cache()
-            a_list_of_scenes_is_emitted_through_add_list_observer()
+            a_list_of_scenes_is_emitted_through_add_list_observer(
+                                                            ResultCacheFactory.AddPosition.START)
             a_new_list_is_emitted_through_replace()
         } whenn {
             another_observer_subscribes_to_flowable()
@@ -33,14 +34,17 @@ class ResultCacheFactoryTest {
     }
 
     @Test
-    fun test_emit_through_add_or_update_a_new_scene() {
-        given {
-            a_created_cache()
-            a_list_of_scenes_is_emitted_through_add_list_observer()
-        } whenn {
-            new_scene_is_emitted_through_add_or_update()
-        } then {
-            a_list_with_previous_scenes_and_new_one_should_be_received()
+    fun test_emit_through_add_or_update_a_new_scene_adds_it_on_specified_position() {
+        for (position in ResultCacheFactory.AddPosition.values()) {
+            given {
+                a_created_cache()
+                a_list_of_scenes_is_emitted_through_add_list_observer(
+                                                            ResultCacheFactory.AddPosition.START)
+            } whenn {
+                new_scene_is_emitted_through_add_or_update(position)
+            } then {
+                should_receive_a_list_with_new_scene_and_previous_scenes(position)
+            }
         }
     }
 
@@ -48,21 +52,23 @@ class ResultCacheFactoryTest {
     fun test_emit_through_add_or_update_an_old_scene_modified() {
         given {
             a_created_cache()
-            a_list_of_scenes_is_emitted_through_add_list_observer()
+            a_list_of_scenes_is_emitted_through_add_list_observer(
+                                                            ResultCacheFactory.AddPosition.START)
         } whenn {
-            modified_scene_is_emitted_through_add_or_update()
+            modified_scene_is_emitted_through_add_or_update(ResultCacheFactory.AddPosition.START)
         } then {
             a_list_with_previous_scenes_but_with_scene_modifications()
         }
     }
 
     @Test
-    fun test_emit_through_add_list_adds_elements() {
+    fun test_emit_through_add_list_adds_elements_at_the_end() {
         given {
             a_created_cache()
-            a_list_of_scenes_is_emitted_through_add_list_observer()
+            a_list_of_scenes_is_emitted_through_add_list_observer(
+                                                            ResultCacheFactory.AddPosition.START)
         } whenn {
-            a_new_list_is_emitted_through_add_list_observer()
+            a_new_list_is_emitted_through_add_list_observer(ResultCacheFactory.AddPosition.END)
         } then {
             new_list_should_be_appended_to_old_one()
         }
@@ -100,20 +106,23 @@ class ResultCacheFactoryTest {
             cache.resultFlowable.subscribeOn(Schedulers.trampoline()).subscribe(testSubscriber)
         }
 
-        fun a_list_of_scenes_is_emitted_through_add_list_observer() {
-            cache.addOrUpdateObserver.onNext(oldScenes)
+        fun a_list_of_scenes_is_emitted_through_add_list_observer(
+                                                        position: ResultCacheFactory.AddPosition) {
+            cache.addOrUpdateObserver.onNext(Pair(oldScenes, position))
         }
 
-        fun new_scene_is_emitted_through_add_or_update() {
-            cache.addOrUpdateObserver.onNext(listOf(newScene))
+        fun new_scene_is_emitted_through_add_or_update(position: ResultCacheFactory.AddPosition) {
+            cache.addOrUpdateObserver.onNext(Pair(listOf(newScene), position))
         }
 
-        fun modified_scene_is_emitted_through_add_or_update() {
-            cache.addOrUpdateObserver.onNext(listOf(updatedScene))
+        fun modified_scene_is_emitted_through_add_or_update(
+                                                        position: ResultCacheFactory.AddPosition) {
+            cache.addOrUpdateObserver.onNext(Pair(listOf(updatedScene), position))
         }
 
-        fun a_new_list_is_emitted_through_add_list_observer() {
-            cache.addOrUpdateObserver.onNext(newScenes)
+        fun a_new_list_is_emitted_through_add_list_observer(
+                                                        position: ResultCacheFactory.AddPosition) {
+            cache.addOrUpdateObserver.onNext(Pair(newScenes, position))
         }
 
         fun a_new_list_is_emitted_through_replace() {
@@ -121,15 +130,20 @@ class ResultCacheFactoryTest {
         }
 
         fun another_observer_subscribes_to_flowable() {
-            cache.resultFlowable.subscribeOn(Schedulers.trampoline()).subscribe(secondTestSubscriber)
+            cache.resultFlowable.subscribeOn(Schedulers.trampoline())
+                    .subscribe(secondTestSubscriber)
         }
 
-        fun a_list_with_previous_scenes_and_new_one_should_be_received() {
+        fun should_receive_a_list_with_new_scene_and_previous_scenes(
+                                                        position: ResultCacheFactory.AddPosition) {
             testSubscriber.awaitCount(3)
 
             val secondResult = testSubscriber.events.get(0).get(2) as Result<*>
             val secondSceneList = secondResult.data as List<*>
-            assertEquals(oldScenes.union(listOf(newScene)).toList(), secondSceneList)
+            if (position == ResultCacheFactory.AddPosition.START)
+                assertEquals(listOf(newScene).union(oldScenes).toList(), secondSceneList)
+            else
+                assertEquals(oldScenes.union(listOf(newScene)).toList(), secondSceneList)
         }
 
         fun a_list_with_previous_scenes_but_with_scene_modifications() {

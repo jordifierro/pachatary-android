@@ -196,7 +196,8 @@ class ExperienceRequesterFactoryTest {
         var kind = ExperienceRepoSwitch.Kind.MINE
         lateinit var resultCache: ResultCacheFactory.ResultCache<Experience>
         lateinit var resultFlowable: Flowable<Result<List<Experience>>>
-        val addOrUpdateObserver = TestObserver.create<List<Experience>>()
+        val addOrUpdateObserver = TestObserver.create<Pair<List<Experience>,
+                                                           ResultCacheFactory.AddPosition>>()
         val updateObserver = TestObserver.create<List<Experience>>()
         val replaceResultObserver = TestObserver.create<Result<List<Experience>>>()
         lateinit var experienceA: Experience

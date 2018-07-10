@@ -8,15 +8,19 @@ import io.reactivex.subjects.PublishSubject
 
 class ResultCacheFactory<T> where T : Identifiable {
 
+    enum class AddPosition {
+        START, END
+    }
+
     data class ResultCache<T>(
             val replaceResultObserver: Observer<Result<List<T>>>,
-            val addOrUpdateObserver: Observer<List<T>>,
+            val addOrUpdateObserver: Observer<Pair<List<T>, AddPosition>>,
             val updateObserver: Observer<List<T>>,
             val resultFlowable: Flowable<Result<List<T>>>)
 
     fun create(): ResultCache<T> {
         val replaceResultSubject = PublishSubject.create<Result<List<T>>>()
-        val addOrUpdateSubject = PublishSubject.create<List<T>>()
+        val addOrUpdateSubject = PublishSubject.create<Pair<List<T>, AddPosition>>()
         val updateSubject = PublishSubject.create<List<T>>()
         val resultFlowable =
             Flowable.merge(
@@ -24,13 +28,22 @@ class ResultCacheFactory<T> where T : Identifiable {
                         .map { newResult: Result<List<T>> ->
                             Function<Result<List<T>>, Result<List<T>>> { newResult }},
                 addOrUpdateSubject.toFlowable(BackpressureStrategy.LATEST)
-                        .map { tList: List<T> -> Function<Result<List<T>>, Result<List<T>>>
+                        .map { listPositionPair: Pair<List<T>, AddPosition> ->
+                                                        Function<Result<List<T>>, Result<List<T>>>
                             { previousTListResult: Result<List<T>> ->
-                                var newList = previousTListResult.data!!
-                                for (t in tList) {
-                                    if (newList.find { it.id == t.id } != null)
-                                        newList = newList.map { x -> if (x.id == t.id) t else x }
-                                    else newList = newList.union(listOf(t)).toList()
+                                var newList: List<T>
+                                if (listPositionPair.second == AddPosition.START) {
+                                    newList = listPositionPair.first.toMutableList()
+                                    for (t in previousTListResult.data!!)
+                                        if (newList.find { it.id == t.id } == null)
+                                            newList.add(t)
+                                }
+                                else {
+                                    newList = previousTListResult.data!!.toMutableList()
+                                    for (t in listPositionPair.first) {
+                                        newList = newList.filter { it.id != t.id }
+                                        newList = newList.union(listOf(t)).toMutableList()
+                                    }
                                 }
                                 previousTListResult.builder().data(newList).build()
                             }
