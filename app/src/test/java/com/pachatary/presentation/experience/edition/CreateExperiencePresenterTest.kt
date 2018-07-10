@@ -1,5 +1,7 @@
 package com.pachatary.presentation.experience.edition
 
+import com.pachatary.data.DummyExperience
+import com.pachatary.data.ExperienceResultSuccess
 import com.pachatary.data.common.ResultSuccess
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.experience.ExperienceRepository
@@ -17,64 +19,48 @@ class CreateExperiencePresenterTest {
     @Test
     fun on_create_navigates_to_edit_title_and_description() {
         given {
-            nothing()
+
         } whenn {
             presenter_is_created()
         } then {
-            presenter_should_navigate_to_edit_title_and_description()
+            should_navigate_to_edit_title_and_description()
         }
     }
 
     @Test
-    fun on_title_and_description_edited_saves_them_and_navigates_to_pick_image() {
+    fun on_title_and_description_and_select_image_creates_experience_uploads_image_and_finishes() {
         given {
-            a_title()
-            a_description()
-            an_experience_repository_that_returns_created_experience()
+            an_experience_repository_that_returns_created_experience_with_id("3", "ttt", "ddd")
         } whenn {
-            title_and_description_are_edited()
+            title_and_description_are_edited("ttt", "ddd")
+            image_is_selected("picture_path")
         } then {
-            presenter_should_create_experience()
-            presenter_should_save_received_experience()
-            presenter_should_navigate_to_select_image()
+            should_create_experience("ttt", "ddd")
+            should_upload_picture("3", "picture_path")
+            should_finish_view()
         }
     }
 
     @Test
     fun on_edit_title_and_description_canceled_presenter_should_finsh_view() {
         given {
-            nothing()
+
         } whenn {
             title_and_description_edition_canceled()
         } then {
-            presenter_should_finish_view()
+            should_finish_view()
         }
     }
 
     @Test
-    fun on_image_picked_presenter_should_navigate_to_crop_image() {
+    fun on_select_image_canceled_presenter_should_finsh_view() {
         given {
-            a_title()
-            a_description()
-            an_experience_repository_that_returns_created_experience()
-            an_image()
-        } whenn {
-            title_and_description_are_edited()
-            image_is_selected()
-        } then {
-            presenter_should_upload_that_selected_image_with_created_experience_id()
-            presenter_should_finish_view()
-        }
-    }
 
-    @Test
-    fun on_pick_image_canceled_presenter_should_finsh_view() {
-        given {
-            nothing()
         } whenn {
+            title_and_description_are_edited("t", "s")
             select_image_is_canceled()
         } then {
-            presenter_should_finish_view()
+            should_navigate_to_edit_title_and_description("t", "s")
         }
     }
 
@@ -83,12 +69,7 @@ class CreateExperiencePresenterTest {
     class ScenarioMaker {
         private lateinit var presenter: CreateExperiencePresenter
         @Mock private lateinit var mockView: CreateExperienceView
-        @Mock lateinit var mockRepository: ExperienceRepository
-        var title = ""
-        var description = ""
-        var image = ""
-        var sentCreatedExperience: Experience? = null
-        var receivedCreatedExperience: Experience? = null
+        @Mock private lateinit var mockRepository: ExperienceRepository
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
@@ -99,37 +80,19 @@ class CreateExperiencePresenterTest {
             return this
         }
 
-        fun nothing() {}
-
-        fun a_title() {
-            title = "Some title"
-        }
-
-        fun a_description() {
-            description = "Some description"
-        }
-
-        fun an_image() {
-            image = "image_uri_string"
-        }
-
-        fun a_created_experience() {
-            receivedCreatedExperience = Experience(id = "1", title = title, description = description, picture = null)
-        }
-
-        fun an_experience_repository_that_returns_created_experience() {
-            sentCreatedExperience = Experience(id = "", title = title, description = description, picture = null)
-            a_created_experience()
-
-            BDDMockito.given(mockRepository.createExperience(experience = sentCreatedExperience!!))
-                    .willReturn(Flowable.just(ResultSuccess(receivedCreatedExperience!!)))
+        fun an_experience_repository_that_returns_created_experience_with_id(id: String,
+                                                                             title: String,
+                                                                             description: String) {
+            BDDMockito.given(mockRepository.createExperience(
+                    Experience(id = "", title = title, description = description, picture = null)))
+                    .willReturn(Flowable.just(ExperienceResultSuccess(id)))
         }
 
         fun presenter_is_created() {
             presenter.create()
         }
 
-        fun title_and_description_are_edited() {
+        fun title_and_description_are_edited(title: String, description: String) {
             presenter.onTitleAndDescriptionEdited(title = title, description = description)
         }
 
@@ -137,37 +100,34 @@ class CreateExperiencePresenterTest {
             presenter.onEditTitleAndDescriptionCanceled()
         }
 
-        fun image_is_selected() {
-            presenter.onImageSelectSuccess(image)
+        fun image_is_selected(imageString: String) {
+            presenter.onImageSelectSuccess(imageString)
         }
 
         fun select_image_is_canceled() {
             presenter.onImageSelectCancel()
         }
 
-        fun presenter_should_navigate_to_edit_title_and_description() {
-            BDDMockito.then(mockView).should().navigateToEditTitleAndDescription()
+        fun should_navigate_to_edit_title_and_description(title: String? = null,
+                                                          description: String? = null) {
+            if (title == null)
+                BDDMockito.then(mockView).should().navigateToEditTitleAndDescription()
+            else
+                BDDMockito.then(mockView).should()
+                        .navigateToEditTitleAndDescription(title, description!!)
         }
 
-        fun presenter_should_finish_view() {
+        fun should_finish_view() {
             BDDMockito.then(mockView).should().finish()
         }
 
-        fun presenter_should_create_experience() {
-            BDDMockito.then(mockRepository).should().createExperience(sentCreatedExperience!!)
+        fun should_create_experience(title: String, description: String) {
+            BDDMockito.then(mockRepository).should().createExperience(
+                    Experience(id = "", title = title, description = description, picture = null))
         }
 
-        fun presenter_should_save_received_experience() {
-            Assert.assertEquals(receivedCreatedExperience, presenter.createdExperience)
-        }
-
-        fun presenter_should_navigate_to_select_image() {
-            BDDMockito.then(mockView).should().navigateToSelectImage()
-        }
-
-        fun presenter_should_upload_that_selected_image_with_created_experience_id() {
-            BDDMockito.then(mockRepository).should()
-                    .uploadExperiencePicture(receivedCreatedExperience!!.id, image)
+        fun should_upload_picture(id: String, imageString: String) {
+            BDDMockito.then(mockRepository).should().uploadExperiencePicture(id, imageString)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

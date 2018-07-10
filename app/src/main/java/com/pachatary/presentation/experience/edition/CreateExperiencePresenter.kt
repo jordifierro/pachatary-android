@@ -9,13 +9,16 @@ import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
 import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
-class CreateExperiencePresenter @Inject constructor(private val experienceRepository: ExperienceRepository,
-                                                    private val schedulerProvider: SchedulerProvider): LifecycleObserver {
+class CreateExperiencePresenter @Inject constructor(
+        private val experienceRepository: ExperienceRepository,
+        private val schedulerProvider: SchedulerProvider): LifecycleObserver {
 
     lateinit var view: CreateExperienceView
+
     var title = ""
     var description = ""
-    var createdExperience: Experience? = null
+    private var selectedImageUriString: String? = null
+
     var disposable: Disposable? = null
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
@@ -31,28 +34,37 @@ class CreateExperiencePresenter @Inject constructor(private val experienceReposi
     fun onTitleAndDescriptionEdited(title: String, description: String) {
         this.title = title
         this.description = description
-        val newExperience = Experience(id = "", title = this.title, description = this.description, picture = null)
-        disposable = experienceRepository.createExperience(newExperience)
-                .subscribeOn(schedulerProvider.subscriber())
-                .observeOn(schedulerProvider.observer())
-                .subscribe({ onExperienceCreatedCorrectly(it.data!!) }, { throw it })
+        view.navigateToSelectImage()
     }
 
     fun onEditTitleAndDescriptionCanceled() {
         view.finish()
     }
 
-    fun onExperienceCreatedCorrectly(experience: Experience) {
-        this.createdExperience = experience
-        view.navigateToSelectImage()
-    }
-
     fun onImageSelectSuccess(selectedImageUriString: String) {
-        experienceRepository.uploadExperiencePicture(createdExperience!!.id, selectedImageUriString)
-        view.finish()
+        this.selectedImageUriString = selectedImageUriString
+        createExperience()
     }
 
     fun onImageSelectCancel() {
+        view.navigateToEditTitleAndDescription(title, description)
+    }
+
+    private fun createExperience() {
+        val newExperience = Experience(id = "", title = this.title,
+                                       description = this.description, picture = null)
+        disposable = experienceRepository.createExperience(newExperience)
+                .subscribeOn(schedulerProvider.subscriber())
+                .observeOn(schedulerProvider.observer())
+                .subscribe({ onExperienceCreatedCorrectly(it.data!!) }, { throw it })
+    }
+
+    private fun onExperienceCreatedCorrectly(experience: Experience) {
+        uploadExperiencePicture(experience.id)
         view.finish()
+    }
+
+    private fun uploadExperiencePicture(experienceId: String) {
+        experienceRepository.uploadExperiencePicture(experienceId, selectedImageUriString!!)
     }
 }
