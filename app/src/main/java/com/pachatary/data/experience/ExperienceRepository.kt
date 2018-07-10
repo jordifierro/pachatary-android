@@ -44,8 +44,9 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
     }
 
     fun uploadExperiencePicture(experienceId: String, croppedImageUriString: String) {
-        apiRepository.uploadExperiencePicture(
-                experienceId, croppedImageUriString, addOrUpdateExperienceToMine)
+        apiRepository.uploadExperiencePicture(experienceId, croppedImageUriString)
+                .doOnNext(addOrUpdateExperienceToMine)
+                .subscribe()
     }
 
     @SuppressLint("CheckResult")
@@ -69,9 +70,11 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
 
     internal val addOrUpdateExperienceToMine =
         { experienceResult: Result<Experience> ->
-            repoSwitch.modifyResult(ExperienceRepoSwitch.Kind.MINE,
-                ExperienceRepoSwitch.Modification.ADD_OR_UPDATE_LIST,
-                list = listOf(experienceResult.data!!)) }
+            if (experienceResult.isSuccess())
+                repoSwitch.modifyResult(ExperienceRepoSwitch.Kind.MINE,
+                                        ExperienceRepoSwitch.Modification.ADD_OR_UPDATE_LIST,
+                                        list = listOf(experienceResult.data!!))
+        }
 
     private val addOrUpdateToSavedAndUpdateToExplorePersonsAndOtherExperiences =
         { experiencesList: List<Experience> ->

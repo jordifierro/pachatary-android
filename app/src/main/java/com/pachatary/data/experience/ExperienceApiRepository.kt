@@ -12,6 +12,7 @@ import com.pachatary.data.common.Result
 import com.pachatary.data.common.ResultInProgress
 import com.pachatary.data.common.ResultSuccess
 import com.pachatary.data.picture.Picture
+import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Scheduler
 import net.gotev.uploadservice.*
@@ -81,32 +82,44 @@ class ExperienceApiRepository (retrofit: Retrofit, @Named("io") val scheduler: S
                     .compose(NetworkParserFactory.getTransformer())
                     .startWith(ResultInProgress())
 
-    fun uploadExperiencePicture(experienceId: String, croppedImageUriString: String,
-                                delegate: (resultExperience: Result<Experience>) -> Unit) {
-        try {
-            val authHeader = authHttpInterceptor.getAuthHeader()
-            MultipartUploadRequest(context,
-                    BuildConfig.API_URL + "/experiences/" + experienceId + "/picture/")
-                    .addFileToUpload(Uri.parse(croppedImageUriString).path, "picture")
-                    .setNotificationConfig(UploadNotificationConfig())
-                    .setMaxRetries(2)
-                    .addHeader(authHeader.key, authHeader.value)
-                    .setDelegate(object : UploadStatusDelegate {
-                        override fun onProgress(context: Context, uploadInfo: UploadInfo) {}
-                        override fun onError(context: Context, uploadInfo: UploadInfo, serverResponse: ServerResponse,
-                                             exception: Exception) {}
-                        override fun onCancelled(context: Context, uploadInfo: UploadInfo) {}
-                        override fun onCompleted(context: Context, uploadInfo: UploadInfo,
-                                                 serverResponse: ServerResponse) {
-                            val jsonExperience = JsonParser().parse(serverResponse.bodyAsString).asJsonObject
-                            delegate(ResultSuccess(parseExperienceJson(jsonExperience)))
-                        }
-                    })
-                    .startUpload()
-        } catch (exc: Exception) {
-            Log.e("AndroidUploadService", exc.message, exc)
-        }
-    }
+    fun uploadExperiencePicture(experienceId: String, croppedImageUriString: String)
+                                                                    : Flowable<Result<Experience>> =
+        Flowable.create<Result<Experience>>({ emitter ->
+            try {
+                val authHeader = authHttpInterceptor.getAuthHeader()
+                MultipartUploadRequest(context,
+                        BuildConfig.API_URL + "/experiences/" + experienceId + "/picture/")
+                        .addFileToUpload(Uri.parse(croppedImageUriString).path, "picture")
+                        .setNotificationConfig(UploadNotificationConfig())
+                        .setMaxRetries(2)
+                        .addHeader(authHeader.key, authHeader.value)
+                        .setDelegate(object : UploadStatusDelegate {
+                            override fun onProgress(context: Context, uploadInfo: UploadInfo) {}
+                            override fun onError(context: Context, uploadInfo: UploadInfo,
+                                                 serverResponse: ServerResponse,
+                                                 exception: Exception) {
+                                emitter.onError(exception)
+                            }
+
+                            override fun onCancelled(context: Context, uploadInfo: UploadInfo) {
+                                emitter.onComplete()
+                            }
+                            override fun onCompleted(context: Context, uploadInfo: UploadInfo,
+                                                     serverResponse: ServerResponse) {
+                                val jsonExperience = JsonParser().parse(
+                                        serverResponse.bodyAsString).asJsonObject
+                                emitter.onNext(ResultSuccess(parseExperienceJson(jsonExperience)))
+                                emitter.onComplete()
+                            }
+                        })
+                        .startUpload()
+            } catch (exc: Exception) {
+                emitter.onError(exc)
+            }
+        }, BackpressureStrategy.LATEST)
+                .subscribeOn(scheduler)
+                .retry(2)
+                .startWith(ResultInProgress())
 
     internal fun parseExperienceJson(jsonExperience: JsonObject): Experience {
         val id = jsonExperience.get("id").asString

@@ -53,7 +53,8 @@ class SceneApiRepository(retrofit: Retrofit, @Named("io") val ioScheduler: Sched
                         .addHeader(authHeader.key, authHeader.value)
                         .setDelegate(object : UploadStatusDelegate {
                             override fun onProgress(context: Context, uploadInfo: UploadInfo) {}
-                            override fun onError(context: Context, uploadInfo: UploadInfo, serverResponse: ServerResponse,
+                            override fun onError(context: Context, uploadInfo: UploadInfo,
+                                                 serverResponse: ServerResponse,
                                                  exception: Exception) {
                                 emitter.onError(exception)
                             }

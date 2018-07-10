@@ -1,9 +1,6 @@
 package com.pachatary.data.experience
 
-import com.pachatary.data.common.Request
-import com.pachatary.data.common.Result
-import com.pachatary.data.common.ResultError
-import com.pachatary.data.common.ResultSuccess
+import com.pachatary.data.common.*
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.subjects.PublishSubject
@@ -117,10 +114,13 @@ class ExperienceRepositoryTest {
         given {
             an_experience_id()
             an_image_cropped_string()
+            an_experience()
+            an_experience_repo_that_returns_inprogress_and_that_experience_when_upload_picture()
         } whenn {
             upload_experience_picture_is_called()
         } then {
             should_call_api_repo_upload_picture()
+            should_call_switch_add_or_update_with_that_experience()
         }
     }
 
@@ -271,6 +271,13 @@ class ExperienceRepositoryTest {
                     .willReturn(Flowable.just(ResultSuccess(experience)))
         }
 
+        fun an_experience_repo_that_returns_inprogress_and_that_experience_when_upload_picture() {
+            BDDMockito.given(mockApiRepository.uploadExperiencePicture(experienceId,
+                                                                       croppedImageString))
+                    .willReturn(Flowable.fromIterable(listOf(
+                            ResultInProgress(),ResultSuccess(experience))))
+        }
+
         fun an_api_repo_that_return_that_experience_on_get() {
             BDDMockito.given(mockApiRepository.experienceFlowable(experienceId))
                     .willReturn(Flowable.just(ResultSuccess(experience)))
@@ -417,8 +424,7 @@ class ExperienceRepositoryTest {
 
         fun should_call_api_repo_upload_picture() {
             BDDMockito.then(mockApiRepository).should()
-                    .uploadExperiencePicture(experienceId, croppedImageString,
-                                             repository.addOrUpdateExperienceToMine)
+                    .uploadExperiencePicture(experienceId, croppedImageString)
         }
 
         fun should_call_api_repo_save_experience() {
