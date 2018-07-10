@@ -200,6 +200,16 @@ class ExperienceScenesPresenterTest {
         }
     }
 
+    @Test
+    fun test_on_add_scene_click_navigate_to_create_scene() {
+        given {
+            a_presenter_with("9")
+        } whenn {
+            add_scene_click()
+        } then {
+            should_navigate_to_create_scene_with("9")
+        }
+    }
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
@@ -242,6 +252,10 @@ class ExperienceScenesPresenterTest {
 
         fun edit_scene_click(sceneId: String) {
             presenter.onEditSceneClick(sceneId)
+        }
+
+        fun add_scene_click() {
+            presenter.onAddSceneButtonClick()
         }
 
         fun edit_experience_click() {
@@ -317,6 +331,10 @@ class ExperienceScenesPresenterTest {
 
         fun should_scroll_to_scene(sceneId: String) {
             BDDMockito.then(mockView).should().scrollToScene(sceneId)
+        }
+
+        fun should_navigate_to_create_scene_with(experienceId: String) {
+            BDDMockito.then(mockView).should().navigateToCreateScene(experienceId)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

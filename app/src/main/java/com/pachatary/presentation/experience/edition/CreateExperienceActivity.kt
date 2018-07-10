@@ -8,10 +8,9 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.pachatary.R
 import com.pachatary.presentation.common.PachataryApplication
-import com.pachatary.presentation.common.edition.CropImageActivity
-import com.pachatary.presentation.common.edition.PickImageActivity
 import com.pachatary.presentation.common.edition.EditTitleAndDescriptionActivity
-import com.yalantis.ucrop.UCrop
+import com.pachatary.presentation.common.edition.PickAndCropImageActivity
+import com.pachatary.presentation.common.edition.PickImageActivity
 import kotlinx.android.synthetic.main.activity_create_experience.*
 import javax.inject.Inject
 
@@ -19,8 +18,7 @@ import javax.inject.Inject
 class CreateExperienceActivity : AppCompatActivity(), CreateExperienceView {
 
     val EDIT_TITLE_AND_DESCRIPTION = 1
-    val PICK_IMAGE = 2
-    val CROP_IMAGE = UCrop.REQUEST_CROP
+    val SELECT_IMAGE = 2
 
     @Inject
     lateinit var presenter: CreateExperiencePresenter
@@ -49,15 +47,10 @@ class CreateExperienceActivity : AppCompatActivity(), CreateExperienceView {
         else if (requestCode == EDIT_TITLE_AND_DESCRIPTION
                  && resultCode == Activity.RESULT_CANCELED)
             presenter.onEditTitleAndDescriptionCanceled()
-        else if (requestCode == PICK_IMAGE && resultCode == Activity.RESULT_OK)
-            presenter.onImagePicked(PickImageActivity.getPickedImageUriStringFromResultData(data!!))
-        else if (requestCode == PICK_IMAGE && resultCode == Activity.RESULT_CANCELED)
-            presenter.onPickImageCanceled()
-        else if (requestCode == CROP_IMAGE && resultCode == Activity.RESULT_OK)
-            presenter.onImageCropped(
-                    CropImageActivity.getCroppedImageUriStringFromResultData(data!!))
-        else if (requestCode == CROP_IMAGE && resultCode == Activity.RESULT_CANCELED)
-            presenter.onCropImageCanceled()
+        else if (requestCode == SELECT_IMAGE && resultCode == Activity.RESULT_OK)
+            presenter.onImageSelectSuccess(PickAndCropImageActivity.getImageUriFrom(data!!))
+        else if (requestCode == SELECT_IMAGE && resultCode == Activity.RESULT_CANCELED)
+            presenter.onImageSelectCancel()
     }
 
     override fun navigateToEditTitleAndDescription(initialTitle: String,
@@ -67,12 +60,8 @@ class CreateExperienceActivity : AppCompatActivity(), CreateExperienceView {
                 EDIT_TITLE_AND_DESCRIPTION)
     }
 
-    override fun navigateToPickImage() {
-        PickImageActivity.startActivityForResult(this, PICK_IMAGE)
-    }
-
-    override fun navigateToCropImage(selectedImageUriString: String) {
-        CropImageActivity.startActivityForResult(this, selectedImageUriString)
+    override fun navigateToSelectImage() {
+        startActivityForResult(PickAndCropImageActivity.newIntent(this), SELECT_IMAGE)
     }
 
     override fun getLifecycle(): LifecycleRegistry = registry

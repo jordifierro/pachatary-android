@@ -94,4 +94,8 @@ class ExperienceScenesPresenter @Inject constructor(
     fun onLocateSceneClick(sceneId: String) {
         view.navigateToExperienceMap(experienceId, sceneId)
     }
+
+    fun onAddSceneButtonClick() {
+        view.navigateToCreateScene(experienceId)
+    }
 }

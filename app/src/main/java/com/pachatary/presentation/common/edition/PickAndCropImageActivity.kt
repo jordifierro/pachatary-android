@@ -32,8 +32,9 @@ class PickAndCropImageActivity : AppCompatActivity(), PickAndCropImageView {
     val registry: LifecycleRegistry = LifecycleRegistry(this)
 
     companion object {
-        const val RESULT_IMAGE_URI = "result_image_uri"
+        private const val RESULT_IMAGE_URI = "result_image_uri"
         fun newIntent(context: Context) = Intent(context, PickAndCropImageActivity::class.java)
+        fun getImageUriFrom(data: Intent) = data.getStringExtra(RESULT_IMAGE_URI)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,15 +48,15 @@ class PickAndCropImageActivity : AppCompatActivity(), PickAndCropImageView {
     override fun hasStoragePermissions(): Boolean {
         return (checkCallingOrSelfPermission("android.permission.WRITE_EXTERNAL_STORAGE") ==
                 PackageManager.PERMISSION_GRANTED &&
-                checkCallingOrSelfPermission("android.permissions.READ_EXTERNAL_STORAGE") ==
+                checkCallingOrSelfPermission("android.permission.READ_EXTERNAL_STORAGE") ==
                 PackageManager.PERMISSION_GRANTED)
     }
 
-    override fun canAskStoragePermissions(): Boolean {
+    override fun shouldShowExplanation(): Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
             return shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 && shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)
-        throw Exception()
+        return true
     }
 
     override fun askStoragePermissions() {
@@ -81,6 +82,7 @@ class PickAndCropImageActivity : AppCompatActivity(), PickAndCropImageView {
                     grantResults[1] == PackageManager.PERMISSION_GRANTED) {
                 presenter.onPermissionsAccepted()
             }
+            else if (this.shouldShowExplanation()) presenter.onPermissionsDenied()
             else presenter.onPermissionsDenied()
         }
         else throw Exception(requestCode.toString())
@@ -141,6 +143,9 @@ class PickAndCropImageActivity : AppCompatActivity(), PickAndCropImageView {
                         CropImageActivity.getCroppedImageUriStringFromResultData(data!!))
             else if (resultCode == Activity.RESULT_CANCELED) presenter.onCropImageCancel()
             else throw Exception(resultCode.toString())
+        }
+        else if (requestCode == REQUEST_SETTINGS) {
+            presenter.onSettingsClosed()
         }
         else throw Exception(requestCode.toString())
     }

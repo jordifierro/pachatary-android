@@ -16,4 +16,5 @@ interface ExperienceScenesView {
     fun showUnsaveDialog()
     fun showSavedMessage()
     fun scrollToScene(sceneId: String)
+    fun navigateToCreateScene(experienceId: String)
 }

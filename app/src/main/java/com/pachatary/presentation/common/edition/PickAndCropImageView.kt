@@ -3,7 +3,7 @@ package com.pachatary.presentation.common.edition
 interface PickAndCropImageView {
 
     fun hasStoragePermissions(): Boolean
-    fun canAskStoragePermissions(): Boolean
+    fun shouldShowExplanation(): Boolean
     fun askStoragePermissions()
     fun showSettingsRecover()
     fun showPermissionsExplanationDialog()

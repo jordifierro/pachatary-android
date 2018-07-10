@@ -1,6 +1,5 @@
 package com.pachatary.presentation.scene.edition
 
-import com.pachatary.data.common.Result
 import com.pachatary.data.common.ResultSuccess
 import com.pachatary.data.scene.Scene
 import com.pachatary.data.scene.SceneRepository
@@ -76,14 +75,14 @@ class CreateScenePresenterTest {
             a_description()
             a_latitude()
             a_longitude()
-            a_scene_repository_that_returns_created_scene()
+            an_scene_repository_that_returns_created_scene()
         } whenn {
             title_and_description_are_edited()
             location_is_selected()
         } then {
             presenter_should_create_scene()
             presenter_should_save_received_scene()
-            presenter_should_navigate_to_pick_image()
+            presenter_should_navigate_to_select_image()
         }
     }
 
@@ -104,11 +103,19 @@ class CreateScenePresenterTest {
     @Test
     fun on_image_picked_presenter_should_navigate_to_crop_image() {
         given {
+            a_title()
+            a_description()
+            a_latitude()
+            a_longitude()
+            an_scene_repository_that_returns_created_scene()
             an_image()
         } whenn {
-            image_is_picked()
+            title_and_description_are_edited()
+            location_is_selected()
+            image_is_selected()
         } then {
-            presenter_should_navigate_to_crop_that_image()
+            presenter_should_upload_that_selected_image_with_created_scene_id()
+            presenter_should_finish_view()
         }
     }
 
@@ -117,39 +124,9 @@ class CreateScenePresenterTest {
         given {
             nothing()
         } whenn {
-            pick_image_is_canceled()
+            select_image_is_canceled()
         } then {
             presenter_should_finish_view()
-        }
-    }
-
-    @Test
-    fun on_image_cropped_presenter_should_upload_image_and_finish_view() {
-        given {
-            a_title()
-            a_description()
-            a_latitude()
-            a_longitude()
-            a_scene_repository_that_returns_created_scene()
-            a_cropped_image()
-        } whenn {
-            title_and_description_are_edited()
-            location_is_selected()
-            image_is_cropped()
-        } then {
-            presenter_should_upload_that_cropped_image_with_created_scene_id()
-            presenter_should_finish_view()
-        }
-    }
-
-    @Test
-    fun on_crop_image_canceled_presenter_should_navigate_to_pick_image() {
-        given {
-            nothing()
-        } whenn {
-            crop_image_canceled()
-        } then {
-            presenter_should_navigate_to_pick_image()
         }
     }
 
@@ -167,7 +144,6 @@ class CreateScenePresenterTest {
         var personLastKnowLatitude = 0.0
         var personLastKnowLongitude = 0.0
         var image = ""
-        var croppedImage = ""
         var sentCreatedScene: Scene? = null
         var receivedCreatedScene: Scene? = null
 
@@ -210,17 +186,13 @@ class CreateScenePresenterTest {
             image = "image_uri_string"
         }
 
-        fun a_cropped_image() {
-            croppedImage = "another_iamge_uri_string"
-        }
-
         fun a_created_scene() {
             receivedCreatedScene = Scene(id = "1", title = title, description = description,
                     latitude = latitude, longitude = longitude,
                     experienceId = experienceId, picture = null)
         }
 
-        fun a_scene_repository_that_returns_created_scene() {
+        fun an_scene_repository_that_returns_created_scene() {
             sentCreatedScene = Scene(id = "", title = title, description = description,
                                      latitude = latitude, longitude = longitude,
                                      experienceId = experienceId, picture = null)
@@ -254,20 +226,12 @@ class CreateScenePresenterTest {
             presenter.onSelectLocationCanceled()
         }
 
-        fun image_is_picked() {
-            presenter.onImagePicked(image)
+        fun image_is_selected() {
+            presenter.onSelectImageSuccess(image)
         }
 
-        fun pick_image_is_canceled() {
-            presenter.onPickImageCanceled()
-        }
-
-        fun image_is_cropped() {
-            presenter.onImageCropped(croppedImage)
-        }
-
-        fun crop_image_canceled() {
-            presenter.onCropImageCanceled()
+        fun select_image_is_canceled() {
+            presenter.onSelectImageCanceled()
         }
 
         fun presenter_should_navigate_to_edit_title_and_description() {
@@ -308,16 +272,13 @@ class CreateScenePresenterTest {
             Assert.assertEquals(receivedCreatedScene, presenter.createdScene)
         }
 
-        fun presenter_should_navigate_to_pick_image() {
-            BDDMockito.then(mockView).should().navigateToPickImage()
+        fun presenter_should_navigate_to_select_image() {
+            BDDMockito.then(mockView).should().navigateToSelectImage()
         }
 
-        fun presenter_should_navigate_to_crop_that_image() {
-            BDDMockito.then(mockView).should().navigateToCropImage(image)
-        }
-
-        fun presenter_should_upload_that_cropped_image_with_created_scene_id() {
-            BDDMockito.then(mockRepository).should().uploadScenePicture(receivedCreatedScene!!.id, croppedImage)
+        fun presenter_should_upload_that_selected_image_with_created_scene_id() {
+            BDDMockito.then(mockRepository).should()
+                    .uploadScenePicture(receivedCreatedScene!!.id, image)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

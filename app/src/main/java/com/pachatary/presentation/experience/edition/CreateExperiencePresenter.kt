@@ -1,6 +1,5 @@
 package com.pachatary.presentation.experience.edition
 
-import android.annotation.SuppressLint
 import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.OnLifecycleEvent
@@ -45,23 +44,15 @@ class CreateExperiencePresenter @Inject constructor(private val experienceReposi
 
     fun onExperienceCreatedCorrectly(experience: Experience) {
         this.createdExperience = experience
-        view.navigateToPickImage()
+        view.navigateToSelectImage()
     }
 
-    fun onImagePicked(selectedImageUriString: String) {
-        view.navigateToCropImage(selectedImageUriString)
-    }
-
-    fun onPickImageCanceled() {
+    fun onImageSelectSuccess(selectedImageUriString: String) {
+        experienceRepository.uploadExperiencePicture(createdExperience!!.id, selectedImageUriString)
         view.finish()
     }
 
-    fun onImageCropped(croppedImageUriString: String) {
-        experienceRepository.uploadExperiencePicture(createdExperience!!.id, croppedImageUriString)
+    fun onImageSelectCancel() {
         view.finish()
-    }
-
-    fun onCropImageCanceled() {
-        view.navigateToPickImage()
     }
 }

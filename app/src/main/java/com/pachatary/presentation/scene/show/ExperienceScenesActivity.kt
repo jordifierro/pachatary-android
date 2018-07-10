@@ -22,6 +22,7 @@ import com.pachatary.data.experience.Experience
 import com.pachatary.data.scene.Scene
 import com.pachatary.presentation.common.PachataryApplication
 import com.pachatary.presentation.experience.edition.EditExperienceActivity
+import com.pachatary.presentation.scene.edition.CreateSceneActivity
 import com.pachatary.presentation.scene.edition.EditSceneActivity
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_scene_list.*
@@ -122,6 +123,10 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
                                MAP_INTENT)
     }
 
+    override fun navigateToCreateScene(experienceId: String) {
+        startActivity(CreateSceneActivity.newIntent(this, experienceId))
+    }
+
     override fun showUnsaveDialog() {
         val builder: AlertDialog.Builder
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
@@ -203,6 +208,7 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
                 EXPERIENCE_TYPE -> {
                     return ExperienceViewHolder(inflater.inflate(R.layout.item_experience, parent, false),
                             showEditable, { presenter.onEditExperienceClick() },
+                            { presenter.onAddSceneButtonClick() },
                             { save -> presenter.onExperienceSave(save) },
                             { presenter.onMapButtonClick() })
                 }
@@ -246,6 +252,7 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
 
     class ExperienceViewHolder(view: View, private val showEditableIfItsMine: Boolean,
                                private val onEditExperienceClick: () -> Unit,
+                               private val onAddSceneClick: () -> Unit,
                                private val onSaveExperienceClick: (Boolean) -> Unit,
                                private val onMapButtonClick: () -> Unit)
         : RecyclerView.ViewHolder(view), View.OnClickListener {
@@ -254,6 +261,7 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
         private val descriptionView: TextView = view.findViewById(R.id.description)
         private val pictureView: ImageView = view.findViewById(R.id.picture)
         private val editButton: FloatingActionButton = view.findViewById(R.id.edit_button)
+        private val addSceneButton: FloatingActionButton = view.findViewById(R.id.add_scene_button)
         private val saveButton: FloatingActionButton = view.findViewById(R.id.save_button)
         private val unsaveButton: FloatingActionButton = view.findViewById(R.id.unsave_button)
         private val savesCountView: TextView = view.findViewById(R.id.saves_count)
@@ -267,14 +275,17 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
             descriptionView.text = experience.description
 
             editButton.setOnClickListener { onEditExperienceClick() }
+            addSceneButton.setOnClickListener { onAddSceneClick() }
             saveButton.setOnClickListener { onSaveExperienceClick(true) }
             unsaveButton.setOnClickListener { onSaveExperienceClick(false) }
             if (showEditableIfItsMine && experience.isMine) {
                 editButton.visibility = View.VISIBLE
+                addSceneButton.visibility = View.VISIBLE
                 saveButton.visibility = View.GONE
                 unsaveButton.visibility = View.GONE
             }
             else if (!experience.isMine) {
+                addSceneButton.visibility = View.GONE
                 editButton.visibility = View.GONE
                 if (experience.isSaved) {
                     saveButton.visibility = View.INVISIBLE
@@ -283,10 +294,10 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
                 else {
                     saveButton.visibility = View.VISIBLE
                     unsaveButton.visibility = View.INVISIBLE
-
                 }
             }
             else {
+                addSceneButton.visibility = View.GONE
                 editButton.visibility = View.GONE
                 saveButton.visibility = View.GONE
                 unsaveButton.visibility = View.GONE

@@ -1,6 +1,5 @@
 package com.pachatary.presentation.experience.edition
 
-import com.pachatary.data.common.Result
 import com.pachatary.data.common.ResultSuccess
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.experience.ExperienceRepository
@@ -31,13 +30,13 @@ class CreateExperiencePresenterTest {
         given {
             a_title()
             a_description()
-            a_experience_repository_that_returns_created_experience()
+            an_experience_repository_that_returns_created_experience()
         } whenn {
             title_and_description_are_edited()
         } then {
             presenter_should_create_experience()
             presenter_should_save_received_experience()
-            presenter_should_navigate_to_pick_image()
+            presenter_should_navigate_to_select_image()
         }
     }
 
@@ -55,11 +54,16 @@ class CreateExperiencePresenterTest {
     @Test
     fun on_image_picked_presenter_should_navigate_to_crop_image() {
         given {
+            a_title()
+            a_description()
+            an_experience_repository_that_returns_created_experience()
             an_image()
         } whenn {
-            image_is_picked()
+            title_and_description_are_edited()
+            image_is_selected()
         } then {
-            presenter_should_navigate_to_crop_that_image()
+            presenter_should_upload_that_selected_image_with_created_experience_id()
+            presenter_should_finish_view()
         }
     }
 
@@ -68,36 +72,9 @@ class CreateExperiencePresenterTest {
         given {
             nothing()
         } whenn {
-            pick_image_is_canceled()
+            select_image_is_canceled()
         } then {
             presenter_should_finish_view()
-        }
-    }
-
-    @Test
-    fun on_image_cropped_presenter_should_upload_image_and_finish_view() {
-        given {
-            a_title()
-            a_description()
-            a_experience_repository_that_returns_created_experience()
-            a_cropped_image()
-        } whenn {
-            title_and_description_are_edited()
-            image_is_cropped()
-        } then {
-            presenter_should_upload_that_cropped_image_with_created_experience_id()
-            presenter_should_finish_view()
-        }
-    }
-
-    @Test
-    fun on_crop_image_canceled_presenter_should_navigate_to_pick_image() {
-        given {
-            nothing()
-        } whenn {
-            crop_image_canceled()
-        } then {
-            presenter_should_navigate_to_pick_image()
         }
     }
 
@@ -110,7 +87,6 @@ class CreateExperiencePresenterTest {
         var title = ""
         var description = ""
         var image = ""
-        var croppedImage = ""
         var sentCreatedExperience: Experience? = null
         var receivedCreatedExperience: Experience? = null
 
@@ -137,15 +113,11 @@ class CreateExperiencePresenterTest {
             image = "image_uri_string"
         }
 
-        fun a_cropped_image() {
-            croppedImage = "another_iamge_uri_string"
-        }
-
         fun a_created_experience() {
             receivedCreatedExperience = Experience(id = "1", title = title, description = description, picture = null)
         }
 
-        fun a_experience_repository_that_returns_created_experience() {
+        fun an_experience_repository_that_returns_created_experience() {
             sentCreatedExperience = Experience(id = "", title = title, description = description, picture = null)
             a_created_experience()
 
@@ -165,20 +137,12 @@ class CreateExperiencePresenterTest {
             presenter.onEditTitleAndDescriptionCanceled()
         }
 
-        fun image_is_picked() {
-            presenter.onImagePicked(image)
+        fun image_is_selected() {
+            presenter.onImageSelectSuccess(image)
         }
 
-        fun pick_image_is_canceled() {
-            presenter.onPickImageCanceled()
-        }
-
-        fun image_is_cropped() {
-            presenter.onImageCropped(croppedImage)
-        }
-
-        fun crop_image_canceled() {
-            presenter.onCropImageCanceled()
+        fun select_image_is_canceled() {
+            presenter.onImageSelectCancel()
         }
 
         fun presenter_should_navigate_to_edit_title_and_description() {
@@ -197,16 +161,13 @@ class CreateExperiencePresenterTest {
             Assert.assertEquals(receivedCreatedExperience, presenter.createdExperience)
         }
 
-        fun presenter_should_navigate_to_pick_image() {
-            BDDMockito.then(mockView).should().navigateToPickImage()
+        fun presenter_should_navigate_to_select_image() {
+            BDDMockito.then(mockView).should().navigateToSelectImage()
         }
 
-        fun presenter_should_navigate_to_crop_that_image() {
-            BDDMockito.then(mockView).should().navigateToCropImage(image)
-        }
-
-        fun presenter_should_upload_that_cropped_image_with_created_experience_id() {
-            BDDMockito.then(mockRepository).should().uploadExperiencePicture(receivedCreatedExperience!!.id, croppedImage)
+        fun presenter_should_upload_that_selected_image_with_created_experience_id() {
+            BDDMockito.then(mockRepository).should()
+                    .uploadExperiencePicture(receivedCreatedExperience!!.id, image)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

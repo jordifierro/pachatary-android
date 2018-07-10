@@ -76,23 +76,15 @@ class CreateScenePresenter @Inject constructor(private val sceneRepository: Scen
 
     fun onSceneCreatedCorrectly(scene: Scene) {
         this.createdScene = scene
-        view.navigateToPickImage()
+        view.navigateToSelectImage()
     }
 
-    fun onImagePicked(selectedImageUriString: String) {
-        view.navigateToCropImage(selectedImageUriString)
-    }
-
-    fun onPickImageCanceled() {
+    fun onSelectImageSuccess(selectedImageUriString: String) {
+        sceneRepository.uploadScenePicture(createdScene!!.id, selectedImageUriString)
         view.finish()
     }
 
-    fun onImageCropped(croppedImageUriString: String) {
-        sceneRepository.uploadScenePicture(createdScene!!.id, croppedImageUriString)
+    fun onSelectImageCanceled() {
         view.finish()
-    }
-
-    fun onCropImageCanceled() {
-        view.navigateToPickImage()
     }
 }

@@ -9,13 +9,11 @@ class PickAndCropImagePresenter @Inject constructor(): LifecycleObserver {
 
     lateinit var view: PickAndCropImageView
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    fun resume() {
+    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
+    fun create() {
         if (view.hasStoragePermissions()) view.showPickImage()
-        else {
-            if (view.canAskStoragePermissions()) view.askStoragePermissions()
-            else view.showSettingsRecover()
-        }
+        else if (view.shouldShowExplanation()) view.showPermissionsExplanationDialog()
+        else view.askStoragePermissions()
     }
 
     fun onPermissionsAccepted() {
@@ -23,7 +21,7 @@ class PickAndCropImagePresenter @Inject constructor(): LifecycleObserver {
     }
 
     fun onPermissionsDenied() {
-        if (view.canAskStoragePermissions()) view.showPermissionsExplanationDialog()
+        if (view.shouldShowExplanation()) view.showPermissionsExplanationDialog()
         else view.showSettingsRecover()
     }
 
@@ -41,6 +39,11 @@ class PickAndCropImagePresenter @Inject constructor(): LifecycleObserver {
 
     fun onSettingsClick() {
         view.navigateToSettings()
+    }
+
+    fun onSettingsClosed() {
+        if (view.hasStoragePermissions()) view.showPickImage()
+        else view.showSettingsRecover()
     }
 
     fun onPickImageSuccess(selectedImageUriString: String) {
