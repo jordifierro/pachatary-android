@@ -7,7 +7,11 @@
         android:color="@color/colorPrimary"/>
 
     <size
-        android:width="10dp"
-        android:height="10dp"/>
+        android:width="20dp"
+        android:height="20dp"/>
+
+    <stroke
+        android:color="@color/transparent"
+        android:width="10dp" />
 
 </shape>
