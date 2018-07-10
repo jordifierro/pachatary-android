@@ -19,6 +19,7 @@ class CreateScenePresenter @Inject constructor(private val sceneRepository: Scen
     var description = ""
     var latitude = 0.0
     var longitude = 0.0
+    var selectedImageUriString: String? = null
     var createdScene: Scene? = null
     var lastLocationFound = false
     var lastLatitude = 0.0
@@ -49,6 +50,10 @@ class CreateScenePresenter @Inject constructor(private val sceneRepository: Scen
     fun onTitleAndDescriptionEdited(title: String, description: String) {
         this.title = title
         this.description = description
+        navigateToSelectLocation()
+    }
+
+    private fun navigateToSelectLocation() {
         var locationType = SelectLocationPresenter.LocationType.UNKNWON
         if (lastLocationFound) locationType = SelectLocationPresenter.LocationType.APROX
         view.navigateToSelectLocation(lastLatitude, lastLongitude, locationType)
@@ -59,32 +64,41 @@ class CreateScenePresenter @Inject constructor(private val sceneRepository: Scen
     }
 
     fun onLocationSelected(latitude: Double, longitude: Double) {
+        onLastLocationFound(latitude, longitude)
         this.latitude = latitude
         this.longitude = longitude
-        val sceneToCreate = Scene(id = "", title = title, description = description,
-                                  latitude = latitude, longitude = longitude,
-                                  experienceId = experienceId, picture = null)
-        disposable = sceneRepository.createScene(sceneToCreate)
-                .subscribeOn(schedulerProvider.subscriber())
-                .observeOn(schedulerProvider.observer())
-                .subscribe({ onSceneCreatedCorrectly(it.data!!) }, { throw it })
+        view.navigateToSelectImage()
     }
 
     fun onSelectLocationCanceled() {
         view.navigateToEditTitleAndDescription(title, description)
     }
 
-    fun onSceneCreatedCorrectly(scene: Scene) {
-        this.createdScene = scene
-        view.navigateToSelectImage()
-    }
-
     fun onSelectImageSuccess(selectedImageUriString: String) {
-        sceneRepository.uploadScenePicture(createdScene!!.id, selectedImageUriString)
-        view.finish()
+        this.selectedImageUriString = selectedImageUriString
+        createScene()
     }
 
     fun onSelectImageCanceled() {
+        navigateToSelectLocation()
+    }
+
+    private fun createScene() {
+        val sceneToCreate = Scene(id = "", title = title, description = description,
+                latitude = latitude, longitude = longitude,
+                experienceId = experienceId, picture = null)
+        disposable = sceneRepository.createScene(sceneToCreate)
+                .subscribeOn(schedulerProvider.subscriber())
+                .observeOn(schedulerProvider.observer())
+                .subscribe({ onSceneCreatedCorrectly(it.data!!) }, { throw it })
+    }
+
+    private fun onSceneCreatedCorrectly(scene: Scene) {
+        uploadPicture(scene.id)
         view.finish()
+    }
+
+    private fun uploadPicture(id: String) {
+        sceneRepository.uploadScenePicture(id, selectedImageUriString!!)
     }
 }

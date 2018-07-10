@@ -69,19 +69,16 @@ class CreateScenePresenterTest {
     }
 
     @Test
-    fun on_location_selected_should_create_scene_and_navigate_to_pick_image() {
+    fun on_location_selected_should_navigate_to_pick_image() {
         given {
             a_title()
             a_description()
             a_latitude()
             a_longitude()
-            an_scene_repository_that_returns_created_scene()
         } whenn {
             title_and_description_are_edited()
             location_is_selected()
         } then {
-            presenter_should_create_scene()
-            presenter_should_save_received_scene()
             presenter_should_navigate_to_select_image()
         }
     }
@@ -101,7 +98,7 @@ class CreateScenePresenterTest {
     }
 
     @Test
-    fun on_image_picked_presenter_should_navigate_to_crop_image() {
+    fun on_image_picked_presenter_should_create_scene_and_upload_picture() {
         given {
             a_title()
             a_description()
@@ -114,19 +111,22 @@ class CreateScenePresenterTest {
             location_is_selected()
             image_is_selected()
         } then {
+            presenter_should_create_scene()
             presenter_should_upload_that_selected_image_with_created_scene_id()
             presenter_should_finish_view()
         }
     }
 
     @Test
-    fun on_pick_image_canceled_presenter_should_finsh_view() {
+    fun on_pick_image_canceled_should_navigate_to_select_location() {
         given {
-            nothing()
+            a_latitude()
+            a_longitude()
         } whenn {
+            location_is_selected()
             select_image_is_canceled()
         } then {
-            presenter_should_finish_view()
+            presenter_should_navigate_to_select_location_with_previous_location()
         }
     }
 
@@ -258,6 +258,11 @@ class CreateScenePresenterTest {
         fun presenter_should_navigate_to_select_location_with_initial_aproximation() {
             BDDMockito.then(mockView).should().navigateToSelectLocation(personLastKnowLatitude, personLastKnowLongitude,
                                                                         SelectLocationPresenter.LocationType.APROX)
+        }
+
+        fun presenter_should_navigate_to_select_location_with_previous_location() {
+            BDDMockito.then(mockView).should().navigateToSelectLocation(latitude, longitude,
+                    SelectLocationPresenter.LocationType.APROX)
         }
 
         fun presenter_should_finish_view() {
