@@ -4,6 +4,7 @@ import com.pachatary.data.auth.ClientException
 import io.reactivex.Flowable
 import io.reactivex.FlowableTransformer
 import org.reactivestreams.Publisher
+import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
 class NetworkParserFactory {
@@ -76,13 +77,9 @@ class NetworkParserFactory {
         : FlowableTransformer<retrofit2.adapter.rxjava2.Result<out T>, Result<U>> {
 
         override fun apply(
-                upstream: Flowable<retrofit2.adapter.rxjava2.Result<out T>>): Publisher<Result<U>> =
+                upstream: Flowable<retrofit2.adapter.rxjava2.Result<out T>>): Flowable<Result<U>> =
             upstream.map {
-                if (it.isError) {
-                    if (it.error() is UnknownHostException)
-                        ResultError(it.error() as UnknownHostException)
-                    else throw it.error()!!
-                }
+                if (it.isError) throw it.error()!!
                 else if (it.response()!!.isSuccessful.not()) {
                     if (errorMapper == null) throw Exception(it.response()!!.errorBody()!!.string())
                     else ResultError(errorMapper.invoke(it.response()!!.errorBody()!!.string()))
@@ -90,5 +87,10 @@ class NetworkParserFactory {
                 else ResultSuccess()
             }
             .retry(2)
+                    .onErrorResumeNext { error: Throwable ->
+                        if (error is UnknownHostException || error is SocketTimeoutException)
+                            Flowable.just(ResultError(error))
+                        else Flowable.error(error)
+                    }
     }
 }
