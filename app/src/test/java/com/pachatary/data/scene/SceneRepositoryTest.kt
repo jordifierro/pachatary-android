@@ -135,7 +135,7 @@ class SceneRepositoryTest {
         } then {
             should_return_flowable_with(ResultInProgress(),
                                         SceneResultSuccess("6", experienceId = "2"))
-            should_emit_through_cache_add_or_update(listOf(DummyScene("6", experienceId = "2")))
+            should_emit_through_cache_update(listOf(DummyScene("6", experienceId = "2")))
         }
     }
 
@@ -150,7 +150,7 @@ class SceneRepositoryTest {
             scenes_flowable("2")
             upload_scene_picture("6", "picture_path")
         } then {
-            should_emit_through_cache_add_or_update(listOf(DummyScene("6", experienceId = "2")))
+            should_emit_through_cache_update(listOf(DummyScene("6", experienceId = "2")))
         }
     }
 
@@ -176,6 +176,7 @@ class SceneRepositoryTest {
                                                                ResultCacheFactory.AddPosition>>()
             addOrUpdateObserver.onSubscribe(addOrUpdateObserver)
             val updateObserver = TestObserver.create<List<Scene>>()
+            updateObserver.onSubscribe(updateObserver)
             val replaceResultObserver = TestObserver.create<Result<List<Scene>>>()
             replaceResultObserver.onSubscribe(replaceResultObserver)
             val scenesFlowable = Flowable.just(result).replay(1).autoConnect()
@@ -239,8 +240,14 @@ class SceneRepositoryTest {
             addOrUpdateObserver.onComplete()
 
             val calls = mutableListOf<Pair<List<Scene>, ResultCacheFactory.AddPosition>>()
-            for (scene in scenes) { calls.add(Pair(scene, ResultCacheFactory.AddPosition.START)) }
+            for (scene in scenes) { calls.add(Pair(scene, ResultCacheFactory.AddPosition.END)) }
             addOrUpdateObserver.assertResult(*calls.toTypedArray())
+        }
+
+        fun should_emit_through_cache_update(vararg scenes: List<Scene>, throughCache: Int = 1) {
+            val updateObserver = caches[throughCache - 1].updateObserver as TestObserver
+            updateObserver.onComplete()
+            updateObserver.assertResult(*scenes)
         }
 
         fun should_return_list_flowable_with(vararg results: Result<List<Scene>>, forResult: Int = 1) {

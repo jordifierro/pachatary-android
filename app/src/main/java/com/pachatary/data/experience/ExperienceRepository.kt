@@ -35,18 +35,18 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
             else Flowable.just(it)
                 }
 
-    fun createExperience(experience: Experience): Flowable<Result<Experience>> {
-        return apiRepository.createExperience(experience).doOnNext(addOrUpdateExperienceToMine)
-    }
+    fun createExperience(experience: Experience): Flowable<Result<Experience>> =
+        apiRepository.createExperience(experience)
+                .doOnNext(addOrUpdateExperienceToMine)
 
-    fun editExperience(experience: Experience): Flowable<Result<Experience>> {
-        return apiRepository.editExperience(experience).doOnNext(addOrUpdateExperienceToMine)
-    }
+    fun editExperience(experience: Experience): Flowable<Result<Experience>> =
+        apiRepository.editExperience(experience)
+                .doOnNext(updateExperienceToMine)
 
     @SuppressLint("CheckResult")
     fun uploadExperiencePicture(experienceId: String, croppedImageUriString: String) {
         apiRepository.uploadExperiencePicture(experienceId, croppedImageUriString)
-                .doOnNext(addOrUpdateExperienceToMine)
+                .doOnNext(updateExperienceToMine)
                 .subscribe({}, { throw it } )
     }
 
@@ -76,6 +76,14 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
                                         ExperienceRepoSwitch.Modification.ADD_OR_UPDATE_LIST,
                                         list = listOf(experienceResult.data!!))
         }
+
+    internal val updateExperienceToMine =
+            { experienceResult: Result<Experience> ->
+                if (experienceResult.isSuccess())
+                    repoSwitch.modifyResult(ExperienceRepoSwitch.Kind.MINE,
+                            ExperienceRepoSwitch.Modification.UPDATE_LIST,
+                            list = listOf(experienceResult.data!!))
+            }
 
     private val addOrUpdateToSavedAndUpdateToExplorePersonsAndOtherExperiences =
         { experiencesList: List<Experience> ->

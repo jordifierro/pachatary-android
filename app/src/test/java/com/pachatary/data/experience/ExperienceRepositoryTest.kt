@@ -82,7 +82,7 @@ class ExperienceRepositoryTest {
     }
 
     @Test
-    fun test_create_experience_call_create_experience_and_update_mine() {
+    fun test_create_experience_call_create_experience_and_add_or_update_mine() {
         given {
             an_experience()
             an_experience_repo_that_returns_that_experience_when_create()
@@ -104,7 +104,7 @@ class ExperienceRepositoryTest {
             edit_experience_is_called()
         } then {
             should_call_api_repo_edit_experience()
-            should_call_switch_add_or_update_with_that_experience()
+            should_call_switch_update_with_that_experience()
             should_return_a_flowable_with_that_experience()
         }
     }
@@ -120,7 +120,7 @@ class ExperienceRepositoryTest {
             upload_experience_picture_is_called()
         } then {
             should_call_api_repo_upload_picture()
-            should_call_switch_add_or_update_with_that_experience()
+            should_call_switch_update_with_that_experience()
         }
     }
 
@@ -414,6 +414,13 @@ class ExperienceRepositoryTest {
                     .modifyResult(ExperienceRepoSwitch.Kind.MINE,
                                   ExperienceRepoSwitch.Modification.ADD_OR_UPDATE_LIST,
                                   listOf(experience))
+        }
+
+        fun should_call_switch_update_with_that_experience() {
+            BDDMockito.then(mockExperiencesRepoSwitch).should()
+                    .modifyResult(ExperienceRepoSwitch.Kind.MINE,
+                            ExperienceRepoSwitch.Modification.UPDATE_LIST,
+                            listOf(experience))
         }
 
         fun should_return_a_flowable_with_that_experience() {

@@ -50,12 +50,12 @@ class SceneRepository(val apiRepository: SceneApiRepository, val cacheFactory: R
 
     fun editScene(scene: Scene): Flowable<Result<Scene>> =
         apiRepository.editScene(scene)
-                .doOnNext(emitThroughAddOrUpdate)
+                .doOnNext(emitThroughUpdate)
 
     @SuppressLint("CheckResult")
     fun uploadScenePicture(sceneId: String, croppedImageUriString: String) {
         apiRepository.uploadScenePicture(sceneId, croppedImageUriString)
-                .doOnNext(emitThroughAddOrUpdate)
+                .doOnNext(emitThroughUpdate)
                 .subscribe({}, { throw it } )
     }
 
@@ -64,7 +64,15 @@ class SceneRepository(val apiRepository: SceneApiRepository, val cacheFactory: R
                 if (resultScene.status == Status.SUCCESS) {
                     scenesCacheHashMap.get(resultScene.data!!.experienceId)!!
                             .addOrUpdateObserver.onNext(Pair(listOf(resultScene.data),
-                                                             ResultCacheFactory.AddPosition.START))
+                                                             ResultCacheFactory.AddPosition.END))
+                }
+            }
+
+    internal val emitThroughUpdate =
+            { resultScene: Result<Scene> ->
+                if (resultScene.status == Status.SUCCESS) {
+                    scenesCacheHashMap.get(resultScene.data!!.experienceId)!!
+                            .updateObserver.onNext(listOf(resultScene.data))
                 }
             }
 }
