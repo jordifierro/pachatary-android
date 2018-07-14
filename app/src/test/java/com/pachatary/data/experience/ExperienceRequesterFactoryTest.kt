@@ -246,15 +246,15 @@ class ExperienceRequesterFactoryTest {
         }
 
         fun a_result_cache_that_return_two_experiences_and_next_url_from_get_firsts() {
-            experienceA = Experience("1", "t", "d", null, true, true, "a")
-            experienceB = Experience("2", "t", "d", null, true, true, "b")
+            experienceA = Experience("1", "t", "d", null, true, true)
+            experienceB = Experience("2", "t", "d", null, true, true)
             resultFlowable = Flowable.just(ResultSuccess(listOf(experienceA, experienceB),
                     action = Request.Action.GET_FIRSTS, nextUrl = nextUrl))
         }
 
         fun an_api_repo_that_returns_two_experiences() {
-            experienceA = Experience("1", "t", "d", null, true, true, "a")
-            experienceB = Experience("2", "t", "d", null, true, true, "b")
+            experienceA = Experience("1", "t", "d", null, true, true)
+            experienceB = Experience("2", "t", "d", null, true, true)
             when (kind) {
                 ExperienceRepoSwitch.Kind.MINE ->
                     BDDMockito.given(mockApiRepository.myExperiencesFlowable())
@@ -278,8 +278,8 @@ class ExperienceRequesterFactoryTest {
         }
 
         fun an_api_repo_that_returns_two_experiences_for_that_url_pagination() {
-            experienceA = Experience("1", "t", "d", null, true, true, "a")
-            experienceB = Experience("2", "t", "d", null, true, true, "b")
+            experienceA = Experience("1", "t", "d", null, true, true)
+            experienceB = Experience("2", "t", "d", null, true, true)
             BDDMockito.given(mockApiRepository.paginateExperiences(nextUrl))
                     .willReturn(Flowable.just(ResultSuccess(listOf(experienceA, experienceB))))
         }

@@ -33,9 +33,11 @@ class ExtendedViewHolder(view: View, val onClick: (String) -> Unit,
 
         this.experienceId = experience.id
         titleView.text = experience.title
-        authorView.text = "by " + experience.authorUsername
+        authorView.text = "by " + experience.authorProfile.username
         authorView.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View?) { onUsernameClick.invoke(experience.authorUsername) }
+            override fun onClick(v: View?) {
+                onUsernameClick.invoke(experience.authorProfile.username)
+            }
         })
         descriptionView.text = experience.description
         savesCountView.text = experience.savesCount.toString()

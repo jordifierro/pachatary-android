@@ -59,7 +59,7 @@
 -keep class com.pachatary.data.auth.PairPersonAuthTokenMapper { *; }
 -keep class com.pachatary.data.common.PaginatedListMapper { *; }
 -keep class com.pachatary.data.experience.ExperienceMapper { *; }
--keep class com.pachatary.data.picture.PictureMapper { *; }
+-keep class com.pachatary.data.picture.BigPictureMapper { *; }
 -keep class com.pachatary.data.auth.AuthTokenMapper { *; }
 -keep class com.pachatary.data.scene.SceneMapper { *; }
 

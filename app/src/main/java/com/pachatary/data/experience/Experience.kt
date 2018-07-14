@@ -1,20 +1,23 @@
 package com.pachatary.data.experience
 
 import com.pachatary.data.common.Identifiable
-import com.pachatary.data.picture.Picture
+import com.pachatary.data.picture.BigPicture
+import com.pachatary.data.profile.Profile
 
 data class Experience(override val id: String, val title: String,
-                      val description: String, val picture: Picture?,
+                      val description: String, val picture: BigPicture? = null,
                       val isMine: Boolean = false, val isSaved: Boolean = false,
-                      val authorUsername: String = "", val savesCount: Int = 0) : Identifiable {
+                      val authorProfile: Profile =
+                              Profile(username = "", bio = "", picture = null, isMe = false),
+                      val savesCount: Int = 0) : Identifiable {
 
     fun builder() = Builder(id, title, description, picture,
-                            isMine, isSaved, authorUsername, savesCount)
+                            isMine, isSaved, authorProfile, savesCount)
 
     class Builder(val id: String, val title: String,
-                  val description: String, val picture: Picture?,
+                  val description: String, val picture: BigPicture?,
                   val isMine: Boolean = false, var isSaved: Boolean = false,
-                  val authorUsername: String = "", var savesCount: Int = 0) {
+                  val authorProfile: Profile, var savesCount: Int = 0) {
 
         fun isSaved(isSaved: Boolean): Builder {
             this.isSaved = isSaved
@@ -27,6 +30,6 @@ data class Experience(override val id: String, val title: String,
         }
 
         fun build() = Experience(id, title, description, picture,
-                                 isMine, isSaved, authorUsername, savesCount)
+                                 isMine, isSaved, authorProfile, savesCount)
     }
 }

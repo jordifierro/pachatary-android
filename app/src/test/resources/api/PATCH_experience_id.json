@@ -9,7 +9,16 @@
     },
     "is_mine": true,
     "is_saved": false,
-    "author_username": "usr.nm",
+    "author_profile": {
+        "username": "usr.nam",
+        "bio": "user info",
+        "picture": {
+            "tiny_url": "https://experiences/029d.tiny.jpg",
+            "small_url": "https://experiences/029d.small.jpg",
+            "medium_url": "https://experiences/029d.medium.jpg"
+        },
+        "is_me": true
+    },
     "saves_count": 5
 }
 

@@ -2,18 +2,18 @@ package com.pachatary.data.experience
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.pachatary.BuildConfig
 import com.pachatary.data.auth.AuthHttpInterceptor
 import com.pachatary.data.common.*
-import com.pachatary.data.picture.Picture
+import com.pachatary.data.picture.BigPicture
+import com.pachatary.data.picture.LittlePicture
+import com.pachatary.data.profile.Profile
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Scheduler
 import net.gotev.uploadservice.*
-import org.json.JSONObject
 import retrofit2.Retrofit
 import java.net.UnknownHostException
 import javax.inject.Named
@@ -132,14 +132,26 @@ class ExperienceApiRepository (retrofit: Retrofit, @Named("io") val scheduler: S
         val smallUrl = pictureJson.get("small_url").asString
         val mediumUrl = pictureJson.get("medium_url").asString
         val largeUrl = pictureJson.get("large_url").asString
-        val picture = Picture(smallUrl = smallUrl, mediumUrl = mediumUrl, largeUrl = largeUrl)
+        val picture = BigPicture(smallUrl = smallUrl, mediumUrl = mediumUrl, largeUrl = largeUrl)
         val isMine = jsonExperience.get("is_mine").asBoolean
         val isSaved = jsonExperience.get("is_saved").asBoolean
-        val authorUsername = jsonExperience.get("author_username").asString
+        val authorProfileJson = jsonExperience.get("author_profile").asJsonObject
+        val username = authorProfileJson.get("username").asString
+        val bio = authorProfileJson.get("bio").asString
+        val isMe = authorProfileJson.get("is_me").asBoolean
+        val profilePictureJson = authorProfileJson.get("picture").asJsonObject
+        val profilePictureTinyUrl = profilePictureJson.get("tiny_url").asString
+        val profilePictureSmallUrl = profilePictureJson.get("small_url").asString
+        val profilePictureMediumUrl = profilePictureJson.get("medium_url").asString
+        val profilePicture = LittlePicture(tinyUrl = profilePictureTinyUrl,
+                                           smallUrl = profilePictureSmallUrl,
+                                           mediumUrl = profilePictureMediumUrl)
+        val authorProfile = Profile(username = username, bio = bio,
+                                    picture = profilePicture, isMe = isMe)
         val savesCount = jsonExperience.get("saves_count").asInt
 
         return Experience(id = id, title = title, description = description,
                           picture = picture, isMine = isMine, isSaved = isSaved,
-                          authorUsername = authorUsername, savesCount = savesCount)
+                          authorProfile = authorProfile, savesCount = savesCount)
     }
 }

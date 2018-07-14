@@ -244,7 +244,7 @@ class ExperienceRepositoryTest {
         }
 
         fun an_experience() {
-            experience = Experience("1", "t", "d", null, true, true, "")
+            experience = Experience("1", "t", "d", null, true, true)
         }
 
         fun an_image_cropped_string() {
@@ -290,11 +290,11 @@ class ExperienceRepositoryTest {
         }
 
         fun a_saved_experience() {
-            savedExperience = Experience("1", "t", "d", null, false, true, "")
+            savedExperience = Experience("1", "t", "d", null, false, true)
         }
 
         fun a_non_saved_experience() {
-            nonSavedExperience = Experience("1", "t", "d", null, false, false, "")
+            nonSavedExperience = Experience("1", "t", "d", null, false, false)
         }
 
         fun a_flowable_that_returns_that_experiences() {

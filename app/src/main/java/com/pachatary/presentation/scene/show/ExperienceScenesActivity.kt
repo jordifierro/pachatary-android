@@ -304,7 +304,7 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
             }
 
             savesCountView.text = experience.savesCount.toString() + " ★"
-            authorView.text = experience.authorUsername
+            authorView.text = experience.authorProfile.username
             Picasso.with(pictureView.context)
                     .load(experience.picture?.mediumUrl)
                     .into(pictureView)

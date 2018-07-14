@@ -11,7 +11,12 @@
             },
             "is_mine": true,
             "is_saved": false,
-            "author_username": "usr.nm",
+            "author_profile": {
+                "username": "da_usr",
+                "bio": "about me",
+                "picture": null,
+                "is_me": true
+            },
             "saves_count": 4
         },
         {
@@ -21,7 +26,16 @@
             "picture": null,
             "is_mine": false,
             "is_saved": true,
-            "author_username": "other.nm",
+            "author_profile": {
+                "username": "usr.nam",
+                "bio": "user info",
+                "picture": {
+                    "tiny_url": "https://experiences/029d.tiny.jpg",
+                    "small_url": "https://experiences/029d.small.jpg",
+                    "medium_url": "https://experiences/029d.medium.jpg"
+                },
+                "is_me": false
+            },
             "saves_count": 7
         }
     ],

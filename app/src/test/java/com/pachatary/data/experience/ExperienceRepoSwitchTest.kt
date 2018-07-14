@@ -228,7 +228,7 @@ class ExperienceRepoSwitchTest {
         }
 
         fun an_experience_with_that_id() {
-            experience = Experience(experienceId, "t", "", null, true, true, "")
+            experience = Experience(experienceId, "t", "", null, true, true)
         }
 
         fun a_request_params() {
@@ -238,28 +238,28 @@ class ExperienceRepoSwitchTest {
         fun some_result_flowables_that_emit_different_and_repeated_experiences() {
             resultMineFlowable = Flowable.just(ResultSuccess(listOf(
                     experience,
-                    Experience("1", "", "", null, true, false, ""))))
+                    Experience("1", "", "", null, true, false))))
             resultSavedFlowable = Flowable.just(ResultSuccess(listOf(
                     experience,
-                    Experience("4", "", "", null, true, false, ""))))
+                    Experience("4", "", "", null, true, false))))
             resultExploreFlowable = Flowable.just(ResultSuccess(listOf(
-                    Experience("4", "", "", null, true, false, ""),
-                    Experience("4", "", "", null, true, false, ""))))
+                    Experience("4", "", "", null, true, false),
+                    Experience("4", "", "", null, true, false))))
             resultPersonsFlowable = Flowable.just(ResultError(Exception()))
             resultOtherFlowable = Flowable.just(ResultInProgress())
         }
 
         fun some_result_flowables_that_dont_emit_the_experience() {
             resultMineFlowable = Flowable.just(ResultSuccess(listOf(
-                    Experience("1", "", "", null, true, false, ""))))
+                    Experience("1", "", "", null, true, false))))
             resultSavedFlowable = Flowable.just(ResultSuccess(listOf(
-                    Experience("4", "", "", null, true, false, ""))))
+                    Experience("4", "", "", null, true, false))))
             resultExploreFlowable = Flowable.just(ResultSuccess(listOf(
-                    Experience("4", "", "", null, true, false, ""),
-                    Experience("3", "", "", null, true, false, ""))))
+                    Experience("4", "", "", null, true, false),
+                    Experience("3", "", "", null, true, false))))
             resultPersonsFlowable = Flowable.just(ResultSuccess(listOf(
-                    Experience("6", "", "", null, true, false, ""),
-                    Experience("4", "", "", null, true, false, ""))))
+                    Experience("6", "", "", null, true, false),
+                    Experience("4", "", "", null, true, false))))
             resultOtherFlowable = Flowable.just(ResultSuccess(listOf()))
         }
 
@@ -272,8 +272,8 @@ class ExperienceRepoSwitchTest {
         }
 
         fun a_list_of_experiences() {
-            experienceList = listOf(Experience("1", "t", "d", null, false, false, "a"),
-                                    Experience("2", "t", "d", null, true, false, "b"))
+            experienceList = listOf(Experience("1", "t", "d", null, false, false),
+                                    Experience("2", "t", "d", null, true, false))
         }
 
         fun a_result_with_that_list() {

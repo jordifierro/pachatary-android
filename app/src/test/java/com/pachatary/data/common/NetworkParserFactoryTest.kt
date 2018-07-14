@@ -14,8 +14,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Response
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
+import org.junit.Assert.*
 import org.junit.Test
 import org.mockito.Mockito.mock
 import retrofit2.Retrofit
@@ -166,7 +165,10 @@ class NetworkParserFactoryTest {
             assertEquals("https://experiences/8c29c4735.large.jpg", experience.picture!!.largeUrl)
             assertEquals(true, experience.isMine)
             assertEquals(false, experience.isSaved)
-            assertEquals("usr.nm", experience.authorUsername)
+            assertEquals("da_usr", experience.authorProfile.username)
+            assertEquals("about me", experience.authorProfile.bio)
+            assertNull(experience.authorProfile.picture)
+            assertTrue(experience.authorProfile.isMe)
             assertEquals(4, experience.savesCount)
 
             val secondExperience = experiences[1] as Experience
@@ -176,7 +178,15 @@ class NetworkParserFactoryTest {
             assertEquals(false, secondExperience.isMine)
             assertEquals(true, secondExperience.isSaved)
             assertNull(secondExperience.picture)
-            assertEquals("other.nm", secondExperience.authorUsername)
+            assertEquals("usr.nam", secondExperience.authorProfile.username)
+            assertEquals("user info", secondExperience.authorProfile.bio)
+            assertEquals("https://experiences/029d.tiny.jpg",
+                    secondExperience.authorProfile.picture!!.tinyUrl)
+            assertEquals("https://experiences/029d.small.jpg",
+                    secondExperience.authorProfile.picture!!.smallUrl)
+            assertEquals("https://experiences/029d.medium.jpg",
+                    secondExperience.authorProfile.picture!!.mediumUrl)
+            assertFalse(secondExperience.authorProfile.isMe)
             assertEquals(7, secondExperience.savesCount)
 
             assertEquals("https://next_url", result.nextUrl)

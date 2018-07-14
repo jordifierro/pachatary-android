@@ -2,13 +2,12 @@ package com.pachatary.data.scene
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.pachatary.BuildConfig
 import com.pachatary.data.auth.AuthHttpInterceptor
 import com.pachatary.data.common.*
-import com.pachatary.data.picture.Picture
+import com.pachatary.data.picture.BigPicture
 import io.reactivex.*
 import net.gotev.uploadservice.*
 import retrofit2.Retrofit
@@ -93,7 +92,7 @@ class SceneApiRepository(retrofit: Retrofit, @Named("io") val ioScheduler: Sched
         val smallUrl = pictureJson.get("small_url").asString
         val mediumUrl = pictureJson.get("medium_url").asString
         val largeUrl = pictureJson.get("large_url").asString
-        val picture = Picture(smallUrl = smallUrl, mediumUrl = mediumUrl, largeUrl = largeUrl)
+        val picture = BigPicture(smallUrl = smallUrl, mediumUrl = mediumUrl, largeUrl = largeUrl)
 
         return Scene(id = id, title = title, description = description, latitude = latitude,
                      longitude = longitude, experienceId = experienceId, picture = picture)

@@ -24,6 +24,6 @@ fun DummyScene(id: String, experienceId: String = "") =
 
 fun DummyExperience(id: String) =
         Experience(id = id, title = "", description = "", picture = null,
-                    isMine = false, isSaved = false, authorUsername = "", savesCount = 0)
+                   isMine = false, isSaved = false, savesCount = 0)
 
 fun ExperienceResultSuccess(id: String): Result<Experience> = ResultSuccess(DummyExperience(id))
