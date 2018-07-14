@@ -22,9 +22,11 @@ import com.pachatary.data.experience.Experience
 import com.pachatary.data.scene.Scene
 import com.pachatary.presentation.common.PachataryApplication
 import com.pachatary.presentation.experience.edition.EditExperienceActivity
+import com.pachatary.presentation.experience.show.PersonsExperienceActivity
 import com.pachatary.presentation.scene.edition.CreateSceneActivity
 import com.pachatary.presentation.scene.edition.EditSceneActivity
 import com.squareup.picasso.Picasso
+import jp.wasabeef.picasso.transformations.CropCircleTransformation
 import kotlinx.android.synthetic.main.activity_scene_list.*
 import javax.inject.Inject
 
@@ -156,6 +158,10 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
         (recyclerView.adapter as ExperienceScenesAdapter).scrollToScene(sceneId)
     }
 
+    override fun navigateToProfile(username: String) {
+        startActivity(PersonsExperienceActivity.newIntent(this, username))
+    }
+
     override fun getLifecycle(): LifecycleRegistry = registry
 
     class ExperienceScenesAdapter(private val inflater: LayoutInflater,
@@ -210,7 +216,8 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
                             showEditable, { presenter.onEditExperienceClick() },
                             { presenter.onAddSceneButtonClick() },
                             { save -> presenter.onExperienceSave(save) },
-                            { presenter.onMapButtonClick() })
+                            { presenter.onMapButtonClick() },
+                            { presenter.onProfileClick(it) })
                 }
                 SCENE_TYPE -> {
                     var isEditable = false
@@ -254,7 +261,8 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
                                private val onEditExperienceClick: () -> Unit,
                                private val onAddSceneClick: () -> Unit,
                                private val onSaveExperienceClick: (Boolean) -> Unit,
-                               private val onMapButtonClick: () -> Unit)
+                               private val onMapButtonClick: () -> Unit,
+                               private val onProfileClick: (String) -> Unit)
         : RecyclerView.ViewHolder(view), View.OnClickListener {
 
         private val titleView: TextView = view.findViewById(R.id.title)
@@ -265,7 +273,8 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
         private val saveButton: FloatingActionButton = view.findViewById(R.id.save_button)
         private val unsaveButton: FloatingActionButton = view.findViewById(R.id.unsave_button)
         private val savesCountView: TextView = view.findViewById(R.id.saves_count)
-        private val authorView: TextView = view.findViewById(R.id.author)
+        private val authorUsernameView: TextView = view.findViewById(R.id.author_username)
+        private val authorPictureView: ImageView = view.findViewById(R.id.author_picture)
         private val mapButton: Button = view.findViewById(R.id.map_button)
         lateinit var experienceId: String
 
@@ -303,11 +312,20 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
                 unsaveButton.visibility = View.GONE
             }
 
+            authorPictureView.setOnClickListener {
+                onProfileClick(experience.authorProfile.username) }
+            authorUsernameView.setOnClickListener {
+                onProfileClick(experience.authorProfile.username) }
             savesCountView.text = experience.savesCount.toString() + " ★"
-            authorView.text = experience.authorProfile.username
+            authorUsernameView.text = experience.authorProfile.username
             Picasso.with(pictureView.context)
                     .load(experience.picture?.mediumUrl)
                     .into(pictureView)
+            Picasso.with(authorPictureView.context)
+                    .load(experience.authorProfile.picture?.tinyUrl)
+                    .transform(CropCircleTransformation())
+                    .into(authorPictureView)
+
             mapButton.setOnClickListener { onMapButtonClick() }
         }
 

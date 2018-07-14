@@ -210,6 +210,18 @@ class ExperienceScenesPresenterTest {
             should_navigate_to_create_scene_with("9")
         }
     }
+
+    @Test
+    fun test_on_profile_click() {
+        given {
+
+        } whenn {
+            profile_click(username = "asr")
+        } then {
+            should_navigate_to_profile("asr")
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
@@ -278,6 +290,10 @@ class ExperienceScenesPresenterTest {
             presenter.onExperienceSave(save)
         }
 
+        fun profile_click(username: String) {
+            presenter.onProfileClick(username)
+        }
+
         fun should_navigate_to_edit_experience(experienceId: String) {
             BDDMockito.then(mockView).should().navigateToEditExperience(experienceId)
         }
@@ -335,6 +351,10 @@ class ExperienceScenesPresenterTest {
 
         fun should_navigate_to_create_scene_with(experienceId: String) {
             BDDMockito.then(mockView).should().navigateToCreateScene(experienceId)
+        }
+
+        fun should_navigate_to_profile(username: String) {
+            BDDMockito.then(mockView).should().navigateToProfile(username)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

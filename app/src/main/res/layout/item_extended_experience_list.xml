@@ -28,28 +28,27 @@
         android:layout_below="@+id/experience_title">
 
         <ImageView
-            android:id="@+id/experience_saves_icon"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_alignParentStart="true"
+            android:id="@+id/experience_author_picture"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            app:srcCompat="@drawable/ic_star_black_24dp"
-            android:tint="@color/black" />
+            android:layout_margin="10dp" />
 
         <TextView
-            android:id="@+id/experience_saves_count"
+            android:id="@+id/experience_author_username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/experience_saves_icon"
+            android:layout_toRightOf="@+id/experience_author_picture"
+            android:layout_toEndOf="@+id/experience_author_picture"
             android:layout_centerVertical="true"
-            android:layout_margin="10dp"
             android:textColor="@color/grey"
             android:textSize="14sp"
             android:textStyle="italic" />
 
         <TextView
-            android:id="@+id/experience_author"
+            android:id="@+id/experience_saves_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"

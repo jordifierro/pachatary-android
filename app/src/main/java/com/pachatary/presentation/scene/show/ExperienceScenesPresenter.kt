@@ -98,4 +98,8 @@ class ExperienceScenesPresenter @Inject constructor(
     fun onAddSceneButtonClick() {
         view.navigateToCreateScene(experienceId)
     }
+
+    fun onProfileClick(username: String) {
+        view.navigateToProfile(username)
+    }
 }
