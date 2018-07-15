@@ -98,7 +98,23 @@ class AuthRepositoryTest {
         } then {
             should_call_api_register_with_username_and_email()
             should_receive_error_result()
-            should_not_call_storage_repo_to_save_person()
+            should_save_nothing_to_storage_repo()
+        }
+    }
+
+    @Test
+    fun test_when_register_returns_already_registered_error_must_set_is_register_completed_true() {
+        given {
+            a_username()
+            an_email()
+            a_result_already_registered_error()
+            an_auth_api_that_returns_a_flowable_with_that_result_error()
+        } whenn {
+            register_person()
+        } then {
+            should_call_api_register_with_username_and_email()
+            should_receive_error_result()
+            should_call_storage_repo_set_is_register_completed()
         }
     }
 
@@ -127,7 +143,7 @@ class AuthRepositoryTest {
         } then {
             should_call_api_confirm_email_with_confirmation_token()
             should_receive_error_result()
-            should_not_call_storage_repo_to_save_person()
+            should_save_nothing_to_storage_repo()
         }
     }
 
@@ -246,6 +262,12 @@ class AuthRepositoryTest {
 
         fun a_result_error() {
             resultError = ResultError(ClientException(source = "s", code = "c", message = "m"))
+        }
+
+        fun a_result_already_registered_error() {
+            resultError = ResultError(
+                    ClientException(source = "person", code = "already_registered",
+                                    message = "Person already registered"))
         }
 
         fun an_auth_api_that_returns_a_flowable_with_success_for_register() {
@@ -389,7 +411,7 @@ class AuthRepositoryTest {
             testVoidSubscriber.assertResult(resultError)
         }
 
-        fun should_not_call_storage_repo_to_save_person() {
+        fun should_save_nothing_to_storage_repo() {
             BDDMockito.then(authStorageRepository).shouldHaveZeroInteractions()
         }
 

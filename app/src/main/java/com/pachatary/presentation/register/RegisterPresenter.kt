@@ -3,6 +3,7 @@ package com.pachatary.presentation.register
 import android.annotation.SuppressLint
 import android.arch.lifecycle.LifecycleObserver
 import com.pachatary.data.auth.AuthRepository
+import com.pachatary.data.auth.ClientException
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
 import javax.inject.Inject
 
@@ -24,7 +25,10 @@ class RegisterPresenter @Inject constructor(private val authRepository: AuthRepo
                     if (it.isSuccess()) {
                         view.showMessage("Successfully registered!\n Check your email to finalize the process")
                         view.finish()
-                    } else view.showMessage(it.error!!.message!!)
+                    } else if (it.error is ClientException &&
+                               it.error.code == "already_registered")
+                        view.finish()
+                    else view.showMessage(it.error!!.message!!)
                 }, { throw it })
     }
 }

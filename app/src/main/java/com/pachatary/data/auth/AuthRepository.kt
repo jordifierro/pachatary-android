@@ -23,6 +23,9 @@ class AuthRepository(val authStorageRepository: AuthStorageRepository,
 
     fun register(username: String, email: String): Flowable<Result<Void>> =
             authApiRepository.register(username, email)
+                    .doOnNext { if (it.isError() && (it.error is ClientException) &&
+                                    it.error.code == "already_registered")
+                                    authStorageRepository.setIsRegisterCompleted(true) }
 
     fun confirmEmail(confirmationToken: String): Flowable<Result<Void>> =
             authApiRepository.confirmEmail(confirmationToken)

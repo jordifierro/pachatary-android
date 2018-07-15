@@ -49,6 +49,22 @@ class RegisterPresenterTest {
         }
     }
 
+    @Test
+    fun test_register_already_registered_error_finishes_view() {
+        given {
+            a_username()
+            an_email()
+            an_already_registered_client_error()
+            an_auth_repo_that_returns_a_flowable_with_that_error()
+        } whenn {
+            done_button_is_clicked()
+        } then {
+            should_show_view_loader()
+            should_block_done_button()
+            should_finish_view()
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
@@ -82,6 +98,11 @@ class RegisterPresenterTest {
             clientError = ClientException(source = "s", code = "c", message = "mess")
         }
 
+        fun an_already_registered_client_error() {
+            clientError = ClientException(source = "person", code = "already_registered",
+                                          message = "Person already registered")
+        }
+
         fun an_auth_repo_that_returns_a_flowable_with_a_person() {
             BDDMockito.given(mockAuthRepo.register(username, email))
                     .willReturn(Flowable.just(ResultSuccess()))
@@ -103,6 +124,10 @@ class RegisterPresenterTest {
         fun should_show_success_message_and_finish_view() {
             BDDMockito.then(mockView).should()
                     .showMessage("Successfully registered!\n Check your email to finalize the process")
+            BDDMockito.then(mockView).should().finish()
+        }
+
+        fun should_finish_view() {
             BDDMockito.then(mockView).should().finish()
         }
 
