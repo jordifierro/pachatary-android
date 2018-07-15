@@ -186,6 +186,17 @@ class ExperienceApiRepositoryTest {
         }
     }
 
+    @Test
+    fun test_upload_experience_result_parser_without_profile_picture() {
+        given {
+            a_json_object_from_POST_experience_json_without_profile_picture()
+        } whenn {
+            parse_that_json_object()
+        } then {
+            result_should_be_experience_without_profile_picture_parsed_correctly()
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
@@ -228,6 +239,12 @@ class ExperienceApiRepositoryTest {
         fun a_json_object_from_POST_experience_json() {
             jsonObject = JsonParser().parse(ExperienceApiRepositoryTest::class.java
                     .getResource("/api/POST_experiences.json").readText()).asJsonObject
+        }
+
+        fun a_json_object_from_POST_experience_json_without_profile_picture() {
+            jsonObject = JsonParser().parse(ExperienceApiRepositoryTest::class.java
+                    .getResource("/api/POST_experiences_without_profile_picture.json")
+                        .readText()).asJsonObject
         }
 
         fun a_web_server_that_returns_get_experiences() {
@@ -538,6 +555,25 @@ class ExperienceApiRepositoryTest {
                     resultExperience.authorProfile.picture!!.smallUrl)
             assertEquals("https://experiences/029d.medium.jpg",
                     resultExperience.authorProfile.picture!!.mediumUrl)
+            assertTrue(resultExperience.authorProfile.isMe)
+            assertEquals(5, resultExperience.savesCount)
+        }
+
+        fun result_should_be_experience_without_profile_picture_parsed_correctly() {
+            assertEquals("4", resultExperience.id)
+            assertEquals("Plaça", resultExperience.title)
+            assertEquals("", resultExperience.description)
+            assertEquals("https://experiences/00df.small.jpeg",
+                    resultExperience.picture!!.smallUrl)
+            assertEquals("https://experiences/00df.medium.jpeg",
+                    resultExperience.picture!!.mediumUrl)
+            assertEquals("https://experiences/00df.large.jpeg",
+                    resultExperience.picture!!.largeUrl)
+            assertEquals(true, resultExperience.isMine)
+            assertEquals(false, resultExperience.isSaved)
+            assertEquals("usr.nam", resultExperience.authorProfile.username)
+            assertEquals("user info", resultExperience.authorProfile.bio)
+            assertNull(resultExperience.authorProfile.picture)
             assertTrue(resultExperience.authorProfile.isMe)
             assertEquals(5, resultExperience.savesCount)
         }

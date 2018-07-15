@@ -139,13 +139,16 @@ class ExperienceApiRepository (retrofit: Retrofit, @Named("io") val scheduler: S
         val username = authorProfileJson.get("username").asString
         val bio = authorProfileJson.get("bio").asString
         val isMe = authorProfileJson.get("is_me").asBoolean
-        val profilePictureJson = authorProfileJson.get("picture").asJsonObject
-        val profilePictureTinyUrl = profilePictureJson.get("tiny_url").asString
-        val profilePictureSmallUrl = profilePictureJson.get("small_url").asString
-        val profilePictureMediumUrl = profilePictureJson.get("medium_url").asString
-        val profilePicture = LittlePicture(tinyUrl = profilePictureTinyUrl,
+        var profilePicture: LittlePicture? = null
+        if (!authorProfileJson.get("picture").isJsonNull) {
+            val profilePictureJson = authorProfileJson.get("picture").asJsonObject
+            val profilePictureTinyUrl = profilePictureJson.get("tiny_url").asString
+            val profilePictureSmallUrl = profilePictureJson.get("small_url").asString
+            val profilePictureMediumUrl = profilePictureJson.get("medium_url").asString
+            profilePicture = LittlePicture(tinyUrl = profilePictureTinyUrl,
                                            smallUrl = profilePictureSmallUrl,
                                            mediumUrl = profilePictureMediumUrl)
+        }
         val authorProfile = Profile(username = username, bio = bio,
                                     picture = profilePicture, isMe = isMe)
         val savesCount = jsonExperience.get("saves_count").asInt

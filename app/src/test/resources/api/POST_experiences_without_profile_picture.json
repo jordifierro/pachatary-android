@@ -1,0 +1,20 @@
+{
+    "id": "4",
+    "title": "Plaça",
+    "description": "",
+    "picture": {
+        "small_url": "https://experiences/00df.small.jpeg",
+        "medium_url": "https://experiences/00df.medium.jpeg",
+        "large_url": "https://experiences/00df.large.jpeg"
+    },
+    "is_mine": true,
+    "is_saved": false,
+    "author_profile": {
+        "username": "usr.nam",
+        "bio": "user info",
+        "picture": null,
+        "is_me": true
+    },
+    "saves_count": 5
+}
+
