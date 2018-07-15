@@ -70,7 +70,6 @@ class AuthStorageRepositoryTest() {
 
     class ScenarioMaker {
         lateinit var authToken: AuthToken
-        lateinit var person: Person
         val authStorageRepository = AuthStorageRepository(InstrumentationRegistry.getTargetContext())
         lateinit var exception: Exception
         var isRegisteredResult: Boolean? = null

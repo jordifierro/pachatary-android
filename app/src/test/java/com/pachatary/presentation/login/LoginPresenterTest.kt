@@ -1,9 +1,6 @@
 package com.pachatary.presentation.login
 
 import com.pachatary.data.auth.AuthRepository
-import com.pachatary.data.auth.AuthToken
-import com.pachatary.data.auth.Person
-import com.pachatary.data.common.Result
 import com.pachatary.data.common.ResultError
 import com.pachatary.data.common.ResultInProgress
 import com.pachatary.data.common.ResultSuccess
