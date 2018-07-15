@@ -31,16 +31,16 @@ class AuthApiRepositoryTest {
     }
 
     @Test
-    fun test_on_register_parses_person() {
+    fun test_on_register_returns_success() {
         given {
             a_username()
             an_email()
-            a_web_server_that_returns_person_response_200_when_patch_people()
+            a_web_server_that_returns_empty_response_204_when_patch_people()
         } whenn {
             register_person()
         } then {
             request_should_patch_person_me_with_username_and_email()
-            response_should_be_person()
+            response_should_be_success()
         }
     }
 
@@ -59,15 +59,15 @@ class AuthApiRepositoryTest {
     }
 
     @Test
-    fun test_on_confirm_email_parses_person() {
+    fun test_on_confirm_email_parses_success() {
         given {
             a_confirmation_token()
-            a_web_server_that_returns_person_response_200_when_post_email_confirmation()
+            a_web_server_that_returns_empty_response_204_when_post_email_confirmation()
         } whenn {
             confirm_email_person()
         } then {
             request_should_post_email_confirmation_with_confirmation_token()
-            response_should_be_person()
+            response_should_be_success()
         }
     }
 
@@ -106,7 +106,7 @@ class AuthApiRepositoryTest {
             login()
         } then {
             request_should_post_login_with_token()
-            response_should_be_in_progress_and_success_with_person_and_auth_token()
+            response_should_be_in_progress_and_success_with_auth_token()
         }
     }
 
@@ -136,9 +136,9 @@ class AuthApiRepositoryTest {
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build(), clientSecretKey, Schedulers.trampoline())
         val testAuthTokenSubscriber = TestSubscriber<Result<AuthToken>>()
-        val testRegisterSubscriber = TestSubscriber<Result<Person>>()
+        val testRegisterSubscriber = TestSubscriber<Result<Void>>()
         val testAskLoginEmailSubscriber = TestSubscriber<Result<Void>>()
-        val testLoginSubscriber = TestSubscriber<Result<Pair<Person, AuthToken>>>()
+        val testLoginSubscriber = TestSubscriber<Result<AuthToken>>()
         val testClientVersionsSubscriber = TestSubscriber<Result<Int>>()
         var username = ""
         var email = ""
@@ -166,15 +166,12 @@ class AuthApiRepositoryTest {
                     AuthApiRepository::class.java.getResource("/api/POST_people.json").readText()))
         }
 
-        fun a_web_server_that_returns_person_response_200_when_patch_people() {
-            mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(
-                    AuthApiRepository::class.java.getResource("/api/PATCH_people.json").readText()))
+        fun a_web_server_that_returns_empty_response_204_when_patch_people() {
+            mockWebServer.enqueue(MockResponse().setResponseCode(204).setBody(""))
         }
 
-        fun a_web_server_that_returns_person_response_200_when_post_email_confirmation() {
-            mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(
-                    AuthApiRepository::class.java.getResource(
-                            "/api/POST_people_me_email_confirmation.json").readText()))
+        fun a_web_server_that_returns_empty_response_204_when_post_email_confirmation() {
+            mockWebServer.enqueue(MockResponse().setResponseCode(204).setBody(""))
         }
 
         fun a_web_server_that_returns_error_response_422_invalid_entity_when_patch_people() {
@@ -287,10 +284,8 @@ class AuthApiRepositoryTest {
                                                  ResultSuccess(AuthToken("868a2b9a", "9017c7e7")))
         }
 
-        fun response_should_be_person() {
-            testRegisterSubscriber.assertResult(
-                    ResultSuccess(Person(isRegistered = true, username = "user.name",
-                                         email = "test@mail.com", isEmailConfirmed = false)))
+        fun response_should_be_success() {
+            testRegisterSubscriber.assertResult( ResultSuccess())
         }
 
         fun response_should_be_error() {
@@ -309,10 +304,9 @@ class AuthApiRepositoryTest {
             testAskLoginEmailSubscriber.assertResult(ResultInProgress(), ResultSuccess())
         }
 
-        fun response_should_be_in_progress_and_success_with_person_and_auth_token() {
+        fun response_should_be_in_progress_and_success_with_auth_token() {
             testLoginSubscriber.assertResult(ResultInProgress(),
-                    ResultSuccess(Pair(Person(true, "user.name", "email@example.com", true),
-                                       AuthToken("A_T_12345", "R_T_67890"))))
+                    ResultSuccess(AuthToken("A_T_12345", "R_T_67890")))
         }
 
         fun response_should_return_inprogress_and_3() {

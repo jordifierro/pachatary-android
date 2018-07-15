@@ -24,27 +24,14 @@ class AuthStorageRepository(val context: Context) {
         editor.apply()
     }
 
-    @Throws(NoPersonInfoException::class)
-    fun getPerson(): Person {
-        val isRegistered = sharedPrefs.getBoolean(context.resources.getString(R.string.auth_person_is_registered_key),
-                                                  false)
-        val username = sharedPrefs.getString(context.resources.getString(R.string.auth_person_username_key), null)
-        val email = sharedPrefs.getString(context.resources.getString(R.string.auth_person_email_key), null)
-        val isEmailConfirmed = sharedPrefs.getBoolean(
-                context.resources.getString(R.string.auth_person_is_email_confirmed_key), false)
+    fun isRegistrationCompleted(): Boolean =
+        sharedPrefs.getBoolean(context.resources.getString(R.string.auth_is_register_completed_key),
+                               false)
 
-        if (username == null) throw NoPersonInfoException("Person has not started register process")
-        return Person(isRegistered = isRegistered, username = username,
-                      email = email, isEmailConfirmed = isEmailConfirmed)
-    }
-
-    fun setPerson(person: Person) {
+    fun setIsRegisterCompleted(isRegisterCompleted: Boolean) {
         val editor = sharedPrefs.edit()
-        editor.putBoolean(context.resources.getString(R.string.auth_person_is_registered_key), person.isRegistered)
-        editor.putString(context.resources.getString(R.string.auth_person_username_key), person.username)
-        editor.putString(context.resources.getString(R.string.auth_person_email_key), person.email)
-        editor.putBoolean(context.resources.getString(R.string.auth_person_is_email_confirmed_key),
-                          person.isEmailConfirmed)
+        editor.putBoolean(context.resources.getString(R.string.auth_is_register_completed_key),
+                          isRegisterCompleted)
         editor.apply()
     }
 }

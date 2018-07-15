@@ -16,7 +16,8 @@ class NetworkParserFactory {
         fun <T> getListTransformer() = ListResultTransformer<T>()
         fun <T, U: ToDomainMapper<T>> getPaginatedListTransformer() =
                 PaginatedListResultTransformer<T, U>()
-        fun getVoidTransformer() = VoidTransformer()
+        fun getVoidTransformer(errorMapper: ((String) -> ClientException)? = null)
+                = VoidTransformer(errorMapper)
     }
 
     class ResultTransformer<T>(private val errorMapper: ((String) -> ClientException)? = null)
@@ -62,12 +63,12 @@ class NetworkParserFactory {
                               nextUrl = rxJavaResult.response()!!.body()!!.nextUrl) }
     }
 
-    class VoidTransformer : FlowableTransformer<retrofit2.adapter.rxjava2.Result<Void>,
-                                                Result<Void>> {
+    class VoidTransformer(private val errorMapper: ((String) -> ClientException)? = null)
+                       : FlowableTransformer<retrofit2.adapter.rxjava2.Result<Void>, Result<Void>> {
 
         override fun apply(upstream: Flowable<retrofit2.adapter.rxjava2.Result<Void>>)
                 : Publisher<Result<Void>> =
-                upstream.compose(CommonTransformer(null, null, true))
+                upstream.compose(CommonTransformer(null, errorMapper, true))
     }
 
     class CommonTransformer<T, U>(
@@ -87,10 +88,10 @@ class NetworkParserFactory {
                 else ResultSuccess()
             }
             .retry(2)
-                    .onErrorResumeNext { error: Throwable ->
-                        if (error is UnknownHostException || error is SocketTimeoutException)
-                            Flowable.just(ResultError(error))
-                        else Flowable.error(error)
-                    }
+            .onErrorResumeNext { error: Throwable ->
+                if (error is UnknownHostException || error is SocketTimeoutException)
+                    Flowable.just(ResultError(error))
+                else Flowable.error(error)
+            }
     }
 }

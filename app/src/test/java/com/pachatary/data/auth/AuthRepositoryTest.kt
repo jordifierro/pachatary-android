@@ -38,21 +38,9 @@ class AuthRepositoryTest {
     }
 
     @Test
-    fun test_can_create_content_returns_false_if_no_person_info() {
+    fun test_can_create_content_returns_false_if_register_not_completed() {
         given {
-            an_auth_api_that_raises_no_person_info_on_get_person_info()
-        } whenn {
-            can_create_content()
-        } then {
-            should_return_false()
-        }
-    }
-
-    @Test
-    fun test_can_create_content_returns_false_if_person_is_email_confirmed_false() {
-        given {
-            a_person_with_is_email_confirmed_false()
-            an_auth_api_that_returns_that_person_on_get_person()
+            an_auth_api_with_is_register_completed(false)
         } whenn {
             can_create_content()
         } then {
@@ -63,8 +51,7 @@ class AuthRepositoryTest {
     @Test
     fun test_can_create_content_returns_true_if_person_is_email_confirmed_true() {
         given {
-            a_person_with_is_email_confirmed_true()
-            an_auth_api_that_returns_that_person_on_get_person()
+            an_auth_api_with_is_register_completed(true)
         } whenn {
             can_create_content()
         } then {
@@ -84,30 +71,18 @@ class AuthRepositoryTest {
         }
     }
 
-    @Test
-    fun test_save_person_call_storage_repo_set_person() {
-        given {
-            a_person_with_is_email_confirmed_true()
-        } whenn {
-            save_that_person()
-        } then {
-            should_call_storage_repo_set_person_with_that_person()
-        }
-    }
 
     @Test
-    fun test_register_returns_api_register_return_and_saves_person_on_storage_repo() {
+    fun test_register_returns_api_register() {
         given {
             a_username()
             an_email()
-            a_person()
-            an_auth_api_that_returns_a_flowable_with_that_person()
+            an_auth_api_that_returns_a_flowable_with_success_for_register()
         } whenn {
             register_person()
         } then {
             should_call_api_register_with_username_and_email()
-            should_receive_person()
-            should_call_storage_repo_to_save_person()
+            should_receive_success()
         }
     }
 
@@ -131,14 +106,13 @@ class AuthRepositoryTest {
     fun test_confirm_email_returns_api_confirm_email_return_and_saves_person_on_storage_repo() {
         given {
             a_confirmation_token()
-            a_person()
-            an_auth_api_that_returns_a_flowable_with_that_person_on_confirm_email()
+            an_auth_api_that_returns_a_flowable_with_success_for_confirm_email()
         } whenn {
             confirm_email_person()
         } then {
             should_call_api_confirm_email_with_confirmation_token()
-            should_receive_person()
-            should_call_storage_repo_to_save_person()
+            should_receive_success()
+            should_call_storage_repo_set_is_register_completed()
         }
     }
 
@@ -161,15 +135,14 @@ class AuthRepositoryTest {
     fun test_login_calls_api_and_saves_person_and_auth_token() {
         given {
             a_login_token()
-            a_person()
             an_auth_token()
-            an_auth_api_that_returns_person_and_auth_token_when_login()
+            an_auth_api_that_returns_auth_token_when_login()
         } whenn {
             login()
         } then {
             should_call_api_repo_login_with_login_token()
-            should_receive_person_and_auth_token()
-            should_save_person_and_auth_token_to_storage_repo()
+            should_return_auth_token_flowable()
+            should_save_auth_token_to_storage_repo()
         }
     }
 
@@ -242,16 +215,14 @@ class AuthRepositoryTest {
         var hasCredentialsResult = false
         var canCreateContentResult = false
         val testAuthTokenSubscriber = TestSubscriber<Result<AuthToken>>()
-        val testPersonSubscriber = TestSubscriber<Result<Person>>()
-        val testPersonAuthTokenSubscriber = TestSubscriber<Result<Pair<Person, AuthToken>>>()
+        val testVoidSubscriber = TestSubscriber<Result<Void>>()
         val testCurrentVersionExpiredSubscriber = TestSubscriber<Boolean>()
         lateinit var authToken: AuthToken
-        lateinit var person: Person
         var username = ""
         var email = ""
         var confirmationToken = ""
         var loginToken = ""
-        var resultError: Result<Person>? = null
+        var resultError: Result<Void>? = null
 
         fun a_username() {
             username = "usr.nm"
@@ -273,18 +244,13 @@ class AuthRepositoryTest {
             loginToken = "ABC"
         }
 
-        fun a_person() {
-            person = Person(isRegistered = true, username = "srnm",
-                            email = "test@m.c", isEmailConfirmed = false)
-        }
-
         fun a_result_error() {
             resultError = ResultError(ClientException(source = "s", code = "c", message = "m"))
         }
 
-        fun an_auth_api_that_returns_a_flowable_with_that_person() {
+        fun an_auth_api_that_returns_a_flowable_with_success_for_register() {
             BDDMockito.given(authApiRepository.register(username, email))
-                    .willReturn(Flowable.just(ResultSuccess(person)))
+                    .willReturn(Flowable.just(ResultSuccess()))
         }
 
         fun an_auth_api_that_returns_a_flowable_with_that_result_error() {
@@ -292,9 +258,9 @@ class AuthRepositoryTest {
                     .willReturn(Flowable.just(resultError))
         }
 
-        fun an_auth_api_that_returns_a_flowable_with_that_person_on_confirm_email() {
+        fun an_auth_api_that_returns_a_flowable_with_success_for_confirm_email() {
             BDDMockito.given(authApiRepository.confirmEmail(confirmationToken))
-                    .willReturn(Flowable.just(ResultSuccess(person)))
+                    .willReturn(Flowable.just(ResultSuccess()))
         }
 
         fun an_auth_api_that_returns_a_flowable_with_that_result_error_on_confirm_email() {
@@ -318,9 +284,9 @@ class AuthRepositoryTest {
                     Flowable.just(ResultSuccess(authToken)))
         }
 
-        fun an_auth_api_that_returns_person_and_auth_token_when_login() {
+        fun an_auth_api_that_returns_auth_token_when_login() {
             BDDMockito.given(authApiRepository.login(loginToken))
-                    .willReturn(Flowable.just(ResultSuccess(Pair(person, authToken))))
+                    .willReturn(Flowable.just(ResultSuccess(authToken)))
         }
 
         fun an_api_that_returns_error_client_version() {
@@ -331,6 +297,11 @@ class AuthRepositoryTest {
         fun an_api_that_returns_min_client_version(minClientVersion: Int) {
             BDDMockito.given(authApiRepository.clientVersions())
                     .willReturn(Flowable.just(ResultSuccess(minClientVersion)))
+        }
+
+        fun an_auth_api_with_is_register_completed(isRegisterCompleted: Boolean) {
+            BDDMockito.given(authStorageRepository.isRegistrationCompleted())
+                    .willReturn(isRegisterCompleted)
         }
 
         fun an_api_that_returns_in_progress_client_version() {
@@ -350,19 +321,19 @@ class AuthRepositoryTest {
 
         fun register_person() {
             repository.register(username = username, email = email)
-                    .subscribeOn(Schedulers.trampoline()).subscribe(testPersonSubscriber)
-            testPersonSubscriber.awaitCount(1)
+                    .subscribeOn(Schedulers.trampoline()).subscribe(testVoidSubscriber)
+            testVoidSubscriber.awaitCount(1)
         }
 
         fun confirm_email_person() {
             repository.confirmEmail(confirmationToken = confirmationToken)
-                    .subscribeOn(Schedulers.trampoline()).subscribe(testPersonSubscriber)
-            testPersonSubscriber.awaitCount(1)
+                    .subscribeOn(Schedulers.trampoline()).subscribe(testVoidSubscriber)
+            testVoidSubscriber.awaitCount(1)
         }
 
         fun login() {
             repository.login(loginToken).subscribeOn(Schedulers.trampoline())
-                    .subscribe(testPersonAuthTokenSubscriber)
+                    .subscribe(testAuthTokenSubscriber)
         }
 
         fun current_version_has_expired() {
@@ -386,31 +357,8 @@ class AuthRepositoryTest {
             BDDMockito.then(authStorageRepository).should().setPersonCredentials(authToken)
         }
 
-        fun an_auth_api_that_raises_no_person_info_on_get_person_info() {
-            BDDMockito.given(authStorageRepository.getPerson())
-                    .willThrow(NoPersonInfoException("Person has not started register process"))
-        }
-
-        fun a_person_with_is_email_confirmed_false() {
-            person = Person(isRegistered = true, username = "usr",
-                            email = "e@m.c", isEmailConfirmed = false)
-        }
-
-        fun a_person_with_is_email_confirmed_true() {
-            person = Person(isRegistered = true, username = "usr",
-                            email = "e@m.c", isEmailConfirmed = true)
-        }
-
-        fun an_auth_api_that_returns_that_person_on_get_person() {
-            BDDMockito.given(authStorageRepository.getPerson()).willReturn(person)
-        }
-
         fun can_create_content() {
             canCreateContentResult = repository.canPersonCreateContent()
-        }
-
-        fun save_that_person() {
-            repository.savePerson(person)
         }
 
         fun should_return_false() {
@@ -421,8 +369,8 @@ class AuthRepositoryTest {
             assertTrue(canCreateContentResult)
         }
 
-        fun should_call_storage_repo_set_person_with_that_person() {
-            BDDMockito.then(authStorageRepository).should().setPerson(person)
+        fun should_call_storage_repo_set_is_register_completed() {
+            BDDMockito.then(authStorageRepository).should().setIsRegisterCompleted(true)
         }
 
         fun should_call_api_client_version() {
@@ -433,16 +381,12 @@ class AuthRepositoryTest {
             BDDMockito.then(authApiRepository).should().register(username = username, email = email)
         }
 
-        fun should_receive_person() {
-            testPersonSubscriber.assertResult(ResultSuccess(person))
-        }
-
-        fun should_call_storage_repo_to_save_person() {
-            BDDMockito.then(authStorageRepository).should().setPerson(person)
+        fun should_receive_success() {
+            testVoidSubscriber.assertResult(ResultSuccess())
         }
 
         fun should_receive_error_result() {
-            testPersonSubscriber.assertResult(resultError)
+            testVoidSubscriber.assertResult(resultError)
         }
 
         fun should_not_call_storage_repo_to_save_person() {
@@ -457,13 +401,7 @@ class AuthRepositoryTest {
             BDDMockito.then(authApiRepository).should().login(loginToken)
         }
 
-        fun should_receive_person_and_auth_token() {
-            testPersonAuthTokenSubscriber.awaitCount(1)
-            testPersonAuthTokenSubscriber.assertResult(ResultSuccess(Pair(person, authToken)))
-        }
-
-        fun should_save_person_and_auth_token_to_storage_repo() {
-            BDDMockito.then(authStorageRepository).should().setPerson(person)
+        fun should_save_auth_token_to_storage_repo() {
             BDDMockito.then(authStorageRepository).should().setPersonCredentials(authToken)
         }
 

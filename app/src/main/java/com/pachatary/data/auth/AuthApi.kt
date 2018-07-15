@@ -14,12 +14,11 @@ interface AuthApi {
     @FormUrlEncoded
     @PATCH("/people/me")
     fun register(@Field("username") username: String,
-                 @Field("email") email: String): Flowable<Result<PersonMapper>>
+                 @Field("email") email: String): Flowable<Result<Void>>
 
     @FormUrlEncoded
     @POST("/people/me/email-confirmation")
-    fun confirmEmail(@Field("confirmation_token") confirmationToken: String)
-                                                                    : Flowable<Result<PersonMapper>>
+    fun confirmEmail(@Field("confirmation_token") confirmationToken: String): Flowable<Result<Void>>
 
     @FormUrlEncoded
     @POST("/people/me/login-email")
@@ -27,7 +26,7 @@ interface AuthApi {
 
     @FormUrlEncoded
     @POST("/people/me/login")
-    fun login(@Field("token") loginToken: String) : Flowable<Result<PairPersonAuthTokenMapper>>
+    fun login(@Field("token") loginToken: String): Flowable<Result<AuthTokenMapper>>
 
     @GET("/client-versions")
     fun clientVersions(): Flowable<Result<ClientVersionsMapper>>

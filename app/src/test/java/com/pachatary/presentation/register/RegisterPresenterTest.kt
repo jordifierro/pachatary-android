@@ -2,8 +2,6 @@ package com.pachatary.presentation.register
 
 import com.pachatary.data.auth.AuthRepository
 import com.pachatary.data.auth.ClientException
-import com.pachatary.data.auth.Person
-import com.pachatary.data.common.Result
 import com.pachatary.data.common.ResultError
 import com.pachatary.data.common.ResultSuccess
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
@@ -86,7 +84,7 @@ class RegisterPresenterTest {
 
         fun an_auth_repo_that_returns_a_flowable_with_a_person() {
             BDDMockito.given(mockAuthRepo.register(username, email))
-                    .willReturn(Flowable.just(ResultSuccess(Person(true, "u", "e", false))))
+                    .willReturn(Flowable.just(ResultSuccess()))
         }
 
         fun an_auth_repo_that_returns_a_flowable_with_that_error() {

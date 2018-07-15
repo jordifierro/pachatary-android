@@ -3,7 +3,6 @@ package com.pachatary.data.auth
 import com.pachatary.data.common.NetworkParserFactory
 import com.pachatary.data.common.Result
 import com.pachatary.data.common.ResultInProgress
-import com.pachatary.data.common.Status
 import io.reactivex.Flowable
 import io.reactivex.Scheduler
 import retrofit2.Retrofit
@@ -20,15 +19,15 @@ class AuthApiRepository (retrofit: Retrofit, private val clientSecretKey: String
                 .compose(NetworkParserFactory.getTransformer())
                 .startWith(ResultInProgress())
 
-    fun register(username: String, email: String): Flowable<Result<Person>> =
+    fun register(username: String, email: String): Flowable<Result<Void>> =
         authApi.register(username = username, email = email)
-                .compose(NetworkParserFactory.getErrorTransformer(
-                        { ClientExceptionMapper(it).toError() }))
+                .compose(NetworkParserFactory
+                                .getVoidTransformer { ClientExceptionMapper(it).toError() })
 
-    fun confirmEmail(confirmationToken: String): Flowable<Result<Person>> =
+    fun confirmEmail(confirmationToken: String): Flowable<Result<Void>> =
         authApi.confirmEmail(confirmationToken = confirmationToken)
-                .compose(NetworkParserFactory.getErrorTransformer(
-                        { ClientExceptionMapper(it).toError() }))
+                .compose(NetworkParserFactory
+                                .getVoidTransformer { ClientExceptionMapper(it).toError() })
 
     fun askLoginEmail(email: String): Flowable<Result<Void>> =
         authApi.askLoginEmail(email)
@@ -36,7 +35,7 @@ class AuthApiRepository (retrofit: Retrofit, private val clientSecretKey: String
                 .compose(NetworkParserFactory.getVoidTransformer())
                 .startWith(ResultInProgress())
 
-    fun login(loginToken: String): Flowable<Result<Pair<Person, AuthToken>>> =
+    fun login(loginToken: String): Flowable<Result<AuthToken>> =
         authApi.login(loginToken)
                 .subscribeOn(ioScheduler)
                 .compose(NetworkParserFactory.getErrorTransformer(

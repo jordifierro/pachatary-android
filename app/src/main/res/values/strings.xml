@@ -2,10 +2,7 @@
     <string name="auth_sharedpreferences_file">auth_prefs</string>
     <string name="auth_access_token_key">auth_access_token</string>
     <string name="auth_refresh_token_key">auth_refresh_token</string>
-    <string name="auth_person_is_registered_key">auth_person_is_registered</string>
-    <string name="auth_person_username_key">auth_person_username</string>
-    <string name="auth_person_email_key">auth_person_email</string>
-    <string name="auth_person_is_email_confirmed_key">auth_person_is_email_confirmed</string>
+    <string name="auth_is_register_completed_key">auth_is_register_completed</string>
 
     <string name="title_activity_experiences_list">Experiences</string>
     <string name="title_activity_experience_map">Map</string>

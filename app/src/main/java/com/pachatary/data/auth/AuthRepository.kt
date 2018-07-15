@@ -19,26 +19,22 @@ class AuthRepository(val authStorageRepository: AuthStorageRepository,
                                 authStorageRepository.setPersonCredentials(it.data!!) }
     }
 
-    fun canPersonCreateContent(): Boolean {
-        return try { authStorageRepository.getPerson().isEmailConfirmed }
-        catch (e: NoPersonInfoException) { false }
-    }
+    fun canPersonCreateContent() = authStorageRepository.isRegistrationCompleted()
 
-    fun register(username: String, email: String): Flowable<Result<Person>> =
+    fun register(username: String, email: String): Flowable<Result<Void>> =
             authApiRepository.register(username, email)
-                .doOnNext { if (it.isSuccess()) savePerson(it.data!!) }
 
-    fun confirmEmail(confirmationToken: String): Flowable<Result<Person>> =
+    fun confirmEmail(confirmationToken: String): Flowable<Result<Void>> =
             authApiRepository.confirmEmail(confirmationToken)
-                .doOnNext { if (it.isSuccess()) savePerson(it.data!!) }
+                .doOnNext { if (it.isSuccess()) authStorageRepository.setIsRegisterCompleted(true) }
 
     fun askLoginEmail(email: String) = authApiRepository.askLoginEmail(email)
 
-    fun login(loginToken: String): Flowable<Result<Pair<Person, AuthToken>>> =
+    fun login(loginToken: String): Flowable<Result<AuthToken>> =
             authApiRepository.login(loginToken)
                 .doOnNext { if (it.isSuccess()) {
-                                savePerson(it.data!!.first)
-                                authStorageRepository.setPersonCredentials(it.data.second)
+                                authStorageRepository.setIsRegisterCompleted(true)
+                                authStorageRepository.setPersonCredentials(it.data!!)
                             } }
 
     fun currentVersionHasExpired(): Flowable<Boolean> =
@@ -46,8 +42,4 @@ class AuthRepository(val authStorageRepository: AuthStorageRepository,
                     .filter { !it.isInProgress() }
                     .map { if (it.isSuccess()) currentVersion < it.data!!
                            else false }
-
-    internal fun savePerson(person: Person) {
-        authStorageRepository.setPerson(person)
-    }
 }

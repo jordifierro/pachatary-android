@@ -34,24 +34,35 @@ class AuthStorageRepositoryTest() {
     }
 
     @Test
-    fun test_get_and_save_person() {
+    fun test_no_info_about_register_returns_false() {
         given {
-            a_person()
+
         } whenn {
-            save_that_person()
+            get_is_register_completed()
         } then {
-            get_should_receive_that_person()
+            get_should_receive(false)
         }
     }
 
     @Test
-    fun test_get_person_when_no_person() {
+    fun test_set_not_registered() {
         given {
-            nothing()
+            set_register_completed(false)
         } whenn {
-            get_person()
+            get_is_register_completed()
         } then {
-            should_raise_no_person_info_exception()
+            get_should_receive(false)
+        }
+    }
+
+    @Test
+    fun test_set_registered() {
+        given {
+            set_register_completed(true)
+        } whenn {
+            get_is_register_completed()
+        } then {
+            get_should_receive(true)
         }
     }
 
@@ -62,6 +73,7 @@ class AuthStorageRepositoryTest() {
         lateinit var person: Person
         val authStorageRepository = AuthStorageRepository(InstrumentationRegistry.getTargetContext())
         lateinit var exception: Exception
+        var isRegisteredResult: Boolean? = null
 
         fun nothing() {}
 
@@ -69,16 +81,12 @@ class AuthStorageRepositoryTest() {
             authToken = AuthToken("AT", "RT")
         }
 
-        fun a_person() {
-            person = Person(isRegistered = true, username = "usr.nm", email = "mail@test.com", isEmailConfirmed = false)
+        fun set_register_completed(isRegistered: Boolean) {
+            authStorageRepository.setIsRegisterCompleted(isRegistered)
         }
 
         fun save_that_auth_token() {
             authStorageRepository.setPersonCredentials(authToken)
-        }
-
-        fun save_that_person() {
-            authStorageRepository.setPerson(person)
         }
 
         fun get_auth_token() {
@@ -89,28 +97,20 @@ class AuthStorageRepositoryTest() {
             }
         }
 
-        fun get_person() {
-            try {
-                authStorageRepository.getPerson()
-            } catch (e: NoPersonInfoException) {
-                exception = e
-            }
+        fun get_is_register_completed() {
+            isRegisteredResult = authStorageRepository.isRegistrationCompleted()
         }
 
         fun get_should_receive_that_token() {
             Assert.assertEquals(authStorageRepository.getPersonCredentials(), authToken)
         }
 
-        fun get_should_receive_that_person() {
-            Assert.assertEquals(authStorageRepository.getPerson(), person)
-        }
-
         fun should_raise_no_logged_exception() {
             assert(exception is NoLoggedException)
         }
 
-        fun should_raise_no_person_info_exception() {
-            assert(exception is NoPersonInfoException)
+        fun get_should_receive(isRegistered: Boolean) {
+            assert(isRegisteredResult!! == isRegistered)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = apply(func)

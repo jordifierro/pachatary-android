@@ -2,8 +2,6 @@ package com.pachatary.presentation.register
 
 import com.pachatary.data.auth.AuthRepository
 import com.pachatary.data.auth.ClientException
-import com.pachatary.data.auth.Person
-import com.pachatary.data.common.Result
 import com.pachatary.data.common.ResultError
 import com.pachatary.data.common.ResultSuccess
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
@@ -20,7 +18,7 @@ class ConfirmEmailPresenterTest {
     fun test_register_ok() {
         given {
             a_confirmation_token()
-            an_auth_repo_that_returns_a_flowable_with_a_person()
+            an_auth_repo_that_returns_a_flowable_with_success()
         } whenn {
             presenter_is_created()
         } then {
@@ -76,9 +74,9 @@ class ConfirmEmailPresenterTest {
             clientError = ClientException(source = "s", code = "c", message = "mess")
         }
 
-        fun an_auth_repo_that_returns_a_flowable_with_a_person() {
+        fun an_auth_repo_that_returns_a_flowable_with_success() {
             BDDMockito.given(mockAuthRepo.confirmEmail(confirmationToken))
-                    .willReturn(Flowable.just(ResultSuccess(Person(true, "u", "e", false))))
+                    .willReturn(Flowable.just(ResultSuccess()))
         }
 
         fun an_auth_repo_that_returns_a_flowable_with_that_error() {
