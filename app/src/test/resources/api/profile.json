@@ -1,0 +1,10 @@
+{
+    "username": "usr.nm",
+    "bio": "bio description",
+    "picture": {
+        "medium_url": "https://experiences/8c29.medium.jpg",
+        "small_url": "https://experiences/8c29.small.jpg",
+        "tiny_url": "https://experiences/8c29.tiny.jpg"
+    },
+    "is_me": false
+}
