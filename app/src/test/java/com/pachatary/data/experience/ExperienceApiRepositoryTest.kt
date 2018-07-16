@@ -9,12 +9,10 @@ import com.pachatary.data.auth.AuthHttpInterceptor
 import com.pachatary.data.common.Result
 import com.pachatary.data.common.ResultInProgress
 import com.pachatary.data.common.ResultSuccess
-import com.pachatary.data.profile.Profile
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
-import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Test
 import org.mockito.Mockito.mock
@@ -208,7 +206,7 @@ class ExperienceApiRepositoryTest {
         val mockContext = mock(Context::class.java)
         val mockAuthHttpInterceptor = mock(AuthHttpInterceptor::class.java)
         val mockWebServer = MockWebServer()
-        val repository = ExperienceApiRepository(Retrofit.Builder()
+        val repository = ExperienceApiRepo(Retrofit.Builder()
                 .baseUrl(mockWebServer.url("/"))
                 .addConverterFactory(GsonConverterFactory.create(
                         GsonBuilder().setFieldNamingPolicy(

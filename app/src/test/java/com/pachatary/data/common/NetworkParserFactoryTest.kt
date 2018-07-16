@@ -5,7 +5,7 @@ import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import com.pachatary.data.auth.AuthHttpInterceptor
 import com.pachatary.data.experience.Experience
-import com.pachatary.data.experience.ExperienceApiRepository
+import com.pachatary.data.experience.ExperienceApiRepo
 import com.pachatary.data.experience.ExperienceApiRepositoryTest
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
@@ -24,7 +24,6 @@ import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeoutException
 
 class NetworkParserFactoryTest {
 
@@ -85,7 +84,7 @@ class NetworkParserFactoryTest {
         val mockContext = mock(Context::class.java)
         val mockWebServer = MockWebServer()
         var logInterceptor = LoggerHttpInterceptor()
-        val repository = ExperienceApiRepository(Retrofit.Builder()
+        val repository = ExperienceApiRepo(Retrofit.Builder()
                 .baseUrl(mockWebServer.url("/"))
                 .addConverterFactory(GsonConverterFactory.create(
                         GsonBuilder().setFieldNamingPolicy(
@@ -105,7 +104,7 @@ class NetworkParserFactoryTest {
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .client(OkHttpClient.Builder().addInterceptor(logInterceptor).build())
                 .build()
-        val unknownHostRepo = ExperienceApiRepository(unknownHostRetrofit,
+        val unknownHostRepo = ExperienceApiRepo(unknownHostRetrofit,
                 Schedulers.trampoline(), mockContext, mockAuthHttpInterceptor)
 
         fun buildScenario(): ScenarioMaker {

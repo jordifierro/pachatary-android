@@ -2,15 +2,12 @@ package com.pachatary.data.scene
 
 import com.pachatary.data.DummyResultError
 import com.pachatary.data.DummyScene
-import com.pachatary.data.SceneResultSuccess
-import com.pachatary.data.ScenesListResultSuccess
+import com.pachatary.data.DummySceneResultSuccess
+import com.pachatary.data.DummyScenesResultSuccess
 import com.pachatary.data.common.*
 import io.reactivex.Flowable
 import io.reactivex.observers.TestObserver
-import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
-import org.junit.Assert
-import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.BDDMockito
 import org.mockito.Mock
@@ -22,14 +19,14 @@ class SceneRepositoryTest {
     @Test
     fun test_scenes_flowable_return_cache_flowable_connected_with_api_request() {
         given {
-            an_scenes_cache_factory_that_returns_cache_with(ScenesListResultSuccess("8"))
+            an_scenes_cache_factory_that_returns_cache_with(DummyScenesResultSuccess("8"))
             an_api_repo_that_returns_scenes_flowable_for("1",
-                    ResultInProgress(), ScenesListResultSuccess("4"))
+                    ResultInProgress(), DummyScenesResultSuccess("4"))
         } whenn {
             scenes_flowable(experienceId = "1")
         } then {
-            should_return_list_flowable_with(ScenesListResultSuccess("8"))
-            should_emit_through_cache_replace(ResultInProgress(), ScenesListResultSuccess("4"))
+            should_return_list_flowable_with(DummyScenesResultSuccess("8"))
+            should_emit_through_cache_replace(ResultInProgress(), DummyScenesResultSuccess("4"))
         }
     }
 
@@ -63,61 +60,61 @@ class SceneRepositoryTest {
     fun test_scenes_flowable_calls_api_when_cached_result_is_error() {
         given {
             an_scenes_cache_factory_that_returns_cache_with(DummyResultError())
-            an_api_repo_that_returns_scenes_flowable_for("1", ScenesListResultSuccess("4"))
+            an_api_repo_that_returns_scenes_flowable_for("1", DummyScenesResultSuccess("4"))
         } whenn {
             scenes_flowable(experienceId = "1")
             scenes_flowable(experienceId = "1")
         } then {
             should_return_list_flowable_with(DummyResultError(), forResult = 1)
             should_return_list_flowable_with(forResult = 2)
-            should_emit_through_cache_replace(ScenesListResultSuccess("4"),
-                                              ScenesListResultSuccess("4"))
+            should_emit_through_cache_replace(DummyScenesResultSuccess("4"),
+                                              DummyScenesResultSuccess("4"))
         }
     }
 
     @Test
     fun test_repo_caches() {
         given {
-            an_scenes_cache_factory_that_returns_cache_with(ScenesListResultSuccess("8"))
-            an_api_repo_that_returns_scenes_flowable_for("1", ScenesListResultSuccess("4"))
+            an_scenes_cache_factory_that_returns_cache_with(DummyScenesResultSuccess("8"))
+            an_api_repo_that_returns_scenes_flowable_for("1", DummyScenesResultSuccess("4"))
         } whenn {
             scenes_flowable(experienceId = "1")
             scenes_flowable(experienceId = "1")
             scenes_flowable(experienceId = "1")
         } then {
-            should_emit_through_cache_replace(ScenesListResultSuccess("4"))
-            should_return_list_flowable_with(ScenesListResultSuccess("8"), forResult = 1)
-            should_return_list_flowable_with(ScenesListResultSuccess("8"), forResult = 2)
-            should_return_list_flowable_with(ScenesListResultSuccess("8"), forResult = 3)
+            should_emit_through_cache_replace(DummyScenesResultSuccess("4"))
+            should_return_list_flowable_with(DummyScenesResultSuccess("8"), forResult = 1)
+            should_return_list_flowable_with(DummyScenesResultSuccess("8"), forResult = 2)
+            should_return_list_flowable_with(DummyScenesResultSuccess("8"), forResult = 3)
         }
     }
 
     @Test
     fun test_scene_flowable_returns_experience_scenes_flowable_filtering_desired_scene() {
         given {
-            an_scenes_cache_factory_that_returns_cache_with(ScenesListResultSuccess("8", "9", "10"))
-            an_api_repo_that_returns_scenes_flowable_for("2", ScenesListResultSuccess("4"))
+            an_scenes_cache_factory_that_returns_cache_with(DummyScenesResultSuccess("8", "9", "10"))
+            an_api_repo_that_returns_scenes_flowable_for("2", DummyScenesResultSuccess("4"))
         } whenn {
             scene_flowable(sceneId = "9", experienceId = "2")
         } then {
-            should_return_flowable_with(SceneResultSuccess("9"), forResult = 1)
-            should_emit_through_cache_replace(ScenesListResultSuccess("4"))
+            should_return_flowable_with(DummySceneResultSuccess("9"), forResult = 1)
+            should_emit_through_cache_replace(DummyScenesResultSuccess("4"))
         }
     }
 
     @Test
     fun test_create_scene_calls_api_repo_and_emits_through_add_observer_the_new_scene() {
         given {
-            an_scenes_cache_factory_that_returns_cache_with(ScenesListResultSuccess("8"))
-            an_api_repo_that_returns_scenes_flowable_for("2", ScenesListResultSuccess("4"))
+            an_scenes_cache_factory_that_returns_cache_with(DummyScenesResultSuccess("8"))
+            an_api_repo_that_returns_scenes_flowable_for("2", DummyScenesResultSuccess("4"))
             an_api_repo_that_returns_created_flowable_for(DummyScene("6", experienceId = "2"),
-                ResultInProgress(), SceneResultSuccess("6", experienceId = "2"))
+                ResultInProgress(), DummySceneResultSuccess("6", experienceId = "2"))
         } whenn {
             scenes_flowable("2")
             create_scene(DummyScene("6", experienceId = "2"))
         } then {
             should_return_flowable_with(ResultInProgress(),
-                                        SceneResultSuccess("6", experienceId = "2"))
+                                        DummySceneResultSuccess("6", experienceId = "2"))
             should_emit_through_cache_add_or_update(listOf(DummyScene("6", experienceId = "2")))
         }
     }
@@ -125,16 +122,16 @@ class SceneRepositoryTest {
     @Test
     fun test_edit_scene_calls_api_repo_and_emits_through_add_observer_the_updated_scene() {
         given {
-            an_scenes_cache_factory_that_returns_cache_with(ScenesListResultSuccess("8"))
-            an_api_repo_that_returns_scenes_flowable_for("2", ScenesListResultSuccess("4"))
+            an_scenes_cache_factory_that_returns_cache_with(DummyScenesResultSuccess("8"))
+            an_api_repo_that_returns_scenes_flowable_for("2", DummyScenesResultSuccess("4"))
             an_api_repo_that_returns_edited_flowable_for(DummyScene("6", experienceId = "2"),
-                    ResultInProgress(), SceneResultSuccess("6", experienceId = "2"))
+                    ResultInProgress(), DummySceneResultSuccess("6", experienceId = "2"))
         } whenn {
             scenes_flowable("2")
             edit_scene(DummyScene("6", experienceId = "2"))
         } then {
             should_return_flowable_with(ResultInProgress(),
-                                        SceneResultSuccess("6", experienceId = "2"))
+                                        DummySceneResultSuccess("6", experienceId = "2"))
             should_emit_through_cache_update(listOf(DummyScene("6", experienceId = "2")))
         }
     }
@@ -142,10 +139,10 @@ class SceneRepositoryTest {
     @Test
     fun test_upload_scene_picture_calls_api_repo_with_delegate_to_emit_through_update_observer() {
         given {
-            an_scenes_cache_factory_that_returns_cache_with(ScenesListResultSuccess("8"))
-            an_api_repo_that_returns_scenes_flowable_for("2", ScenesListResultSuccess("4"))
+            an_scenes_cache_factory_that_returns_cache_with(DummyScenesResultSuccess("8"))
+            an_api_repo_that_returns_scenes_flowable_for("2", DummyScenesResultSuccess("4"))
             an_api_repo_that_returns_upload_flowable_for("6", "picture_path",
-                    ResultInProgress(), SceneResultSuccess("6", experienceId = "2"))
+                    ResultInProgress(), DummySceneResultSuccess("6", experienceId = "2"))
         } whenn {
             scenes_flowable("2")
             upload_scene_picture("6", "picture_path")

@@ -11,7 +11,7 @@ interface ExperienceApi {
     fun exploreExperiences(@Query("word") word: String?,
                            @Query("latitude") latitude: Double?,
                            @Query("longitude") longitude: Double?)
-            : Flowable<Result<PaginatedListMapper<Experience, ExperienceMapper>>>
+                               : Flowable<Result<PaginatedListMapper<Experience, ExperienceMapper>>>
 
     @GET("/experiences/?username=self")
     fun myExperiences(): Flowable<Result<PaginatedListMapper<Experience, ExperienceMapper>>>
@@ -21,11 +21,11 @@ interface ExperienceApi {
 
     @GET("/experiences/")
     fun personsExperiences(@Query("username") username: String)
-        : Flowable<Result<PaginatedListMapper<Experience, ExperienceMapper>>>
+                               : Flowable<Result<PaginatedListMapper<Experience, ExperienceMapper>>>
 
     @GET
     fun paginateExperiences(@Url url: String)
-            : Flowable<Result<PaginatedListMapper<Experience, ExperienceMapper>>>
+                               : Flowable<Result<PaginatedListMapper<Experience, ExperienceMapper>>>
 
     @FormUrlEncoded
     @POST("/experiences/")

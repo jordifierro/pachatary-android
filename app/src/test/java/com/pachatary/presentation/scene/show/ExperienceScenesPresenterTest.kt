@@ -55,7 +55,7 @@ class ExperienceScenesPresenterTest {
     fun test_experience_response_success() {
         for (action in ExperienceScenesPresenterAction.values()) {
             given {
-                an_experience_repo_that_returns(ExperienceResultSuccess("4"), forExperienceId = "4")
+                an_experience_repo_that_returns(DummyExperienceResultSuccess("4"), forExperienceId = "4")
                 an_scene_repo_that_returns(forExperienceId = "4")
                 a_presenter_with(experienceId = "4")
             } whenn {
@@ -101,7 +101,7 @@ class ExperienceScenesPresenterTest {
         for (action in ExperienceScenesPresenterAction.values()) {
             given {
                 an_experience_repo_that_returns(forExperienceId = "4")
-                an_scene_repo_that_returns(ScenesListResultSuccess("6", "7"), forExperienceId = "4")
+                an_scene_repo_that_returns(DummyScenesResultSuccess("6", "7"), forExperienceId = "4")
                 a_presenter_with(experienceId = "4")
             } whenn {
                 presenter_action(action)

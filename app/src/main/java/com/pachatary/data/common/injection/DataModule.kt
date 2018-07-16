@@ -8,6 +8,9 @@ import com.pachatary.BuildConfig
 import com.pachatary.data.auth.*
 import com.pachatary.data.common.ResultCacheFactory
 import com.pachatary.data.experience.*
+import com.pachatary.data.profile.ProfileApiRepository
+import com.pachatary.data.profile.ProfileRepository
+import com.pachatary.data.profile.ProfileSnifferExperienceApiRepo
 import com.pachatary.data.scene.Scene
 import com.pachatary.data.scene.SceneApiRepository
 import com.pachatary.data.scene.SceneRepository
@@ -71,9 +74,23 @@ class DataModule {
 
     @Provides
     @Singleton
+    fun provideProfileApiRepository(retrofit: Retrofit, @Named("io") scheduler: Scheduler) =
+            ProfileApiRepository(retrofit, scheduler)
+
+    @Provides
+    @Singleton
+    fun provideProfileRepository(profileApiRepository: ProfileApiRepository) =
+            ProfileRepository(profileApiRepository)
+
+    @Provides
+    @Singleton
     fun provideExperienceApiRepository(retrofit: Retrofit, @Named("io") scheduler: Scheduler,
-                                       context: Context, authHttpInterceptor: AuthHttpInterceptor) =
-            ExperienceApiRepository(retrofit, scheduler, context, authHttpInterceptor)
+                                       context: Context, authHttpInterceptor: AuthHttpInterceptor,
+                                       profileRepository: ProfileRepository)
+            : ExperienceApiRepository {
+        val trueRepo = ExperienceApiRepo(retrofit, scheduler, context, authHttpInterceptor)
+        return ProfileSnifferExperienceApiRepo(profileRepository, trueRepo)
+    }
 
     @Provides
     @Singleton

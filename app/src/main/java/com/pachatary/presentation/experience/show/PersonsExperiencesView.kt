@@ -1,6 +1,7 @@
 package com.pachatary.presentation.experience.show
 
 import com.pachatary.data.experience.Experience
+import com.pachatary.data.profile.Profile
 import com.pachatary.presentation.common.view.LoaderView
 
 interface PersonsExperiencesView : LoaderView {
@@ -11,4 +12,5 @@ interface PersonsExperiencesView : LoaderView {
     fun hidePaginationLoader()
     fun showExperienceList(experienceList: List<Experience>)
     fun navigateToExperience(experienceId: String)
+    fun showProfile(profile: Profile)
 }

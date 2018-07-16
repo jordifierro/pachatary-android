@@ -6,19 +6,22 @@ import android.arch.lifecycle.OnLifecycleEvent
 import com.pachatary.data.common.Request
 import com.pachatary.data.experience.ExperienceRepoSwitch
 import com.pachatary.data.experience.ExperienceRepository
+import com.pachatary.data.profile.ProfileRepository
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 import javax.inject.Named
 
 class PersonsExperiencesPresenter @Inject constructor(private val repository: ExperienceRepository,
-                                                      @Named("main") val scheduler: Scheduler)
+                                                      private val profileRepo: ProfileRepository,
+                                                      @Named("main") val mainScheduler: Scheduler)
                                                                                : LifecycleObserver {
 
     lateinit var view: PersonsExperiencesView
     lateinit var username: String
 
     private var experiencesDisposable: Disposable? = null
+    private var profileDisposable: Disposable? = null
 
     fun setViewAndUsername(view: PersonsExperiencesView, username: String) {
         this.view = view
@@ -27,12 +30,14 @@ class PersonsExperiencesPresenter @Inject constructor(private val repository: Ex
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun create() {
+        connectToProfile()
         connectToExperiences()
     }
 
     fun onRetryClick() {
         repository.getFirstExperiences(ExperienceRepoSwitch.Kind.PERSONS,
                                        Request.Params(username = this.username))
+        connectToProfile()
     }
 
     fun onExperienceClick(experienceId: String) {
@@ -40,12 +45,12 @@ class PersonsExperiencesPresenter @Inject constructor(private val repository: Ex
     }
 
     fun lastExperienceShown() {
-        repository.getMoreExperiences(ExperienceRepoSwitch.Kind.SAVED)
+        repository.getMoreExperiences(ExperienceRepoSwitch.Kind.PERSONS)
     }
 
     private fun connectToExperiences() {
         experiencesDisposable = repository.experiencesFlowable(ExperienceRepoSwitch.Kind.PERSONS)
-                                          .observeOn(scheduler)
+                                          .observeOn(mainScheduler)
                                           .subscribe({
                                               if (it.isInProgress()) {
                                                   if (it.action == Request.Action.GET_FIRSTS) {
@@ -75,8 +80,17 @@ class PersonsExperiencesPresenter @Inject constructor(private val repository: Ex
                                        Request.Params(username = this.username))
     }
 
+    private fun connectToProfile() {
+        profileDisposable = profileRepo.profile(this.username)
+                .observeOn(mainScheduler)
+                .subscribe({
+                    if (it.isSuccess()) view.showProfile(it.data!!)
+                }, { throw it })
+    }
+
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun destroy() {
         experiencesDisposable?.dispose()
+        profileDisposable?.dispose()
     }
 }

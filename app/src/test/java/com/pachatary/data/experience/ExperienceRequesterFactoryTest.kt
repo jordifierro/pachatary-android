@@ -190,7 +190,7 @@ class ExperienceRequesterFactoryTest {
 
     @Suppress("UNCHECKED_CAST")
     class ScenarioMaker {
-        @Mock lateinit var mockApiRepository: ExperienceApiRepository
+        @Mock lateinit var mockApiRepository: ExperienceApiRepo
         lateinit var requesterFactory: ExperienceRequesterFactory
         lateinit var requesterObserver: Observer<Request>
         var kind = ExperienceRepoSwitch.Kind.MINE

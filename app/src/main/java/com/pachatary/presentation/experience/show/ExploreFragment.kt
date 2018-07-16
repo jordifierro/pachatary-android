@@ -140,8 +140,8 @@ class ExploreFragment : Fragment(), ExploreView {
     override fun navigateToSelectLocation(latitude: Double?, longitude: Double?) {
         val intent: Intent
         if (latitude != null && longitude != null)
-            intent = SelectLocationActivity.newIntent(activity!!.applicationContext, latitude, longitude,
-                                             SelectLocationPresenter.LocationType.APROX)
+            intent = SelectLocationActivity.newIntent(activity!!.applicationContext, latitude,
+                    longitude, SelectLocationPresenter.LocationType.APROX)
         else intent = SelectLocationActivity.newIntent(activity!!.applicationContext)
         startActivityForResult(intent, SELECT_LOCATION_ACTIVITY)
     }
@@ -152,7 +152,5 @@ class ExploreFragment : Fragment(), ExploreView {
             val longitude = data.getDoubleExtra(SelectLocationActivity.LONGITUDE, 0.0)
             presenter.onLocationSelected(latitude, longitude)
         }
-
-
     }
 }

@@ -1,9 +1,12 @@
 package com.pachatary.presentation.experience.show
 
+import com.pachatary.data.*
 import com.pachatary.data.common.*
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.experience.ExperienceRepoSwitch
 import com.pachatary.data.experience.ExperienceRepository
+import com.pachatary.data.profile.Profile
+import com.pachatary.data.profile.ProfileRepository
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
@@ -18,20 +21,25 @@ import org.mockito.MockitoAnnotations
 class PersonsExperiencesPresenterTest {
 
     @Test
-    fun test_create_asks_firsts_experiences() {
+    fun test_create_asks_firsts_experiences_and_profile() {
         given {
-            an_experience_repo_that_returns_in_progress(Request.Action.GET_FIRSTS)
+            a_presenter("username")
+            an_experience_repo_that_returns(ResultInProgress(action = Request.Action.GET_FIRSTS))
+            a_profile_repo_that_returns("username", ResultInProgress())
         } whenn {
             create_presenter()
         } then {
-            should_call_repo_get_firsts_experiences()
+            should_call_repo_get_firsts_experiences("username")
+            should_call_profile("username")
         }
     }
 
     @Test
     fun test_when_result_in_progress_last_event_get_firsts_shows_loader() {
         given {
-            an_experience_repo_that_returns_in_progress(action = Request.Action.GET_FIRSTS)
+            a_presenter("username")
+            an_experience_repo_that_returns(ResultInProgress(action = Request.Action.GET_FIRSTS))
+            a_profile_repo_that_returns("username", ResultInProgress())
         } whenn {
             create_presenter()
         } then {
@@ -45,7 +53,9 @@ class PersonsExperiencesPresenterTest {
     @Test
     fun test_when_result_in_progress_last_event_pagination_shows_pagination_loader() {
         given {
-            an_experience_repo_that_returns_in_progress(action = Request.Action.PAGINATE)
+            a_presenter("username")
+            an_experience_repo_that_returns(ResultInProgress(action = Request.Action.PAGINATE))
+            a_profile_repo_that_returns("username", ResultInProgress())
         } whenn {
             create_presenter()
         } then {
@@ -58,23 +68,27 @@ class PersonsExperiencesPresenterTest {
     @Test
     fun test_when_result_success_shows_data() {
         given {
-            an_experience()
-            another_experience()
-            an_experience_repo_that_returns_both_on_my_experiences_flowable()
+            a_presenter("username")
+            an_experience_repo_that_returns(DummyExperiencesResultSuccess(listOf("3", "4")))
+            a_profile_repo_that_returns("username", DummyProfileResult("other"))
         } whenn {
             create_presenter()
         } then {
             should_hide_view_loader()
             should_hide_view_retry()
             should_hide_view_pagination_loader()
-            should_show_received_experiences()
+            should_show_received_experiences(listOf(DummyExperience("3"), DummyExperience("4")))
+            should_show_profile(DummyProfile("other"))
         }
     }
 
     @Test
     fun test_create_when_response_error_shows_retry_if_last_event_get_firsts() {
         given {
-            an_experience_repo_that_returns_exception(action = Request.Action.GET_FIRSTS)
+            a_presenter("username")
+            an_experience_repo_that_returns(
+                    ResultError(Exception(), action = Request.Action.GET_FIRSTS))
+            a_profile_repo_that_returns("username", DummyResultError())
         } whenn {
             create_presenter()
         } then {
@@ -87,7 +101,10 @@ class PersonsExperiencesPresenterTest {
     @Test
     fun test_create_when_response_error_does_nothing_if_last_event_pagination() {
         given {
-            an_experience_repo_that_returns_exception(action = Request.Action.PAGINATE)
+            a_presenter("username")
+            an_experience_repo_that_returns(
+                    ResultError(Exception(), action = Request.Action.PAGINATE))
+            a_profile_repo_that_returns("username", DummyResultError())
         } whenn {
             create_presenter()
         } then {
@@ -100,18 +117,20 @@ class PersonsExperiencesPresenterTest {
     @Test
     fun test_on_retry_click_calls_get_firsts_experiences_again() {
         given {
-            nothing()
+            a_presenter("username")
+            a_profile_repo_that_returns("username", DummyProfileResult("other"))
         } whenn {
             retry_clicked()
         } then {
-            should_call_repo_get_firsts_experiences()
+            should_call_repo_get_firsts_experiences("username")
+            should_show_profile(DummyProfile("other"))
         }
     }
 
     @Test
     fun test_experience_tapped() {
         given {
-            nothing()
+            a_presenter("username")
         } whenn {
             experience_click("2")
         } then {
@@ -122,20 +141,20 @@ class PersonsExperiencesPresenterTest {
     @Test
     fun test_unsubscribe_on_destroy() {
         given {
-            a_test_observable()
-            an_experience_repo_that_returns_test_observable()
+            a_presenter("username")
+            repos_that_return_test_observables("username")
         } whenn {
             create_presenter()
             destroy_presenter()
         } then {
-            should_unsubscribe_observable()
+            should_unsubscribe_observables()
         }
     }
 
     @Test
-    fun test_last_experience_shown_calls_repo_get_more_with_saved_kind() {
+    fun test_last_experience_shown_calls_repo_get_more_with_persons_kind() {
         given {
-            nothing()
+            a_presenter("username")
         } whenn {
             last_experience_shown()
         } then {
@@ -150,42 +169,30 @@ class PersonsExperiencesPresenterTest {
         lateinit var presenter: PersonsExperiencesPresenter
         @Mock lateinit var mockView: PersonsExperiencesView
         @Mock lateinit var mockRepository: ExperienceRepository
-        lateinit var experienceA: Experience
-        lateinit var experienceB: Experience
-        lateinit var testObservable: PublishSubject<Result<List<Experience>>>
-        val username = "test.username"
+        @Mock lateinit var mockProfileRepo: ProfileRepository
+        lateinit var experienceTestObservable: PublishSubject<Result<List<Experience>>>
+        lateinit var profileTestObservable: PublishSubject<Result<Profile>>
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
-            presenter = PersonsExperiencesPresenter(mockRepository, Schedulers.trampoline())
-            presenter.setViewAndUsername(mockView, username)
+            presenter = PersonsExperiencesPresenter(mockRepository, mockProfileRepo,
+                                                    Schedulers.trampoline())
 
             return this
         }
 
-        fun nothing() {}
-
-        fun an_experience() {
-            experienceA = Experience(id = "1", title = "A", description = "", picture = null)
+        fun a_presenter(username: String) {
+            presenter.setViewAndUsername(mockView, username)
         }
 
-        fun another_experience() {
-            experienceB = Experience(id = "2", title = "B", description = "", picture = null)
-        }
-
-        fun an_experience_repo_that_returns_in_progress(action: Request.Action) {
+        fun an_experience_repo_that_returns(result: Result<List<Experience>>) {
             BDDMockito.given(mockRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.PERSONS))
-                    .willReturn(Flowable.just(ResultInProgress(action = action)))
+                    .willReturn(Flowable.just(result))
         }
 
-        fun an_experience_repo_that_returns_both_on_my_experiences_flowable() {
-            BDDMockito.given(mockRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.PERSONS))
-                    .willReturn(Flowable.just(ResultSuccess(listOf(experienceA, experienceB))))
-        }
-
-        fun an_experience_repo_that_returns_exception(action: Request.Action) {
-            BDDMockito.given(mockRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.PERSONS))
-                    .willReturn(Flowable.just(ResultError(Exception(), action = action)))
+        fun a_profile_repo_that_returns(username: String, result: Result<Profile>) {
+            BDDMockito.given(mockProfileRepo.profile(username))
+                    .willReturn(Flowable.just(result))
         }
 
         fun create_presenter() {
@@ -204,8 +211,12 @@ class PersonsExperiencesPresenterTest {
             presenter.onExperienceClick(experienceId)
         }
 
-        fun should_show_received_experiences() {
-            then(mockView).should().showExperienceList(arrayListOf(experienceA, experienceB))
+        fun should_show_received_experiences(experiences: List<Experience>) {
+            then(mockView).should().showExperienceList(experiences)
+        }
+
+        fun should_show_profile(profile: Profile) {
+            BDDMockito.then(mockView).should().showProfile(profile)
         }
 
         fun should_show_view_loader() {
@@ -232,36 +243,43 @@ class PersonsExperiencesPresenterTest {
             then(mockView).should().hideRetry()
         }
 
-        fun should_call_repo_get_firsts_experiences() {
+        fun should_call_repo_get_firsts_experiences(username: String) {
             then(mockRepository).should()
                     .getFirstExperiences(ExperienceRepoSwitch.Kind.PERSONS,
-                                         Request.Params(username = this.username))
+                                         Request.Params(username = username))
+        }
+
+        fun should_call_profile(username: String) {
+            BDDMockito.then(mockProfileRepo).should().profile(username)
         }
 
         fun should_navigate_to_experience(experienceId: String) {
             then(mockView).should().navigateToExperience(experienceId)
         }
 
-        fun a_test_observable() {
-            testObservable = PublishSubject.create<Result<List<Experience>>>()
-            assertFalse(testObservable.hasObservers())
-        }
+        fun repos_that_return_test_observables(username: String) {
+            experienceTestObservable = PublishSubject.create<Result<List<Experience>>>()
+            assertFalse(experienceTestObservable.hasObservers())
+            profileTestObservable = PublishSubject.create<Result<Profile>>()
+            assertFalse(profileTestObservable.hasObservers())
 
-        fun an_experience_repo_that_returns_test_observable() {
             BDDMockito.given(mockRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.PERSONS))
-                    .willReturn(testObservable.toFlowable(BackpressureStrategy.LATEST))
+                    .willReturn(experienceTestObservable.toFlowable(BackpressureStrategy.LATEST))
+            BDDMockito.given(mockProfileRepo.profile(username))
+                    .willReturn(profileTestObservable.toFlowable(BackpressureStrategy.LATEST))
         }
 
         fun destroy_presenter() {
             presenter.destroy()
         }
 
-        fun should_unsubscribe_observable() {
-            assertFalse(testObservable.hasObservers())
+        fun should_unsubscribe_observables() {
+            assertFalse(experienceTestObservable.hasObservers())
+            assertFalse(profileTestObservable.hasObservers())
         }
 
         fun should_call_repo_get_more_experiences() {
-            then(mockRepository).should().getMoreExperiences(ExperienceRepoSwitch.Kind.SAVED)
+            then(mockRepository).should().getMoreExperiences(ExperienceRepoSwitch.Kind.PERSONS)
         }
 
         fun should_show_empty_experiences() {

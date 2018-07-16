@@ -201,7 +201,7 @@ class ExperienceRepositoryTest {
     @Suppress("UNCHECKED_CAST")
     class ScenarioMaker {
         lateinit var repository: ExperienceRepository
-        @Mock lateinit var mockApiRepository: ExperienceApiRepository
+        @Mock lateinit var mockApiRepository: ExperienceApiRepo
         @Mock lateinit var mockExperiencesRepoSwitch: ExperienceRepoSwitch
         lateinit var experiencesFlowable: Flowable<Result<List<Experience>>>
         lateinit var experienceFlowable: Flowable<Result<Experience>>

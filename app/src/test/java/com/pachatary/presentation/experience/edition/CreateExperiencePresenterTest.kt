@@ -1,14 +1,11 @@
 package com.pachatary.presentation.experience.edition
 
-import com.pachatary.data.DummyExperience
-import com.pachatary.data.ExperienceResultSuccess
-import com.pachatary.data.common.ResultSuccess
+import com.pachatary.data.DummyExperienceResultSuccess
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.experience.ExperienceRepository
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
-import org.junit.Assert
 import org.junit.Test
 import org.mockito.BDDMockito
 import org.mockito.Mock
@@ -85,7 +82,7 @@ class CreateExperiencePresenterTest {
                                                                              description: String) {
             BDDMockito.given(mockRepository.createExperience(
                     Experience(id = "", title = title, description = description, picture = null)))
-                    .willReturn(Flowable.just(ExperienceResultSuccess(id)))
+                    .willReturn(Flowable.just(DummyExperienceResultSuccess(id)))
         }
 
         fun presenter_is_created() {
