@@ -1,5 +1,6 @@
-package com.pachatary.data.auth
+package com.pachatary.data.common
 
+import com.pachatary.data.auth.NoLoggedException
 import okhttp3.Interceptor
 import okhttp3.Response
 

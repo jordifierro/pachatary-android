@@ -1,5 +1,6 @@
 package com.pachatary.data.auth
 
+import com.pachatary.data.common.ClientVersionHttpInterceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.mockwebserver.MockResponse

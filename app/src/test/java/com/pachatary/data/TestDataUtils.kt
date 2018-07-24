@@ -1,6 +1,6 @@
 package com.pachatary.data
 
-import com.pachatary.data.auth.ClientException
+import com.pachatary.data.common.ClientException
 import com.pachatary.data.common.Result
 import com.pachatary.data.common.ResultError
 import com.pachatary.data.common.ResultSuccess

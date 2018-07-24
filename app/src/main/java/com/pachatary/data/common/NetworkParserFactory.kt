@@ -1,6 +1,5 @@
 package com.pachatary.data.common
 
-import com.pachatary.data.auth.ClientException
 import io.reactivex.Flowable
 import io.reactivex.FlowableTransformer
 import org.reactivestreams.Publisher

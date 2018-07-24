@@ -1,5 +1,6 @@
 package com.pachatary.data.auth
 
+import com.pachatary.data.common.ClientException
 import com.pachatary.data.common.Result
 import io.reactivex.Flowable
 

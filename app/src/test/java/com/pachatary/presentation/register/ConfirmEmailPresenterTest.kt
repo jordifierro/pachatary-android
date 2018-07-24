@@ -1,7 +1,7 @@
 package com.pachatary.presentation.register
 
 import com.pachatary.data.auth.AuthRepository
-import com.pachatary.data.auth.ClientException
+import com.pachatary.data.common.ClientException
 import com.pachatary.data.common.ResultError
 import com.pachatary.data.common.ResultSuccess
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider

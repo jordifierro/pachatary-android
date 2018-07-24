@@ -3,7 +3,7 @@ package com.pachatary.presentation.register
 import android.annotation.SuppressLint
 import android.arch.lifecycle.LifecycleObserver
 import com.pachatary.data.auth.AuthRepository
-import com.pachatary.data.auth.ClientException
+import com.pachatary.data.common.ClientException
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
 import javax.inject.Inject
 

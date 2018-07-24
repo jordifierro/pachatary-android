@@ -1,11 +1,8 @@
 package com.pachatary.data.auth
 
-import com.pachatary.data.common.Result
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
-import com.pachatary.data.common.ResultError
-import com.pachatary.data.common.ResultInProgress
-import com.pachatary.data.common.ResultSuccess
+import com.pachatary.data.common.*
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
 import okhttp3.mockwebserver.MockResponse
@@ -291,13 +288,13 @@ class AuthApiRepositoryTest {
         fun response_should_be_error() {
             testRegisterSubscriber.assertResult(
                     ResultError(ClientException(source = "username", code = "not_allowed",
-                                                message = "Username not allowed")))
+                            message = "Username not allowed")))
         }
 
         fun response_should_be_invalid_confirmation_token_error() {
             testRegisterSubscriber.assertResult(
                     ResultError(ClientException(source = "confirmation_token", code = "invalid",
-                                                message = "Invalid confirmation token")))
+                            message = "Invalid confirmation token")))
         }
 
         fun response_should_be_in_progress_and_success() {

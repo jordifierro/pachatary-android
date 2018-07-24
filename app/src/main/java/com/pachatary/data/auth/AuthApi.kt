@@ -1,5 +1,6 @@
 package com.pachatary.data.auth
 
+import com.pachatary.data.common.ClientVersionsMapper
 import io.reactivex.Flowable
 import retrofit2.adapter.rxjava2.Result
 import retrofit2.http.*

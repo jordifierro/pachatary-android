@@ -52,9 +52,9 @@
 -keepattributes InnerClasses
 # Mappers
 -keep class com.pachatary.data.auth.AuthTokenMapper { *; }
--keep class com.pachatary.data.auth.ClientExceptionMapper { *; }
--keep class com.pachatary.data.auth.ClientVersionsMapper { *; }
--keep class com.pachatary.data.auth.ClientVersionsMapper$AndroidClient { *; }
+-keep class com.pachatary.data.common.ClientExceptionMapper { *; }
+-keep class com.pachatary.data.common.ClientVersionsMapper { *; }
+-keep class com.pachatary.data.common.ClientVersionsMapper$AndroidClient { *; }
 -keep class com.pachatary.data.common.PaginatedListMapper { *; }
 -keep class com.pachatary.data.experience.ExperienceMapper { *; }
 -keep class com.pachatary.data.picture.BigPictureMapper { *; }

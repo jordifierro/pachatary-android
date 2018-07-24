@@ -1,4 +1,4 @@
-package com.pachatary.data.auth
+package com.pachatary.data.common
 
 import com.google.gson.JsonParser
 

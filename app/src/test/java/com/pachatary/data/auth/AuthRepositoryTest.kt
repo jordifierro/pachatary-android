@@ -1,9 +1,6 @@
 package com.pachatary.data.auth
 
-import com.pachatary.data.common.Result
-import com.pachatary.data.common.ResultError
-import com.pachatary.data.common.ResultInProgress
-import com.pachatary.data.common.ResultSuccess
+import com.pachatary.data.common.*
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
@@ -267,7 +264,7 @@ class AuthRepositoryTest {
         fun a_result_already_registered_error() {
             resultError = ResultError(
                     ClientException(source = "person", code = "already_registered",
-                                    message = "Person already registered"))
+                            message = "Person already registered"))
         }
 
         fun an_auth_api_that_returns_a_flowable_with_success_for_register() {

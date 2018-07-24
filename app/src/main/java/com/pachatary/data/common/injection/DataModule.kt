@@ -6,6 +6,8 @@ import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import com.pachatary.BuildConfig
 import com.pachatary.data.auth.*
+import com.pachatary.data.common.AcceptLanguageHttpInterceptor
+import com.pachatary.data.common.ClientVersionHttpInterceptor
 import com.pachatary.data.common.ResultCacheFactory
 import com.pachatary.data.experience.*
 import com.pachatary.data.profile.ProfileApiRepository

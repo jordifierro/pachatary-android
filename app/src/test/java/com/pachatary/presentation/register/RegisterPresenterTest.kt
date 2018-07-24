@@ -1,7 +1,7 @@
 package com.pachatary.presentation.register
 
 import com.pachatary.data.auth.AuthRepository
-import com.pachatary.data.auth.ClientException
+import com.pachatary.data.common.ClientException
 import com.pachatary.data.common.ResultError
 import com.pachatary.data.common.ResultSuccess
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
@@ -100,7 +100,7 @@ class RegisterPresenterTest {
 
         fun an_already_registered_client_error() {
             clientError = ClientException(source = "person", code = "already_registered",
-                                          message = "Person already registered")
+                    message = "Person already registered")
         }
 
         fun an_auth_repo_that_returns_a_flowable_with_a_person() {

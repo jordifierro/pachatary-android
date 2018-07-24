@@ -1,5 +1,6 @@
 package com.pachatary.data.auth
 
+import com.pachatary.data.common.ClientExceptionMapper
 import com.pachatary.data.common.NetworkParserFactory
 import com.pachatary.data.common.Result
 import com.pachatary.data.common.ResultInProgress

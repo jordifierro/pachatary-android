@@ -1,10 +1,10 @@
 package com.pachatary.data.auth
 
+import com.pachatary.data.common.AcceptLanguageHttpInterceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
-import org.intellij.lang.annotations.Language
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

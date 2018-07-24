@@ -1,6 +1,4 @@
-package com.pachatary.data.auth
-
-import com.pachatary.data.common.ToDomainMapper
+package com.pachatary.data.common
 
 data class ClientVersionsMapper(val android: AndroidClient) : ToDomainMapper<Int> {
 
