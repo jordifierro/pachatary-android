@@ -4,6 +4,7 @@ import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.OnLifecycleEvent
 import com.pachatary.data.common.Request
+import com.pachatary.data.common.ResultInProgress
 import com.pachatary.data.experience.ExperienceRepoSwitch
 import com.pachatary.data.experience.ExperienceRepository
 import com.pachatary.data.profile.ProfileRepository
@@ -54,24 +55,23 @@ class ProfilePresenter @Inject constructor(private val repository: ExperienceRep
                                           .subscribe({
                                               if (it.isInProgress()) {
                                                   if (it.action == Request.Action.GET_FIRSTS) {
-                                                      view.showLoader()
-                                                      view.showExperienceList(listOf())
+                                                      view.showExperiencesLoader()
                                                       view.hidePaginationLoader()
                                                   }
                                                   else if (it.action == Request.Action.PAGINATE) {
-                                                      view.hideLoader()
+                                                      view.hideExperiencesLoader()
                                                       view.showPaginationLoader()
                                                   }
                                               }
                                               else {
-                                                  view.hideLoader()
+                                                  view.hideExperiencesLoader()
                                                   view.hidePaginationLoader()
                                               }
 
                                               if (it.isError() &&
                                                       it.action == Request.Action.GET_FIRSTS)
-                                                  view.showRetry()
-                                              else view.hideRetry()
+                                                  view.showExperiencesRetry()
+                                              else view.hideExperiencesRetry()
 
                                               if (it.isSuccess())
                                                   view.showExperienceList(it.data!!)
@@ -84,7 +84,19 @@ class ProfilePresenter @Inject constructor(private val repository: ExperienceRep
         profileDisposable = profileRepo.profile(this.username)
                 .observeOn(mainScheduler)
                 .subscribe({
-                    if (it.isSuccess()) view.showProfile(it.data!!)
+                    if (it.isSuccess()) {
+                        view.showProfile(it.data!!)
+                        view.hideProfileLoader()
+                        view.hideProfileRetry()
+                    }
+                    else if (it.isInProgress()) {
+                        view.showProfileLoader()
+                        view.hideProfileRetry()
+                    }
+                    else {
+                        view.showProfileRetry()
+                        view.hideProfileLoader()
+                    }
                 }, { throw it })
     }
 

@@ -38,8 +38,6 @@ class ProfileActivity : AppCompatActivity(), ProfileView {
     lateinit var presenter: ProfilePresenter
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var progressBar: ProgressBar
-    private lateinit var retryIcon: ImageView
     var experiences: List<Experience> = listOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,13 +45,11 @@ class ProfileActivity : AppCompatActivity(), ProfileView {
         setContentView(R.layout.activity_profile)
         val username = intent.getStringExtra(USERNAME)
 
-        progressBar = findViewById(R.id.experiences_progressbar)
-        retryIcon = findViewById(R.id.experiences_retry)
-        retryIcon.setOnClickListener { presenter.onRetryClick() }
         recyclerView = findViewById(R.id.experiences_recyclerview)
         recyclerView.layoutManager = GridLayoutManager(this, 2)
         recyclerView.adapter = ProfileAdapter(layoutInflater,
-                { id -> presenter.onExperienceClick(id) }, { presenter.lastExperienceShown() })
+                { id -> presenter.onExperienceClick(id) }, { presenter.lastExperienceShown() },
+                { presenter.onRetryClick() })
         (recyclerView.layoutManager as GridLayoutManager).spanSizeLookup =
                 object: GridLayoutManager.SpanSizeLookup() {
                     override fun getSpanSize(position: Int): Int {
@@ -68,29 +64,53 @@ class ProfileActivity : AppCompatActivity(), ProfileView {
         lifecycle.addObserver(presenter)
     }
 
-    override fun showLoader() {
-        progressBar.visibility = View.VISIBLE
+    override fun showExperiencesRetry() {
+        (recyclerView.adapter as ProfileAdapter).experiencesError = true
+        recyclerView.adapter.notifyDataSetChanged()
     }
 
-    override fun hideLoader() {
-        progressBar.visibility = View.GONE
+    override fun hideExperiencesRetry() {
+        (recyclerView.adapter as ProfileAdapter).experiencesError = false
+        recyclerView.adapter.notifyDataSetChanged()
     }
 
-    override fun showRetry() {
-        retryIcon.visibility = View.VISIBLE
+    override fun showExperiencesLoader() {
+        (recyclerView.adapter as ProfileAdapter).experiencesInProgress = true
+        recyclerView.adapter.notifyDataSetChanged()
     }
 
-    override fun hideRetry() {
-        retryIcon.visibility = View.GONE
+    override fun hideExperiencesLoader() {
+        (recyclerView.adapter as ProfileAdapter).experiencesInProgress = false
+        recyclerView.adapter.notifyDataSetChanged()
+    }
+
+    override fun showProfileLoader() {
+        (recyclerView.adapter as ProfileAdapter).profileInProgress = true
+        recyclerView.adapter.notifyDataSetChanged()
+    }
+
+    override fun hideProfileLoader() {
+        (recyclerView.adapter as ProfileAdapter).profileInProgress = false
+        recyclerView.adapter.notifyDataSetChanged()
+    }
+
+    override fun showProfileRetry() {
+        (recyclerView.adapter as ProfileAdapter).profileError = true
+        recyclerView.adapter.notifyDataSetChanged()
+    }
+
+    override fun hideProfileRetry() {
+        (recyclerView.adapter as ProfileAdapter).profileError = false
+        recyclerView.adapter.notifyDataSetChanged()
     }
 
     override fun showPaginationLoader() {
-        (recyclerView.adapter as ProfileAdapter).inProgress = true
+        (recyclerView.adapter as ProfileAdapter).paginationInProgress = true
         recyclerView.adapter.notifyDataSetChanged()
     }
 
     override fun hidePaginationLoader() {
-        (recyclerView.adapter as ProfileAdapter).inProgress = false
+        (recyclerView.adapter as ProfileAdapter).paginationInProgress = false
         recyclerView.adapter.notifyDataSetChanged()
     }
 
@@ -112,49 +132,68 @@ class ProfileActivity : AppCompatActivity(), ProfileView {
 
     class ProfileAdapter(private val inflater: LayoutInflater,
                          val onClick: (String) -> Unit,
-                         private val onLastItemShown: () -> Unit)
+                         private val onLastItemShown: () -> Unit,
+                         private val onRetryClick: () -> Unit)
         : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-        var inProgress = true
+        var experiencesInProgress = true
+        var experiencesError = false
         var paginationInProgress = false
         var experiences: List<Experience> = listOf()
+
         var profileInProgress = true
+        var profileError = false
         var profile: Profile? = null
 
         val LOADER_TYPE = 0
-        val PROFILE_TYPE = 1
-        val EXPERIENCE_TYPE = 2
-
+        val RETRY_TYPE = 1
+        val PROFILE_TYPE = 2
+        val EXPERIENCE_TYPE = 3
 
         override fun getItemViewType(position: Int): Int {
             if (position == 0) {
-                if (profileInProgress) return LOADER_TYPE
+                if (experiencesError || profileError) return RETRY_TYPE
+                else if (profileInProgress) return LOADER_TYPE
                 else return PROFILE_TYPE
             }
+            else if (position == 1) {
+                if (experiencesInProgress) return LOADER_TYPE
+                else return EXPERIENCE_TYPE
+            }
             else if (position == experiences.size + 1) return LOADER_TYPE
-            return EXPERIENCE_TYPE
+            else return EXPERIENCE_TYPE
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            if (position == experiences.size + 1) {}
-            else if (position == 0) {
-                if (!profileInProgress) {
+            when (getItemViewType(position)) {
+                PROFILE_TYPE -> {
                     val profileViewHolder = holder as ProfileViewHolder
                     profileViewHolder.bind(profile!!)
                 }
+                EXPERIENCE_TYPE -> {
+                    val experienceViewHolder = holder as SquareViewHolder
+                    experienceViewHolder.bind(experiences[position-1])
+                }
+                else -> {}
             }
-            else {
+
+            if (!experiencesError && !experiencesInProgress) {
                 val endHasBeenReached = position == experiences.size
                 if (experiences.isNotEmpty() && endHasBeenReached) onLastItemShown.invoke()
-                val experienceViewHolder = holder as SquareViewHolder
-                experienceViewHolder.bind(experiences[position-1])
             }
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
             when (viewType) {
-                LOADER_TYPE ->
-                    return LoaderViewHolder(inflater.inflate(R.layout.item_loader, parent, false))
+                LOADER_TYPE -> return object : RecyclerView.ViewHolder(
+                        inflater.inflate(R.layout.item_loader, parent, false)) {}
+                RETRY_TYPE -> {
+                    val view = inflater.inflate(R.layout.item_retry, parent, false)
+                    val viewHolder =  object : RecyclerView.ViewHolder(view), View.OnClickListener {
+                        override fun onClick(v: View?) { onRetryClick.invoke() } }
+                    view.setOnClickListener(viewHolder)
+                    return viewHolder
+                }
                 PROFILE_TYPE ->
                     return ProfileViewHolder(inflater.inflate(R.layout.item_profile, parent, false))
                 else ->
@@ -165,12 +204,15 @@ class ProfileActivity : AppCompatActivity(), ProfileView {
         }
 
         override fun getItemCount(): Int {
-            if (inProgress || paginationInProgress) return experiences.size + 2
-            return experiences.size + 1
+            if (experiencesError || profileError) return 1
+            else if (profileInProgress && experiencesInProgress) return 1
+            else if (profileInProgress) return experiences.size + 1
+            else if (experiencesInProgress) return 2
+            else if (paginationInProgress) return experiences.size + 2
+            else return experiences.size + 1
         }
 
-        class ProfileViewHolder(view: View)
-            : RecyclerView.ViewHolder(view), View.OnClickListener {
+        class ProfileViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
             private val usernameView: TextView = view.findViewById(R.id.username)
             private val bioView: TextView = view.findViewById(R.id.bio)
@@ -184,14 +226,6 @@ class ProfileActivity : AppCompatActivity(), ProfileView {
                         .transform(CropCircleTransformation())
                         .into(pictureView)
             }
-
-            override fun onClick(view: View?) {}
-        }
-
-        class LoaderViewHolder(view: View)
-            : RecyclerView.ViewHolder(view), View.OnClickListener {
-
-            override fun onClick(view: View?) {}
         }
     }
 }

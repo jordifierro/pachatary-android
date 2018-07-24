@@ -43,10 +43,11 @@ class ProfilePresenterTest {
         } whenn {
             create_presenter()
         } then {
-            should_show_view_loader()
-            should_show_empty_experiences()
+            should_show_experiences_loader()
             should_hide_view_pagination_loader()
-            should_hide_view_retry()
+            should_hide_experiences_retry()
+            should_hide_profile_retry()
+            should_show_profile_loader()
         }
     }
 
@@ -59,9 +60,11 @@ class ProfilePresenterTest {
         } whenn {
             create_presenter()
         } then {
-            should_hide_view_loader()
+            should_hide_experiences_loader()
             should_show_view_pagination_loader()
-            should_hide_view_retry()
+            should_hide_experiences_retry()
+            should_hide_profile_retry()
+            should_show_profile_loader()
         }
     }
 
@@ -74,11 +77,14 @@ class ProfilePresenterTest {
         } whenn {
             create_presenter()
         } then {
-            should_hide_view_loader()
-            should_hide_view_retry()
+            should_hide_experiences_loader()
+            should_hide_experiences_retry()
             should_hide_view_pagination_loader()
             should_show_received_experiences(listOf(DummyExperience("3"), DummyExperience("4")))
+
             should_show_profile(DummyProfile("other"))
+            should_hide_profile_retry()
+            should_hide_profile_loader()
         }
     }
 
@@ -92,9 +98,11 @@ class ProfilePresenterTest {
         } whenn {
             create_presenter()
         } then {
-            should_hide_view_loader()
+            should_hide_experiences_loader()
             should_hide_view_pagination_loader()
-            should_show_view_retry()
+            should_show_experiences_retry()
+            should_hide_profile_loader()
+            should_show_profile_retry()
         }
     }
 
@@ -108,9 +116,11 @@ class ProfilePresenterTest {
         } whenn {
             create_presenter()
         } then {
-            should_hide_view_loader()
-            should_hide_view_retry()
+            should_hide_experiences_loader()
+            should_hide_experiences_retry()
             should_hide_view_pagination_loader()
+            should_hide_profile_loader()
+            should_show_profile_retry()
         }
     }
 
@@ -219,12 +229,12 @@ class ProfilePresenterTest {
             BDDMockito.then(mockView).should().showProfile(profile)
         }
 
-        fun should_show_view_loader() {
-            then(mockView).should().showLoader()
+        fun should_show_experiences_loader() {
+            then(mockView).should().showExperiencesLoader()
         }
 
-        fun should_hide_view_loader() {
-            then(mockView).should().hideLoader()
+        fun should_hide_experiences_loader() {
+            then(mockView).should().hideExperiencesLoader()
         }
 
         fun should_show_view_pagination_loader() {
@@ -235,12 +245,12 @@ class ProfilePresenterTest {
             then(mockView).should().hidePaginationLoader()
         }
 
-        fun should_show_view_retry() {
-            then(mockView).should().showRetry()
+        fun should_show_experiences_retry() {
+            then(mockView).should().showExperiencesRetry()
         }
 
-        fun should_hide_view_retry() {
-            then(mockView).should().hideRetry()
+        fun should_hide_experiences_retry() {
+            then(mockView).should().hideExperiencesRetry()
         }
 
         fun should_call_repo_get_firsts_experiences(username: String) {
@@ -282,8 +292,20 @@ class ProfilePresenterTest {
             then(mockRepository).should().getMoreExperiences(ExperienceRepoSwitch.Kind.PERSONS)
         }
 
-        fun should_show_empty_experiences() {
-            BDDMockito.then(mockView).should().showExperienceList(listOf())
+        fun should_hide_profile_retry() {
+            BDDMockito.then(mockView).should().hideProfileRetry()
+        }
+
+        fun should_show_profile_loader() {
+            BDDMockito.then(mockView).should().showProfileLoader()
+        }
+
+        fun should_hide_profile_loader() {
+            BDDMockito.then(mockView).should().hideProfileLoader()
+        }
+
+        fun should_show_profile_retry() {
+            BDDMockito.then(mockView).should().showProfileRetry()
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)
