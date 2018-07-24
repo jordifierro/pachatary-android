@@ -28,7 +28,7 @@ import com.pachatary.presentation.scene.edition.EditSceneActivity
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.CropCircleTransformation
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.activity_scene_list.*
+import kotlinx.android.synthetic.main.activity_experience_scenes.*
 
 
 class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
@@ -57,7 +57,7 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_scene_list)
+        setContentView(R.layout.activity_experience_scenes)
         setSupportActionBar(toolbar)
 
         recyclerView = findViewById(R.id.scenes_recyclerview)
@@ -228,7 +228,8 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
                             { presenter.onLocateSceneClick(it) })
                 }
                 else -> {
-                    return LoaderViewHolder(inflater.inflate(R.layout.item_loader, parent, false))
+                    return object : RecyclerView.ViewHolder(
+                            inflater.inflate(R.layout.item_loader, parent, false)) {}
                 }
             }
         }
@@ -263,7 +264,7 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
                                private val onSaveExperienceClick: (Boolean) -> Unit,
                                private val onMapButtonClick: () -> Unit,
                                private val onProfileClick: (String) -> Unit)
-        : RecyclerView.ViewHolder(view), View.OnClickListener {
+                                                                   : RecyclerView.ViewHolder(view) {
 
         private val titleView: TextView = view.findViewById(R.id.title)
         private val descriptionView: TextView = view.findViewById(R.id.description)
@@ -328,14 +329,12 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
 
             mapButton.setOnClickListener { onMapButtonClick() }
         }
-
-        override fun onClick(v: View?) {}
     }
 
     class SceneViewHolder(view: View, private val isEditable: Boolean,
                           private val onEditSceneClick: (String) -> Unit,
                           private val onLocateSceneClick: (String) -> Unit)
-        : RecyclerView.ViewHolder(view), View.OnClickListener {
+                                                                   : RecyclerView.ViewHolder(view) {
 
         private val titleView: TextView = view.findViewById(R.id.title)
         private val descriptionView: TextView = view.findViewById(R.id.description)
@@ -356,13 +355,5 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
                     .load(scene.picture?.mediumUrl)
                     .into(pictureView)
         }
-
-        override fun onClick(view: View?) {}
-    }
-
-    class LoaderViewHolder(view: View)
-        : RecyclerView.ViewHolder(view), View.OnClickListener {
-
-        override fun onClick(view: View?) {}
     }
 }
