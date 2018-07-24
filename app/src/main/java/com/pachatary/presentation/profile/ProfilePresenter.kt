@@ -1,4 +1,4 @@
-package com.pachatary.presentation.experience.show
+package com.pachatary.presentation.profile
 
 import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleObserver
@@ -12,18 +12,18 @@ import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 import javax.inject.Named
 
-class PersonsExperiencesPresenter @Inject constructor(private val repository: ExperienceRepository,
-                                                      private val profileRepo: ProfileRepository,
-                                                      @Named("main") val mainScheduler: Scheduler)
+class ProfilePresenter @Inject constructor(private val repository: ExperienceRepository,
+                                           private val profileRepo: ProfileRepository,
+                                           @Named("main") val mainScheduler: Scheduler)
                                                                                : LifecycleObserver {
 
-    lateinit var view: PersonsExperiencesView
+    lateinit var view: ProfileView
     lateinit var username: String
 
     private var experiencesDisposable: Disposable? = null
     private var profileDisposable: Disposable? = null
 
-    fun setViewAndUsername(view: PersonsExperiencesView, username: String) {
+    fun setViewAndUsername(view: ProfileView, username: String) {
         this.view = view
         this.username = username
     }

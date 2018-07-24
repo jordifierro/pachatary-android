@@ -9,7 +9,7 @@ import com.pachatary.presentation.experience.edition.EditExperienceActivity
 import com.pachatary.presentation.experience.router.ExperienceRouterActivity
 import com.pachatary.presentation.experience.show.ExploreFragment
 import com.pachatary.presentation.experience.show.MyExperiencesFragment
-import com.pachatary.presentation.experience.show.PersonsExperienceActivity
+import com.pachatary.presentation.profile.ProfileActivity
 import com.pachatary.presentation.experience.show.SavedFragment
 import com.pachatary.presentation.login.AskLoginEmailActivity
 import com.pachatary.presentation.login.LoginActivity
@@ -45,7 +45,7 @@ interface ApplicationComponent {
     fun inject(welcomeActivity: WelcomeActivity)
     fun inject(askLoginEmailActivity: AskLoginEmailActivity)
     fun inject(loginActivity: LoginActivity)
-    fun inject(personsExperienceActivity: PersonsExperienceActivity)
+    fun inject(profileActivity: ProfileActivity)
     fun inject(experienceRouterActivity: ExperienceRouterActivity)
     fun inject(pickAndCropImageActivity: PickAndCropImageActivity)
 }

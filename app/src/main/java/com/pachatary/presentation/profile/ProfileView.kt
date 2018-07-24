@@ -1,10 +1,10 @@
-package com.pachatary.presentation.experience.show
+package com.pachatary.presentation.profile
 
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.profile.Profile
 import com.pachatary.presentation.common.view.LoaderView
 
-interface PersonsExperiencesView : LoaderView {
+interface ProfileView : LoaderView {
 
     fun showRetry()
     fun hideRetry()

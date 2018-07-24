@@ -60,7 +60,7 @@
     <string name="title_login_activity">Login</string>
     <string name="filter_view_login_activity">Login</string>
 
-    <string name="title_persons_experiences">Persons experiences</string>
+    <string name="title_profile">Profile</string>
 
     <string name="title_settings_activity">Settings</string>
     <string name="settings_privacy_policy">Privacy policy</string>

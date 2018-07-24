@@ -21,6 +21,7 @@ import com.pachatary.presentation.common.edition.SelectLocationPresenter
 import com.pachatary.presentation.common.location.LocationUtils
 import com.pachatary.presentation.experience.show.view.ExtendedListAdapter
 import com.pachatary.presentation.main.MainActivity
+import com.pachatary.presentation.profile.ProfileActivity
 import com.pachatary.presentation.scene.show.ExperienceScenesActivity
 import javax.inject.Inject
 
@@ -134,7 +135,7 @@ class ExploreFragment : Fragment(), ExploreView {
     }
 
     override fun navigateToPersonsExperiences(username: String) {
-        startActivity(PersonsExperienceActivity.newIntent(activity!!.applicationContext, username))
+        startActivity(ProfileActivity.newIntent(activity!!.applicationContext, username))
     }
 
     override fun navigateToSelectLocation(latitude: Double?, longitude: Double?) {

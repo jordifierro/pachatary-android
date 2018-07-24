@@ -124,8 +124,8 @@
                     android:path="/people/me/login"/>
             </intent-filter>
         </activity>
-        <activity android:name=".presentation.experience.show.PersonsExperienceActivity"
-            android:label="@string/title_persons_experiences"
+        <activity android:name=".presentation.profile.ProfileActivity"
+            android:label="@string/title_profile"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".presentation.main.SettingsActivity"

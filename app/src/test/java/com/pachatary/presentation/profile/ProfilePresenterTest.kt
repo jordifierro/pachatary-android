@@ -1,4 +1,4 @@
-package com.pachatary.presentation.experience.show
+package com.pachatary.presentation.profile
 
 import com.pachatary.data.*
 import com.pachatary.data.common.*
@@ -18,7 +18,7 @@ import org.mockito.BDDMockito.then
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 
-class PersonsExperiencesPresenterTest {
+class ProfilePresenterTest {
 
     @Test
     fun test_create_asks_firsts_experiences_and_profile() {
@@ -166,8 +166,8 @@ class PersonsExperiencesPresenterTest {
 
     class ScenarioMaker {
 
-        lateinit var presenter: PersonsExperiencesPresenter
-        @Mock lateinit var mockView: PersonsExperiencesView
+        lateinit var presenter: ProfilePresenter
+        @Mock lateinit var mockView: ProfileView
         @Mock lateinit var mockRepository: ExperienceRepository
         @Mock lateinit var mockProfileRepo: ProfileRepository
         lateinit var experienceTestObservable: PublishSubject<Result<List<Experience>>>
@@ -175,8 +175,8 @@ class PersonsExperiencesPresenterTest {
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
-            presenter = PersonsExperiencesPresenter(mockRepository, mockProfileRepo,
-                                                    Schedulers.trampoline())
+            presenter = ProfilePresenter(mockRepository, mockProfileRepo,
+                    Schedulers.trampoline())
 
             return this
         }

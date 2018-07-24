@@ -1,4 +1,4 @@
-package com.pachatary.presentation.experience.show
+package com.pachatary.presentation.profile
 
 import android.content.Context
 import android.content.Intent
@@ -20,23 +20,22 @@ import com.pachatary.presentation.experience.show.view.SquareViewHolder
 import com.pachatary.presentation.scene.show.ExperienceScenesActivity
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.CropCircleTransformation
-import kotlinx.android.synthetic.main.activity_persons_experiences.*
 import javax.inject.Inject
 
-class PersonsExperienceActivity : AppCompatActivity(), PersonsExperiencesView {
+class ProfileActivity : AppCompatActivity(), ProfileView {
 
     companion object {
         val USERNAME = "username"
 
         fun newIntent(context: Context, username: String): Intent {
-            val intent = Intent(context, PersonsExperienceActivity::class.java)
+            val intent = Intent(context, ProfileActivity::class.java)
             intent.putExtra(USERNAME, username)
             return intent
         }
     }
 
     @Inject
-    lateinit var presenter: PersonsExperiencesPresenter
+    lateinit var presenter: ProfilePresenter
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var progressBar: ProgressBar
@@ -45,10 +44,8 @@ class PersonsExperienceActivity : AppCompatActivity(), PersonsExperiencesView {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_persons_experiences)
-        setSupportActionBar(toolbar)
+        setContentView(R.layout.activity_profile)
         val username = intent.getStringExtra(USERNAME)
-        supportActionBar!!.title = username
 
         progressBar = findViewById(R.id.experiences_progressbar)
         retryIcon = findViewById(R.id.experiences_retry)

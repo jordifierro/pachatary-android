@@ -22,13 +22,13 @@ import com.pachatary.data.experience.Experience
 import com.pachatary.data.scene.Scene
 import com.pachatary.presentation.common.PachataryApplication
 import com.pachatary.presentation.experience.edition.EditExperienceActivity
-import com.pachatary.presentation.experience.show.PersonsExperienceActivity
+import com.pachatary.presentation.profile.ProfileActivity
 import com.pachatary.presentation.scene.edition.CreateSceneActivity
 import com.pachatary.presentation.scene.edition.EditSceneActivity
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.CropCircleTransformation
-import kotlinx.android.synthetic.main.activity_scene_list.*
 import javax.inject.Inject
+import kotlinx.android.synthetic.main.activity_scene_list.*
 
 
 class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
@@ -159,7 +159,7 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
     }
 
     override fun navigateToProfile(username: String) {
-        startActivity(PersonsExperienceActivity.newIntent(this, username))
+        startActivity(ProfileActivity.newIntent(this, username))
     }
 
     override fun getLifecycle(): LifecycleRegistry = registry
