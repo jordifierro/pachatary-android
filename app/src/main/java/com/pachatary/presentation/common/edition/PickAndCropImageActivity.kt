@@ -5,6 +5,7 @@ import android.app.Activity
 import android.arch.lifecycle.LifecycleRegistry
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -13,9 +14,17 @@ import android.provider.Settings
 import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.webkit.MimeTypeMap
+import com.pachatary.BuildConfig
 import com.pachatary.R
 import com.pachatary.presentation.common.PachataryApplication
 import com.yalantis.ucrop.UCrop
+import com.zhihu.matisse.Matisse
+import com.zhihu.matisse.MimeType
+import com.zhihu.matisse.MimeType.JPEG
+import com.zhihu.matisse.MimeType.PNG
+import com.zhihu.matisse.engine.impl.PicassoEngine
+import java.io.File
 import javax.inject.Inject
 
 
@@ -69,7 +78,8 @@ class PickAndCropImageActivity : AppCompatActivity(), PickAndCropImageView {
         else throw Exception()
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
+                                            grantResults: IntArray) {
         if (requestCode == REQUEST_READ_WRITE_EXTERNAL_STORAGE_PERMISSIONS) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED &&
                     grantResults[1] == PackageManager.PERMISSION_GRANTED) {
@@ -108,8 +118,10 @@ class PickAndCropImageActivity : AppCompatActivity(), PickAndCropImageView {
         else builder = AlertDialog.Builder(this)
         builder.setTitle(R.string.pick_and_crop_image_explanation_dialog_title)
                 .setMessage(R.string.pick_and_crop_image_explanation_dialog_message)
-                .setPositiveButton(android.R.string.yes, { _, _ -> presenter.onPermissionsExplanationDialogAccept() })
-                .setNegativeButton(android.R.string.no, { _, _ -> presenter.onPermissionsExplanationDialogCancel() })
+                .setPositiveButton(android.R.string.yes) {
+                    _, _ -> presenter.onPermissionsExplanationDialogAccept() }
+                .setNegativeButton(android.R.string.no) {
+                    _, _ -> presenter.onPermissionsExplanationDialogCancel() }
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show()
     }
@@ -122,25 +134,39 @@ class PickAndCropImageActivity : AppCompatActivity(), PickAndCropImageView {
     }
 
     override fun showPickImage() {
-        PickImageActivity.startActivityForResult(this, PICK_IMAGE_ACTIVITY_INTENT)
+        Matisse.from(this)
+                .choose(MimeType.of(JPEG, PNG))
+                .countable(false)
+                .maxSelectable(1)
+                .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
+                .thumbnailScale(0.85f)
+                .imageEngine(PicassoEngine())
+                .forResult(PICK_IMAGE_ACTIVITY_INTENT)
     }
 
     override fun showCropImage(selectedImageUriString: String) {
-        CropImageActivity.startActivityForResult(this, selectedImageUriString)
+        var extension = File(Uri.parse(selectedImageUriString).path).extension
+        if (extension == "") extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(
+                this.getContentResolver().getType(Uri.parse(selectedImageUriString)))
+
+        val outputUri = Uri.fromFile(
+                File.createTempFile("pachatary", "." + extension, this.cacheDir))
+        UCrop.of(Uri.parse(selectedImageUriString), outputUri)
+                .withAspectRatio(1.0f, 1.0f)
+                .withMaxResultSize(BuildConfig.MAX_IMAGE_SIZE, BuildConfig.MAX_IMAGE_SIZE)
+                .start(this)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == PICK_IMAGE_ACTIVITY_INTENT) {
             if (resultCode == Activity.RESULT_OK)
-                presenter.onPickImageSuccess(
-                        PickImageActivity.getPickedImageUriStringFromResultData(data!!))
+                presenter.onPickImageSuccess(Matisse.obtainResult(data)[0].toString())
             else if (resultCode == Activity.RESULT_CANCELED) presenter.onPickImageCancel()
             else throw Exception(resultCode.toString())
         }
         else if (requestCode == CROP_IMAGE_ACTIVITY_INTENT) {
             if (resultCode == Activity.RESULT_OK)
-                presenter.onCropImageSuccess(
-                        CropImageActivity.getCroppedImageUriStringFromResultData(data!!))
+                presenter.onCropImageSuccess(UCrop.getOutput(data!!).toString())
             else if (resultCode == Activity.RESULT_CANCELED) presenter.onCropImageCancel()
             else throw Exception(resultCode.toString())
         }

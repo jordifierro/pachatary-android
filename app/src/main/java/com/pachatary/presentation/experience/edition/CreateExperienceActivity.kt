@@ -10,7 +10,6 @@ import com.pachatary.R
 import com.pachatary.presentation.common.PachataryApplication
 import com.pachatary.presentation.common.edition.EditTitleAndDescriptionActivity
 import com.pachatary.presentation.common.edition.PickAndCropImageActivity
-import com.pachatary.presentation.common.edition.PickImageActivity
 import kotlinx.android.synthetic.main.activity_create_experience.*
 import javax.inject.Inject
 
