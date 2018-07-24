@@ -11,14 +11,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.ProgressBar
+import android.widget.TextView
 import com.pachatary.R
 import com.pachatary.data.experience.Experience
+import com.pachatary.data.profile.Profile
 import com.pachatary.presentation.common.PachataryApplication
 import com.pachatary.presentation.experience.edition.CreateExperienceActivity
-import com.pachatary.presentation.experience.show.view.SquareListAdapter
+import com.pachatary.presentation.experience.show.view.SquareViewHolder
 import com.pachatary.presentation.register.RegisterActivity
 import com.pachatary.presentation.scene.show.ExperienceScenesActivity
+import com.squareup.picasso.Picasso
+import jp.wasabeef.picasso.transformations.CropCircleTransformation
 import javax.inject.Inject
 
 
@@ -32,9 +35,8 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
     lateinit var presenter: MyExperiencesPresenter
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var progressBar: ProgressBar
-    private lateinit var retryIcon: ImageView
     private lateinit var createExperienceButton: FloatingActionButton
+    private var experiences = listOf<Experience>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,15 +49,21 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_my_experiences, container, false)
 
-        progressBar = view.findViewById(R.id.experiences_progressbar)
-        retryIcon = view.findViewById(R.id.experiences_retry)
-        retryIcon.setOnClickListener { presenter.onRetryClick() }
         recyclerView = view.findViewById(R.id.experiences_recyclerview)
         recyclerView.layoutManager = GridLayoutManager(activity, 2)
         createExperienceButton = view.findViewById(R.id.create_new_experience_button)
         createExperienceButton.setOnClickListener { presenter.onCreateExperienceClick() }
-        recyclerView.adapter = SquareListAdapter(layoutInflater, listOf(), false,
-                { id -> presenter.onExperienceClick(id) }, { presenter.lastExperienceShown() })
+        recyclerView.adapter = MyProfileAdapter(layoutInflater,
+                { presenter.onExperienceClick(it) }, { presenter.lastExperienceShown() },
+                { presenter.onRetryClick() })
+        (recyclerView.layoutManager as GridLayoutManager).spanSizeLookup =
+                object: GridLayoutManager.SpanSizeLookup() {
+                    override fun getSpanSize(position: Int): Int {
+                        if (position == 0) return 2
+                        if (position == experiences.size + 1) return 2
+                        return 1
+                    }
+                }
 
         presenter.create()
 
@@ -67,37 +75,66 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
         presenter.resume()
     }
 
-    override fun showLoader() {
-        progressBar.visibility = View.VISIBLE
+    override fun showExperiencesLoader() {
+        (recyclerView.adapter as MyProfileAdapter).experiencesInProgress = true
+        recyclerView.adapter.notifyDataSetChanged()
     }
 
-    override fun hideLoader() {
-        progressBar.visibility = View.GONE
+    override fun hideExperiencesLoader() {
+        (recyclerView.adapter as MyProfileAdapter).experiencesInProgress = false
+        recyclerView.adapter.notifyDataSetChanged()
     }
 
-    override fun showRetry() {
-        retryIcon.visibility = View.VISIBLE
+    override fun showExperiencesRetry() {
+        (recyclerView.adapter as MyProfileAdapter).experiencesError = true
+        recyclerView.adapter.notifyDataSetChanged()
     }
 
-    override fun hideRetry() {
-        retryIcon.visibility = View.GONE
+    override fun hideExperiencesRetry() {
+        (recyclerView.adapter as MyProfileAdapter).experiencesError = false
+        recyclerView.adapter.notifyDataSetChanged()
     }
 
     override fun showPaginationLoader() {
-        (recyclerView.adapter as SquareListAdapter).inProgress = true
+        (recyclerView.adapter as MyProfileAdapter).paginationInProgress = true
         recyclerView.adapter.notifyDataSetChanged()
     }
 
     override fun hidePaginationLoader() {
-        (recyclerView.adapter as SquareListAdapter).inProgress = false
+        (recyclerView.adapter as MyProfileAdapter).paginationInProgress = false
         recyclerView.adapter.notifyDataSetChanged()
     }
 
-    override fun showExperienceList(experienceList: List<Experience>) {
-        (recyclerView.adapter as SquareListAdapter).experienceList = experienceList
+    override fun showExperienceList(experiences: List<Experience>) {
+        this.experiences = experiences
+        (recyclerView.adapter as MyProfileAdapter).experiences = experiences
         recyclerView.adapter.notifyDataSetChanged()
     }
 
+    override fun showProfile(profile: Profile) {
+        (recyclerView.adapter as MyProfileAdapter).profile = profile
+        recyclerView.adapter.notifyDataSetChanged()
+    }
+
+    override fun hideProfileLoader() {
+        (recyclerView.adapter as MyProfileAdapter).profileInProgress = false
+        recyclerView.adapter.notifyDataSetChanged()
+    }
+
+    override fun hideProfileRetry() {
+        (recyclerView.adapter as MyProfileAdapter).profileError = false
+        recyclerView.adapter.notifyDataSetChanged()
+    }
+
+    override fun showProfileLoader() {
+        (recyclerView.adapter as MyProfileAdapter).profileInProgress = true
+        recyclerView.adapter.notifyDataSetChanged()
+    }
+
+    override fun showProfileRetry() {
+        (recyclerView.adapter as MyProfileAdapter).profileError = true
+        recyclerView.adapter.notifyDataSetChanged()
+    }
 
     override fun navigateToExperience(experienceId: String) {
         startActivity(
@@ -124,4 +161,102 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
         startActivity(RegisterActivity.newIntent(context = activity!!.applicationContext))
     }
 
+    class MyProfileAdapter(private val inflater: LayoutInflater,
+                           val onExperienceClick: (String) -> Unit,
+                           private val onLastItemShown: () -> Unit,
+                           private val onRetryClick: () -> Unit)
+        : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+        var experiencesInProgress = true
+        var experiencesError = false
+        var paginationInProgress = false
+        var experiences: List<Experience> = listOf()
+
+        var profileInProgress = true
+        var profileError = false
+        var profile: Profile? = null
+
+        val LOADER_TYPE = 0
+        val RETRY_TYPE = 1
+        val PROFILE_TYPE = 2
+        val EXPERIENCE_TYPE = 3
+
+        override fun getItemViewType(position: Int): Int {
+            if (position == 0) {
+                if (experiencesError || profileError) return RETRY_TYPE
+                else if (profileInProgress) return LOADER_TYPE
+                else return PROFILE_TYPE
+            }
+            else if (position == 1) {
+                if (experiencesInProgress) return LOADER_TYPE
+                else return EXPERIENCE_TYPE
+            }
+            else if (position == experiences.size + 1) return LOADER_TYPE
+            else return EXPERIENCE_TYPE
+        }
+
+        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+            when (getItemViewType(position)) {
+                PROFILE_TYPE -> {
+                    val profileViewHolder = holder as ProfileViewHolder
+                    profileViewHolder.bind(profile!!)
+                }
+                EXPERIENCE_TYPE -> {
+                    val experienceViewHolder = holder as SquareViewHolder
+                    experienceViewHolder.bind(experiences[position-1])
+                }
+                else -> {}
+            }
+
+            if (!experiencesError && !experiencesInProgress) {
+                val endHasBeenReached = position == experiences.size
+                if (experiences.isNotEmpty() && endHasBeenReached) onLastItemShown.invoke()
+            }
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+            when (viewType) {
+                LOADER_TYPE -> return object : RecyclerView.ViewHolder(
+                        inflater.inflate(R.layout.item_loader, parent, false)) {}
+                RETRY_TYPE -> {
+                    val view = inflater.inflate(R.layout.item_retry, parent, false)
+                    val viewHolder =  object : RecyclerView.ViewHolder(view), View.OnClickListener {
+                        override fun onClick(v: View?) { onRetryClick.invoke() } }
+                    view.setOnClickListener(viewHolder)
+                    return viewHolder
+                }
+                PROFILE_TYPE ->
+                    return ProfileViewHolder(inflater.inflate(R.layout.item_profile, parent, false))
+                else ->
+                    return SquareViewHolder(
+                            inflater.inflate(R.layout.item_square_experiences_list, parent, false),
+                            onExperienceClick)
+            }
+        }
+
+        override fun getItemCount(): Int {
+            if (experiencesError || profileError) return 1
+            else if (profileInProgress && experiencesInProgress) return 1
+            else if (profileInProgress) return experiences.size + 1
+            else if (experiencesInProgress) return 2
+            else if (paginationInProgress) return experiences.size + 2
+            else return experiences.size + 1
+        }
+
+        class ProfileViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+
+            private val usernameView: TextView = view.findViewById(R.id.username)
+            private val bioView: TextView = view.findViewById(R.id.bio)
+            private val pictureView: ImageView = view.findViewById(R.id.picture)
+
+            fun bind(profile: Profile) {
+                usernameView.text = profile.username
+                bioView.text = profile.bio
+                Picasso.with(pictureView.context)
+                        .load(profile.picture?.smallUrl)
+                        .transform(CropCircleTransformation())
+                        .into(pictureView)
+            }
+        }
+    }
 }

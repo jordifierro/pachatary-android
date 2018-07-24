@@ -1,11 +1,13 @@
 package com.pachatary.presentation.experience.show
 
+import com.pachatary.data.*
 import com.pachatary.data.auth.AuthRepository
 import com.pachatary.data.common.*
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.experience.ExperienceRepoSwitch
 import com.pachatary.data.experience.ExperienceRepository
-import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
+import com.pachatary.data.profile.Profile
+import com.pachatary.data.profile.ProfileRepository
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
@@ -23,7 +25,7 @@ class MyExperiencesPresenterTest {
     @Test
     fun test_if_cannot_create_content_shows_register_dialog() {
         given {
-            an_auth_repo_that_returns_false_on_can_create_content()
+            an_auth_repo_that_returns_on_can_create_content(false)
         } whenn {
             create_presenter()
         } then {
@@ -34,68 +36,82 @@ class MyExperiencesPresenterTest {
     @Test
     fun test_create_asks_experiences_and_shows_if_can_create_content() {
         given {
-            an_auth_repo_that_returns_true_on_can_create_content()
-            an_experience()
-            another_experience()
-            an_experience_repo_that_returns_both_on_my_experiences_flowable()
+            an_auth_repo_that_returns_on_can_create_content(true)
+            an_experience_repo_that_returns(DummyExperiencesResultSuccess(listOf("4", "5")))
+            a_profile_repo_that_returns(DummyProfileResult("usr"))
         } whenn {
             create_presenter()
         } then {
             should_call_repo_get_firsts_experiences()
-            should_show_received_experiences()
-            should_hide_view_loader()
+            should_show_experiences(listOf(DummyExperience("4"), DummyExperience("5")))
+            should_hide_experiences_loader()
+
+            should_show_profile(DummyProfile("usr"))
+            should_hide_profile_loader()
+            should_hide_profile_retry()
         }
     }
 
     @Test
     fun test_when_result_in_progress_last_event_get_firsts_shows_loader_if_can_create_content() {
         given {
-            an_auth_repo_that_returns_true_on_can_create_content()
-            an_experience_repo_that_returns_in_progress(action = Request.Action.GET_FIRSTS)
+            an_auth_repo_that_returns_on_can_create_content(true)
+            an_experience_repo_that_returns(ResultInProgress(action = Request.Action.GET_FIRSTS))
+            a_profile_repo_that_returns(ResultInProgress())
         } whenn {
             create_presenter()
         } then {
             should_hide_view_pagination_loader()
-            should_show_view_loader()
-            should_show_empty_experiences()
-            should_hide_view_retry()
+            should_show_experiences_loader()
+            should_show_experiences(listOf())
+            should_hide_experiences_retry()
+
+            should_show_profile_loader()
+            should_hide_profile_retry()
         }
     }
 
     @Test
     fun test_when_result_in_progress_last_event_paginate_shows_loader_if_can_create_content() {
         given {
-            an_auth_repo_that_returns_true_on_can_create_content()
-            an_experience_repo_that_returns_in_progress(action = Request.Action.PAGINATE)
+            an_auth_repo_that_returns_on_can_create_content(true)
+            an_experience_repo_that_returns(ResultInProgress(action = Request.Action.PAGINATE))
+            a_profile_repo_that_returns(ResultInProgress())
         } whenn {
             create_presenter()
         } then {
             should_show_view_pagination_loader()
-            should_hide_view_loader()
-            should_hide_view_retry()
+            should_hide_experiences_loader()
+            should_hide_experiences_retry()
+
+            should_show_profile_loader()
+            should_hide_profile_retry()
         }
     }
 
     @Test
     fun test_resume_checks_if_can_create_content_has_changed_and_connects_to_experiences() {
         given {
-            an_auth_repo_that_returns_true_on_can_create_content()
-            an_experience()
-            another_experience()
-            an_experience_repo_that_returns_both_on_my_experiences_flowable()
+            an_auth_repo_that_returns_on_can_create_content(true)
+            an_experience_repo_that_returns(DummyExperiencesResultSuccess(listOf("4", "5")))
+            a_profile_repo_that_returns(DummyProfileResult("usr"))
         } whenn {
             resume_presenter()
         } then {
             should_call_repo_get_firsts_experiences()
-            should_show_received_experiences()
-            should_hide_view_loader()
+            should_show_experiences(listOf(DummyExperience("4"), DummyExperience("5")))
+            should_hide_experiences_loader()
+
+            should_show_profile(DummyProfile("usr"))
+            should_hide_profile_loader()
+            should_hide_profile_retry()
         }
     }
 
     @Test
     fun test_resume_does_nothing_if_cannot_create_content() {
         given {
-            an_auth_repo_that_returns_false_on_can_create_content()
+            an_auth_repo_that_returns_on_can_create_content(false)
         } whenn {
             resume_presenter()
         } then {
@@ -106,19 +122,23 @@ class MyExperiencesPresenterTest {
     @Test
     fun test_resume_does_nothing_if_already_connected_to_experiences_flowable() {
         given {
-            an_auth_repo_that_returns_true_on_can_create_content()
-            an_experience()
-            another_experience()
-            an_experience_repo_that_returns_both_on_my_experiences_flowable()
+            an_auth_repo_that_returns_on_can_create_content(true)
+            an_experience_repo_that_returns(DummyExperiencesResultSuccess(listOf("4", "5")))
+            a_profile_repo_that_returns(DummyProfileResult("usr"))
         } whenn {
             create_presenter()
         } then {
             should_call_repo_get_firsts_experiences()
             should_call_repo_my_experience_flowable()
-            should_show_received_experiences()
-            should_hide_view_loader()
-            should_hide_view_retry()
+            should_show_experiences(listOf(DummyExperience("4"), DummyExperience("5")))
+            should_hide_experiences_loader()
+            should_hide_experiences_retry()
             should_hide_view_pagination_loader()
+
+            should_call_profile_repo_self()
+            should_show_profile(DummyProfile("usr"))
+            should_hide_profile_loader()
+            should_hide_profile_retry()
         } whenn {
             resume_presenter()
         } then {
@@ -129,28 +149,38 @@ class MyExperiencesPresenterTest {
     @Test
     fun test_create_when_response_error_shows_retry_if_last_event_is_get_firsts() {
         given {
-            an_auth_repo_that_returns_true_on_can_create_content()
-            an_experience_repo_that_returns_exception(action = Request.Action.GET_FIRSTS)
+            an_auth_repo_that_returns_on_can_create_content(true)
+            an_experience_repo_that_returns(
+                    ResultError(Exception(), action = Request.Action.GET_FIRSTS))
+            a_profile_repo_that_returns(DummyResultError())
         } whenn {
             create_presenter()
         } then {
-            should_hide_view_loader()
+            should_hide_experiences_loader()
             should_hide_view_pagination_loader()
-            should_show_view_retry()
+            should_show_experiences_retry()
+
+            should_hide_profile_loader()
+            should_show_profile_retry()
         }
     }
 
     @Test
     fun test_create_when_response_error_hides_loaders_if_last_event_is_paginate() {
         given {
-            an_auth_repo_that_returns_true_on_can_create_content()
-            an_experience_repo_that_returns_exception(action = Request.Action.PAGINATE)
+            an_auth_repo_that_returns_on_can_create_content(true)
+            an_experience_repo_that_returns(
+                    ResultError(Exception(), action = Request.Action.PAGINATE))
+            a_profile_repo_that_returns(DummyResultError())
         } whenn {
             create_presenter()
         } then {
-            should_hide_view_loader()
-            should_hide_view_retry()
+            should_hide_experiences_loader()
+            should_hide_experiences_retry()
             should_hide_view_pagination_loader()
+
+            should_hide_profile_loader()
+            should_show_profile_retry()
         }
     }
 
@@ -179,7 +209,7 @@ class MyExperiencesPresenterTest {
     @Test
     fun test_create_new_experience_button_click_when_can_create_content() {
         given {
-            an_auth_repo_that_returns_true_on_can_create_content()
+            an_auth_repo_that_returns_on_can_create_content(true)
         } whenn {
             on_create_experience_click()
         } then {
@@ -190,7 +220,7 @@ class MyExperiencesPresenterTest {
     @Test
     fun test_create_new_experience_button_click_if_cannot_create_content_shows_register_dialog() {
         given {
-            an_auth_repo_that_returns_false_on_can_create_content()
+            an_auth_repo_that_returns_on_can_create_content(false)
         } whenn {
             on_create_experience_click()
         } then {
@@ -201,13 +231,12 @@ class MyExperiencesPresenterTest {
     @Test
     fun test_unsubscribe_on_destroy() {
         given {
-            a_test_observable()
-            an_experience_repo_that_returns_test_observable()
+            repos_that_returns_test_observables()
         } whenn {
             create_presenter()
             destroy_presenter()
         } then {
-            should_unsubscribe_observable()
+            should_unsubscribe_observables()
         }
     }
 
@@ -251,17 +280,16 @@ class MyExperiencesPresenterTest {
         lateinit var presenter: MyExperiencesPresenter
         @Mock lateinit var mockView: MyExperiencesView
         @Mock private lateinit var mockExperiencesRepository: ExperienceRepository
+        @Mock private lateinit var mockProfileRepository: ProfileRepository
         @Mock private lateinit var mockAuthRepository: AuthRepository
-        private lateinit var experienceA: Experience
-        private lateinit var experienceB: Experience
-        private lateinit var testObservable: PublishSubject<Result<List<Experience>>>
+        private val testExperiencesObservable =
+                PublishSubject.create<Result<List<Experience>>>()
+        private val testProfileObservable = PublishSubject.create<Result<Profile>>()
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
-            val testSchedulerProvider =
-                    SchedulerProvider(Schedulers.trampoline(), Schedulers.trampoline())
-            presenter = MyExperiencesPresenter(mockExperiencesRepository,
-                                               mockAuthRepository, testSchedulerProvider)
+            presenter = MyExperiencesPresenter(mockExperiencesRepository, mockProfileRepository,
+                                               mockAuthRepository, Schedulers.trampoline())
             presenter.view = mockView
 
             return this
@@ -269,37 +297,18 @@ class MyExperiencesPresenterTest {
 
         fun nothing() {}
 
-        fun an_experience() {
-            experienceA = Experience(id = "1", title = "A", description = "", picture = null)
-        }
-
-        fun another_experience() {
-            experienceB = Experience(id = "2", title = "B", description = "", picture = null)
-        }
-
-        fun an_experience_repo_that_returns_both_on_my_experiences_flowable() {
+        fun an_experience_repo_that_returns(vararg results: Result<List<Experience>>) {
             given(mockExperiencesRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.MINE))
-                    .willReturn(Flowable.just(
-                            ResultSuccess(listOf(experienceA, experienceB))))
+                    .willReturn(Flowable.fromArray(*results))
         }
 
-        fun an_experience_repo_that_returns_exception(action: Request.Action) {
-            given(mockExperiencesRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.MINE))
-                    .willReturn(Flowable.just(ResultError(Exception(), action = action)))
+        fun a_profile_repo_that_returns(vararg results: Result<Profile>) {
+            BDDMockito.given(mockProfileRepository.selfProfile())
+                    .willReturn(Flowable.fromArray(*results))
         }
 
-        fun an_experience_repo_that_returns_in_progress(action: Request.Action) {
-            given(mockExperiencesRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.MINE))
-                    .willReturn(Flowable.just(
-                        ResultInProgress(action = action)))
-        }
-
-        fun an_auth_repo_that_returns_true_on_can_create_content() {
-            BDDMockito.given(mockAuthRepository.canPersonCreateContent()).willReturn(true)
-        }
-
-        fun an_auth_repo_that_returns_false_on_can_create_content() {
-            BDDMockito.given(mockAuthRepository.canPersonCreateContent()).willReturn(false)
+        fun an_auth_repo_that_returns_on_can_create_content(can: Boolean) {
+            BDDMockito.given(mockAuthRepository.canPersonCreateContent()).willReturn(can)
         }
 
         fun create_presenter() {
@@ -334,21 +343,21 @@ class MyExperiencesPresenterTest {
             presenter.lastExperienceShown()
         }
 
+        fun should_show_experiences(experiences: List<Experience>) {
+            BDDMockito.then(mockView).should().showExperienceList(experiences)
+        }
+
         fun should_call_repo_get_more_experiences() {
             then(mockExperiencesRepository).should()
                     .getMoreExperiences(ExperienceRepoSwitch.Kind.MINE)
         }
 
-        fun should_show_received_experiences() {
-            then(mockView).should().showExperienceList(arrayListOf(experienceA, experienceB))
+        fun should_show_experiences_loader() {
+            then(mockView).should().showExperiencesLoader()
         }
 
-        fun should_show_view_loader() {
-            then(mockView).should().showLoader()
-        }
-
-        fun should_hide_view_loader() {
-            then(mockView).should().hideLoader()
+        fun should_hide_experiences_loader() {
+            then(mockView).should().hideExperiencesLoader()
         }
 
         fun should_show_view_pagination_loader() {
@@ -359,12 +368,12 @@ class MyExperiencesPresenterTest {
             then(mockView).should().hidePaginationLoader()
         }
 
-        fun should_show_view_retry() {
-            then(mockView).should().showRetry()
+        fun should_show_experiences_retry() {
+            then(mockView).should().showExperiencesRetry()
         }
 
-        fun should_hide_view_retry() {
-            then(mockView).should().hideRetry()
+        fun should_hide_experiences_retry() {
+            then(mockView).should().hideExperiencesRetry()
         }
 
         fun should_call_repo_get_firsts_experiences() {
@@ -380,22 +389,20 @@ class MyExperiencesPresenterTest {
             then(mockView).should().navigateToCreateExperience()
         }
 
-        fun a_test_observable() {
-            testObservable = PublishSubject.create<Result<List<Experience>>>()
-            assertFalse(testObservable.hasObservers())
-        }
-
-        fun an_experience_repo_that_returns_test_observable() {
+        fun repos_that_returns_test_observables() {
             given(mockExperiencesRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.MINE))
-                    .willReturn(testObservable.toFlowable(BackpressureStrategy.LATEST))
+                    .willReturn(testExperiencesObservable.toFlowable(BackpressureStrategy.LATEST))
+            given(mockProfileRepository.selfProfile())
+                    .willReturn(testProfileObservable.toFlowable(BackpressureStrategy.LATEST))
         }
 
         fun destroy_presenter() {
             presenter.destroy()
         }
 
-        fun should_unsubscribe_observable() {
-            assertFalse(testObservable.hasObservers())
+        fun should_unsubscribe_observables() {
+            assertFalse(testExperiencesObservable.hasObservers())
+            assertFalse(testProfileObservable.hasObservers())
         }
 
         fun should_show_view_register_dialog() {
@@ -405,6 +412,7 @@ class MyExperiencesPresenterTest {
         fun should_do_nothing() {
             BDDMockito.then(mockView).shouldHaveNoMoreInteractions()
             BDDMockito.then(mockExperiencesRepository).shouldHaveNoMoreInteractions()
+            BDDMockito.then(mockProfileRepository).shouldHaveNoMoreInteractions()
         }
 
         fun should_call_repo_my_experience_flowable() {
@@ -416,8 +424,28 @@ class MyExperiencesPresenterTest {
             BDDMockito.then(mockView).should().navigateToRegister()
         }
 
-        fun should_show_empty_experiences() {
-            BDDMockito.then(mockView).should().showExperienceList(listOf())
+        fun should_show_profile(profile: Profile) {
+            BDDMockito.then(mockView).should().showProfile(profile)
+        }
+
+        fun should_hide_profile_loader() {
+            BDDMockito.then(mockView).should().hideProfileLoader()
+        }
+
+        fun should_hide_profile_retry() {
+            BDDMockito.then(mockView).should().hideProfileRetry()
+        }
+
+        fun should_show_profile_loader() {
+            BDDMockito.then(mockView).should().showProfileLoader()
+        }
+
+        fun should_show_profile_retry() {
+            BDDMockito.then(mockView).should().showProfileRetry()
+        }
+
+        fun should_call_profile_repo_self() {
+            BDDMockito.then(mockProfileRepository).should().selfProfile()
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

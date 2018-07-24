@@ -10,7 +10,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.ProgressBar
 import android.widget.TextView
 import com.pachatary.R
 import com.pachatary.data.experience.Experience
@@ -132,7 +131,7 @@ class ProfileActivity : AppCompatActivity(), ProfileView {
     }
 
     class ProfileAdapter(private val inflater: LayoutInflater,
-                         val onClick: (String) -> Unit,
+                         val onExperienceClick: (String) -> Unit,
                          private val onLastItemShown: () -> Unit,
                          private val onRetryClick: () -> Unit)
         : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -200,7 +199,7 @@ class ProfileActivity : AppCompatActivity(), ProfileView {
                 else ->
                     return SquareViewHolder(
                             inflater.inflate(R.layout.item_square_experiences_list, parent, false),
-                            onClick)
+                            onExperienceClick)
             }
         }
 
