@@ -1,6 +1,5 @@
 package com.pachatary.data.profile
 
-import android.annotation.SuppressLint
 import com.pachatary.data.common.Result
 import com.pachatary.data.common.ResultError
 import com.pachatary.data.common.ResultSuccess
@@ -37,7 +36,7 @@ class ProfileRepository(val apiRepository: ProfileApiRepository) {
                     .map { if (it.isEmpty()) ResultError(NotCachedProfileException())
                            else ResultSuccess(it[0]) }
                     .flatMap { if (it.isError()) apiRepository.profile(username)
-                                .doOnNext { if (it.isSuccess()) profileSubject.onNext(it.data!!) }
+                                .doOnNext { if (it.isSuccess()) this.cacheProfile(it.data!!) }
                                else Flowable.just(it) }
                     .distinct()
 
@@ -46,7 +45,7 @@ class ProfileRepository(val apiRepository: ProfileApiRepository) {
                     .map { if (it.isEmpty()) ResultError(NotCachedProfileException())
                            else ResultSuccess(it[0]) }
                     .flatMap { if (it.isError()) apiRepository.selfProfile()
-                                .doOnNext { if (it.isSuccess()) profileSubject.onNext(it.data!!) }
+                                .doOnNext { if (it.isSuccess()) this.cacheProfile(it.data!!) }
                                else Flowable.just(it) }
                     .distinct()
 
