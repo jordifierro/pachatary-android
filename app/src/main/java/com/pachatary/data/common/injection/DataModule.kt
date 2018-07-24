@@ -74,8 +74,9 @@ class DataModule {
 
     @Provides
     @Singleton
-    fun provideProfileApiRepository(retrofit: Retrofit, @Named("io") scheduler: Scheduler) =
-            ProfileApiRepository(retrofit, scheduler)
+    fun provideProfileApiRepository(retrofit: Retrofit, @Named("io") scheduler: Scheduler,
+                                    authHttpInterceptor: AuthHttpInterceptor, context: Context) =
+            ProfileApiRepository(retrofit, scheduler, authHttpInterceptor, context)
 
     @Provides
     @Singleton

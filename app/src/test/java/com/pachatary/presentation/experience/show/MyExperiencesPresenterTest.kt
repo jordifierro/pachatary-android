@@ -273,6 +273,28 @@ class MyExperiencesPresenterTest {
         }
     }
 
+    @Test
+    fun test_on_profile_picture_click_navigates_to_select_image() {
+        given {
+            nothing()
+        } whenn {
+            profile_picture_click()
+        } then {
+            should_navigate_to_select_image()
+        }
+    }
+
+    @Test
+    fun test_on_image_selected_uploads_profile_picture() {
+        given {
+            nothing()
+        } whenn {
+            image_selected("path")
+        } then {
+            should_call_profile_repo_upload_picture("path")
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
@@ -341,6 +363,14 @@ class MyExperiencesPresenterTest {
 
         fun last_experience_shown() {
             presenter.lastExperienceShown()
+        }
+
+        fun profile_picture_click() {
+            presenter.onProfilePictureClick()
+        }
+
+        fun image_selected(imageUriString: String) {
+            presenter.onImageSelected(imageUriString)
         }
 
         fun should_show_experiences(experiences: List<Experience>) {
@@ -446,6 +476,14 @@ class MyExperiencesPresenterTest {
 
         fun should_call_profile_repo_self() {
             BDDMockito.then(mockProfileRepository).should().selfProfile()
+        }
+
+        fun should_navigate_to_select_image() {
+            BDDMockito.then(mockView).should().navigateToPickAndCropImage()
+        }
+
+        fun should_call_profile_repo_upload_picture(imageUriString: String) {
+            BDDMockito.then(mockProfileRepository).should().uploadProfilePicture(imageUriString)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

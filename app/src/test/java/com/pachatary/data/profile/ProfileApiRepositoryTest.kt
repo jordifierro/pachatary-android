@@ -1,7 +1,9 @@
 package com.pachatary.data.profile
 
+import android.content.Context
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
+import com.pachatary.data.auth.AuthHttpInterceptor
 import com.pachatary.data.common.Result
 import com.pachatary.data.common.ResultInProgress
 import io.reactivex.schedulers.Schedulers
@@ -11,6 +13,7 @@ import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Test
+import org.mockito.Mockito.mock
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
@@ -59,6 +62,8 @@ class ProfileApiRepositoryTest {
 
         val testSubscriber = TestSubscriber<Result<Profile>>()
         val mockWebServer = MockWebServer()
+        val mockAuthHttpInterceptor = mock(AuthHttpInterceptor::class.java)
+        val mockContext = mock(Context::class.java)
         val repository = ProfileApiRepository(Retrofit.Builder()
                 .baseUrl(mockWebServer.url("/"))
                 .addConverterFactory(GsonConverterFactory.create(
@@ -67,7 +72,7 @@ class ProfileApiRepositoryTest {
                                 .create()))
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build(),
-                Schedulers.trampoline())
+                Schedulers.trampoline(), mockAuthHttpInterceptor, mockContext)
 
         fun a_web_server_that_returns_profile() {
             mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(

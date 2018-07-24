@@ -1,5 +1,7 @@
 package com.pachatary.presentation.experience.show
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
@@ -16,6 +18,7 @@ import com.pachatary.R
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.profile.Profile
 import com.pachatary.presentation.common.PachataryApplication
+import com.pachatary.presentation.common.edition.PickAndCropImageActivity
 import com.pachatary.presentation.experience.edition.CreateExperienceActivity
 import com.pachatary.presentation.experience.show.view.SquareViewHolder
 import com.pachatary.presentation.register.RegisterActivity
@@ -38,6 +41,8 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
     private lateinit var createExperienceButton: FloatingActionButton
     private var experiences = listOf<Experience>()
 
+    private val SELECT_IMAGE = 1
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -55,7 +60,7 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
         createExperienceButton.setOnClickListener { presenter.onCreateExperienceClick() }
         recyclerView.adapter = MyProfileAdapter(layoutInflater,
                 { presenter.onExperienceClick(it) }, { presenter.lastExperienceShown() },
-                { presenter.onRetryClick() })
+                { presenter.onRetryClick() }, { presenter.onProfilePictureClick() })
         (recyclerView.layoutManager as GridLayoutManager).spanSizeLookup =
                 object: GridLayoutManager.SpanSizeLookup() {
                     override fun getSpanSize(position: Int): Int {
@@ -161,10 +166,20 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
         startActivity(RegisterActivity.newIntent(context = activity!!.applicationContext))
     }
 
+    override fun navigateToPickAndCropImage() {
+        startActivityForResult(PickAndCropImageActivity.newIntent(activity!!), SELECT_IMAGE)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == SELECT_IMAGE && resultCode == Activity.RESULT_OK)
+            presenter.onImageSelected(PickAndCropImageActivity.getImageUriFrom(data!!))
+    }
+
     class MyProfileAdapter(private val inflater: LayoutInflater,
                            val onExperienceClick: (String) -> Unit,
                            private val onLastItemShown: () -> Unit,
-                           private val onRetryClick: () -> Unit)
+                           private val onRetryClick: () -> Unit,
+                           private val onProfilePictureClick: () -> Unit)
         : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         var experiencesInProgress = true
@@ -226,7 +241,8 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
                     return viewHolder
                 }
                 PROFILE_TYPE ->
-                    return ProfileViewHolder(inflater.inflate(R.layout.item_profile, parent, false))
+                    return ProfileViewHolder(inflater.inflate(R.layout.item_profile, parent, false),
+                                             onProfilePictureClick)
                 else ->
                     return SquareViewHolder(
                             inflater.inflate(R.layout.item_square_experiences_list, parent, false),
@@ -243,7 +259,8 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
             else return experiences.size + 1
         }
 
-        class ProfileViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        class ProfileViewHolder(view: View, val onProfilePictureClick: () -> Unit)
+                                                                   : RecyclerView.ViewHolder(view) {
 
             private val usernameView: TextView = view.findViewById(R.id.username)
             private val bioView: TextView = view.findViewById(R.id.bio)
@@ -256,6 +273,7 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
                         .load(profile.picture?.smallUrl)
                         .transform(CropCircleTransformation())
                         .into(pictureView)
+                pictureView.setOnClickListener { onProfilePictureClick.invoke() }
             }
         }
     }

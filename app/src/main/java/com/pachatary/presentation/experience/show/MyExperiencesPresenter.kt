@@ -120,4 +120,12 @@ class MyExperiencesPresenter @Inject constructor(
     }
 
     fun onDontProceedToRegister() {}
+
+    fun onProfilePictureClick() {
+        view.navigateToPickAndCropImage()
+    }
+
+    fun onImageSelected(imageUriString: String) {
+        profileRepository.uploadProfilePicture(imageUriString)
+    }
 }

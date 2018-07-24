@@ -24,4 +24,5 @@ interface MyExperiencesView {
     fun navigateToExperience(experienceId: String)
     fun navigateToCreateExperience()
     fun navigateToRegister()
+    fun navigateToPickAndCropImage()
 }

@@ -78,6 +78,21 @@ class ProfileRepositoryTest {
         }
     }
 
+    @Test
+    fun test_upload_profile_picture() {
+        given {
+            cached_profiles(listOf(DummyProfile("a"), DummyProfile("b", bio = "old", isMe = true)))
+            an_api_repo_that_returns_on_upload_picture("image_path",
+                    ResultInProgress(), DummyProfileResult("b", bio = "new bio", isMe = true))
+        } whenn {
+            upload_picture("image_path")
+            self_profile()
+        } then {
+            should_call_upload_profile_picture("image_path")
+            should_return(DummyProfileResult("b", bio = "new bio", isMe = true))
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
@@ -103,6 +118,11 @@ class ProfileRepositoryTest {
             BDDMockito.given(mockApiRepo.editProfile(bio)).willReturn(Flowable.fromArray(*results))
         }
 
+        fun an_api_repo_that_returns_on_upload_picture(image: String, vararg results: Result<Profile>) {
+            BDDMockito.given(mockApiRepo.uploadProfilePicture(image))
+                    .willReturn(Flowable.fromArray(*results))
+        }
+
         fun get_profile(username: String) {
             repository.profile(username).subscribe(testSubscriber)
         }
@@ -113,6 +133,10 @@ class ProfileRepositoryTest {
 
         fun edit_profile(bio: String) {
             repository.editProfile(bio).subscribe(testEditSubscriber)
+        }
+
+        fun upload_picture(image: String) {
+            repository.uploadProfilePicture(image)
         }
 
         fun should_return(vararg results: Result<Profile>) {
@@ -136,6 +160,10 @@ class ProfileRepositoryTest {
 
         fun should_call_edit_profile(bio: String) {
             BDDMockito.then(mockApiRepo).should().editProfile(bio)
+        }
+
+        fun should_call_upload_profile_picture(image: String) {
+            BDDMockito.then(mockApiRepo).should().uploadProfilePicture(image)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = apply(func)

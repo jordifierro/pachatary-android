@@ -1,5 +1,6 @@
 package com.pachatary.data.profile
 
+import android.annotation.SuppressLint
 import com.pachatary.data.common.Result
 import com.pachatary.data.common.ResultError
 import com.pachatary.data.common.ResultSuccess
@@ -55,5 +56,11 @@ class ProfileRepository(val apiRepository: ProfileApiRepository) {
 
     fun cacheProfile(profile: Profile) {
         (profileSubject as Observer<Profile>).onNext(profile)
+    }
+
+    fun uploadProfilePicture(imageUriString: String) {
+        apiRepository.uploadProfilePicture(imageUriString)
+                .doOnNext { if (it.isSuccess()) this.cacheProfile(it.data!!) }
+                .subscribe()
     }
 }
