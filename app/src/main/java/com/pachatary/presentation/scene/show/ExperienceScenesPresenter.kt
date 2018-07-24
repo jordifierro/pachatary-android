@@ -16,13 +16,15 @@ class ExperienceScenesPresenter @Inject constructor(
 
     lateinit var view: ExperienceScenesView
     lateinit var experienceId: String
+    var finishOnProfileClick = false
 
     private var scenesDisposable: Disposable? = null
     private var experienceDisposable: Disposable? = null
 
-    fun setView(view: ExperienceScenesView, experienceId: String) {
+    fun setView(view: ExperienceScenesView, experienceId: String, finishOnProfileClick: Boolean) {
         this.view = view
         this.experienceId = experienceId
+        this.finishOnProfileClick = finishOnProfileClick
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
@@ -100,6 +102,7 @@ class ExperienceScenesPresenter @Inject constructor(
     }
 
     fun onProfileClick(username: String) {
-        view.navigateToProfile(username)
+        if (finishOnProfileClick) view.finish()
+        else view.navigateToProfile(username)
     }
 }

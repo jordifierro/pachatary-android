@@ -18,4 +18,5 @@ interface ExperienceScenesView {
     fun scrollToScene(sceneId: String)
     fun navigateToCreateScene(experienceId: String)
     fun navigateToProfile(username: String)
+    fun finish()
 }

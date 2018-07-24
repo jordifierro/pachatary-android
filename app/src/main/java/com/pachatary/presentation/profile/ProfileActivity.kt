@@ -126,8 +126,9 @@ class ProfileActivity : AppCompatActivity(), ProfileView {
         recyclerView.adapter.notifyDataSetChanged()
     }
 
-    override fun navigateToExperience(experienceId: String) {
-        startActivity(ExperienceScenesActivity.newIntent(this, experienceId))
+    override fun navigateToExperienceWithFinishOnProfileClick(experienceId: String) {
+        startActivity(ExperienceScenesActivity.newIntent(this, experienceId,
+                finishOnProfileClick = true))
     }
 
     class ProfileAdapter(private val inflater: LayoutInflater,

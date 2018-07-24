@@ -4,7 +4,6 @@ import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.OnLifecycleEvent
 import com.pachatary.data.common.Request
-import com.pachatary.data.common.ResultInProgress
 import com.pachatary.data.experience.ExperienceRepoSwitch
 import com.pachatary.data.experience.ExperienceRepository
 import com.pachatary.data.profile.ProfileRepository
@@ -42,7 +41,7 @@ class ProfilePresenter @Inject constructor(private val repository: ExperienceRep
     }
 
     fun onExperienceClick(experienceId: String) {
-        view.navigateToExperience(experienceId)
+        view.navigateToExperienceWithFinishOnProfileClick(experienceId)
     }
 
     fun lastExperienceShown() {

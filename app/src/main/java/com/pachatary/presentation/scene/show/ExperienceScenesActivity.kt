@@ -45,12 +45,15 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
         private const val MAP_INTENT = 1
         private const val EXPERIENCE_ID = "experienceId"
         private const val SHOW_EDITABLE_IF_ITS_MINE = "show_editable_if_its_mine"
+        private const val FINISH_ON_PROFILE_CLICK = "finish_on_profile_click"
 
         fun newIntent(context: Context, experienceId: String,
-                      showEditableIfItsMine: Boolean = false): Intent {
+                      showEditableIfItsMine: Boolean = false,
+                      finishOnProfileClick: Boolean = false): Intent {
             val intent = Intent(context, ExperienceScenesActivity::class.java)
             intent.putExtra(EXPERIENCE_ID, experienceId)
             intent.putExtra(SHOW_EDITABLE_IF_ITS_MINE, showEditableIfItsMine)
+            intent.putExtra(FINISH_ON_PROFILE_CLICK, finishOnProfileClick)
             return intent
         }
     }
@@ -66,7 +69,8 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
         retryButton.setOnClickListener { presenter.onRetryClick() }
 
         PachataryApplication.injector.inject(this)
-        presenter.setView(view = this, experienceId = intent.getStringExtra(EXPERIENCE_ID))
+        presenter.setView(view = this, experienceId = intent.getStringExtra(EXPERIENCE_ID),
+              finishOnProfileClick = intent.getBooleanExtra(FINISH_ON_PROFILE_CLICK, false))
         registry.addObserver(presenter)
 
         recyclerView.adapter = ExperienceScenesAdapter(layoutInflater,

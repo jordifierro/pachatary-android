@@ -20,5 +20,5 @@ interface ProfileView {
     fun showProfileRetry()
     fun hideProfileRetry()
 
-    fun navigateToExperience(experienceId: String)
+    fun navigateToExperienceWithFinishOnProfileClick(experienceId: String)
 }

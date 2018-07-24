@@ -264,7 +264,7 @@ class ProfilePresenterTest {
         }
 
         fun should_navigate_to_experience(experienceId: String) {
-            then(mockView).should().navigateToExperience(experienceId)
+            then(mockView).should().navigateToExperienceWithFinishOnProfileClick(experienceId)
         }
 
         fun repos_that_return_test_observables(username: String) {

@@ -214,7 +214,7 @@ class ExperienceScenesPresenterTest {
     @Test
     fun test_on_profile_click() {
         given {
-
+            a_presenter_with("7", false)
         } whenn {
             profile_click(username = "asr")
         } then {
@@ -222,6 +222,16 @@ class ExperienceScenesPresenterTest {
         }
     }
 
+    @Test
+    fun test_on_profile_click_when_finish_on_profile_click_true() {
+        given {
+            a_presenter_with("7", true)
+        } whenn {
+            profile_click(username = "asr")
+        } then {
+            should_finish_view()
+        }
+    }
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
@@ -239,8 +249,9 @@ class ExperienceScenesPresenterTest {
             return this
         }
 
-        fun a_presenter_with(experienceId: String) {
+        fun a_presenter_with(experienceId: String, finishOnProfileClick: Boolean = false) {
             presenter.experienceId = experienceId
+            presenter.finishOnProfileClick = finishOnProfileClick
         }
 
         fun an_experience_repo_that_returns(vararg results: Result<Experience>,
@@ -355,6 +366,10 @@ class ExperienceScenesPresenterTest {
 
         fun should_navigate_to_profile(username: String) {
             BDDMockito.then(mockView).should().navigateToProfile(username)
+        }
+
+        fun should_finish_view() {
+            BDDMockito.then(mockView).should().finish()
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)
