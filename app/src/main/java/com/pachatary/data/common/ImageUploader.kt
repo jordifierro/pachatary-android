@@ -11,18 +11,21 @@ import io.reactivex.Flowable
 import net.gotev.uploadservice.*
 import java.net.UnknownHostException
 
-class ImageUploader(val context: Context, val authHttpInterceptor: AuthHttpInterceptor) {
+class ImageUploader(val context: Context, val authHttpInterceptor: AuthHttpInterceptor,
+                    val clientVersionHttpInterceptor: ClientVersionHttpInterceptor) {
 
     fun upload(imageUriString: String, relativePath: String): Flowable<Result<JsonObject>> =
         Flowable.create<Result<JsonObject>>({ emitter ->
             try {
-                val authHeader = authHttpInterceptor.getAuthHeader()
                 MultipartUploadRequest(context,
                         BuildConfig.API_URL + relativePath)
                         .addFileToUpload(Uri.parse(imageUriString).path, "picture")
                         .setNotificationConfig(UploadNotificationConfig())
                         .setMaxRetries(3)
-                        .addHeader(authHeader.key, authHeader.value)
+                        .addHeader(authHttpInterceptor.key(),
+                                   authHttpInterceptor.value())
+                        .addHeader(clientVersionHttpInterceptor.key(),
+                                   clientVersionHttpInterceptor.value())
                         .setDelegate(object : UploadStatusDelegate {
                             override fun onCancelled(context: Context?, uploadInfo: UploadInfo?) {
                                 emitter.onComplete()

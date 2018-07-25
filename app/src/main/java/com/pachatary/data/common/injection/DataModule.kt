@@ -76,8 +76,9 @@ class DataModule {
 
     @Provides
     @Singleton
-    fun provideImageUploader(authHttpInterceptor: AuthHttpInterceptor, context: Context) =
-            ImageUploader(context, authHttpInterceptor)
+    fun provideImageUploader(context: Context, authHttpInterceptor: AuthHttpInterceptor,
+                             clientVersionHttpInterceptor: ClientVersionHttpInterceptor) =
+            ImageUploader(context, authHttpInterceptor, clientVersionHttpInterceptor)
 
     @Provides
     @Singleton

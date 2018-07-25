@@ -5,12 +5,15 @@ import okhttp3.Interceptor
 import okhttp3.Response
 
 
-class ClientVersionHttpInterceptor(val versionCode: Int) : Interceptor {
+class ClientVersionHttpInterceptor(val versionCode: Int) : Interceptor, Header {
+
+    override fun key() = "User-Agent"
+    override fun value() = "And-" + String.format("%03d", versionCode)
 
     override fun intercept(chain: Interceptor.Chain): Response {
         try {
             val request = chain.request().newBuilder()
-                    .addHeader("User-Agent", "And-" + String.format("%03d", versionCode))
+                    .addHeader(key(), value())
                     .build()
             return chain.proceed(request)
         } catch (e: NoLoggedException) {
