@@ -70,8 +70,9 @@
     <string name="title_webview_privacy">Privacy Policy</string>
     <string name="title_webview_terms">Terms and conditions</string>
 
-    <string name="title_experience_router_title">Experience</string>
+    <string name="title_router_activity">Router</string>
     <string name="filter_view_experience_router_activity">Open experience</string>
+    <string name="filter_view_profile_router_activity">Open profile</string>
 
     <string name="title_pick_and_crop_image_activity">Pick and crop image</string>
     <string name="pick_and_crop_image_recover_dialog_title">Storage Permissions Required</string>

@@ -1,4 +1,4 @@
-package com.pachatary.presentation.experience.router
+package com.pachatary.presentation.router
 
 import android.annotation.SuppressLint
 import android.arch.lifecycle.Lifecycle
@@ -16,11 +16,11 @@ class ExperienceRouterPresenter @Inject constructor(
         private val experienceRepository: ExperienceRepository,
         @Named("main") private val mainScheduler: Scheduler) : LifecycleObserver {
 
-    lateinit var view: ExperienceRouterView
+    lateinit var view: RouterView
     lateinit var experienceShareId: String
     var disposable: Disposable? = null
 
-    fun setViewAndExperienceShareId(view: ExperienceRouterView, experienceShareId: String) {
+    fun setViewAndExperienceShareId(view: RouterView, experienceShareId: String) {
         this.view = view
         this.experienceShareId = experienceShareId
     }

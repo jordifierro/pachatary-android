@@ -1,4 +1,4 @@
-package com.pachatary.presentation.experience.router
+package com.pachatary.presentation.router
 
 import com.pachatary.data.auth.AuthRepository
 import com.pachatary.data.auth.AuthToken
@@ -291,7 +291,7 @@ class ExperienceRouterPresenterTest {
         lateinit var presenter: ExperienceRouterPresenter
         @Mock lateinit var mockAuthRepository: AuthRepository
         @Mock lateinit var mockExperienceRepository: ExperienceRepository
-        @Mock lateinit var mockView: ExperienceRouterView
+        @Mock lateinit var mockView: RouterView
         val experienceShareId = "sd4Er32R"
 
         fun buildScenario(): ScenarioMaker {

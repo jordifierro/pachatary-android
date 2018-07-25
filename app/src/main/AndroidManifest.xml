@@ -136,8 +136,8 @@
             android:label="@string/title_settings_activity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name="com.pachatary.presentation.experience.router.ExperienceRouterActivity"
-            android:label="@string/title_experience_router_title"
+        <activity android:name="com.pachatary.presentation.router.RouterActivity"
+            android:label="@string/title_router_activity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter android:label="@string/filter_view_experience_router_activity">
@@ -154,6 +154,21 @@
                 <data android:scheme="app"
                     android:host="@string/app_deeplink_host"
                     android:pathPattern="/experiences/..*" />
+            </intent-filter>
+            <intent-filter android:label="@string/filter_view_profile_router_activity">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Accepts URIs that begin with "https://pachatary.com -->
+                <data android:scheme="https"
+                    android:host="@string/https_deeplink_host"
+                    android:pathPattern="/p/..*" />
+                <data android:scheme="http"
+                    android:host="@string/https_deeplink_host"
+                    android:pathPattern="/p/..*" />
+                <data android:scheme="app"
+                    android:host="@string/app_deeplink_host"
+                    android:pathPattern="/profiles/..*" />
             </intent-filter>
         </activity>
         <activity android:name=".presentation.common.edition.PickAndCropImageActivity"

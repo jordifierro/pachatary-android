@@ -6,7 +6,7 @@ import com.pachatary.presentation.common.edition.PickAndCropImageActivity
 import com.pachatary.presentation.common.edition.SelectLocationActivity
 import com.pachatary.presentation.experience.edition.CreateExperienceActivity
 import com.pachatary.presentation.experience.edition.EditExperienceActivity
-import com.pachatary.presentation.experience.router.ExperienceRouterActivity
+import com.pachatary.presentation.router.RouterActivity
 import com.pachatary.presentation.experience.show.ExploreFragment
 import com.pachatary.presentation.experience.show.MyExperiencesFragment
 import com.pachatary.presentation.profile.ProfileActivity
@@ -46,6 +46,6 @@ interface ApplicationComponent {
     fun inject(askLoginEmailActivity: AskLoginEmailActivity)
     fun inject(loginActivity: LoginActivity)
     fun inject(profileActivity: ProfileActivity)
-    fun inject(experienceRouterActivity: ExperienceRouterActivity)
+    fun inject(routerActivity: RouterActivity)
     fun inject(pickAndCropImageActivity: PickAndCropImageActivity)
 }

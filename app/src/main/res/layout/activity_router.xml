@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.pachatary.presentation.experience.router.ExperienceRouterActivity">
+    tools:context="com.pachatary.presentation.router.RouterActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -23,14 +23,14 @@
     </android.support.design.widget.AppBarLayout>
 
     <ProgressBar
-        android:id="@+id/experience_router_progressbar"
+        android:id="@+id/router_progressbar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:visibility="invisible" />
 
     <ImageView
-        android:id="@+id/experience_router_retry"
+        android:id="@+id/router_retry"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
