@@ -1,5 +1,10 @@
 package com.pachatary.presentation.experience.show
 
+import android.content.Context
+import android.support.annotation.RequiresApi
+import android.util.AttributeSet
+import android.view.KeyEvent
+import android.widget.EditText
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.profile.Profile
 import com.pachatary.presentation.common.view.LoaderView

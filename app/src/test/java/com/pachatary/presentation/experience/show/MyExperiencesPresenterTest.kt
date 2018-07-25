@@ -295,6 +295,18 @@ class MyExperiencesPresenterTest {
         }
     }
 
+    @Test
+    fun test_edit_bio() {
+        given {
+            a_profile_repo_that_returns_test_observable_on_edit("new bio")
+        } whenn {
+            bio_edited("new bio")
+        } then {
+            should_call_profile_repo_edit_with("new bio")
+            should_subscribe_to_edit_test_observable()
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
@@ -307,6 +319,7 @@ class MyExperiencesPresenterTest {
         private val testExperiencesObservable =
                 PublishSubject.create<Result<List<Experience>>>()
         private val testProfileObservable = PublishSubject.create<Result<Profile>>()
+        private val testEditProfileObservable = PublishSubject.create<Result<Profile>>()
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
@@ -327,6 +340,11 @@ class MyExperiencesPresenterTest {
         fun a_profile_repo_that_returns(vararg results: Result<Profile>) {
             BDDMockito.given(mockProfileRepository.selfProfile())
                     .willReturn(Flowable.fromArray(*results))
+        }
+
+        fun a_profile_repo_that_returns_test_observable_on_edit(bio: String) {
+            BDDMockito.given(mockProfileRepository.editProfile(bio))
+                    .willReturn(testEditProfileObservable.toFlowable(BackpressureStrategy.LATEST))
         }
 
         fun an_auth_repo_that_returns_on_can_create_content(can: Boolean) {
@@ -371,6 +389,10 @@ class MyExperiencesPresenterTest {
 
         fun image_selected(imageUriString: String) {
             presenter.onImageSelected(imageUriString)
+        }
+
+        fun bio_edited(bio: String) {
+            presenter.onBioEdited(bio)
         }
 
         fun should_show_experiences(experiences: List<Experience>) {
@@ -484,6 +506,14 @@ class MyExperiencesPresenterTest {
 
         fun should_call_profile_repo_upload_picture(imageUriString: String) {
             BDDMockito.then(mockProfileRepository).should().uploadProfilePicture(imageUriString)
+        }
+
+        fun should_call_profile_repo_edit_with(bio: String) {
+            BDDMockito.then(mockProfileRepository).should().editProfile(bio)
+        }
+
+        fun should_subscribe_to_edit_test_observable() {
+            assert(testEditProfileObservable.hasObservers())
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

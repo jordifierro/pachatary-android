@@ -9,15 +9,19 @@ import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.InputType
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
 import android.widget.TextView
 import com.pachatary.R
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.profile.Profile
 import com.pachatary.presentation.common.PachataryApplication
+import com.pachatary.presentation.common.edition.EditTextWithBackListener
 import com.pachatary.presentation.common.edition.PickAndCropImageActivity
 import com.pachatary.presentation.experience.edition.CreateExperienceActivity
 import com.pachatary.presentation.experience.show.view.SquareViewHolder
@@ -59,8 +63,11 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
         createExperienceButton = view.findViewById(R.id.create_new_experience_button)
         createExperienceButton.setOnClickListener { presenter.onCreateExperienceClick() }
         recyclerView.adapter = MyProfileAdapter(layoutInflater,
-                { presenter.onExperienceClick(it) }, { presenter.lastExperienceShown() },
-                { presenter.onRetryClick() }, { presenter.onProfilePictureClick() })
+                onExperienceClick = { presenter.onExperienceClick(it) },
+                onLastItemShown = { presenter.lastExperienceShown() },
+                onRetryClick = { presenter.onRetryClick() },
+                onProfilePictureClick = { presenter.onProfilePictureClick() },
+                onBioEdited = { presenter.onBioEdited(it) })
         (recyclerView.layoutManager as GridLayoutManager).spanSizeLookup =
                 object: GridLayoutManager.SpanSizeLookup() {
                     override fun getSpanSize(position: Int): Int {
@@ -179,7 +186,8 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
                            val onExperienceClick: (String) -> Unit,
                            private val onLastItemShown: () -> Unit,
                            private val onRetryClick: () -> Unit,
-                           private val onProfilePictureClick: () -> Unit)
+                           private val onProfilePictureClick: () -> Unit,
+                           private val onBioEdited: (String) -> Unit)
         : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         var experiencesInProgress = true
@@ -241,8 +249,8 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
                     return viewHolder
                 }
                 PROFILE_TYPE ->
-                    return ProfileViewHolder(inflater.inflate(R.layout.item_profile, parent, false),
-                                             onProfilePictureClick)
+                    return ProfileViewHolder(inflater.inflate(R.layout.item_editable_profile, parent, false),
+                                             onProfilePictureClick, onBioEdited)
                 else ->
                     return SquareViewHolder(
                             inflater.inflate(R.layout.item_square_experiences_list, parent, false),
@@ -259,16 +267,37 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
             else return experiences.size + 1
         }
 
-        class ProfileViewHolder(view: View, val onProfilePictureClick: () -> Unit)
+        class ProfileViewHolder(view: View, val onProfilePictureClick: () -> Unit,
+                                val onBioEdited: (String) -> Unit)
                                                                    : RecyclerView.ViewHolder(view) {
 
             private val usernameView: TextView = view.findViewById(R.id.username)
-            private val bioView: TextView = view.findViewById(R.id.bio)
+            private val bioView: EditTextWithBackListener = view.findViewById(R.id.bio)
             private val pictureView: ImageView = view.findViewById(R.id.picture)
+
+            init {
+                bioView.setImeOptions(EditorInfo.IME_ACTION_DONE)
+                bioView.setRawInputType(InputType.TYPE_CLASS_TEXT)
+                bioView.setOnKeyListener { v, keyCode, event ->
+                    if ((event.action == KeyEvent.ACTION_DOWN)
+                            && (keyCode == KeyEvent.KEYCODE_ENTER)
+                        || event.action == KeyEvent.KEYCODE_BACK)
+                        onBioEdited(bioView.text.toString())
+                    false
+                }
+                bioView.setOnEditorActionListener { v, actionId, event ->
+                    if (actionId == EditorInfo.IME_ACTION_DONE)
+                        onBioEdited(bioView.text.toString())
+                    false
+                }
+                bioView.listener = { onBioEdited(bioView.text.toString()) }
+            }
 
             fun bind(profile: Profile) {
                 usernameView.text = profile.username
-                bioView.text = profile.bio
+                bioView.setText(profile.bio)
+                usernameView.requestFocus()
+                bioView.clearFocus()
                 Picasso.with(pictureView.context)
                         .load(profile.picture?.smallUrl)
                         .transform(CropCircleTransformation())

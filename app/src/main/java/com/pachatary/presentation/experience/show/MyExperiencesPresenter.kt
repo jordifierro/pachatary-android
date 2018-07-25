@@ -128,4 +128,10 @@ class MyExperiencesPresenter @Inject constructor(
     fun onImageSelected(imageUriString: String) {
         profileRepository.uploadProfilePicture(imageUriString)
     }
+
+    fun onBioEdited(newBio: String) {
+        profileRepository.editProfile(newBio)
+                .observeOn(mainScheduler)
+                .subscribe()
+    }
 }
