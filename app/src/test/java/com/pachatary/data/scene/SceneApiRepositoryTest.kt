@@ -8,7 +8,12 @@ import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import com.pachatary.data.DummyResultError
+import com.pachatary.data.common.ImageUploader
 import com.pachatary.data.common.ResultInProgress
+import com.pachatary.data.common.ResultSuccess
+import com.pachatary.data.picture.BigPicture
+import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
 import okhttp3.mockwebserver.MockResponse
@@ -16,6 +21,7 @@ import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.mockito.BDDMockito
 import org.mockito.Mockito.mock
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -62,21 +68,53 @@ class SceneApiRepositoryTest {
     }
 
     @Test
-    fun test_upload_picture_scene_parser() {
+    fun test_upload_picture_result_inprogress() {
         given {
-            a_json_object_from_POST_scenes_response()
+            an_image_uploader_that_returns("image_path", "/scenes/3/picture/",
+                    ResultInProgress())
         } whenn {
-            parse_that_scene_json()
+            upload_scene_picture("3", "image_path")
         } then {
-            should_response_parsed_scene()
+            should_call_upload("image_path", "/scenes/3/picture/")
+            should_receive(ResultInProgress())
+        }
+    }
+
+    @Test
+    fun test_upload_picture_result_error() {
+        given {
+            an_image_uploader_that_returns("image_path", "/scenes/3/picture/",
+                    DummyResultError())
+        } whenn {
+            upload_scene_picture("3", "image_path")
+        } then {
+            should_call_upload("image_path", "/scenes/3/picture/")
+            should_receive(DummyResultError())
+        }
+    }
+
+    @Test
+    fun test_upload_picture_result_success() {
+        given {
+            an_image_uploader_that_returns("image_path", "/scenes/3/picture/",
+                    ResultSuccess(JsonParser().parse(ExperienceApiRepositoryTest::class.java
+                            .getResource("/api/POST_scenes.json").readText()).asJsonObject))
+        } whenn {
+            upload_scene_picture("3", "image_path")
+        } then {
+            should_call_upload("image_path", "/scenes/3/picture/")
+            should_receive(ResultSuccess(Scene(id = "4", title = "Plaça", description = "",
+                    picture = BigPicture("https://scenes/00df.small.jpeg",
+                                         "https://scenes/00df.medium.jpeg",
+                                         "https://scenes/00df.large.jpeg"),
+                    latitude = 41.364679, longitude = 2.135489, experienceId = "5")))
         }
     }
 
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
-        val mockContext = mock(Context::class.java)
-        val mockAuthHttpInterceptor = mock(AuthHttpInterceptor::class.java)
+        val mockImageUploader = mock(ImageUploader::class.java)
         val mockWebServer = MockWebServer()
         var repository = SceneApiRepository(Retrofit.Builder()
                 .baseUrl(mockWebServer.url("/"))
@@ -86,7 +124,7 @@ class SceneApiRepositoryTest {
                                 .create()))
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build(),
-                Schedulers.trampoline(), mockContext, mockAuthHttpInterceptor)
+                Schedulers.trampoline(), mockImageUploader)
         val testSceneListSubscriber = TestSubscriber<Result<List<Scene>>>()
         val testSceneSubscriber = TestSubscriber<Result<Scene>>()
         lateinit var scene: Scene
@@ -100,6 +138,12 @@ class SceneApiRepositoryTest {
         fun an_scene(id: String = "1") {
             scene = Scene(id = id, title = "T", description = "desc",
                           latitude = 1.0, longitude = -2.3, experienceId = "3", picture = null)
+        }
+
+        fun an_image_uploader_that_returns(image: String, path: String,
+                                           result: Result<JsonObject>) {
+            BDDMockito.given(mockImageUploader.upload(image, path))
+                    .willReturn(Flowable.just(result))
         }
 
         fun a_web_server_that_returns(statusCode: Int, jsonResponseFilename: String) {
@@ -127,8 +171,9 @@ class SceneApiRepositoryTest {
             repository.editScene(scene).subscribe(testSceneSubscriber)
         }
 
-        fun parse_that_scene_json() {
-            parsedResult = repository.parseSceneJson(jsonObject)
+        fun upload_scene_picture(sceneId: String, image: String) {
+            repository.uploadScenePicture(sceneId, image)
+                    .subscribe(testSceneSubscriber)
         }
 
         fun should_request_get_scene_for(experienceId: String) {
@@ -214,6 +259,15 @@ class SceneApiRepositoryTest {
             assertEquals(41.364679, parsedResult.latitude, 1e-15)
             assertEquals(2.135489, parsedResult.longitude, 1e-15)
             assertEquals("5", parsedResult.experienceId)
+        }
+
+        fun should_call_upload(image: String, path: String) {
+            BDDMockito.then(mockImageUploader).should().upload(image, path)
+        }
+
+        fun should_receive(result: Result<Scene>) {
+            testSceneSubscriber.awaitCount(1)
+            testSceneSubscriber.assertResult(result)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

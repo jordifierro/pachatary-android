@@ -4,11 +4,10 @@ import android.content.Context
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonObject
 import com.pachatary.BuildConfig
 import com.pachatary.data.auth.*
-import com.pachatary.data.common.AcceptLanguageHttpInterceptor
-import com.pachatary.data.common.ClientVersionHttpInterceptor
-import com.pachatary.data.common.ResultCacheFactory
+import com.pachatary.data.common.*
 import com.pachatary.data.experience.*
 import com.pachatary.data.profile.ProfileApiRepository
 import com.pachatary.data.profile.ProfileRepository
@@ -18,6 +17,7 @@ import com.pachatary.data.scene.SceneApiRepository
 import com.pachatary.data.scene.SceneRepository
 import dagger.Module
 import dagger.Provides
+import io.reactivex.Flowable
 import io.reactivex.Scheduler
 import okhttp3.OkHttpClient
 import retrofit2.Converter
@@ -76,9 +76,14 @@ class DataModule {
 
     @Provides
     @Singleton
+    fun provideImageUploader(authHttpInterceptor: AuthHttpInterceptor, context: Context) =
+            ImageUploader(context, authHttpInterceptor)
+
+    @Provides
+    @Singleton
     fun provideProfileApiRepository(retrofit: Retrofit, @Named("io") scheduler: Scheduler,
-                                    authHttpInterceptor: AuthHttpInterceptor, context: Context) =
-            ProfileApiRepository(retrofit, scheduler, authHttpInterceptor, context)
+                                    imageUploader: ImageUploader) =
+            ProfileApiRepository(retrofit, scheduler, imageUploader)
 
     @Provides
     @Singleton
@@ -88,10 +93,10 @@ class DataModule {
     @Provides
     @Singleton
     fun provideExperienceApiRepository(retrofit: Retrofit, @Named("io") scheduler: Scheduler,
-                                       context: Context, authHttpInterceptor: AuthHttpInterceptor,
+                                       imageUploader: ImageUploader,
                                        profileRepository: ProfileRepository)
             : ExperienceApiRepository {
-        val trueRepo = ExperienceApiRepo(retrofit, scheduler, context, authHttpInterceptor)
+        val trueRepo = ExperienceApiRepo(retrofit, scheduler, imageUploader)
         return ProfileSnifferExperienceApiRepo(profileRepository, trueRepo)
     }
 
@@ -119,8 +124,8 @@ class DataModule {
     @Provides
     @Singleton
     fun provideSceneApiRepository(retrofit: Retrofit, @Named("io") scheduler: Scheduler,
-                                  context: Context, authHttpInterceptor: AuthHttpInterceptor) =
-            SceneApiRepository(retrofit, scheduler, context, authHttpInterceptor)
+                                  imageUploader: ImageUploader) =
+            SceneApiRepository(retrofit, scheduler, imageUploader)
 
     @Provides
     @Singleton

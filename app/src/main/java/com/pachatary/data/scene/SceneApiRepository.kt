@@ -15,8 +15,8 @@ import java.net.UnknownHostException
 import javax.inject.Named
 
 
-class SceneApiRepository(retrofit: Retrofit, @Named("io") val ioScheduler: Scheduler,
-                         val context: Context, val authHttpInterceptor: AuthHttpInterceptor) {
+class SceneApiRepository(retrofit: Retrofit, @Named("io") private val ioScheduler: Scheduler,
+                         private val imageUploader: ImageUploader) {
 
     private val sceneApi: SceneApi = retrofit.create(SceneApi::class.java)
 
@@ -37,49 +37,16 @@ class SceneApiRepository(retrofit: Retrofit, @Named("io") val ioScheduler: Sched
                            scene.latitude, scene.longitude, scene.experienceId)
                 .compose(NetworkParserFactory.getTransformer())
 
-    fun uploadScenePicture(sceneId: String,
-                           croppedImageUriString: String): Flowable<Result<Scene>> =
-        Flowable.create<Result<Scene>>({ emitter ->
-            try {
-                val authHeader = authHttpInterceptor.getAuthHeader()
-                MultipartUploadRequest(context,
-                        BuildConfig.API_URL + "/scenes/" + sceneId + "/picture/")
-                        .addFileToUpload(Uri.parse(croppedImageUriString).path, "picture")
-                        .setNotificationConfig(UploadNotificationConfig())
-                        .setMaxRetries(3)
-                        .addHeader(authHeader.key, authHeader.value)
-                        .setDelegate(object : UploadStatusDelegate {
-                            override fun onCancelled(context: Context?, uploadInfo: UploadInfo?) {
-                                emitter.onComplete()
-                            }
-
-                            override fun onProgress(context: Context?, uploadInfo: UploadInfo?) {}
-
-                            override fun onError(context: Context?, uploadInfo: UploadInfo?,
-                                                 serverResponse: ServerResponse?,
-                                                 exception: java.lang.Exception?) {
-                                if (exception is UnknownHostException) {
-                                    emitter.onNext(ResultError(exception))
-                                    emitter.onComplete()
-                                }
-                                else emitter.onError(exception!!)
-                            }
-
-                            override fun onCompleted(context: Context?, uploadInfo: UploadInfo?,
-                                                     serverResponse: ServerResponse?) {
-                                val jsonScene = JsonParser().parse(
-                                        serverResponse!!.bodyAsString).asJsonObject
-                                emitter.onNext(ResultSuccess(parseSceneJson(jsonScene)))
-                                emitter.onComplete()
-                            }
-                        })
-                        .startUpload()
-            } catch (exc: Exception) {
-                emitter.onError(exc)
-            }
-        }, BackpressureStrategy.LATEST)
-                .subscribeOn(ioScheduler)
-                .startWith(ResultInProgress())
+    fun uploadScenePicture(sceneId: String, imageUriString: String): Flowable<Result<Scene>> =
+            imageUploader.upload(imageUriString, "/scenes/$sceneId/picture/")
+                    .subscribeOn(ioScheduler)
+                    .map {
+                        when {
+                            it.isInProgress() -> ResultInProgress()
+                            it.isError() -> ResultError(it.error!!)
+                            else -> ResultSuccess(parseSceneJson(it.data!!))
+                        }
+                    }
 
     internal fun parseSceneJson(jsonScene: JsonObject): Scene {
         val id = jsonScene.get("id").asString

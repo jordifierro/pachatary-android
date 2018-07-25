@@ -80,8 +80,7 @@ class NetworkParserFactoryTest {
     class ScenarioMaker {
 
         val testListSubscriber = TestSubscriber<Result<List<Experience>>>()
-        val mockAuthHttpInterceptor = mock(AuthHttpInterceptor::class.java)
-        val mockContext = mock(Context::class.java)
+        val mockImageUploader = mock(ImageUploader::class.java)
         val mockWebServer = MockWebServer()
         var logInterceptor = LoggerHttpInterceptor()
         val repository = ExperienceApiRepo(Retrofit.Builder()
@@ -94,7 +93,7 @@ class NetworkParserFactoryTest {
                 .client(OkHttpClient.Builder().addInterceptor(logInterceptor)
                                               .readTimeout(10, TimeUnit.MILLISECONDS).build())
                 .build(),
-                Schedulers.trampoline(), mockContext, mockAuthHttpInterceptor)
+                Schedulers.trampoline(), mockImageUploader)
         val unknownHostRetrofit = Retrofit.Builder()
                 .baseUrl("http://qwerty.skdjwnfkslwjrndlwjr.asdf/")
                 .addConverterFactory(GsonConverterFactory.create(
@@ -105,7 +104,7 @@ class NetworkParserFactoryTest {
                 .client(OkHttpClient.Builder().addInterceptor(logInterceptor).build())
                 .build()
         val unknownHostRepo = ExperienceApiRepo(unknownHostRetrofit,
-                Schedulers.trampoline(), mockContext, mockAuthHttpInterceptor)
+                Schedulers.trampoline(), mockImageUploader)
 
         fun buildScenario(): ScenarioMaker {
             return this

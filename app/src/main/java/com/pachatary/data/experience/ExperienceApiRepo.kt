@@ -1,26 +1,17 @@
 package com.pachatary.data.experience
 
-import android.content.Context
-import android.net.Uri
 import com.google.gson.JsonObject
-import com.google.gson.JsonParser
-import com.pachatary.BuildConfig
-import com.pachatary.data.auth.AuthHttpInterceptor
 import com.pachatary.data.common.*
 import com.pachatary.data.picture.BigPicture
 import com.pachatary.data.picture.LittlePicture
 import com.pachatary.data.profile.Profile
-import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Scheduler
-import net.gotev.uploadservice.*
 import retrofit2.Retrofit
-import java.net.UnknownHostException
 import javax.inject.Named
 
-class ExperienceApiRepo(retrofit: Retrofit, @Named("io") val scheduler: Scheduler,
-                        val context: Context, val authHttpInterceptor: AuthHttpInterceptor)
-                                                                        : ExperienceApiRepository {
+class ExperienceApiRepo(retrofit: Retrofit, @Named("io") val ioScheduler: Scheduler,
+                        val imageUploader: ImageUploader) : ExperienceApiRepository {
 
     private val experienceApi: ExperienceApi = retrofit.create(ExperienceApi::class.java)
 
@@ -28,102 +19,70 @@ class ExperienceApiRepo(retrofit: Retrofit, @Named("io") val scheduler: Schedule
             : Flowable<Result<List<Experience>>> =
             experienceApi.exploreExperiences(word, latitude, longitude)
                 .compose(NetworkParserFactory.getPaginatedListTransformer<Experience, ExperienceMapper>())
-                .subscribeOn(scheduler)
+                .subscribeOn(ioScheduler)
 
     override fun myExperiencesFlowable(): Flowable<Result<List<Experience>>> =
             experienceApi.myExperiences()
                     .compose(NetworkParserFactory.getPaginatedListTransformer<Experience, ExperienceMapper>())
-                    .subscribeOn(scheduler)
+                    .subscribeOn(ioScheduler)
 
     override fun savedExperiencesFlowable(): Flowable<Result<List<Experience>>> =
             experienceApi.savedExperiences()
                     .compose(NetworkParserFactory.getPaginatedListTransformer<Experience, ExperienceMapper>())
-                    .subscribeOn(scheduler)
+                    .subscribeOn(ioScheduler)
 
     override fun personsExperienceFlowable(username: String): Flowable<Result<List<Experience>>> =
             experienceApi.personsExperiences(username)
                     .compose(NetworkParserFactory.getPaginatedListTransformer<Experience, ExperienceMapper>())
-                    .subscribeOn(scheduler)
+                    .subscribeOn(ioScheduler)
 
     override fun paginateExperiences(url: String): Flowable<Result<List<Experience>>> =
             experienceApi.paginateExperiences(url)
                     .compose(NetworkParserFactory.getPaginatedListTransformer<Experience, ExperienceMapper>())
-                    .subscribeOn(scheduler)
+                    .subscribeOn(ioScheduler)
 
     override fun experienceFlowable(experienceId: String): Flowable<Result<Experience>> =
             experienceApi.getExperience(experienceId)
-                    .subscribeOn(scheduler)
+                    .subscribeOn(ioScheduler)
                     .compose(NetworkParserFactory.getTransformer())
                     .startWith(ResultInProgress())
 
     override fun createExperience(experience: Experience): Flowable<Result<Experience>> =
             experienceApi.createExperience(title = experience.title, description = experience.description)
                     .compose(NetworkParserFactory.getTransformer())
-                    .subscribeOn(scheduler)
+                    .subscribeOn(ioScheduler)
 
     override fun editExperience(experience: Experience): Flowable<Result<Experience>> =
             experienceApi.editExperience(experience.id, experience.title, experience.description)
                     .compose(NetworkParserFactory.getTransformer())
-                    .subscribeOn(scheduler)
+                    .subscribeOn(ioScheduler)
 
     override fun saveExperience(save: Boolean, experienceId: String): Flowable<Result<Void>> {
         if (save) return experienceApi.saveExperience(experienceId)
                     .compose(NetworkParserFactory.getVoidTransformer())
-                    .subscribeOn(scheduler)
+                    .subscribeOn(ioScheduler)
         else return experienceApi.unsaveExperience(experienceId)
                     .compose(NetworkParserFactory.getVoidTransformer())
-                    .subscribeOn(scheduler)
+                    .subscribeOn(ioScheduler)
     }
 
     override fun translateShareId(experienceShareId: String): Flowable<Result<String>> =
             experienceApi.translateShareId(experienceShareId)
-                    .subscribeOn(scheduler)
+                    .subscribeOn(ioScheduler)
                     .compose(NetworkParserFactory.getTransformer())
                     .startWith(ResultInProgress())
 
-    override fun uploadExperiencePicture(experienceId: String, croppedImageUriString: String)
+    override fun uploadExperiencePicture(experienceId: String, imageUriString: String)
                                                                     : Flowable<Result<Experience>> =
-        Flowable.create<Result<Experience>>({ emitter ->
-            try {
-                val authHeader = authHttpInterceptor.getAuthHeader()
-                MultipartUploadRequest(context,
-                        BuildConfig.API_URL + "/experiences/" + experienceId + "/picture/")
-                        .addFileToUpload(Uri.parse(croppedImageUriString).path, "picture")
-                        .setNotificationConfig(UploadNotificationConfig())
-                        .setMaxRetries(3)
-                        .addHeader(authHeader.key, authHeader.value)
-                        .setDelegate(object : UploadStatusDelegate {
-                            override fun onCancelled(context: Context?, uploadInfo: UploadInfo?) {
-                                emitter.onComplete()
-                            }
-
-                            override fun onProgress(context: Context?, uploadInfo: UploadInfo?) {}
-
-                            override fun onError(context: Context?, uploadInfo: UploadInfo?,
-                                                 serverResponse: ServerResponse?,
-                                                 exception: java.lang.Exception?) {
-                                if (exception is UnknownHostException) {
-                                    emitter.onNext(ResultError(exception))
-                                    emitter.onComplete()
-                                }
-                                else emitter.onError(exception!!)
-                            }
-
-                            override fun onCompleted(context: Context?, uploadInfo: UploadInfo?,
-                                                     serverResponse: ServerResponse?) {
-                                val jsonExperience = JsonParser().parse(
-                                        serverResponse!!.bodyAsString).asJsonObject
-                                emitter.onNext(ResultSuccess(parseExperienceJson(jsonExperience)))
-                                emitter.onComplete()
-                            }
-                        })
-                        .startUpload()
-            } catch (exc: Exception) {
-                emitter.onError(exc)
-            }
-        }, BackpressureStrategy.LATEST)
-                .subscribeOn(scheduler)
-                .startWith(ResultInProgress())
+            imageUploader.upload(imageUriString, "/experiences/$experienceId/picture/")
+                    .subscribeOn(ioScheduler)
+                    .map {
+                        when {
+                            it.isInProgress() -> ResultInProgress()
+                            it.isError() -> ResultError(it.error!!)
+                            else -> ResultSuccess(parseExperienceJson(it.data!!))
+                        }
+                    }
 
     internal fun parseExperienceJson(jsonExperience: JsonObject): Experience {
         val id = jsonExperience.get("id").asString

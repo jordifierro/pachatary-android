@@ -5,16 +5,23 @@ import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import com.pachatary.data.DummyResultError
 import com.pachatary.data.auth.AuthHttpInterceptor
+import com.pachatary.data.common.ImageUploader
 import com.pachatary.data.common.Result
 import com.pachatary.data.common.ResultInProgress
 import com.pachatary.data.common.ResultSuccess
+import com.pachatary.data.picture.BigPicture
+import com.pachatary.data.picture.LittlePicture
+import com.pachatary.data.profile.Profile
+import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert.*
 import org.junit.Test
+import org.mockito.BDDMockito
 import org.mockito.Mockito.mock
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -174,24 +181,72 @@ class ExperienceApiRepositoryTest {
     }
 
     @Test
-    fun test_upload_experience_result_parser() {
+    fun test_upload_experience_picture_inprogress() {
         given {
-            a_json_object_from_POST_experience_json()
+            an_image_uploader_that_returns("image_path", "/experiences/4/picture/",
+                                           ResultInProgress())
         } whenn {
-            parse_that_json_object()
+            upload_image("4", "image_path")
         } then {
-            result_should_be_experience_parsed_correctly()
+            should_call_upload("image_path", "/experiences/4/picture/")
+            should_receive(ResultInProgress())
         }
     }
 
     @Test
-    fun test_upload_experience_result_parser_without_profile_picture() {
+    fun test_upload_experience_picture_error() {
         given {
-            a_json_object_from_POST_experience_json_without_profile_picture()
+            an_image_uploader_that_returns("image_path", "/experiences/4/picture/",
+                    DummyResultError())
         } whenn {
-            parse_that_json_object()
+            upload_image("4", "image_path")
         } then {
-            result_should_be_experience_without_profile_picture_parsed_correctly()
+            should_call_upload("image_path", "/experiences/4/picture/")
+            should_receive(DummyResultError())
+        }
+    }
+
+    @Test
+    fun test_upload_experience_picture_with_profile_picture() {
+        given {
+            an_image_uploader_that_returns("image_path", "/experiences/4/picture/",
+                    ResultSuccess(JsonParser().parse(ExperienceApiRepositoryTest::class.java
+                    .getResource("/api/POST_experiences.json").readText()).asJsonObject))
+        } whenn {
+            upload_image("4", "image_path")
+        } then {
+            should_call_upload("image_path", "/experiences/4/picture/")
+            should_receive(ResultSuccess(Experience(id = "4", title = "Plaça", description = "",
+                    picture = BigPicture("https://experiences/00df.small.jpeg",
+                                         "https://experiences/00df.medium.jpeg",
+                                         "https://experiences/00df.large.jpeg"),
+                    isMine = true, isSaved = false, savesCount = 5,
+                    authorProfile = Profile(username = "usr.nam", bio = "user info",
+                            picture = LittlePicture("https://experiences/029d.tiny.jpg",
+                                    "https://experiences/029d.small.jpg",
+                                    "https://experiences/029d.medium.jpg"),
+                            isMe = true))))
+        }
+    }
+
+    @Test
+    fun test_upload_experience_picture_without_profile_picture() {
+        given {
+            an_image_uploader_that_returns("image_path", "/experiences/4/picture/",
+                    ResultSuccess(JsonParser().parse(ExperienceApiRepositoryTest::class.java
+                            .getResource("/api/POST_experiences_without_profile_picture.json")
+                            .readText()).asJsonObject))
+        } whenn {
+            upload_image("4", "image_path")
+        } then {
+            should_call_upload("image_path", "/experiences/4/picture/")
+            should_receive(ResultSuccess(Experience(id = "4", title = "Plaça", description = "",
+                    picture = BigPicture("https://experiences/00df.small.jpeg",
+                            "https://experiences/00df.medium.jpeg",
+                            "https://experiences/00df.large.jpeg"),
+                    isMine = true, isSaved = false, savesCount = 5,
+                    authorProfile = Profile(username = "usr.nam", bio = "user info",
+                                            picture = null, isMe = true))))
         }
     }
 
@@ -203,8 +258,7 @@ class ExperienceApiRepositoryTest {
         val testSubscriber = TestSubscriber<Result<Experience>>()
         val testStringSubscriber = TestSubscriber<Result<String>>()
         val testEmptySubscriber = TestSubscriber<Result<Void>>()
-        val mockContext = mock(Context::class.java)
-        val mockAuthHttpInterceptor = mock(AuthHttpInterceptor::class.java)
+        val mockImageUploader = mock(ImageUploader::class.java)
         val mockWebServer = MockWebServer()
         val repository = ExperienceApiRepo(Retrofit.Builder()
                 .baseUrl(mockWebServer.url("/"))
@@ -214,13 +268,11 @@ class ExperienceApiRepositoryTest {
                                 .create()))
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build(),
-                Schedulers.trampoline(), mockContext, mockAuthHttpInterceptor)
+                Schedulers.trampoline(), mockImageUploader)
         lateinit var experience: Experience
         var experienceId = ""
         var experienceShareId = ""
         var url = ""
-        lateinit var jsonObject: JsonObject
-        lateinit var resultExperience: Experience
 
         fun an_experience_id() {
             experienceId = "8"
@@ -234,15 +286,10 @@ class ExperienceApiRepositoryTest {
             url = "/some-url"
         }
 
-        fun a_json_object_from_POST_experience_json() {
-            jsonObject = JsonParser().parse(ExperienceApiRepositoryTest::class.java
-                    .getResource("/api/POST_experiences.json").readText()).asJsonObject
-        }
-
-        fun a_json_object_from_POST_experience_json_without_profile_picture() {
-            jsonObject = JsonParser().parse(ExperienceApiRepositoryTest::class.java
-                    .getResource("/api/POST_experiences_without_profile_picture.json")
-                        .readText()).asJsonObject
+        fun an_image_uploader_that_returns(image: String, path: String,
+                                           result: Result<JsonObject>) {
+            BDDMockito.given(mockImageUploader.upload(image, path))
+                    .willReturn(Flowable.just(result))
         }
 
         fun a_web_server_that_returns_get_experiences() {
@@ -285,6 +332,11 @@ class ExperienceApiRepositoryTest {
 
         fun a_web_server_that_returns_204() {
             mockWebServer.enqueue(MockResponse().setResponseCode(204).setBody(""))
+        }
+
+        fun upload_image(experienceId: String, image: String) {
+            repository.uploadExperiencePicture(experienceId, image)
+                    .subscribe(testSubscriber)
         }
 
         fun my_experiences_are_requested() {
@@ -351,10 +403,6 @@ class ExperienceApiRepositoryTest {
             repository.saveExperience(save = false, experienceId = experience.id)
                     .subscribe(testEmptySubscriber)
             testEmptySubscriber.awaitCount(1)
-        }
-
-        fun parse_that_json_object() {
-            resultExperience = repository.parseExperienceJson(jsonObject)
         }
 
         fun request_should_call_url() {
@@ -533,51 +581,17 @@ class ExperienceApiRepositoryTest {
             assertEquals(ResultSuccess<Void>(), receivedResult)
         }
 
-        fun result_should_be_experience_parsed_correctly() {
-            assertEquals("4", resultExperience.id)
-            assertEquals("Plaça", resultExperience.title)
-            assertEquals("", resultExperience.description)
-            assertEquals("https://experiences/00df.small.jpeg",
-                         resultExperience.picture!!.smallUrl)
-            assertEquals("https://experiences/00df.medium.jpeg",
-                         resultExperience.picture!!.mediumUrl)
-            assertEquals("https://experiences/00df.large.jpeg",
-                         resultExperience.picture!!.largeUrl)
-            assertEquals(true, resultExperience.isMine)
-            assertEquals(false, resultExperience.isSaved)
-            assertEquals("usr.nam", resultExperience.authorProfile.username)
-            assertEquals("user info", resultExperience.authorProfile.bio)
-            assertEquals("https://experiences/029d.tiny.jpg",
-                    resultExperience.authorProfile.picture!!.tinyUrl)
-            assertEquals("https://experiences/029d.small.jpg",
-                    resultExperience.authorProfile.picture!!.smallUrl)
-            assertEquals("https://experiences/029d.medium.jpg",
-                    resultExperience.authorProfile.picture!!.mediumUrl)
-            assertTrue(resultExperience.authorProfile.isMe)
-            assertEquals(5, resultExperience.savesCount)
-        }
-
-        fun result_should_be_experience_without_profile_picture_parsed_correctly() {
-            assertEquals("4", resultExperience.id)
-            assertEquals("Plaça", resultExperience.title)
-            assertEquals("", resultExperience.description)
-            assertEquals("https://experiences/00df.small.jpeg",
-                    resultExperience.picture!!.smallUrl)
-            assertEquals("https://experiences/00df.medium.jpeg",
-                    resultExperience.picture!!.mediumUrl)
-            assertEquals("https://experiences/00df.large.jpeg",
-                    resultExperience.picture!!.largeUrl)
-            assertEquals(true, resultExperience.isMine)
-            assertEquals(false, resultExperience.isSaved)
-            assertEquals("usr.nam", resultExperience.authorProfile.username)
-            assertEquals("user info", resultExperience.authorProfile.bio)
-            assertNull(resultExperience.authorProfile.picture)
-            assertTrue(resultExperience.authorProfile.isMe)
-            assertEquals(5, resultExperience.savesCount)
-        }
-
         fun response_should_parse_inprogress_result_and_experience_id() {
             testStringSubscriber.assertValues(ResultInProgress(), ResultSuccess("43"))
+        }
+
+        fun should_call_upload(image: String, path: String) {
+            BDDMockito.then(mockImageUploader).should().upload(image, path)
+        }
+
+        fun should_receive(result: Result<Experience>) {
+            testSubscriber.awaitCount(1)
+            testSubscriber.assertResult(result)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = apply(func)

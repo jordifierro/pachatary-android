@@ -44,8 +44,8 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
                 .doOnNext(updateExperienceToMine)
 
     @SuppressLint("CheckResult")
-    fun uploadExperiencePicture(experienceId: String, croppedImageUriString: String) {
-        apiRepository.uploadExperiencePicture(experienceId, croppedImageUriString)
+    fun uploadExperiencePicture(experienceId: String, imageUriString: String) {
+        apiRepository.uploadExperiencePicture(experienceId, imageUriString)
                 .doOnNext(updateExperienceToMine)
                 .subscribe({}, { throw it } )
     }

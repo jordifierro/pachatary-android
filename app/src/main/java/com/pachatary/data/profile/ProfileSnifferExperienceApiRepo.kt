@@ -2,7 +2,6 @@ package com.pachatary.data.profile
 
 import com.pachatary.data.common.Result
 import com.pachatary.data.experience.Experience
-import com.pachatary.data.experience.ExperienceApiRepo
 import com.pachatary.data.experience.ExperienceApiRepository
 
 class ProfileSnifferExperienceApiRepo(val profileRepo: ProfileRepository,
@@ -34,8 +33,8 @@ class ProfileSnifferExperienceApiRepo(val profileRepo: ProfileRepository,
             experienceApiRepo.saveExperience(save, experienceId)
     override fun translateShareId(experienceShareId: String) =
             experienceApiRepo.translateShareId(experienceShareId)
-    override fun uploadExperiencePicture(experienceId: String, croppedImageUriString: String) =
-            experienceApiRepo.uploadExperiencePicture(experienceId, croppedImageUriString)
+    override fun uploadExperiencePicture(experienceId: String, imageUriString: String) =
+            experienceApiRepo.uploadExperiencePicture(experienceId, imageUriString)
 
     private val sniffProfiles = { result: Result<List<Experience>> ->
         if (result.isSuccess())

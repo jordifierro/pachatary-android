@@ -1,11 +1,16 @@
 package com.pachatary.data.profile
 
-import android.content.Context
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
-import com.pachatary.data.auth.AuthHttpInterceptor
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
+import com.pachatary.data.DummyResultError
+import com.pachatary.data.common.ImageUploader
 import com.pachatary.data.common.Result
 import com.pachatary.data.common.ResultInProgress
+import com.pachatary.data.common.ResultSuccess
+import com.pachatary.data.picture.LittlePicture
+import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
 import okhttp3.mockwebserver.MockResponse
@@ -13,6 +18,7 @@ import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Test
+import org.mockito.BDDMockito
 import org.mockito.Mockito.mock
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -56,14 +62,57 @@ class ProfileApiRepositoryTest {
         }
     }
 
+    @Test
+    fun test_upload_picture_inprogress() {
+        given {
+            an_image_uploader_that_returns("image_path", "/profiles/me/picture/",
+                                           ResultInProgress())
+        } whenn {
+            upload_picture("image_path")
+        } then {
+            should_call_image_uploader_upload_with("image_path", "/profiles/me/picture/")
+            should_receive(ResultInProgress())
+        }
+    }
+
+    @Test
+    fun test_upload_picture_error() {
+        given {
+            an_image_uploader_that_returns("image_path", "/profiles/me/picture/",
+                    DummyResultError())
+        } whenn {
+            upload_picture("image_path")
+        } then {
+            should_call_image_uploader_upload_with("image_path", "/profiles/me/picture/")
+            should_receive(DummyResultError())
+        }
+    }
+
+    @Test
+    fun test_upload_picture_success() {
+        given {
+            an_image_uploader_that_returns("image_path", "/profiles/me/picture/",
+                    ResultSuccess(JsonParser().parse(ProfileApiRepositoryTest::class.java
+                            .getResource("/api/profile.json").readText()).asJsonObject))
+        } whenn {
+            upload_picture("image_path")
+        } then {
+            should_call_image_uploader_upload_with("image_path", "/profiles/me/picture/")
+            should_receive(ResultSuccess(Profile(username = "usr.nm", bio = "bio description",
+                    picture = LittlePicture("https://experiences/8c29.tiny.jpg",
+                                            "https://experiences/8c29.small.jpg",
+                                            "https://experiences/8c29.medium.jpg"),
+                    isMe = false)))
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
 
         val testSubscriber = TestSubscriber<Result<Profile>>()
         val mockWebServer = MockWebServer()
-        val mockAuthHttpInterceptor = mock(AuthHttpInterceptor::class.java)
-        val mockContext = mock(Context::class.java)
+        var mockImageUploader = mock(ImageUploader::class.java)
         val repository = ProfileApiRepository(Retrofit.Builder()
                 .baseUrl(mockWebServer.url("/"))
                 .addConverterFactory(GsonConverterFactory.create(
@@ -72,12 +121,18 @@ class ProfileApiRepositoryTest {
                                 .create()))
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build(),
-                Schedulers.trampoline(), mockAuthHttpInterceptor, mockContext)
+                Schedulers.trampoline(), mockImageUploader)
 
         fun a_web_server_that_returns_profile() {
             mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody(
                     ProfileApiRepositoryTest::class.java.getResource(
                             "/api/profile.json").readText()))
+        }
+
+        fun an_image_uploader_that_returns(image: String, path: String,
+                                           result: Result<JsonObject>) {
+            BDDMockito.given(mockImageUploader.upload(image, path))
+                    .willReturn(Flowable.just(result))
         }
 
         fun self_profile() {
@@ -92,6 +147,11 @@ class ProfileApiRepositoryTest {
 
         fun edit_profile(bio: String) {
             repository.editProfile(bio)
+                    .subscribe(testSubscriber)
+        }
+
+        fun upload_picture(path: String) {
+            repository.uploadProfilePicture(path)
                     .subscribe(testSubscriber)
         }
 
@@ -124,6 +184,15 @@ class ProfileApiRepositoryTest {
             assertEquals("https://experiences/8c29.small.jpg", profile.picture!!.smallUrl)
             assertEquals("https://experiences/8c29.medium.jpg", profile.picture!!.mediumUrl)
             assertFalse(profile.isMe)
+        }
+
+        fun should_call_image_uploader_upload_with(image: String, path: String) {
+            BDDMockito.then(mockImageUploader).should().upload(image, path)
+        }
+
+        fun should_receive(result: Result<Profile>) {
+            testSubscriber.awaitCount(1)
+            testSubscriber.assertResult(result)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = apply(func)
