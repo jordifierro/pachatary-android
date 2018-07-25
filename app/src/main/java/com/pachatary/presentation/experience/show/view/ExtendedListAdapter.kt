@@ -5,8 +5,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.pachatary.R
 import com.pachatary.data.experience.Experience
+import com.pachatary.presentation.common.view.PictureDeviceCompat
 
 class ExtendedListAdapter(private val inflater: LayoutInflater,
+                          val pictureDeviceCompat: PictureDeviceCompat,
                           var experienceList: List<Experience>,
                           var inProgress: Boolean,
                           val onClick: (String) -> Unit,
@@ -25,7 +27,7 @@ class ExtendedListAdapter(private val inflater: LayoutInflater,
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExtendedViewHolder {
         return ExtendedViewHolder(inflater.inflate(R.layout.item_extended_experience_list,
-                parent, false), onClick, onUsernameClick)
+                parent, false), pictureDeviceCompat, onClick, onUsernameClick)
     }
 
     override fun getItemCount(): Int {

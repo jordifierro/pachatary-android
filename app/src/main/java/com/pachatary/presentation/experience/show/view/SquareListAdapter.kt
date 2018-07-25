@@ -5,8 +5,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.pachatary.R
 import com.pachatary.data.experience.Experience
+import com.pachatary.presentation.common.view.PictureDeviceCompat
 
 class SquareListAdapter(private val inflater: LayoutInflater,
+                        val pictureDeviceCompat: PictureDeviceCompat,
                         var experienceList: List<Experience>,
                         var inProgress: Boolean,
                         val onClick: (String) -> Unit,
@@ -24,7 +26,7 @@ class SquareListAdapter(private val inflater: LayoutInflater,
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SquareViewHolder {
         return SquareViewHolder(inflater.inflate(R.layout.item_square_experiences_list,
-                parent, false), onClick)
+                parent, false), onClick, pictureDeviceCompat)
     }
 
     override fun getItemCount(): Int {

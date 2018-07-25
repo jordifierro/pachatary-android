@@ -1,6 +1,5 @@
 package com.pachatary.presentation.experience.show.view
 
-import android.media.Image
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.ImageView
@@ -8,10 +7,13 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import com.pachatary.R
 import com.pachatary.data.experience.Experience
+import com.pachatary.presentation.common.view.PictureDeviceCompat
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.CropCircleTransformation
 
-class ExtendedViewHolder(view: View, val onClick: (String) -> Unit,
+class ExtendedViewHolder(view: View,
+                         val pictureDeviceCompat: PictureDeviceCompat,
+                         val onClick: (String) -> Unit,
                          val onUsernameClick: (String) -> Unit)
     : RecyclerView.ViewHolder(view), View.OnClickListener {
 
@@ -50,10 +52,10 @@ class ExtendedViewHolder(view: View, val onClick: (String) -> Unit,
         descriptionView.text = experience.description
         savesCountView.text = experience.savesCount.toString() + " ★"
         Picasso.with(pictureView.context)
-                .load(experience.picture?.mediumUrl)
+                .load(pictureDeviceCompat.convert(experience.picture)?.fullScreenSizeUrl)
                 .into(pictureView)
         Picasso.with(authorPictureView.context)
-                .load(experience.authorProfile.picture?.tinyUrl)
+                .load(pictureDeviceCompat.convert(experience.authorProfile.picture)?.iconSizeUrl)
                 .transform(CropCircleTransformation())
                 .into(authorPictureView)
     }

@@ -19,6 +19,7 @@ import com.pachatary.presentation.common.PachataryApplication
 import com.pachatary.presentation.common.edition.SelectLocationActivity
 import com.pachatary.presentation.common.edition.SelectLocationPresenter
 import com.pachatary.presentation.common.location.LocationUtils
+import com.pachatary.presentation.common.view.PictureDeviceCompat
 import com.pachatary.presentation.experience.show.view.ExtendedListAdapter
 import com.pachatary.presentation.main.MainActivity
 import com.pachatary.presentation.profile.ProfileActivity
@@ -36,6 +37,8 @@ class ExploreFragment : Fragment(), ExploreView {
 
     @Inject
     lateinit var presenter: ExplorePresenter
+    @Inject
+    lateinit var pictureDeviceCompat: PictureDeviceCompat
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var progressBar: ProgressBar
@@ -60,7 +63,8 @@ class ExploreFragment : Fragment(), ExploreView {
         retryIcon.setOnClickListener { presenter.onRetryClick() }
         recyclerView = view.findViewById(R.id.experiences_recyclerview)
         recyclerView.layoutManager = GridLayoutManager(activity, 1)
-        recyclerView.adapter = ExtendedListAdapter(layoutInflater, listOf(), false,
+        recyclerView.adapter = ExtendedListAdapter(
+                layoutInflater, pictureDeviceCompat, listOf(), false,
                 { id -> presenter.onExperienceClick(id) },
                 { username -> presenter.onUsernameClicked(username) },
                 { presenter.lastExperienceShown() })

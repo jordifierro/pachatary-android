@@ -23,6 +23,7 @@ import com.pachatary.data.profile.Profile
 import com.pachatary.presentation.common.PachataryApplication
 import com.pachatary.presentation.common.edition.EditTextWithBackListener
 import com.pachatary.presentation.common.edition.PickAndCropImageActivity
+import com.pachatary.presentation.common.view.PictureDeviceCompat
 import com.pachatary.presentation.experience.edition.CreateExperienceActivity
 import com.pachatary.presentation.experience.show.view.SquareViewHolder
 import com.pachatary.presentation.register.RegisterActivity
@@ -40,6 +41,8 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
 
     @Inject
     lateinit var presenter: MyExperiencesPresenter
+    @Inject
+    lateinit var pictureDeviceCompat: PictureDeviceCompat
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var createExperienceButton: FloatingActionButton
@@ -62,7 +65,7 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
         recyclerView.layoutManager = GridLayoutManager(activity, 2)
         createExperienceButton = view.findViewById(R.id.create_new_experience_button)
         createExperienceButton.setOnClickListener { presenter.onCreateExperienceClick() }
-        recyclerView.adapter = MyProfileAdapter(layoutInflater,
+        recyclerView.adapter = MyProfileAdapter(layoutInflater, pictureDeviceCompat,
                 onExperienceClick = { presenter.onExperienceClick(it) },
                 onLastItemShown = { presenter.lastExperienceShown() },
                 onRetryClick = { presenter.onRetryClick() },
@@ -183,6 +186,7 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
     }
 
     class MyProfileAdapter(private val inflater: LayoutInflater,
+                           val pictureDeviceCompat: PictureDeviceCompat,
                            val onExperienceClick: (String) -> Unit,
                            private val onLastItemShown: () -> Unit,
                            private val onRetryClick: () -> Unit,
@@ -249,12 +253,13 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
                     return viewHolder
                 }
                 PROFILE_TYPE ->
-                    return ProfileViewHolder(inflater.inflate(R.layout.item_editable_profile, parent, false),
-                                             onProfilePictureClick, onBioEdited)
+                    return ProfileViewHolder(
+                            inflater.inflate(R.layout.item_editable_profile, parent, false),
+                            pictureDeviceCompat, onProfilePictureClick, onBioEdited)
                 else ->
                     return SquareViewHolder(
                             inflater.inflate(R.layout.item_square_experiences_list, parent, false),
-                            onExperienceClick)
+                            onExperienceClick, pictureDeviceCompat)
             }
         }
 
@@ -267,7 +272,8 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
             else return experiences.size + 1
         }
 
-        class ProfileViewHolder(view: View, val onProfilePictureClick: () -> Unit,
+        class ProfileViewHolder(view: View, private val pictureDeviceCompat: PictureDeviceCompat,
+                                val onProfilePictureClick: () -> Unit,
                                 val onBioEdited: (String) -> Unit)
                                                                    : RecyclerView.ViewHolder(view) {
 
@@ -299,7 +305,7 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
                 usernameView.requestFocus()
                 bioView.clearFocus()
                 Picasso.with(pictureView.context)
-                        .load(profile.picture?.smallUrl)
+                        .load(pictureDeviceCompat.convert(profile.picture)?.halfScreenSizeUrl)
                         .transform(CropCircleTransformation())
                         .into(pictureView)
                 pictureView.setOnClickListener { onProfilePictureClick.invoke() }

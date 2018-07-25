@@ -12,6 +12,7 @@ import android.widget.ProgressBar
 import com.pachatary.R
 import com.pachatary.data.experience.Experience
 import com.pachatary.presentation.common.PachataryApplication
+import com.pachatary.presentation.common.view.PictureDeviceCompat
 import com.pachatary.presentation.experience.show.view.SquareListAdapter
 import com.pachatary.presentation.scene.show.ExperienceScenesActivity
 import javax.inject.Inject
@@ -24,6 +25,8 @@ class SavedFragment : Fragment(), SavedView {
 
     @Inject
     lateinit var presenter: SavedPresenter
+    @Inject
+    lateinit var pictureDeviceCompat: PictureDeviceCompat
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var progressBar: ProgressBar
@@ -45,7 +48,8 @@ class SavedFragment : Fragment(), SavedView {
         retryIcon.setOnClickListener { presenter.onRetryClick() }
         recyclerView = view.findViewById(R.id.experiences_recyclerview)
         recyclerView.layoutManager = GridLayoutManager(activity, 2)
-        recyclerView.adapter = SquareListAdapter(layoutInflater, listOf(), false,
+        recyclerView.adapter = SquareListAdapter(
+                layoutInflater, pictureDeviceCompat, listOf(), false,
                 { id -> presenter.onExperienceClick(id) }, { presenter.lastExperienceShown() })
 
         presenter.create()

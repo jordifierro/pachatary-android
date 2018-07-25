@@ -2,7 +2,10 @@ package com.pachatary.presentation.common.injection
 
 import android.app.Application
 import android.content.Context
+import android.content.res.Resources
+import android.support.v4.content.res.ResourcesCompat
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
+import com.pachatary.presentation.common.view.PictureDeviceCompat
 import dagger.Module
 import dagger.Provides
 import io.reactivex.Scheduler
@@ -35,4 +38,14 @@ class ApplicationModule(val application: Application) {
     fun provideSchedulerProvider(@Named("io") subscriberScheduler: Scheduler,
                                  @Named("main") observerScheduler: Scheduler): SchedulerProvider =
         SchedulerProvider(subscriberScheduler, observerScheduler)
+
+    @Provides
+    @Singleton
+    @Named("device_width")
+    fun provideDeviceWidth() = Resources.getSystem().displayMetrics.widthPixels
+
+    @Provides
+    @Singleton
+    fun providePictureDeviceCompat(@Named("device_width") deviceWidth: Int): PictureDeviceCompat =
+            PictureDeviceCompat(deviceWidth)
 }

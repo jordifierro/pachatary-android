@@ -7,9 +7,11 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import com.pachatary.R
 import com.pachatary.data.experience.Experience
+import com.pachatary.presentation.common.view.PictureDeviceCompat
 import com.squareup.picasso.Picasso
 
-class SquareViewHolder(view: View, val onClick: (String) -> Unit)
+class SquareViewHolder(view: View, val onClick: (String) -> Unit,
+                       val pictureDeviceCompat: PictureDeviceCompat)
     : RecyclerView.ViewHolder(view), View.OnClickListener {
 
     private val titleView: TextView = view.findViewById(R.id.experience_title)
@@ -26,7 +28,7 @@ class SquareViewHolder(view: View, val onClick: (String) -> Unit)
         this.experienceId = experience.id
         titleView.text = experience.title
         Picasso.with(pictureView.context)
-                .load(experience.picture?.smallUrl)
+                .load(pictureDeviceCompat.convert(experience.picture)?.halfScreenSizeUrl)
                 .into(pictureView)
     }
 

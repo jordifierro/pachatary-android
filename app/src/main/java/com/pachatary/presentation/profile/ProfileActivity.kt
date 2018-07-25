@@ -15,6 +15,7 @@ import com.pachatary.R
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.profile.Profile
 import com.pachatary.presentation.common.PachataryApplication
+import com.pachatary.presentation.common.view.PictureDeviceCompat
 import com.pachatary.presentation.experience.show.view.SquareViewHolder
 import com.pachatary.presentation.scene.show.ExperienceScenesActivity
 import com.squareup.picasso.Picasso
@@ -35,6 +36,8 @@ class ProfileActivity : AppCompatActivity(), ProfileView {
 
     @Inject
     lateinit var presenter: ProfilePresenter
+    @Inject
+    lateinit var pictureDeviceCompat: PictureDeviceCompat
 
     private lateinit var recyclerView: RecyclerView
     var experiences: List<Experience> = listOf()
@@ -44,9 +47,11 @@ class ProfileActivity : AppCompatActivity(), ProfileView {
         setContentView(R.layout.activity_profile)
         val username = intent.getStringExtra(USERNAME)
 
+        PachataryApplication.injector.inject(this)
+
         recyclerView = findViewById(R.id.experiences_recyclerview)
         recyclerView.layoutManager = GridLayoutManager(this, 2)
-        recyclerView.adapter = ProfileAdapter(layoutInflater,
+        recyclerView.adapter = ProfileAdapter(layoutInflater, pictureDeviceCompat,
                 { id -> presenter.onExperienceClick(id) }, { presenter.lastExperienceShown() },
                 { presenter.onRetryClick() })
         (recyclerView.layoutManager as GridLayoutManager).spanSizeLookup =
@@ -58,7 +63,6 @@ class ProfileActivity : AppCompatActivity(), ProfileView {
                     }
                 }
 
-        PachataryApplication.injector.inject(this)
         presenter.setViewAndUsername(this, username)
         lifecycle.addObserver(presenter)
     }
@@ -131,6 +135,7 @@ class ProfileActivity : AppCompatActivity(), ProfileView {
     }
 
     class ProfileAdapter(private val inflater: LayoutInflater,
+                         val pictureDeviceCompat: PictureDeviceCompat,
                          val onExperienceClick: (String) -> Unit,
                          private val onLastItemShown: () -> Unit,
                          private val onRetryClick: () -> Unit)
@@ -195,11 +200,12 @@ class ProfileActivity : AppCompatActivity(), ProfileView {
                     return viewHolder
                 }
                 PROFILE_TYPE ->
-                    return ProfileViewHolder(inflater.inflate(R.layout.item_profile, parent, false))
+                    return ProfileViewHolder(inflater.inflate(R.layout.item_profile, parent, false),
+                                             pictureDeviceCompat)
                 else ->
                     return SquareViewHolder(
                             inflater.inflate(R.layout.item_square_experiences_list, parent, false),
-                            onExperienceClick)
+                            onExperienceClick, pictureDeviceCompat)
             }
         }
 
@@ -212,7 +218,8 @@ class ProfileActivity : AppCompatActivity(), ProfileView {
             else return experiences.size + 1
         }
 
-        class ProfileViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        class ProfileViewHolder(view: View, private val pictureDeviceCompat: PictureDeviceCompat)
+                                                                   : RecyclerView.ViewHolder(view) {
 
             private val usernameView: TextView = view.findViewById(R.id.username)
             private val bioView: TextView = view.findViewById(R.id.bio)
@@ -222,7 +229,7 @@ class ProfileActivity : AppCompatActivity(), ProfileView {
                 usernameView.text = profile.username
                 bioView.text = profile.bio
                 Picasso.with(pictureView.context)
-                        .load(profile.picture?.smallUrl)
+                        .load(pictureDeviceCompat.convert(profile.picture)?.halfScreenSizeUrl)
                         .transform(CropCircleTransformation())
                         .into(pictureView)
             }

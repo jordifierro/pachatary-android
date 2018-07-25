@@ -21,6 +21,7 @@ import com.pachatary.R
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.scene.Scene
 import com.pachatary.presentation.common.PachataryApplication
+import com.pachatary.presentation.common.view.PictureDeviceCompat
 import com.pachatary.presentation.experience.edition.EditExperienceActivity
 import com.pachatary.presentation.profile.ProfileActivity
 import com.pachatary.presentation.scene.edition.CreateSceneActivity
@@ -35,6 +36,8 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
 
     @Inject
     lateinit var presenter: ExperienceScenesPresenter
+    @Inject
+    lateinit var pictureDeviceCompat: PictureDeviceCompat
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var retryButton: ImageView
@@ -74,7 +77,8 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
         registry.addObserver(presenter)
 
         recyclerView.adapter = ExperienceScenesAdapter(layoutInflater,
-                intent.getBooleanExtra(SHOW_EDITABLE_IF_ITS_MINE, false), presenter)
+                intent.getBooleanExtra(SHOW_EDITABLE_IF_ITS_MINE, false),
+                pictureDeviceCompat, presenter)
     }
 
     override fun navigateToEditScene(sceneId: String, experienceId: String) {
@@ -170,6 +174,7 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
 
     class ExperienceScenesAdapter(private val inflater: LayoutInflater,
                                   val showEditable: Boolean,
+                                  val pictureDeviceCompat: PictureDeviceCompat,
                                   val presenter: ExperienceScenesPresenter)
         : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -217,7 +222,8 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
             when (viewType) {
                 EXPERIENCE_TYPE -> {
                     return ExperienceViewHolder(inflater.inflate(R.layout.item_experience, parent, false),
-                            showEditable, { presenter.onEditExperienceClick() },
+                            showEditable, pictureDeviceCompat,
+                            { presenter.onEditExperienceClick() },
                             { presenter.onAddSceneButtonClick() },
                             { save -> presenter.onExperienceSave(save) },
                             { presenter.onMapButtonClick() },
@@ -228,7 +234,8 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
                     if (showEditable && experience != null && experience!!.isMine) isEditable = true
 
                     return SceneViewHolder(inflater.inflate(R.layout.item_scene, parent, false),
-                            isEditable , { presenter.onEditSceneClick(it) },
+                            isEditable , pictureDeviceCompat,
+                            { presenter.onEditSceneClick(it) },
                             { presenter.onLocateSceneClick(it) })
                 }
                 else -> {
@@ -263,6 +270,7 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
     }
 
     class ExperienceViewHolder(view: View, private val showEditableIfItsMine: Boolean,
+                               private val pictureDeviceCompat: PictureDeviceCompat,
                                private val onEditExperienceClick: () -> Unit,
                                private val onAddSceneClick: () -> Unit,
                                private val onSaveExperienceClick: (Boolean) -> Unit,
@@ -324,18 +332,19 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
             savesCountView.text = experience.savesCount.toString() + " ★"
             authorUsernameView.text = experience.authorProfile.username
             Picasso.with(pictureView.context)
-                    .load(experience.picture?.mediumUrl)
-                    .into(pictureView)
+                .load(pictureDeviceCompat.convert(experience.picture)?.fullScreenSizeUrl)
+                .into(pictureView)
             Picasso.with(authorPictureView.context)
-                    .load(experience.authorProfile.picture?.tinyUrl)
-                    .transform(CropCircleTransformation())
-                    .into(authorPictureView)
+                .load(pictureDeviceCompat.convert(experience.authorProfile.picture)?.iconSizeUrl)
+                .transform(CropCircleTransformation())
+                .into(authorPictureView)
 
             mapButton.setOnClickListener { onMapButtonClick() }
         }
     }
 
     class SceneViewHolder(view: View, private val isEditable: Boolean,
+                          private val pictureDeviceCompat: PictureDeviceCompat,
                           private val onEditSceneClick: (String) -> Unit,
                           private val onLocateSceneClick: (String) -> Unit)
                                                                    : RecyclerView.ViewHolder(view) {
@@ -356,7 +365,7 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
             if (isEditable) editButton.visibility = View.VISIBLE
             else editButton.visibility = View.GONE
             Picasso.with(pictureView.context)
-                    .load(scene.picture?.mediumUrl)
+                    .load(pictureDeviceCompat.convert(scene.picture)?.fullScreenSizeUrl)
                     .into(pictureView)
         }
     }
