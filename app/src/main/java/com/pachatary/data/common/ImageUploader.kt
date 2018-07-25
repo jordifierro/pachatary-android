@@ -9,6 +9,7 @@ import com.pachatary.data.auth.AuthHttpInterceptor
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import net.gotev.uploadservice.*
+import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
 class ImageUploader(val context: Context, val authHttpInterceptor: AuthHttpInterceptor,
@@ -36,7 +37,8 @@ class ImageUploader(val context: Context, val authHttpInterceptor: AuthHttpInter
                             override fun onError(context: Context?, uploadInfo: UploadInfo?,
                                                  serverResponse: ServerResponse?,
                                                  exception: java.lang.Exception?) {
-                                if (exception is UnknownHostException) {
+                                if (exception is UnknownHostException
+                                        || exception is SocketTimeoutException) {
                                     emitter.onNext(ResultError(exception))
                                     emitter.onComplete()
                                 }
