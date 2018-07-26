@@ -4,6 +4,7 @@ import android.app.Activity
 import android.arch.lifecycle.LifecycleRegistry
 import android.content.Context
 import android.content.Intent
+import android.content.res.Resources
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -17,6 +18,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import com.mapbox.api.staticmap.v1.MapboxStaticMap
+import com.mapbox.api.staticmap.v1.StaticMapCriteria
+import com.mapbox.api.staticmap.v1.models.StaticMarkerAnnotation
+import com.mapbox.geojson.Point
+import com.mapbox.mapboxsdk.constants.Style
+import com.pachatary.BuildConfig
 import com.pachatary.R
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.scene.Scene
@@ -30,7 +37,6 @@ import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.CropCircleTransformation
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.activity_experience_scenes.*
-
 
 class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
 
@@ -192,7 +198,7 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
             when (getItemViewType(position)) {
                 EXPERIENCE_TYPE -> {
                     val experienceViewHolder = holder as ExperienceViewHolder
-                    experienceViewHolder.bind(experience!!)
+                    experienceViewHolder.bind(experience!!, scenes)
                 }
                 SCENE_TYPE -> {
                     val sceneViewHolder = holder as SceneViewHolder
@@ -288,10 +294,10 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
         private val savesCountView: TextView = view.findViewById(R.id.saves_count)
         private val authorUsernameView: TextView = view.findViewById(R.id.author_username)
         private val authorPictureView: ImageView = view.findViewById(R.id.author_picture)
-        private val mapButton: Button = view.findViewById(R.id.map_button)
+        private val mapView: ImageView = view.findViewById(R.id.map)
         lateinit var experienceId: String
 
-        fun bind(experience: Experience) {
+        fun bind(experience: Experience, scenes: List<Scene>) {
             this.experienceId = experience.id
             titleView.text = experience.title
             descriptionView.text = experience.description
@@ -339,7 +345,31 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
                 .transform(CropCircleTransformation())
                 .into(authorPictureView)
 
-            mapButton.setOnClickListener { onMapButtonClick() }
+            mapView.setOnClickListener { onMapButtonClick() }
+            Picasso.with(mapView.context)
+                    .load(mapUrl(scenes))
+                    .into(mapView)
+        }
+
+        private fun mapUrl(scenes: List<Scene>): String? {
+            if (scenes.size == 0) return null
+            val screenWidth = Resources.getSystem().displayMetrics.widthPixels
+            val markers = mutableListOf<StaticMarkerAnnotation>()
+            for (scene in scenes) {
+                markers.add(StaticMarkerAnnotation.builder()
+                        .lnglat(Point.fromLngLat(scene.longitude, scene.latitude))
+                        .iconUrl("https://s3-eu-west-1.amazonaws.com/pachatary/static/circle.png")
+                        .build())
+            }
+            val map = MapboxStaticMap.builder()
+                    .accessToken(BuildConfig.MAPBOX_ACCESS_TOKEN)
+                    .styleId(StaticMapCriteria.LIGHT_STYLE)
+                    .width(screenWidth)
+                    .height(screenWidth / 2)
+                    .staticMarkerAnnotations(markers)
+                    .cameraAuto(true)
+                    .build()
+            return map.url().toString()
         }
     }
 
