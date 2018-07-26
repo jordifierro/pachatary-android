@@ -70,12 +70,12 @@ class SceneApiRepositoryTest {
     @Test
     fun test_upload_picture_result_inprogress() {
         given {
-            an_image_uploader_that_returns("image_path", "/scenes/3/picture/",
+            an_image_uploader_that_returns("image_path", "/scenes/3/picture",
                     ResultInProgress())
         } whenn {
             upload_scene_picture("3", "image_path")
         } then {
-            should_call_upload("image_path", "/scenes/3/picture/")
+            should_call_upload("image_path", "/scenes/3/picture")
             should_receive(ResultInProgress())
         }
     }
@@ -83,12 +83,12 @@ class SceneApiRepositoryTest {
     @Test
     fun test_upload_picture_result_error() {
         given {
-            an_image_uploader_that_returns("image_path", "/scenes/3/picture/",
+            an_image_uploader_that_returns("image_path", "/scenes/3/picture",
                     DummyResultError())
         } whenn {
             upload_scene_picture("3", "image_path")
         } then {
-            should_call_upload("image_path", "/scenes/3/picture/")
+            should_call_upload("image_path", "/scenes/3/picture")
             should_receive(DummyResultError())
         }
     }
@@ -96,13 +96,13 @@ class SceneApiRepositoryTest {
     @Test
     fun test_upload_picture_result_success() {
         given {
-            an_image_uploader_that_returns("image_path", "/scenes/3/picture/",
+            an_image_uploader_that_returns("image_path", "/scenes/3/picture",
                     ResultSuccess(JsonParser().parse(ExperienceApiRepositoryTest::class.java
                             .getResource("/api/POST_scenes.json").readText()).asJsonObject))
         } whenn {
             upload_scene_picture("3", "image_path")
         } then {
-            should_call_upload("image_path", "/scenes/3/picture/")
+            should_call_upload("image_path", "/scenes/3/picture")
             should_receive(ResultSuccess(Scene(id = "4", title = "Plaça", description = "",
                     picture = BigPicture("https://scenes/00df.small.jpeg",
                                          "https://scenes/00df.medium.jpeg",

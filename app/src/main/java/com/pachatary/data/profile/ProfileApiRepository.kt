@@ -32,7 +32,7 @@ class ProfileApiRepository(retrofit: Retrofit, @Named("io") val ioScheduler: Sch
                     .startWith(ResultInProgress())
 
     fun uploadProfilePicture(imageUriString: String): Flowable<Result<Profile>> =
-            imageUploader.upload(imageUriString, "/profiles/me/picture/")
+            imageUploader.upload(imageUriString, "/profiles/me/picture")
                 .subscribeOn(ioScheduler)
                 .map {
                     when {

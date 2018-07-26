@@ -74,7 +74,7 @@ class ExperienceApiRepo(retrofit: Retrofit, @Named("io") val ioScheduler: Schedu
 
     override fun uploadExperiencePicture(experienceId: String, imageUriString: String)
                                                                     : Flowable<Result<Experience>> =
-            imageUploader.upload(imageUriString, "/experiences/$experienceId/picture/")
+            imageUploader.upload(imageUriString, "/experiences/$experienceId/picture")
                     .subscribeOn(ioScheduler)
                     .map {
                         when {

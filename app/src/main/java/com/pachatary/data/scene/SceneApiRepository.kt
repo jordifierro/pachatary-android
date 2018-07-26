@@ -38,7 +38,7 @@ class SceneApiRepository(retrofit: Retrofit, @Named("io") private val ioSchedule
                 .compose(NetworkParserFactory.getTransformer())
 
     fun uploadScenePicture(sceneId: String, imageUriString: String): Flowable<Result<Scene>> =
-            imageUploader.upload(imageUriString, "/scenes/$sceneId/picture/")
+            imageUploader.upload(imageUriString, "/scenes/$sceneId/picture")
                     .subscribeOn(ioScheduler)
                     .map {
                         when {

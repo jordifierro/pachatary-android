@@ -65,12 +65,12 @@ class ProfileApiRepositoryTest {
     @Test
     fun test_upload_picture_inprogress() {
         given {
-            an_image_uploader_that_returns("image_path", "/profiles/me/picture/",
+            an_image_uploader_that_returns("image_path", "/profiles/me/picture",
                                            ResultInProgress())
         } whenn {
             upload_picture("image_path")
         } then {
-            should_call_image_uploader_upload_with("image_path", "/profiles/me/picture/")
+            should_call_image_uploader_upload_with("image_path", "/profiles/me/picture")
             should_receive(ResultInProgress())
         }
     }
@@ -78,12 +78,12 @@ class ProfileApiRepositoryTest {
     @Test
     fun test_upload_picture_error() {
         given {
-            an_image_uploader_that_returns("image_path", "/profiles/me/picture/",
+            an_image_uploader_that_returns("image_path", "/profiles/me/picture",
                     DummyResultError())
         } whenn {
             upload_picture("image_path")
         } then {
-            should_call_image_uploader_upload_with("image_path", "/profiles/me/picture/")
+            should_call_image_uploader_upload_with("image_path", "/profiles/me/picture")
             should_receive(DummyResultError())
         }
     }
@@ -91,13 +91,13 @@ class ProfileApiRepositoryTest {
     @Test
     fun test_upload_picture_success() {
         given {
-            an_image_uploader_that_returns("image_path", "/profiles/me/picture/",
+            an_image_uploader_that_returns("image_path", "/profiles/me/picture",
                     ResultSuccess(JsonParser().parse(ProfileApiRepositoryTest::class.java
                             .getResource("/api/profile.json").readText()).asJsonObject))
         } whenn {
             upload_picture("image_path")
         } then {
-            should_call_image_uploader_upload_with("image_path", "/profiles/me/picture/")
+            should_call_image_uploader_upload_with("image_path", "/profiles/me/picture")
             should_receive(ResultSuccess(Profile(username = "usr.nm", bio = "bio description",
                     picture = LittlePicture("https://experiences/8c29.tiny.jpg",
                                             "https://experiences/8c29.small.jpg",

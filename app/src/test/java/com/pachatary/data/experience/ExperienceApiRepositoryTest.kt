@@ -183,12 +183,12 @@ class ExperienceApiRepositoryTest {
     @Test
     fun test_upload_experience_picture_inprogress() {
         given {
-            an_image_uploader_that_returns("image_path", "/experiences/4/picture/",
+            an_image_uploader_that_returns("image_path", "/experiences/4/picture",
                                            ResultInProgress())
         } whenn {
             upload_image("4", "image_path")
         } then {
-            should_call_upload("image_path", "/experiences/4/picture/")
+            should_call_upload("image_path", "/experiences/4/picture")
             should_receive(ResultInProgress())
         }
     }
@@ -196,12 +196,12 @@ class ExperienceApiRepositoryTest {
     @Test
     fun test_upload_experience_picture_error() {
         given {
-            an_image_uploader_that_returns("image_path", "/experiences/4/picture/",
+            an_image_uploader_that_returns("image_path", "/experiences/4/picture",
                     DummyResultError())
         } whenn {
             upload_image("4", "image_path")
         } then {
-            should_call_upload("image_path", "/experiences/4/picture/")
+            should_call_upload("image_path", "/experiences/4/picture")
             should_receive(DummyResultError())
         }
     }
@@ -209,13 +209,13 @@ class ExperienceApiRepositoryTest {
     @Test
     fun test_upload_experience_picture_with_profile_picture() {
         given {
-            an_image_uploader_that_returns("image_path", "/experiences/4/picture/",
+            an_image_uploader_that_returns("image_path", "/experiences/4/picture",
                     ResultSuccess(JsonParser().parse(ExperienceApiRepositoryTest::class.java
                     .getResource("/api/POST_experiences.json").readText()).asJsonObject))
         } whenn {
             upload_image("4", "image_path")
         } then {
-            should_call_upload("image_path", "/experiences/4/picture/")
+            should_call_upload("image_path", "/experiences/4/picture")
             should_receive(ResultSuccess(Experience(id = "4", title = "Plaça", description = "",
                     picture = BigPicture("https://experiences/00df.small.jpeg",
                                          "https://experiences/00df.medium.jpeg",
@@ -232,14 +232,14 @@ class ExperienceApiRepositoryTest {
     @Test
     fun test_upload_experience_picture_without_profile_picture() {
         given {
-            an_image_uploader_that_returns("image_path", "/experiences/4/picture/",
+            an_image_uploader_that_returns("image_path", "/experiences/4/picture",
                     ResultSuccess(JsonParser().parse(ExperienceApiRepositoryTest::class.java
                             .getResource("/api/POST_experiences_without_profile_picture.json")
                             .readText()).asJsonObject))
         } whenn {
             upload_image("4", "image_path")
         } then {
-            should_call_upload("image_path", "/experiences/4/picture/")
+            should_call_upload("image_path", "/experiences/4/picture")
             should_receive(ResultSuccess(Experience(id = "4", title = "Plaça", description = "",
                     picture = BigPicture("https://experiences/00df.small.jpeg",
                             "https://experiences/00df.medium.jpeg",
@@ -460,14 +460,14 @@ class ExperienceApiRepositoryTest {
 
         fun request_should_post_experience_id_save() {
             val request = mockWebServer.takeRequest()
-            assertEquals("/experiences/" + experience.id + "/save/", request.path)
+            assertEquals("/experiences/" + experience.id + "/save", request.path)
             assertEquals("POST", request.getMethod())
             assertEquals("", request.getBody().readUtf8())
         }
 
         fun request_should_delete_experience_id_save() {
             val request = mockWebServer.takeRequest()
-            assertEquals("/experiences/" + experience.id + "/save/", request.path)
+            assertEquals("/experiences/" + experience.id + "/save", request.path)
             assertEquals("DELETE", request.getMethod())
             assertEquals("", request.getBody().readUtf8())
         }
