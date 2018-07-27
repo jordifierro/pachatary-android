@@ -116,8 +116,9 @@ class ExploreFragment : Fragment(), ExploreView {
     override fun hasLocationPermission() = LocationUtils.checkLocationPermission(activity!!)
 
     override fun askLastKnownLocation() {
-        LocationUtils.addListenerToLocation((activity as MainActivity)) { location: Location ->
-            presenter.onLastLocationFound(location.latitude, location.longitude)
+        LocationUtils.addListenerToLocation((activity as MainActivity)) { location: Location? ->
+            if (location == null) presenter.onLastLocationNotFound()
+            else presenter.onLastLocationFound(location.latitude, location.longitude)
         }
     }
 

@@ -60,6 +60,10 @@ class ExplorePresenter @Inject constructor(private val repository: ExperienceRep
         getFirstsExperiences()
     }
 
+    fun onLastLocationNotFound() {
+        getFirstsExperiences()
+    }
+
     private fun connectToExperiences() {
         experiencesDisposable = repository.experiencesFlowable(ExperienceRepoSwitch.Kind.EXPLORE)
                                           .subscribeOn(schedulerProvider.subscriber())

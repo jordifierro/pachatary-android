@@ -159,8 +159,9 @@ class SelectLocationActivity : AppCompatActivity(), SelectLocationView {
     override fun hasLocationPermission() = LocationUtils.checkLocationPermission(this)
 
     override fun askLocation() {
-        LocationUtils.addListenerToLocation(this) { location: Location ->
-            presenter.onLocationFound(location.latitude, location.longitude)
+        LocationUtils.addListenerToLocation(this) { location: Location? ->
+            if (location != null)
+                presenter.onLocationFound(location.latitude, location.longitude)
         }
     }
 

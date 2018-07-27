@@ -46,8 +46,10 @@ class CreateSceneActivity : AppCompatActivity(), CreateSceneView {
         setContentView(R.layout.activity_create_scene)
         setSupportActionBar(toolbar)
 
-        LocationUtils.addListenerToLocation(this, { location: Location ->
-            presenter.onLastLocationFound(location.latitude, location.longitude) })
+        LocationUtils.addListenerToLocation(this) { location: Location? ->
+            if (location != null)
+                presenter.onLastLocationFound(location.latitude, location.longitude)
+        }
 
         PachataryApplication.injector.inject(this)
         presenter.setView(this, intent.getStringExtra(EXPERIENCE_ID))

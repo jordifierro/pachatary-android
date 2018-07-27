@@ -90,6 +90,18 @@ class ExplorePresenterTest {
     }
 
     @Test
+    fun test_create_with_last_location_not_found_ask_firsts_experiences_without_location() {
+        given {
+            an_experience_repo_that_returns_in_progress(Request.Action.GET_FIRSTS)
+        } whenn {
+            create_presenter()
+            last_location_not_found()
+        } then {
+            should_call_repo_get_firsts_experiences()
+        }
+    }
+
+    @Test
     fun test_on_retry_click_with_last_location_calls_get_firsts_experiences_again() {
         given {
             nothing()
@@ -296,6 +308,10 @@ class ExplorePresenterTest {
 
         fun last_location_known(latitude: Double, longitude: Double) {
             presenter.onLastLocationFound(latitude, longitude)
+        }
+
+        fun last_location_not_found() {
+            presenter.onLastLocationNotFound()
         }
 
         fun experience_click(experienceId: String) {

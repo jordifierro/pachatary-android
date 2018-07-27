@@ -12,7 +12,7 @@ class LocationUtils {
             activity.checkCallingOrSelfPermission("android.permission.ACCESS_COARSE_LOCATION") ==
                     PackageManager.PERMISSION_GRANTED
 
-        fun addListenerToLocation(activity: Activity, listener: (location: Location) -> Unit) {
+        fun addListenerToLocation(activity: Activity, listener: (location: Location?) -> Unit) {
             if (LocationUtils.checkLocationPermission(activity)) {
                 val fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity)
                 fusedLocationClient.lastLocation.addOnSuccessListener(listener)
