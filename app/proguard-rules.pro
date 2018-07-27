@@ -98,3 +98,10 @@
 
 -keep public class com.google.android.gms.* { public *; }
 -dontwarn com.google.android.gms.**
+
+# Firebase Crashlytics
+-keepattributes *Annotation*
+-keepattributes SourceFile,LineNumberTable
+-keep public class * extends java.lang.Exception
+
+-printmapping mapping.txt
