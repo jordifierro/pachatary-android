@@ -5,7 +5,6 @@ import android.support.multidex.MultiDex
 import android.support.multidex.MultiDexApplication
 import com.facebook.stetho.Stetho
 import com.jakewharton.picasso.OkHttp3Downloader
-import com.mapbox.android.telemetry.TelemetryEnabler
 import com.pachatary.BuildConfig
 import com.pachatary.data.common.injection.DataModule
 import com.pachatary.presentation.common.injection.ApplicationComponent
@@ -38,9 +37,6 @@ class PachataryApplication : MultiDexApplication() {
 
         UploadService.NAMESPACE = BuildConfig.APPLICATION_ID
         UploadService.HTTP_STACK = OkHttpStack()
-
-        try { TelemetryEnabler.updateTelemetryState(TelemetryEnabler.State.DISABLED) }
-        catch (e: Exception) {}
     }
 
     override fun attachBaseContext(base: Context?) {
