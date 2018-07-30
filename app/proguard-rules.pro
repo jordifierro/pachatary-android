@@ -96,7 +96,7 @@
 -dontwarn com.mapbox.mapboxsdk.plugins.locationlayer.**
 -dontwarn okhttp3.internal.platform.ConscryptPlatform.**
 
--keep public class com.google.android.gms.* { public *; }
+-keep public class com.google.android.gms.** { *; }
 -dontwarn com.google.android.gms.**
 
 # Firebase Crashlytics
