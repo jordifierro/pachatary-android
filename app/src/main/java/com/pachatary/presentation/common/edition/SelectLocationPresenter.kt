@@ -41,7 +41,10 @@ class SelectLocationPresenter @Inject constructor(val schedulerProvider: Schedul
     fun destroy() {}
 
     fun doneButtonClick() {
-        view.finishWith(latitude = view.latitude(), longitude = view.longitude())
+        val latitude = view.latitude()
+        val longitude = view.longitude()
+        if (latitude != null && longitude != null)
+            view.finishWith(latitude = latitude, longitude = longitude)
     }
 
     @SuppressLint("CheckResult")

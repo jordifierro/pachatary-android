@@ -118,13 +118,15 @@ class SelectLocationActivity : AppCompatActivity(), SelectLocationView {
         }
     }
 
-    fun center(): LatLng {
+    fun center(): LatLng? {
+        if (!::mapboxMap.isInitialized) return null
+
         val centerPointF = PointF(mapView.width.toFloat()/2, mapView.height.toFloat()/2)
         return mapboxMap.projection.fromScreenLocation(centerPointF)
     }
 
-    override fun latitude() = center().latitude
-    override fun longitude() = center().longitude
+    override fun latitude() = center()?.latitude
+    override fun longitude() = center()?.longitude
 
     override fun finishWith(latitude: Double, longitude: Double) {
         val returnIntent = Intent()

@@ -62,6 +62,18 @@ class SelectLocationPresenterTest {
     }
 
     @Test
+    fun done_button_without_latitude_and_longitude_does_nothing() {
+        given {
+            an_unknown_initial_location()
+            presenter_initialized_with_this_location()
+        } whenn {
+            done_button_is_clicked()
+        } then {
+            should_just_ask_latitude_and_longitude()
+        }
+    }
+
+    @Test
     fun test_when_search_location_button_clicked_subscribe_to_geocoder() {
         given {
             an_unknown_initial_location()
@@ -148,8 +160,8 @@ class SelectLocationPresenterTest {
         var initialLatitude = 0.0
         var initialLongitude = 0.0
         var initialLocationType = SelectLocationPresenter.LocationType.UNKNWON
-        var latitude = 0.0
-        var longitude = 0.0
+        var latitude: Double? = null
+        var longitude: Double? = null
         var address = ""
         lateinit var geocoderFlowable: Flowable<Pair<Double, Double>>
 
@@ -185,7 +197,7 @@ class SelectLocationPresenterTest {
         }
 
         fun an_observable_that_returns_that_latitude_and_longitude_when_geocoder_called_with_that_address() {
-            geocoderFlowable = Flowable.just(Pair(latitude, longitude))
+            geocoderFlowable = Flowable.just(Pair(latitude!!, longitude!!))
             BDDMockito.given(mockView.geocodeAddress(address)).willReturn(geocoderFlowable)
         }
 
@@ -237,7 +249,7 @@ class SelectLocationPresenterTest {
         }
 
         fun finish_should_be_called_with_latitude_and_longitude() {
-            BDDMockito.then(mockView).should().finishWith(latitude, longitude)
+            BDDMockito.then(mockView).should().finishWith(latitude!!, longitude!!)
         }
 
         fun presenter_should_set_view_initial_location_with_far_zoom_level() {
@@ -260,7 +272,7 @@ class SelectLocationPresenterTest {
         }
 
         fun view_should_move_map_to_that_latitude_and_longitude_point() {
-            BDDMockito.then(mockView).should().moveMapToPoint(latitude, longitude)
+            BDDMockito.then(mockView).should().moveMapToPoint(latitude!!, longitude!!)
         }
 
         fun should_ask_location_permissions() {
@@ -277,6 +289,12 @@ class SelectLocationPresenterTest {
 
         fun should_move_camera_to_point(latitude: Double, longitude: Double) {
             BDDMockito.then(mockView).should().moveMapToPoint(latitude, longitude)
+        }
+
+        fun should_just_ask_latitude_and_longitude() {
+            BDDMockito.then(mockView).should().latitude()
+            BDDMockito.then(mockView).should().longitude()
+            BDDMockito.verifyNoMoreInteractions(mockView)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)
