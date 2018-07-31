@@ -160,18 +160,6 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
         startActivity(CreateExperienceActivity.newIntent(context = activity!!.applicationContext))
     }
 
-    override fun showRegisterDialog() {
-        val builder: AlertDialog.Builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            AlertDialog.Builder(context!!, android.R.style.Theme_Material_Dialog_Alert)
-        else AlertDialog.Builder(context!!)
-        builder.setTitle(R.string.dialog_title_mine_register)
-                .setMessage(R.string.dialog_question_mine_register)
-                .setPositiveButton(android.R.string.yes, { _, _ -> presenter.onProceedToRegister() })
-                .setNegativeButton(android.R.string.no, { _, _ -> presenter.onDontProceedToRegister() })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show()
-    }
-
     override fun navigateToRegister() {
         startActivity(RegisterActivity.newIntent(context = activity!!.applicationContext))
     }
@@ -194,12 +182,12 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
                            private val onBioEdited: (String) -> Unit)
         : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-        var experiencesInProgress = true
+        var experiencesInProgress = false
         var experiencesError = false
         var paginationInProgress = false
         var experiences: List<Experience> = listOf()
 
-        var profileInProgress = true
+        var profileInProgress = false
         var profileError = false
         var profile: Profile? = null
 
@@ -226,7 +214,7 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
             when (getItemViewType(position)) {
                 PROFILE_TYPE -> {
                     val profileViewHolder = holder as ProfileViewHolder
-                    profileViewHolder.bind(profile!!)
+                    if (profile != null) profileViewHolder.bind(profile!!)
                 }
                 EXPERIENCE_TYPE -> {
                     val experienceViewHolder = holder as SquareViewHolder
@@ -264,6 +252,9 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
         }
 
         override fun getItemCount(): Int {
+            if (!experiencesInProgress && !profileInProgress
+                    && !experiencesError && !profileError
+                    && experiences.isEmpty() && profile == null) return 0
             if (experiencesError || profileError) return 1
             else if (profileInProgress && experiencesInProgress) return 1
             else if (profileInProgress) return experiences.size + 1

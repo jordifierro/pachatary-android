@@ -41,9 +41,6 @@
 
     <string name="title_activity_main">Experiences</string>
     <string name="title_mine">Mine</string>
-    <string name="dialog_title_mine_register">You cannot create content</string>
-    <string name="dialog_question_mine_register">To create content you must just register your email and username.
-        Do you want to proceed?</string>
     <string name="edittext_hint_mine_profile_bio">Add your bio here</string>
     <string name="title_saved">Saved</string>
     <string name="title_explore">Explore</string>

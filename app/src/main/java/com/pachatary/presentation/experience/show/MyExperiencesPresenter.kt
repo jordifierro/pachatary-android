@@ -27,7 +27,7 @@ class MyExperiencesPresenter @Inject constructor(
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun create() {
         if (authRepository.canPersonCreateContent()) connectToExperiencesAndProfile()
-        else view.showRegisterDialog()
+        else view.navigateToRegister()
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
@@ -112,7 +112,7 @@ class MyExperiencesPresenter @Inject constructor(
 
     fun onCreateExperienceClick() {
         if (authRepository.canPersonCreateContent()) view.navigateToCreateExperience()
-        else view.showRegisterDialog()
+        else view.navigateToRegister()
     }
 
     fun onProceedToRegister() {

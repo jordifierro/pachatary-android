@@ -3,6 +3,7 @@ package com.pachatary.presentation.register
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.Button
@@ -62,5 +63,9 @@ class RegisterActivity : AppCompatActivity(), RegisterView {
 
     override fun showMessage(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
+
+    override fun finishApplication() {
+        ActivityCompat.finishAffinity(this)
     }
 }

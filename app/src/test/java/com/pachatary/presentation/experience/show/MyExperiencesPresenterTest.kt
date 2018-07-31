@@ -29,7 +29,7 @@ class MyExperiencesPresenterTest {
         } whenn {
             create_presenter()
         } then {
-            should_show_view_register_dialog()
+            should_navigate_to_register()
         }
     }
 
@@ -224,7 +224,7 @@ class MyExperiencesPresenterTest {
         } whenn {
             on_create_experience_click()
         } then {
-            should_show_view_register_dialog()
+            should_navigate_to_register()
         }
     }
 
@@ -455,10 +455,6 @@ class MyExperiencesPresenterTest {
         fun should_unsubscribe_observables() {
             assertFalse(testExperiencesObservable.hasObservers())
             assertFalse(testProfileObservable.hasObservers())
-        }
-
-        fun should_show_view_register_dialog() {
-            BDDMockito.then(mockView).should().showRegisterDialog()
         }
 
         fun should_do_nothing() {

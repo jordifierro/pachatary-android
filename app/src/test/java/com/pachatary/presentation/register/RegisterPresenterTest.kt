@@ -27,7 +27,7 @@ class RegisterPresenterTest {
             should_block_done_button()
             should_call_repo_register_with_username_and_email()
             should_hide_view_loader()
-            should_show_success_message_and_finish_view()
+            should_show_success_message_and_finish_application()
         }
     }
 
@@ -121,10 +121,10 @@ class RegisterPresenterTest {
             BDDMockito.then(mockAuthRepo).should().register(username, email)
         }
 
-        fun should_show_success_message_and_finish_view() {
+        fun should_show_success_message_and_finish_application() {
             BDDMockito.then(mockView).should()
                     .showMessage("Successfully registered!\n Check your email to finalize the process")
-            BDDMockito.then(mockView).should().finish()
+            BDDMockito.then(mockView).should().finishApplication()
         }
 
         fun should_finish_view() {

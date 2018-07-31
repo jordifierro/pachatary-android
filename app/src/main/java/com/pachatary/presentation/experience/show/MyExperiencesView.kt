@@ -25,7 +25,6 @@ interface MyExperiencesView {
     fun showProfileLoader()
     fun showProfileRetry()
 
-    fun showRegisterDialog()
     fun navigateToExperience(experienceId: String)
     fun navigateToCreateExperience()
     fun navigateToRegister()
