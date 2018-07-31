@@ -36,13 +36,13 @@ class RouterActivity : AppCompatActivity(), RouterView {
 
         PachataryApplication.injector.inject(this)
         val path = intent.data.pathSegments[0]
-        if (path == "e" || path == "experiences") {
+        if (path == "e") {
             experienceShareId = intent.data.pathSegments[1]
             retryView.setOnClickListener { experienceRouterPresenter.onRetryClick() }
             experienceRouterPresenter.setViewAndExperienceShareId(this, experienceShareId)
             lifecycle.addObserver(experienceRouterPresenter)
         }
-        else if (path == "p" || path == "profiles") {
+        else if (path == "p") {
             username = intent.data.pathSegments[1]
             retryView.setOnClickListener { profileRouterPresenter.onRetryClick() }
             profileRouterPresenter.setViewAndUsername(this, username)

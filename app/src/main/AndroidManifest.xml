@@ -153,7 +153,7 @@
                     android:pathPattern="/e/..*" />
                 <data android:scheme="app"
                     android:host="@string/app_deeplink_host"
-                    android:pathPattern="/experiences/..*" />
+                    android:pathPattern="/e/..*" />
             </intent-filter>
             <intent-filter android:label="@string/filter_view_profile_router_activity">
                 <action android:name="android.intent.action.VIEW" />
@@ -168,7 +168,7 @@
                     android:pathPattern="/p/..*" />
                 <data android:scheme="app"
                     android:host="@string/app_deeplink_host"
-                    android:pathPattern="/profiles/..*" />
+                    android:pathPattern="/p/..*" />
             </intent-filter>
         </activity>
         <activity android:name=".presentation.common.edition.PickAndCropImageActivity"
