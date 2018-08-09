@@ -37,8 +37,8 @@
                 <data android:scheme="http"
                     android:host="@string/https_deeplink_host"
                     android:path="/"/>
-                <data android:scheme="app"
-                    android:host="@string/app_deeplink_host"
+                <data android:scheme="@string/app_deeplink_scheme"
+                    android:host="app"
                     android:path="/"/>
             </intent-filter>
         </activity>
@@ -101,8 +101,8 @@
                 <data android:scheme="http"
                     android:host="@string/https_deeplink_host"
                     android:path="/people/me/email-confirmation"/>
-                <data android:scheme="app"
-                    android:host="@string/app_deeplink_host"
+                <data android:scheme="@string/app_deeplink_scheme"
+                    android:host="app"
                     android:path="/people/me/email-confirmation"/>
             </intent-filter>
         </activity>
@@ -134,8 +134,8 @@
                 <data android:scheme="http"
                     android:host="@string/https_deeplink_host"
                     android:path="/people/me/login"/>
-                <data android:scheme="app"
-                    android:host="@string/app_deeplink_host"
+                <data android:scheme="@string/app_deeplink_scheme"
+                    android:host="app"
                     android:path="/people/me/login"/>
             </intent-filter>
         </activity>
@@ -166,9 +166,9 @@
                 <data android:scheme="http"
                     android:host="@string/https_deeplink_host"
                     android:pathPattern="/e/..*" />
-                <data android:scheme="app"
-                    android:host="@string/app_deeplink_host"
-                    android:pathPattern="/e/..*" />
+                <data android:scheme="@string/app_deeplink_scheme"
+                    android:host="app"
+                    android:pathPattern="/experiences/..*" />
             </intent-filter>
             <intent-filter android:label="@string/filter_view_profile_router_activity">
                 <action android:name="android.intent.action.VIEW" />
@@ -181,9 +181,9 @@
                 <data android:scheme="http"
                     android:host="@string/https_deeplink_host"
                     android:pathPattern="/p/..*" />
-                <data android:scheme="app"
-                    android:host="@string/app_deeplink_host"
-                    android:pathPattern="/p/..*" />
+                <data android:scheme="@string/app_deeplink_scheme"
+                    android:host="app"
+                    android:pathPattern="/profiles/..*" />
             </intent-filter>
         </activity>
         <activity android:name=".presentation.common.edition.PickAndCropImageActivity"

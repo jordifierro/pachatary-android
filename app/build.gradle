@@ -36,7 +36,7 @@ android {
             applicationIdSuffix '.develop'
             resValue 'string', 'app_name', 'Pachatary develop'
             resValue 'string', 'https_deeplink_host', '"' + appProperties['devHttpsDeeplinkHost'] + '"'
-            resValue 'string', 'app_deeplink_host', '"' + appProperties['devAppDeeplinkHost'] + '"'
+            resValue 'string', 'app_deeplink_scheme', '"' + appProperties['devAppDeeplinkScheme'] + '"'
             buildConfigField 'String', 'API_URL', '"' + appProperties['devApiUrl'] + '"'
             buildConfigField 'String', 'MAPBOX_ACCESS_TOKEN', '"' + appProperties['devMapboxAccessToken'] + '"'
             buildConfigField 'String', 'CLIENT_SECRET_KEY', '"' + appProperties['devClientSecretKey'] + '"'
@@ -45,7 +45,7 @@ android {
         release {
             resValue 'string', 'app_name', 'Pachatary'
             resValue 'string', 'https_deeplink_host', '"' + appProperties['httpsDeeplinkHost'] + '"'
-            resValue 'string', 'app_deeplink_host', '"' + appProperties['appDeeplinkHost'] + '"'
+            resValue 'string', 'app_deeplink_scheme', '"' + appProperties['appDeeplinkScheme'] + '"'
             buildConfigField 'String', 'API_URL', '"' + appProperties['apiUrl'] + '"'
             buildConfigField 'String', 'MAPBOX_ACCESS_TOKEN', '"' + appProperties['mapboxAccessToken'] + '"'
             buildConfigField 'String', 'CLIENT_SECRET_KEY', '"' + appProperties['clientSecretKey'] + '"'
