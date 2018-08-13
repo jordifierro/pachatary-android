@@ -1,7 +1,6 @@
 package com.pachatary.presentation.login
 
 import com.pachatary.data.auth.AuthRepository
-import com.pachatary.data.common.Result
 import com.pachatary.data.common.ResultError
 import com.pachatary.data.common.ResultInProgress
 import com.pachatary.data.common.ResultSuccess
@@ -39,7 +38,7 @@ class AskLoginEmailPresenterTest {
             should_call_repo_ask_login_email_with_email()
             should_hide_loader()
             should_show_success_message()
-            should_finish_view()
+            should_finish_app()
         }
     }
 
@@ -114,8 +113,8 @@ class AskLoginEmailPresenterTest {
             BDDMockito.then(mockView).should().hideLoader()
         }
 
-        fun should_finish_view() {
-            BDDMockito.then(mockView).should().finish()
+        fun should_finish_app() {
+            BDDMockito.then(mockView).should().finishApplication()
         }
 
         fun should_enable_ask_button() {

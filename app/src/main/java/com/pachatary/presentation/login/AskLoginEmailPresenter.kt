@@ -24,7 +24,7 @@ class AskLoginEmailPresenter @Inject constructor(
                     if (it.isSuccess()) {
                         view.hideLoader()
                         view.showSuccessMessage()
-                        view.finish()
+                        view.finishApplication()
                     }
                     else if (it.isError()) {
                         view.showErrorMessage()

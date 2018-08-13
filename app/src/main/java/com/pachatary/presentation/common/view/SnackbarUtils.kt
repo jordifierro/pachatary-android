@@ -1,28 +1,32 @@
 package com.pachatary.presentation.common.view
 
 import android.content.Context
-import android.graphics.Color
 import android.os.Build
-import android.support.annotation.RequiresApi
 import android.support.design.widget.Snackbar
 import android.util.TypedValue
 import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import com.pachatary.R
-import android.view.ViewGroup
-
 
 
 class SnackbarUtils {
     companion object {
-        fun show(view: View, message: String, duration: Int = Snackbar.LENGTH_SHORT) {
-            Snackbar.make(view, message, duration).show()
+
+        fun showSuccess(view: View, context: Context, message: String) {
+            val snackbar = Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
+            showSnackbar(snackbar, context, true)
         }
 
         fun showError(view: View, context: Context) {
             val snackbar = Snackbar.make(view,
                                          context.getString(R.string.error_message).toString(),
                                          Snackbar.LENGTH_SHORT)
+            showSnackbar(snackbar, context, false)
+        }
+
+        private fun showSnackbar(snackbar: Snackbar, context: Context, success: Boolean) {
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 snackbar.view.background = context.resources.getDrawable(R.drawable.snackbar_shape)
             }
@@ -33,7 +37,9 @@ class SnackbarUtils {
             textView.setPadding((25*d).toInt(), (-20*d).toInt(), (25*d).toInt(), (-20*d).toInt())
             snackbar.view.setPadding(0, (-20*d).toInt(), 0, (-20*d).toInt())
             textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14.0f)
-            textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_cross, 0, 0, 0);
+            if (success)
+                textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_check, 0, 0, 0)
+            else textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_cross, 0, 0, 0)
             textView.compoundDrawablePadding = context.resources
                     .getDimensionPixelOffset(R.dimen.snackbar_icon_padding)
             setMargins(context, snackbar.view, 20, 20, 20, 20)

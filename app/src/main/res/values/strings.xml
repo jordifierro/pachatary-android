@@ -56,8 +56,11 @@
     <string name="title_confirm_email_activity">Confirm Email</string>
     <string name="filter_view_confirm_email_activity">Confirm Email</string>
 
-    <string name="title_ask_login_email_activity">Ask login email</string>
-    <string name="ask_login_email_button">Ask login email</string>
+    <string name="title_ask_login_email_activity">LOGIN</string>
+    <string name="ask_login_email_hint">Email…</string>
+    <string name="ask_login_email_button">Send login email</string>
+    <string name="ask_login_email_info">We will send an email to you with a login link</string>
+    <string name="ask_login_email_message">We\'ve send an email to you</string>
     <string name="ask_login_email_email">Email:</string>
     <string name="title_login_activity">Login</string>
     <string name="filter_view_login_activity">Login</string>

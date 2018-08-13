@@ -4,7 +4,7 @@ import com.pachatary.presentation.common.view.LoaderView
 
 interface AskLoginEmailView : LoaderView {
 
-    fun finish()
+    fun finishApplication()
     fun showSuccessMessage()
     fun showErrorMessage()
     fun disableAskButton()

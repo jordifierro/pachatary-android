@@ -41,7 +41,6 @@ class WelcomePresenter @Inject constructor(private val authRepository: AuthRepos
 
     fun onLoginClick() {
         view.navigateToAskLogin()
-        view.finish()
     }
 
     fun onPrivacyPolicyClick() {

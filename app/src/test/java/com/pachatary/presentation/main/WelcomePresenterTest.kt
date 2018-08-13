@@ -61,7 +61,6 @@ class WelcomePresenterTest {
             on_login_click()
         } then {
             should_navigate_to_ask_login()
-            should_finish_view()
         }
     }
 

@@ -118,6 +118,7 @@
         <activity android:name=".presentation.login.AskLoginEmailActivity"
             android:label="@string/title_ask_login_email_activity"
             android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name="com.pachatary.presentation.login.LoginActivity"
             android:label="@string/title_login_activity"
