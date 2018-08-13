@@ -1,76 +1,138 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.pachatary.presentation.register.RegisterActivity">
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:padding="@dimen/activity_horizontal_margin"
-        android:gravity="center"
-        android:text="Welcome to Pachatary!"
-        android:textSize="30sp"/>
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.pachatary.presentation.register.RegisterActivity"
+    android:background="@drawable/background">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_above="@+id/welcome_start_button">
+        android:layout_height="match_parent"
+        android:layout_above="@+id/buttons_layout">
 
-        <TextView
-            android:id="@+id/welcome_legal1_textview"
+        <RelativeLayout
+            android:id="@+id/titles_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true">
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/app_name"
+                android:textSize="50sp"
+                android:textColor="@color/black"
+                app:fontFamily="@font/bahiana_regular"
+                tools:ignore="PrivateResource" />
+
+            <TextView
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:gravity="center"
+                android:layout_below="@+id/title"
+                android:text="@string/app_slogan"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                tools:ignore="PrivateResource" />
+
+        </RelativeLayout>
+
+        <ProgressBar
+            android:id="@+id/welcome_progressbar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/welcome_legal1_text"/>
-
-        <TextView
-            android:id="@+id/welcome_legal2_textview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/welcome_legal1_textview"
-            android:text="@string/welcome_legal2_text"/>
-
-        <TextView
-            android:id="@+id/welcome_legal3_textview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/welcome_legal2_textview"
-            android:layout_below="@+id/welcome_legal1_textview"
-            android:text="@string/welcome_legal3_text"/>
-
-        <TextView
-            android:id="@+id/welcome_legal4_textview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/welcome_legal1_textview"
-            android:layout_toRightOf="@+id/welcome_legal3_textview"
-            android:text="@string/welcome_legal4_text"/>
+            android:layout_below="@+id/titles_layout"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:visibility="invisible"/>
 
     </RelativeLayout>
 
-    <Button
-        android:id="@+id/welcome_start_button"
+    <RelativeLayout
+        android:id="@+id/buttons_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/welcome_login_button"
-        android:text="START NEW ADVENTURE"/>
+        android:layout_height="200dp"
+        android:layout_alignParentBottom="true">
 
-    <Button
-        android:id="@+id/welcome_login_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:text="I already have an account"/>
+        <Button
+            android:id="@+id/welcome_start_button"
+            android:layout_width="225dp"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_above="@+id/legals"
+            android:text="Start new adventure"
+            style="@style/MyButton.Colored" />
 
-    <ProgressBar
-        android:id="@+id/welcome_progressbar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:visibility="invisible"/>
+
+        <RelativeLayout
+            android:id="@+id/legals"
+            android:layout_width="225dp"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:layout_above="@+id/welcome_login_button">
+
+            <TextView
+                android:id="@+id/welcome_legal1_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:textSize="10sp"
+                android:text="@string/welcome_legal1_text" />
+
+            <RelativeLayout
+                android:id="@+id/second_line"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/welcome_legal1_textview"
+                android:layout_centerHorizontal="true">
+
+                <TextView
+                    android:id="@+id/welcome_legal2_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="10sp"
+                    android:text="@string/welcome_legal2_text" />
+
+                <TextView
+                    android:id="@+id/welcome_legal3_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/welcome_legal2_textview"
+                    android:layout_toEndOf="@+id/welcome_legal2_textview"
+                    android:textSize="10sp"
+                    android:text="@string/welcome_legal3_text" />
+
+                <TextView
+                    android:id="@+id/welcome_legal4_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/welcome_legal3_textview"
+                    android:layout_toEndOf="@+id/welcome_legal3_textview"
+                    android:textSize="10sp"
+                    android:text="@string/welcome_legal4_text" />
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+        <Button
+            android:id="@+id/welcome_login_button"
+            android:layout_width="225dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="40dp"
+            android:layout_marginTop="30dp"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            android:text="I have an account"
+            style="@style/MyButton.White" />
+
+    </RelativeLayout>
 
 </RelativeLayout>

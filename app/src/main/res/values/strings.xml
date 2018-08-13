@@ -1,4 +1,8 @@
 <resources>
+    <string name="app_slogan">Remember moments.\n Discover the world.</string>
+
+    <string name="error_message">Oops! Something went wrong. Please try again</string>
+
     <string name="auth_sharedpreferences_file">auth_prefs</string>
     <string name="auth_access_token_key">auth_access_token</string>
     <string name="auth_refresh_token_key">auth_refresh_token</string>
@@ -16,7 +20,7 @@
     <string name="title_search_settings_activity">Search</string>
 
     <string name="title_welcome_activity">Welcome</string>
-    <string name="welcome_legal1_text">By clicking start new adventure you accept our </string>
+    <string name="welcome_legal1_text">by clicking start new adventure you accept our </string>
     <string name="welcome_legal2_text"><u>privacy policy</u></string>
     <string name="welcome_legal3_text">&#160;and&#160;</string>
     <string name="welcome_legal4_text"><u>terms and conditions</u></string>

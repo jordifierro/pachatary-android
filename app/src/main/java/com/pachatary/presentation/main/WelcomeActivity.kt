@@ -5,12 +5,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
-import android.widget.Button
-import android.widget.ProgressBar
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import com.pachatary.R
 import com.pachatary.presentation.common.PachataryApplication
+import com.pachatary.presentation.common.view.SnackbarUtils
 import com.pachatary.presentation.login.AskLoginEmailActivity
 import javax.inject.Inject
 
@@ -19,6 +17,7 @@ class WelcomeActivity : AppCompatActivity(), WelcomeView {
     private lateinit var progressBar: ProgressBar
     private lateinit var startButton: Button
     private lateinit var loginButton: Button
+    private lateinit var rootView: RelativeLayout
 
     @Inject
     lateinit var presenter: WelcomePresenter
@@ -31,6 +30,7 @@ class WelcomeActivity : AppCompatActivity(), WelcomeView {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_welcome)
 
+        rootView = findViewById(R.id.root)
         progressBar = findViewById(R.id.welcome_progressbar)
         startButton = findViewById(R.id.welcome_start_button)
         startButton.setOnClickListener { presenter.onStartClick() }
@@ -65,7 +65,7 @@ class WelcomeActivity : AppCompatActivity(), WelcomeView {
     }
 
     override fun showErrorMessage() {
-        Toast.makeText(this, "Some error has occurred", Toast.LENGTH_SHORT).show()
+        SnackbarUtils.showError(rootView, this)
     }
 
     override fun showLoader() {
