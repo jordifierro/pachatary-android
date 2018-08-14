@@ -113,16 +113,6 @@ class ExploreFragment : Fragment(), ExploreView {
             { presenter.onRetryClick() }
     }
 
-    override fun showPaginationLoader() {
-        (recyclerView.adapter as ExtendedListAdapter).inProgress = true
-        recyclerView.adapter.notifyDataSetChanged()
-    }
-
-    override fun hidePaginationLoader() {
-        (recyclerView.adapter as ExtendedListAdapter).inProgress = false
-        recyclerView.adapter.notifyDataSetChanged()
-    }
-
     override fun showExperienceList(experienceList: List<Experience>) {
         (recyclerView.adapter as ExtendedListAdapter).experienceList = experienceList
         recyclerView.adapter.notifyDataSetChanged()

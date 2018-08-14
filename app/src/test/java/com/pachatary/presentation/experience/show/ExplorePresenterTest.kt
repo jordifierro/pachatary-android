@@ -122,7 +122,6 @@ class ExplorePresenterTest {
         } then {
             should_show_view_loader()
             should_show_empty_experiences()
-            should_hide_view_pagination_loader()
         }
     }
 
@@ -134,8 +133,7 @@ class ExplorePresenterTest {
         } whenn {
             create_presenter()
         } then {
-            should_hide_view_loader()
-            should_show_view_pagination_loader()
+            should_show_view_loader()
         }
     }
 
@@ -149,7 +147,6 @@ class ExplorePresenterTest {
             create_presenter()
         } then {
             should_hide_view_loader()
-            should_hide_view_pagination_loader()
             should_show_received_experiences()
         }
 
@@ -163,7 +160,6 @@ class ExplorePresenterTest {
             create_presenter()
         } then {
             should_hide_view_loader()
-            should_hide_view_pagination_loader()
             should_show_view_retry()
         }
     }
@@ -176,7 +172,6 @@ class ExplorePresenterTest {
             create_presenter()
         } then {
             should_hide_view_loader()
-            should_hide_view_pagination_loader()
         }
     }
 
@@ -340,14 +335,6 @@ class ExplorePresenterTest {
 
         fun should_hide_view_loader() {
             then(mockView).should().hideLoader()
-        }
-
-        fun should_show_view_pagination_loader() {
-            then(mockView).should().showPaginationLoader()
-        }
-
-        fun should_hide_view_pagination_loader() {
-            then(mockView).should().hidePaginationLoader()
         }
 
         fun should_show_view_retry() {

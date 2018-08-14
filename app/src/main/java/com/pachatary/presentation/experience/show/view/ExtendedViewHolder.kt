@@ -22,20 +22,12 @@ class ExtendedViewHolder(view: View,
     private val authorPictureView: ImageView = view.findViewById(R.id.experience_author_picture)
     private val descriptionView: TextView = view.findViewById(R.id.experience_description)
     private val pictureView: ImageView = view.findViewById(R.id.experience_picture)
-    private val progressBar: ProgressBar = view.findViewById(R.id.experience_progressbar)
     private val savesCountView: TextView = view.findViewById(R.id.experience_saves_count)
     lateinit var experienceId: String
 
     init { view.setOnClickListener(this) }
 
     fun bind(experience: Experience) {
-        titleView.visibility = View.VISIBLE
-        pictureView.visibility = View.VISIBLE
-        authorUsernameView.visibility = View.VISIBLE
-        descriptionView.visibility = View.VISIBLE
-        savesCountView.visibility = View.VISIBLE
-        progressBar.visibility = View.GONE
-
         this.experienceId = experience.id
         titleView.text = experience.title
         authorUsernameView.text = experience.authorProfile.username
@@ -49,8 +41,10 @@ class ExtendedViewHolder(view: View,
                 onUsernameClick.invoke(experience.authorProfile.username)
             }
         })
-        descriptionView.text = experience.description
-        savesCountView.text = experience.savesCount.toString() + " ★"
+        var cutDescription = experience.description.take(80)
+        if (cutDescription.length == 80) cutDescription += "..."
+        descriptionView.text =  cutDescription
+        savesCountView.text = experience.savesCount.toString()
         Picasso.with(pictureView.context)
                 .load(pictureDeviceCompat.convert(experience.picture)?.fullScreenSizeUrl)
                 .into(pictureView)
@@ -58,15 +52,6 @@ class ExtendedViewHolder(view: View,
                 .load(pictureDeviceCompat.convert(experience.authorProfile.picture)?.iconSizeUrl)
                 .transform(CropCircleTransformation())
                 .into(authorPictureView)
-    }
-
-    fun bindProgressBar() {
-        titleView.visibility = View.GONE
-        pictureView.visibility = View.GONE
-        authorUsernameView.visibility = View.GONE
-        descriptionView.visibility = View.GONE
-        savesCountView.visibility = View.GONE
-        progressBar.visibility = View.VISIBLE
     }
 
     override fun onClick(view: View?) = this.onClick(this.experienceId)

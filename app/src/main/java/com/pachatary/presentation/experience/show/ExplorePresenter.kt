@@ -70,20 +70,13 @@ class ExplorePresenter @Inject constructor(private val repository: ExperienceRep
                                           .observeOn(schedulerProvider.observer())
                                           .subscribe({
                                               if (it.isInProgress()) {
-                                                  if (it.action == Request.Action.GET_FIRSTS) {
-                                                      view.showLoader()
+                                                  view.showLoader()
+                                                  if (it.action == Request.Action.GET_FIRSTS)
                                                       view.showExperienceList(listOf())
-                                                      view.hidePaginationLoader()
-                                                  }
-                                                  else if (it.action == Request.Action.PAGINATE) {
-                                                      view.hideLoader()
-                                                      view.showPaginationLoader()
-                                                  }
+                                                  else if (it.action == Request.Action.PAGINATE)
+                                                      view.showExperienceList(it.data!!)
                                               }
-                                              else {
-                                                  view.hideLoader()
-                                                  view.hidePaginationLoader()
-                                              }
+                                              else view.hideLoader()
 
                                               if (it.isError() &&
                                                       it.action == Request.Action.GET_FIRSTS)

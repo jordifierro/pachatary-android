@@ -12,22 +12,35 @@ class ExtendedListAdapter(private val inflater: LayoutInflater,
                           var experienceList: List<Experience>,
                           var inProgress: Boolean,
                           val onClick: (String) -> Unit,
-                          val onUsernameClick: (String) -> Unit,
+                          private val onUsernameClick: (String) -> Unit,
                           private val onLastItemShown: () -> Unit)
-                                                : RecyclerView.Adapter<ExtendedViewHolder>() {
+                                                : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    override fun onBindViewHolder(holder: ExtendedViewHolder, position: Int) {
-        if (inProgress && position == experienceList.size) holder.bindProgressBar()
-        else {
+    private val EXPERIENCE_TYPE = 1
+    private val LOADER_TYPE = 2
+
+    override fun getItemViewType(position: Int): Int {
+        if (inProgress && position == experienceList.size) return LOADER_TYPE
+        return EXPERIENCE_TYPE
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if (!(inProgress && position == experienceList.size)) {
             val endHasBeenReached = position == experienceList.size - 1
             if (experienceList.isNotEmpty() && endHasBeenReached) onLastItemShown.invoke()
-            holder.bind(experienceList[position])
+            (holder as ExtendedViewHolder).bind(experienceList[position])
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExtendedViewHolder {
-        return ExtendedViewHolder(inflater.inflate(R.layout.item_extended_experience_list,
-                parent, false), pictureDeviceCompat, onClick, onUsernameClick)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return when (viewType) {
+            EXPERIENCE_TYPE ->
+                ExtendedViewHolder(inflater.inflate(R.layout.item_extended_experience_list,
+                        parent, false), pictureDeviceCompat, onClick, onUsernameClick)
+            else ->
+                object : RecyclerView.ViewHolder(
+                    inflater.inflate(R.layout.item_loader, parent, false)) {}
+        }
     }
 
     override fun getItemCount(): Int {
