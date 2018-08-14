@@ -2,17 +2,22 @@ package com.pachatary.presentation.experience.show
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
+import android.support.design.widget.CoordinatorLayout
 import android.support.v4.app.Fragment
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.EditText
+import android.widget.ImageButton
 import com.pachatary.R
 import com.pachatary.data.experience.Experience
 import com.pachatary.presentation.common.PachataryApplication
@@ -20,11 +25,21 @@ import com.pachatary.presentation.common.edition.SelectLocationActivity
 import com.pachatary.presentation.common.edition.SelectLocationPresenter
 import com.pachatary.presentation.common.location.LocationUtils
 import com.pachatary.presentation.common.view.PictureDeviceCompat
+import com.pachatary.presentation.common.view.SnackbarUtils
+import com.pachatary.presentation.common.view.ToolbarUtils
 import com.pachatary.presentation.experience.show.view.ExtendedListAdapter
 import com.pachatary.presentation.main.MainActivity
 import com.pachatary.presentation.profile.ProfileActivity
 import com.pachatary.presentation.scene.show.ExperienceScenesActivity
 import javax.inject.Inject
+import android.view.inputmethod.EditorInfo
+import android.widget.TextView
+import android.content.Context.INPUT_METHOD_SERVICE
+import android.view.inputmethod.InputMethodManager.HIDE_NOT_ALWAYS
+import android.content.Context.INPUT_METHOD_SERVICE
+import android.view.inputmethod.InputMethodManager
+import com.pachatary.presentation.common.edition.EditTextWithBackListener
+
 
 class ExploreFragment : Fragment(), ExploreView {
 
@@ -41,11 +56,9 @@ class ExploreFragment : Fragment(), ExploreView {
     lateinit var pictureDeviceCompat: PictureDeviceCompat
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var progressBar: ProgressBar
-    private lateinit var retryIcon: ImageView
-    private lateinit var searchButton: ImageButton
-    private lateinit var searchEditText: EditText
+    private lateinit var searchEditText: EditTextWithBackListener
     private lateinit var locationButton: ImageButton
+    private lateinit var rootView: CoordinatorLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,9 +71,10 @@ class ExploreFragment : Fragment(), ExploreView {
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_explore, container, false)
 
-        progressBar = view.findViewById(R.id.experiences_progressbar)
-        retryIcon = view.findViewById(R.id.experiences_retry)
-        retryIcon.setOnClickListener { presenter.onRetryClick() }
+        ToolbarUtils.setUp(view, activity as AppCompatActivity, getString(R.string.app_name), false)
+        ToolbarUtils.activateCustomFont(view, activity as AppCompatActivity)
+
+        rootView = view.findViewById(R.id.root)
         recyclerView = view.findViewById(R.id.experiences_recyclerview)
         recyclerView.layoutManager = GridLayoutManager(activity, 1)
         recyclerView.adapter = ExtendedListAdapter(
@@ -69,29 +83,34 @@ class ExploreFragment : Fragment(), ExploreView {
                 { username -> presenter.onUsernameClicked(username) },
                 { presenter.lastExperienceShown() })
         searchEditText = view.findViewById(R.id.experiences_search_edittext)
-        searchButton = view.findViewById(R.id.experiences_search_button)
-        searchButton.setOnClickListener { presenter.searchClick(searchEditText.text.toString()) }
+        searchEditText.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) searchAndHideKeyboard()
+            false
+        }
+        searchEditText.listener = { search() }
         locationButton = view.findViewById(R.id.experiences_location_button)
-        locationButton.setOnClickListener { presenter.locationClick() }
+        locationButton.setOnClickListener {
+            hideKeyboard()
+            presenter.locationClick()
+        }
 
         presenter.create()
         return view
     }
 
     override fun showLoader() {
-        progressBar.visibility = View.VISIBLE
+        (recyclerView.adapter as ExtendedListAdapter).inProgress = true
+        recyclerView.adapter.notifyDataSetChanged()
     }
 
     override fun hideLoader() {
-        progressBar.visibility = View.GONE
+        (recyclerView.adapter as ExtendedListAdapter).inProgress = false
+        recyclerView.adapter.notifyDataSetChanged()
     }
 
     override fun showRetry() {
-        retryIcon.visibility = View.VISIBLE
-    }
-
-    override fun hideRetry() {
-        retryIcon.visibility = View.GONE
+        SnackbarUtils.showRetry(rootView, activity as AppCompatActivity)
+            { presenter.onRetryClick() }
     }
 
     override fun showPaginationLoader() {
@@ -158,5 +177,23 @@ class ExploreFragment : Fragment(), ExploreView {
             val longitude = data.getDoubleExtra(SelectLocationActivity.LONGITUDE, 0.0)
             presenter.onLocationSelected(latitude, longitude)
         }
+    }
+
+    override fun searchText() = searchEditText.text.toString()
+
+    private fun searchAndHideKeyboard() {
+        search()
+        hideKeyboard()
+    }
+
+    private fun search() {
+        presenter.searchClick(searchEditText.text.toString())
+    }
+
+    private fun hideKeyboard() {
+        val inputManager =
+                context!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputManager.hideSoftInputFromWindow(activity!!.currentFocus.windowToken,
+                InputMethodManager.HIDE_NOT_ALWAYS)
     }
 }

@@ -87,4 +87,5 @@
     <string name="pick_and_crop_image_explanation_dialog_message">Picture is needed to create content.
         To select an image you need to grant read and write storage access permissions.
         Would you like to grant that permissions?</string>
+    <string name="explore_search_button">Search…</string>
 </resources>

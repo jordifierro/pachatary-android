@@ -123,7 +123,6 @@ class ExplorePresenterTest {
             should_show_view_loader()
             should_show_empty_experiences()
             should_hide_view_pagination_loader()
-            should_hide_view_retry()
         }
     }
 
@@ -137,7 +136,6 @@ class ExplorePresenterTest {
         } then {
             should_hide_view_loader()
             should_show_view_pagination_loader()
-            should_hide_view_retry()
         }
     }
 
@@ -151,7 +149,6 @@ class ExplorePresenterTest {
             create_presenter()
         } then {
             should_hide_view_loader()
-            should_hide_view_retry()
             should_hide_view_pagination_loader()
             should_show_received_experiences()
         }
@@ -179,7 +176,6 @@ class ExplorePresenterTest {
             create_presenter()
         } then {
             should_hide_view_loader()
-            should_hide_view_retry()
             should_hide_view_pagination_loader()
         }
     }
@@ -356,10 +352,6 @@ class ExplorePresenterTest {
 
         fun should_show_view_retry() {
             then(mockView).should().showRetry()
-        }
-
-        fun should_hide_view_retry() {
-            then(mockView).should().hideRetry()
         }
 
         fun should_call_repo_get_firsts_experiences(text: String? = null,

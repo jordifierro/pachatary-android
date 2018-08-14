@@ -43,7 +43,7 @@
     </style>
 
     <style name="MyEditText" parent="Widget.AppCompat.EditText">
-        <item name="android:layout_height">46dp</item>
+        <item name="android:layout_height">50dp</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/black</item>
         <item name="android:padding">15dp</item>

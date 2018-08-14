@@ -26,6 +26,8 @@ class MainActivity : AppCompatActivity(), MainView {
     private lateinit var savedFragment: SavedFragment
     private lateinit var exploreFragment: ExploreFragment
 
+    private lateinit var currentView: MainView.ExperiencesViewType
+
     @Inject
     lateinit var presenter: MainPresenter
 
@@ -45,7 +47,14 @@ class MainActivity : AppCompatActivity(), MainView {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.main, menu)
+        if (::currentView.isInitialized) {
+            when (currentView) {
+                MainView.ExperiencesViewType.MY_EXPERIENCES ->
+                    menuInflater.inflate(R.menu.main, menu)
+                MainView.ExperiencesViewType.SAVED -> {}
+                MainView.ExperiencesViewType.EXPLORE -> {}
+            }
+        }
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -126,6 +135,9 @@ class MainActivity : AppCompatActivity(), MainView {
         }
         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
         fragmentTransaction.commit()
+
+        currentView = viewType
+        invalidateOptionsMenu()
     }
 
     override fun onBackPressed() {

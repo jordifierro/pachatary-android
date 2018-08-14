@@ -6,7 +6,6 @@ import com.pachatary.presentation.common.view.LoaderView
 interface ExploreView : LoaderView {
 
     fun showRetry()
-    fun hideRetry()
     fun showPaginationLoader()
     fun hidePaginationLoader()
     fun showExperienceList(experienceList: List<Experience>)
@@ -16,4 +15,5 @@ interface ExploreView : LoaderView {
     fun askPermissions()
     fun navigateToPersonsExperiences(username: String)
     fun navigateToSelectLocation(latitude: Double?, longitude: Double?)
+    fun searchText(): String
 }

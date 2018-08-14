@@ -37,7 +37,7 @@ class ExplorePresenter @Inject constructor(private val repository: ExperienceRep
         getFirstsExperiences()
     }
 
-    fun getFirstsExperiences() {
+    private fun getFirstsExperiences() {
         repository.getFirstExperiences(ExperienceRepoSwitch.Kind.EXPLORE,
                 Request.Params(searchText, latitude, longitude))
     }
@@ -88,7 +88,6 @@ class ExplorePresenter @Inject constructor(private val repository: ExperienceRep
                                               if (it.isError() &&
                                                       it.action == Request.Action.GET_FIRSTS)
                                                   view.showRetry()
-                                              else view.hideRetry()
 
                                               if (it.isSuccess())
                                                   view.showExperienceList(it.data!!)
@@ -115,6 +114,7 @@ class ExplorePresenter @Inject constructor(private val repository: ExperienceRep
     fun onLocationSelected(latitude: Double, longitude: Double) {
         this.latitude = latitude
         this.longitude = longitude
+        this.searchText = view.searchText()
         getFirstsExperiences()
     }
 }

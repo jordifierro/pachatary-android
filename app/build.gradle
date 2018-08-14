@@ -34,7 +34,7 @@ android {
         }
         debug {
             applicationIdSuffix '.develop'
-            resValue 'string', 'app_name', 'Pachatary develop'
+            resValue 'string', 'app_name', 'Pachatary Dev'
             resValue 'string', 'https_deeplink_host', '"' + appProperties['devHttpsDeeplinkHost'] + '"'
             resValue 'string', 'app_deeplink_scheme', '"' + appProperties['devAppDeeplinkScheme'] + '"'
             buildConfigField 'String', 'API_URL', '"' + appProperties['devApiUrl'] + '"'
