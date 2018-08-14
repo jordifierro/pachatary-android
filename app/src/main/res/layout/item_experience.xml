@@ -50,7 +50,7 @@
         android:layout_below="@+id/picture"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        app:srcCompat="@drawable/ic_star_black_24dp"
+        app:srcCompat="@drawable/ic_star"
         android:tint="@color/grey"
         app:backgroundTint="@color/white"
         android:visibility="invisible" />
@@ -65,7 +65,7 @@
         android:layout_below="@+id/picture"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        app:srcCompat="@drawable/ic_star_black_24dp"
+        app:srcCompat="@drawable/ic_star"
         android:tint="@color/black"
         app:backgroundTint="@color/colorAccent"
         android:visibility="invisible" />

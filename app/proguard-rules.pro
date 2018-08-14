@@ -105,3 +105,9 @@
 -keep public class * extends java.lang.Exception
 
 -printmapping mapping.txt
+
+# UnlabeledBottomNavigationView
+-keepclassmembers class android.support.design.internal.BottomNavigationMenuView {
+    boolean mShiftingMode;
+    Field mMenuView;
+}

@@ -25,7 +25,7 @@
         android:layout_alignParentTop="true"
         android:layout_toLeftOf="@+id/experiences_location_button"
         android:layout_toStartOf="@+id/experiences_location_button"
-        app:srcCompat="@drawable/ic_search_black_24dp" />
+        app:srcCompat="@drawable/ic_search" />
 
     <ImageButton
         android:id="@+id/experiences_location_button"

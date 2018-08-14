@@ -11,14 +11,30 @@
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/navigation"/>
+        android:layout_above="@+id/navigation"
+        android:background="@color/white" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:layout_above="@+id/navigation"
+        android:background="@drawable/shadow"/>
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?android:attr/windowBackground"
+        android:background="@color/white"
         android:layout_alignParentBottom="true"
+        android:paddingTop="15dp"
+        app:itemIconTint="@drawable/black_colored"
+        app:itemBackground="@color/white"
         app:menu="@menu/navigation" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="17dp"
+        android:layout_alignTop="@+id/navigation"
+        android:background="@color/white" />
 
 </RelativeLayout>

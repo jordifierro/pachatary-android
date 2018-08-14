@@ -23,7 +23,7 @@ class MainPresenterTest {
         } then {
             should_call_auth_repo_has_person_credentials()
             should_call_auth_repo_current_version_has_expired()
-            should_select_tab(MainView.ExperiencesViewType.SAVED)
+            should_select_tab(MainView.ExperiencesViewType.EXPLORE)
         }
     }
 
@@ -37,7 +37,7 @@ class MainPresenterTest {
         } then {
             should_call_auth_repo_has_person_credentials()
             should_call_auth_repo_current_version_has_expired()
-            should_select_tab(MainView.ExperiencesViewType.SAVED)
+            should_select_tab(MainView.ExperiencesViewType.EXPLORE)
             should_show_upgrade_version_dialog()
         }
     }

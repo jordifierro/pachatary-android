@@ -25,7 +25,7 @@ class MainPresenter @Inject constructor(private val authRepository: AuthReposito
             view.finish()
         }
         else {
-            view.selectTab(MainView.ExperiencesViewType.SAVED)
+            view.selectTab(MainView.ExperiencesViewType.EXPLORE)
             disposable = authRepository.currentVersionHasExpired()
                     .observeOn(mainScheduler)
                     .subscribe { hasExpired -> if (hasExpired == true) view.showUpgradeDialog() }
