@@ -5,6 +5,7 @@ import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.OnLifecycleEvent
 import com.pachatary.data.auth.AuthRepository
+import com.pachatary.data.common.ClientException
 import io.reactivex.Scheduler
 import javax.inject.Inject
 import javax.inject.Named
@@ -15,9 +16,17 @@ class LoginPresenter @Inject constructor(private val authRepository: AuthReposit
 
     lateinit var view: LoginView
 
-    @SuppressLint("CheckResult")
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun create() {
+        login()
+    }
+
+    fun retryClick() {
+        login()
+    }
+
+    @SuppressLint("CheckResult")
+    private fun login() {
         authRepository.login(view.loginToken())
                 .observeOn(mainScheduler)
                 .subscribe({
@@ -28,8 +37,12 @@ class LoginPresenter @Inject constructor(private val authRepository: AuthReposit
                         view.finish()
                     } else if (it.isError()) {
                         view.hideLoader()
-                        view.showErrorMessage()
-                        view.finish()
+                        if (it.error is ClientException) {
+                            view.showErrorMessage()
+                            view.navigateToAskLoginEmailWithDelay()
+                            view.finishWithDelay()
+                        }
+                        else view.showRetry()
                     } else if (it.isInProgress()) {
                         view.showLoader()
                     }

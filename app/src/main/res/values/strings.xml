@@ -26,6 +26,7 @@
     <string name="welcome_legal4_text"><u>terms and conditions</u></string>
 
     <string name="retry">Retry</string>
+    <string name="snackbar_retry">RETRY</string>
 
     <string name="title_activity_edit_title_and_description">Edit scene</string>
     <string name="edit_title_and_description_title">Title:</string>
@@ -63,6 +64,8 @@
     <string name="ask_login_email_message">We\'ve send an email to you</string>
     <string name="ask_login_email_email">Email:</string>
     <string name="title_login_activity">Login</string>
+    <string name="login_success">Login successful!</string>
+    <string name="login_error">Invalid login token. Ask a new email</string>
     <string name="filter_view_login_activity">Login</string>
 
     <string name="title_profile">Profile</string>

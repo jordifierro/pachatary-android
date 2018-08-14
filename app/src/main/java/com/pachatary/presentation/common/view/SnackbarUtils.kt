@@ -3,6 +3,7 @@ package com.pachatary.presentation.common.view
 import android.content.Context
 import android.os.Build
 import android.support.design.widget.Snackbar
+import android.support.v4.content.ContextCompat
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
@@ -18,14 +19,21 @@ class SnackbarUtils {
             showSnackbar(snackbar, context, true)
         }
 
-        fun showError(view: View, context: Context) {
-            val snackbar = Snackbar.make(view,
-                                         context.getString(R.string.error_message).toString(),
-                                         Snackbar.LENGTH_SHORT)
+        fun showError(view: View, context: Context,
+                      message: String = context.getString(R.string.error_message).toString()) {
+            val snackbar = Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
             showSnackbar(snackbar, context, false)
         }
 
-        private fun showSnackbar(snackbar: Snackbar, context: Context, success: Boolean) {
+        fun showRetry(view: View, context: Context, doOnRetry: () -> Unit) {
+            val snackbar = Snackbar.make(view,
+                                         context.getString(R.string.error_message).toString(),
+                                         Snackbar.LENGTH_INDEFINITE)
+            showSnackbar(snackbar, context, false, doOnRetry)
+        }
+
+        private fun showSnackbar(snackbar: Snackbar, context: Context,
+                                 success: Boolean, doOnRetry: (() -> Unit)? = null) {
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 snackbar.view.background = context.resources.getDrawable(R.drawable.snackbar_shape)
@@ -40,6 +48,8 @@ class SnackbarUtils {
             if (success)
                 textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_check, 0, 0, 0)
             else textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_cross, 0, 0, 0)
+            if (doOnRetry != null) snackbar.setAction(R.string.snackbar_retry) { doOnRetry() }
+            snackbar.setActionTextColor(ContextCompat.getColor(context, R.color.colorPrimary))
             textView.compoundDrawablePadding = context.resources
                     .getDimensionPixelOffset(R.dimen.snackbar_icon_padding)
             setMargins(context, snackbar.view, 20, 20, 20, 20)

@@ -1,6 +1,7 @@
 package com.pachatary.presentation.login
 
 import com.pachatary.data.auth.AuthRepository
+import com.pachatary.data.common.ClientException
 import com.pachatary.data.common.ResultError
 import com.pachatary.data.common.ResultInProgress
 import com.pachatary.data.common.ResultSuccess
@@ -13,47 +14,71 @@ import org.mockito.MockitoAnnotations
 
 class LoginPresenterTest {
 
+    enum class Action { CREATE, RETRY }
+
     @Test
-    fun test_on_login_receives_in_progress() {
-        given {
-            a_login_token()
-            an_auth_repo_that_returns_loading_result_when_login()
-        } whenn {
-            on_create_presenter()
-        } then {
-            should_call_repo_login_with_login_token()
-            should_show_loader()
+    fun test_on_login_retry_receives_in_progress() {
+        for (action in Action.values()) {
+            given {
+                a_login_token()
+                an_auth_repo_that_returns_loading_result_when_login()
+            } whenn {
+                do_action(action)
+            } then {
+                should_call_repo_login_with_login_token()
+                should_show_loader()
+            }
         }
     }
 
     @Test
-    fun test_on_login_receives_success() {
-        given {
-            a_login_token()
-            an_auth_repo_that_returns_success_result_when_login()
-        } whenn {
-            on_create_presenter()
-        } then {
-            should_call_repo_login_with_login_token()
-            should_hide_loader()
-            should_show_success_message()
-            should_navigate_to_main()
-            should_finish_view()
+    fun test_on_login_retry_receives_success() {
+        for (action in Action.values()) {
+            given {
+                a_login_token()
+                an_auth_repo_that_returns_success_result_when_login()
+            } whenn {
+                do_action(action)
+            } then {
+                should_call_repo_login_with_login_token()
+                should_hide_loader()
+                should_show_success_message()
+                should_navigate_to_main()
+                should_finish_view()
+            }
         }
     }
 
     @Test
-    fun test_on_login_receives_error() {
-        given {
-            a_login_token()
-            an_auth_repo_that_returns_error_result_when_login()
-        } whenn {
-            on_create_presenter()
-        } then {
-            should_call_repo_login_with_login_token()
-            should_hide_loader()
-            should_show_error_message()
-            should_finish_view()
+    fun test_on_login_retry_receives_internet_error() {
+        for (action in Action.values()) {
+            given {
+                a_login_token()
+                an_auth_repo_that_returns_error_result_when_login(Exception())
+            } whenn {
+                do_action(action)
+            } then {
+                should_call_repo_login_with_login_token()
+                should_hide_loader()
+                should_show_retry()
+            }
+        }
+    }
+
+    @Test
+    fun test_on_login_retry_receives_client_error() {
+        for (action in Action.values()) {
+            given {
+                a_login_token()
+                an_auth_repo_that_returns_error_result_when_login(ClientException("s", "c", "m"))
+            } whenn {
+                do_action(action)
+            } then {
+                should_call_repo_login_with_login_token()
+                should_hide_loader()
+                should_show_error_message()
+                should_navigate_to_ask_login_email()
+            }
         }
     }
 
@@ -89,13 +114,16 @@ class LoginPresenterTest {
                     .willReturn(Flowable.just(ResultSuccess()))
         }
 
-        fun an_auth_repo_that_returns_error_result_when_login() {
+        fun an_auth_repo_that_returns_error_result_when_login(error: Exception) {
             BDDMockito.given(mockAuthRepository.login(loginToken)).willReturn(
-                    Flowable.just(ResultError(Exception())))
+                    Flowable.just(ResultError(error)))
         }
 
-        fun on_create_presenter() {
-            presenter.create()
+        fun do_action(action: Action) {
+            when (action) {
+                Action.CREATE -> presenter.create()
+                Action.RETRY -> presenter.retryClick()
+            }
         }
 
         fun should_call_repo_login_with_login_token() {
@@ -124,6 +152,14 @@ class LoginPresenterTest {
 
         fun should_navigate_to_main() {
             BDDMockito.then(mockView).should().navigateToMain()
+        }
+
+        fun should_show_retry() {
+            BDDMockito.then(mockView).should().showRetry()
+        }
+
+        fun should_navigate_to_ask_login_email() {
+            BDDMockito.then(mockView).should().navigateToAskLoginEmailWithDelay()
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)
