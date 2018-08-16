@@ -19,17 +19,14 @@ class ExtendedListAdapter(private val inflater: LayoutInflater,
     private val EXPERIENCE_TYPE = 1
     private val LOADER_TYPE = 2
 
+    override fun getItemCount(): Int {
+        if (inProgress) return experienceList.size + 1
+        return experienceList.size
+    }
+
     override fun getItemViewType(position: Int): Int {
         if (inProgress && position == experienceList.size) return LOADER_TYPE
         return EXPERIENCE_TYPE
-    }
-
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (!(inProgress && position == experienceList.size)) {
-            val endHasBeenReached = position == experienceList.size - 1
-            if (experienceList.isNotEmpty() && endHasBeenReached) onLastItemShown.invoke()
-            (holder as ExtendedViewHolder).bind(experienceList[position])
-        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -39,12 +36,16 @@ class ExtendedListAdapter(private val inflater: LayoutInflater,
                         parent, false), pictureDeviceCompat, onClick, onUsernameClick)
             else ->
                 object : RecyclerView.ViewHolder(
-                    inflater.inflate(R.layout.item_loader, parent, false)) {}
+                        inflater.inflate(R.layout.item_loader, parent, false)) {}
         }
     }
 
-    override fun getItemCount(): Int {
-        if (inProgress) return experienceList.size + 1
-        return experienceList.size
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if (!(inProgress && position == experienceList.size)) {
+            val endHasBeenReached = position == experienceList.size - 1
+            if (experienceList.isNotEmpty() && endHasBeenReached) onLastItemShown.invoke()
+            (holder as ExtendedViewHolder).bind(experienceList[position])
+        }
     }
 }

@@ -10,11 +10,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <com.pachatary.presentation.common.view.HalfHeightLinearLayout
+    <com.pachatary.presentation.common.view.SquareLinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/experience_picture"
-        android:background="@drawable/shadow_image"/>
+        android:background="@drawable/shadow_experience"/>
 
     <TextView
         android:id="@+id/experience_title"

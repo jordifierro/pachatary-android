@@ -3,32 +3,30 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp">
 
     <com.pachatary.presentation.common.view.SquareImageView
         android:id="@+id/experience_picture"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
+    <com.pachatary.presentation.common.view.SquareLinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/shadow_small_experience" />
+
     <com.pachatary.presentation.common.view.SquareTextView
         android:id="@+id/experience_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
+        android:padding="5dp"
         android:gravity="center"
         android:textColor="@color/white"
-        android:shadowColor="@color/black"
-        android:shadowDx="0"
-        android:shadowDy="0"
-        android:shadowRadius="5"
+        android:textSize="12sp"
+        android:textStyle="bold"
         tools:text="Experience Title"
         android:background="@drawable/clickable_background" />
-
-    <ProgressBar
-        android:id="@+id/experience_progressbar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:visibility="invisible" />
 
 </RelativeLayout>

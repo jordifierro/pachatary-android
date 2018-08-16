@@ -88,4 +88,7 @@
         To select an image you need to grant read and write storage access permissions.
         Would you like to grant that permissions?</string>
     <string name="explore_search_button">Search…</string>
+    <string name="title_saved_experiences">SAVED EXPERIENCES</string>
+    <string name="saved_experience_info_1">YOU HAVEN\'T SAVED ANY EXPERIENCE YET.</string>
+    <string name="saved_experience_info_2">SAVE ANY EXPERIENCE CLICKING TOP STAR ICON ON EXPERIENCE DETAIL.</string>
 </resources>

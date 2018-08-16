@@ -38,28 +38,23 @@ class SavedPresenter @Inject constructor(private val repository: ExperienceRepos
                                           .observeOn(scheduler)
                                           .subscribe({
                                               if (it.isInProgress()) {
-                                                  if (it.action == Request.Action.GET_FIRSTS) {
-                                                      view.showLoader()
+                                                  view.showLoader()
+                                                  if (it.action == Request.Action.GET_FIRSTS)
                                                       view.showExperienceList(listOf())
-                                                      view.hidePaginationLoader()
-                                                  }
-                                                  else if (it.action == Request.Action.PAGINATE) {
-                                                      view.hideLoader()
-                                                      view.showPaginationLoader()
-                                                  }
+                                                  else if (it.action == Request.Action.PAGINATE)
+                                                      view.showExperienceList(it.data!!)
                                               }
-                                              else {
-                                                  view.hideLoader()
-                                                  view.hidePaginationLoader()
-                                              }
+                                              else view.hideLoader()
 
                                               if (it.isError() &&
                                                       it.action == Request.Action.GET_FIRSTS)
                                                   view.showRetry()
-                                              else view.hideRetry()
 
-                                              if (it.isSuccess())
-                                                  view.showExperienceList(it.data!!)
+                                              if (it.isSuccess()) {
+                                                  if (it.data!!.isEmpty())
+                                                      view.showNoSavedExperiencesInfo()
+                                                  else view.showExperienceList(it.data)
+                                              }
                                           }, { throw it })
         repository.getFirstExperiences(ExperienceRepoSwitch.Kind.SAVED)
     }

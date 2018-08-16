@@ -37,8 +37,6 @@ class SavedPresenterTest {
         } then {
             should_show_view_loader()
             should_show_empty_experiences()
-            should_hide_view_pagination_loader()
-            should_hide_view_retry()
         }
     }
 
@@ -49,9 +47,7 @@ class SavedPresenterTest {
         } whenn {
             create_presenter()
         } then {
-            should_hide_view_loader()
-            should_show_view_pagination_loader()
-            should_hide_view_retry()
+            should_show_view_loader()
         }
     }
 
@@ -65,9 +61,19 @@ class SavedPresenterTest {
             create_presenter()
         } then {
             should_hide_view_loader()
-            should_hide_view_retry()
-            should_hide_view_pagination_loader()
             should_show_received_experiences()
+        }
+    }
+
+    @Test
+    fun test_when_result_success_with_no_experiences_shows_no_saved_info() {
+        given {
+            an_experience_repo_that_returns_success_without_any_experience()
+        } whenn {
+            create_presenter()
+        } then {
+            should_hide_view_loader()
+            should_show_no_saved_experiences_info()
         }
     }
 
@@ -79,7 +85,6 @@ class SavedPresenterTest {
             create_presenter()
         } then {
             should_hide_view_loader()
-            should_hide_view_pagination_loader()
             should_show_view_retry()
         }
     }
@@ -92,8 +97,6 @@ class SavedPresenterTest {
             create_presenter()
         } then {
             should_hide_view_loader()
-            should_hide_view_retry()
-            should_hide_view_pagination_loader()
         }
     }
 
@@ -182,6 +185,11 @@ class SavedPresenterTest {
                     .willReturn(Flowable.just(ResultSuccess(listOf(experienceA, experienceB))))
         }
 
+        fun an_experience_repo_that_returns_success_without_any_experience() {
+            BDDMockito.given(mockRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.SAVED))
+                    .willReturn(Flowable.just(ResultSuccess(listOf())))
+        }
+
         fun an_experience_repo_that_returns_exception(action: Request.Action) {
             BDDMockito.given(mockRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.SAVED))
                     .willReturn(Flowable.just(ResultError(Exception(), action = action)))
@@ -215,20 +223,8 @@ class SavedPresenterTest {
             then(mockView).should().hideLoader()
         }
 
-        fun should_show_view_pagination_loader() {
-            then(mockView).should().showPaginationLoader()
-        }
-
-        fun should_hide_view_pagination_loader() {
-            then(mockView).should().hidePaginationLoader()
-        }
-
         fun should_show_view_retry() {
             then(mockView).should().showRetry()
-        }
-
-        fun should_hide_view_retry() {
-            then(mockView).should().hideRetry()
         }
 
         fun should_call_repo_get_firsts_experiences() {
@@ -263,6 +259,10 @@ class SavedPresenterTest {
 
         fun should_show_empty_experiences() {
             BDDMockito.then(mockView).should().showExperienceList(listOf())
+        }
+
+        fun should_show_no_saved_experiences_info() {
+            BDDMockito.then(mockView).should().showNoSavedExperiencesInfo()
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)
