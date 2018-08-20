@@ -68,6 +68,7 @@
     <string name="title_profile">Profile</string>
 
     <string name="title_settings_activity">Settings</string>
+    <string name="main_menu_share">Share</string>
     <string name="settings_privacy_policy">Privacy policy</string>
     <string name="settings_terms_and_conditions">Terms and conditions</string>
 
@@ -93,4 +94,5 @@
     <string name="saved_experience_info_2">SAVE ANY EXPERIENCE CLICKING TOP STAR ICON ON EXPERIENCE DETAIL.</string>
     <string name="mine_experiences_experiences_title">YOUR EXPERIENCES</string>
     <string name="mine_experiences_no_experiences">YOU DON\'T HAVE ANY EXPERIENCE YET. ADD YOUR FIRST ONE!</string>
+    <string name="mine_experiences_forbidden_share">You must have at least one experience and upload a profile picture</string>
 </resources>

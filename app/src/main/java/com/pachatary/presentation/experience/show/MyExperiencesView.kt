@@ -18,6 +18,9 @@ interface MyExperiencesView {
     fun showProfileLoader()
     fun showProfileRetry()
 
+    fun showShareDialog(username: String)
+    fun showNotEnoughInfoToShareDialog()
+
     fun navigateToExperience(experienceId: String)
     fun navigateToCreateExperience()
     fun navigateToRegister()

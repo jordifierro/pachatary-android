@@ -17,6 +17,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
 import android.widget.TextView
+import com.pachatary.BuildConfig
 import com.pachatary.R
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.profile.Profile
@@ -172,6 +173,23 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == SELECT_IMAGE && resultCode == Activity.RESULT_OK)
             presenter.onImageSelected(PickAndCropImageActivity.getImageUriFrom(data!!))
+    }
+
+    override fun showShareDialog(username: String) {
+        val i = Intent(Intent.ACTION_SEND)
+        i.type = "text/plain"
+        i.putExtra(Intent.EXTRA_TEXT,
+                   "http://" + getString(R.string.https_deeplink_host) + "/" + username)
+        startActivity(Intent.createChooser(i, "Share URL"))
+    }
+
+    override fun showNotEnoughInfoToShareDialog() {
+        SnackbarUtils.showError(rootView, activity as AppCompatActivity,
+                                getString(R.string.mine_experiences_experiences_title))
+    }
+
+    fun onShareClick() {
+        presenter.onShareClick()
     }
 
     class MyProfileAdapter(private val inflater: LayoutInflater,

@@ -60,6 +60,7 @@ class MainActivity : AppCompatActivity(), MainView {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         if (item!!.itemId == R.id.settings) presenter.onSettingsClick()
+        if (item.itemId == R.id.share) myExperiencesFragment.onShareClick()
         return super.onOptionsItemSelected(item)
     }
 

@@ -146,12 +146,12 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
     override fun showUnsaveDialog() {
         val builder: AlertDialog.Builder
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            builder = AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+            builder = AlertDialog.Builder(this, R.style.MyDialogTheme)
         else builder = AlertDialog.Builder(this)
         builder.setTitle(R.string.dialog_title_unsave_experience)
                 .setMessage(R.string.dialog_question_unsave_experience)
-                .setPositiveButton(android.R.string.yes, { _, _ -> presenter.onConfirmUnsaveExperience() })
-                .setNegativeButton(android.R.string.no, { _, _ -> presenter.onCancelUnsaveExperience() })
+                .setPositiveButton(android.R.string.yes) { _, _ -> presenter.onConfirmUnsaveExperience() }
+                .setNegativeButton(android.R.string.no) { _, _ -> presenter.onCancelUnsaveExperience() }
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show()
     }

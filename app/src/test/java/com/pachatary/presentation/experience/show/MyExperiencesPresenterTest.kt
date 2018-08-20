@@ -6,6 +6,7 @@ import com.pachatary.data.common.*
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.experience.ExperienceRepoSwitch
 import com.pachatary.data.experience.ExperienceRepository
+import com.pachatary.data.picture.LittlePicture
 import com.pachatary.data.profile.Profile
 import com.pachatary.data.profile.ProfileRepository
 import io.reactivex.BackpressureStrategy
@@ -318,6 +319,62 @@ class MyExperiencesPresenterTest {
         }
     }
 
+    @Test
+    fun test_when_no_experiences_and_no_profile_does_nothing() {
+        given {
+            nothing()
+        } whenn {
+            share_click()
+        } then {
+            should_do_nothing()
+        }
+    }
+
+    @Test
+    fun test_when_no_profile_picture_shows_forbidden_info() {
+        given {
+            an_auth_repo_that_returns_on_can_create_content(true)
+            an_experience_repo_that_returns(DummyExperiencesResultSuccess(listOf("2")))
+            a_profile_repo_that_returns(DummyProfileResult("a"))
+        } whenn {
+            create_presenter()
+            share_click()
+        } then {
+            should_show_forbidden_share_dialog()
+        }
+    }
+
+    @Test
+    fun test_when_zero_experiences_shows_forbidden_info() {
+        given {
+            an_auth_repo_that_returns_on_can_create_content(true)
+            an_experience_repo_that_returns(DummyExperiencesResultSuccess(listOf()))
+            a_profile_repo_that_returns(
+                    ResultSuccess(Profile("", "", LittlePicture("", "", ""), false)))
+        } whenn {
+            create_presenter()
+            share_click()
+        } then {
+            should_show_forbidden_share_dialog()
+        }
+    }
+
+    @Test
+    fun test_when_profile_pic_and_experiences_shows_share_dialog() {
+        given {
+            an_auth_repo_that_returns_on_can_create_content(true)
+            an_experience_repo_that_returns(DummyExperiencesResultSuccess(listOf("2")))
+            a_profile_repo_that_returns(
+                    ResultSuccess(Profile("usr", "", LittlePicture("", "", ""), false)))
+        } whenn {
+            create_presenter()
+            share_click()
+        } then {
+            should_show_share_dialog("usr")
+        }
+
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
@@ -404,6 +461,10 @@ class MyExperiencesPresenterTest {
 
         fun bio_edited(bio: String) {
             presenter.onBioEdited(bio)
+        }
+
+        fun share_click() {
+            presenter.onShareClick()
         }
 
         fun should_show_experiences(experiences: List<Experience>) {
@@ -517,6 +578,14 @@ class MyExperiencesPresenterTest {
 
         fun should_show_no_experiences_info() {
             BDDMockito.then(mockView).should().showNoExperiencesInfo()
+        }
+
+        fun should_show_forbidden_share_dialog() {
+            BDDMockito.then(mockView).should().showNotEnoughInfoToShareDialog()
+        }
+
+        fun should_show_share_dialog(username: String) {
+            BDDMockito.then(mockView).should().showShareDialog(username)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

@@ -5,8 +5,10 @@ import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.OnLifecycleEvent
 import com.pachatary.data.auth.AuthRepository
 import com.pachatary.data.common.Request
+import com.pachatary.data.experience.Experience
 import com.pachatary.data.experience.ExperienceRepoSwitch
 import com.pachatary.data.experience.ExperienceRepository
+import com.pachatary.data.profile.Profile
 import com.pachatary.data.profile.ProfileRepository
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
@@ -23,6 +25,9 @@ class MyExperiencesPresenter @Inject constructor(
 
     private var experiencesDisposable: Disposable? = null
     private var profileDisposable: Disposable? = null
+
+    private var experiences: List<Experience>? = null
+    private var profile: Profile? = null
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun create() {
@@ -75,8 +80,8 @@ class MyExperiencesPresenter @Inject constructor(
                                                     view.showExperiencesRetry()
 
                                             if (it.isSuccess()) {
-                                                if (it.data!!.isEmpty())
-                                                    view.showNoExperiencesInfo()
+                                                experiences = it.data!!
+                                                if (it.data.isEmpty()) view.showNoExperiencesInfo()
                                                 else view.showExperienceList(it.data)
                                             }
                                         }, { throw it })
@@ -89,7 +94,8 @@ class MyExperiencesPresenter @Inject constructor(
                 .subscribe({
                     when {
                         it.isSuccess() -> {
-                            view.showProfile(it.data!!)
+                            profile = it.data!!
+                            view.showProfile(it.data)
                             view.hideProfileLoader()
                         }
                         it.isInProgress() -> view.showProfileLoader()
@@ -133,5 +139,13 @@ class MyExperiencesPresenter @Inject constructor(
         profileRepository.editProfile(newBio)
                 .observeOn(mainScheduler)
                 .subscribe()
+    }
+
+    fun onShareClick() {
+        if (experiences != null && profile != null) {
+            if (!experiences!!.isEmpty() && profile!!.picture != null)
+                view.showShareDialog(profile!!.username)
+            else view.showNotEnoughInfoToShareDialog()
+        }
     }
 }
