@@ -45,7 +45,7 @@
     <string name="dialog_question_edit_experience_picture">Do you also want to change experience picture?</string>
 
     <string name="title_activity_main">Experiences</string>
-    <string name="edittext_hint_mine_profile_bio">Add your bio here</string>
+    <string name="edittext_hint_mine_profile_bio">Tap to add your bio</string>
 
     <string name="title_register_activity">Register</string>
     <string name="edit_regsiter_username">Username:</string>
@@ -91,4 +91,6 @@
     <string name="title_saved_experiences">SAVED EXPERIENCES</string>
     <string name="saved_experience_info_1">YOU HAVEN\'T SAVED ANY EXPERIENCE YET.</string>
     <string name="saved_experience_info_2">SAVE ANY EXPERIENCE CLICKING TOP STAR ICON ON EXPERIENCE DETAIL.</string>
+    <string name="mine_experiences_experiences_title">YOUR EXPERIENCES</string>
+    <string name="mine_experiences_no_experiences">YOU DON\'T HAVE ANY EXPERIENCE YET. ADD YOUR FIRST ONE!</string>
 </resources>

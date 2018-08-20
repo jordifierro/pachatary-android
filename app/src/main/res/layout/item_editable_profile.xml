@@ -1,25 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <ImageView
-        android:id="@+id/picture"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+    <RelativeLayout
+        android:id="@+id/picture_layout"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
         android:layout_alignParentTop="true"
-        android:layout_margin="10dp"
-        android:layout_centerHorizontal="true" />
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="5dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/background_profile_pic">
+
+        <ImageView
+            android:id="@+id/picture"
+            android:layout_width="120dp"
+            android:layout_height="120dp" />
+
+        <ImageView
+            android:id="@+id/picture_edit_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            app:srcCompat="@drawable/ic_add_a_photo" />
+
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_below="@+id/picture"
-        android:layout_margin="10dp"
-        android:textSize="20sp"
+        android:layout_below="@+id/picture_layout"
+        android:layout_marginBottom="15dp"
+        android:textSize="18sp"
+        android:textStyle="bold"
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:textColor="@color/black" />
@@ -29,17 +47,32 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:gravity="center"
-        android:layout_margin="10dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
         android:layout_below="@+id/username"
+        android:gravity="center"
         android:inputType="textMultiLine"
         android:maxLines="6"
         android:maxLength="140"
-        android:hint="@string/edittext_hint_mine_profile_bio" />
+        android:hint="@string/edittext_hint_mine_profile_bio"
+        style="@style/BioEditText" />
 
     <RelativeLayout
+        android:id="@+id/divider"
         android:layout_width="match_parent"
-        android:layout_height="10dp"
+        android:layout_height="1dp"
+        android:background="@color/light_grey"
         android:layout_below="@+id/bio" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/divider"
+        android:layout_marginTop="20dp"
+        android:paddingBottom="20dp"
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        android:text="@string/mine_experiences_experiences_title" />
 
 </RelativeLayout>

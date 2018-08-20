@@ -37,7 +37,7 @@ class MyExperiencesPresenter @Inject constructor(
     }
 
     fun onRetryClick() {
-        experiencesRepository.getFirstExperiences(ExperienceRepoSwitch.Kind.MINE)
+        connectToExperiencesAndProfile()
     }
 
     fun onExperienceClick(experienceId: String) {
@@ -54,29 +54,31 @@ class MyExperiencesPresenter @Inject constructor(
                 experiencesRepository.experiencesFlowable(ExperienceRepoSwitch.Kind.MINE)
                                         .observeOn(mainScheduler)
                                         .subscribe({
-                                            if (it.isInProgress()) {
-                                                if (it.action == Request.Action.GET_FIRSTS) {
-                                                    view.showExperiencesLoader()
-                                                    view.showExperienceList(listOf())
+                                            when {
+                                                it.isInProgress() ->
+                                                    if (it.action == Request.Action.GET_FIRSTS) {
+                                                        view.showExperiencesLoader()
+                                                        view.showExperienceList(listOf())
+                                                        view.hidePaginationLoader()
+                                                    } else if (it.action == Request.Action.PAGINATE) {
+                                                        view.hideExperiencesLoader()
+                                                        view.showPaginationLoader()
+                                                    }
+                                                else -> {
+                                                    view.hideExperiencesLoader()
                                                     view.hidePaginationLoader()
                                                 }
-                                                else if (it.action == Request.Action.PAGINATE) {
-                                                    view.hideExperiencesLoader()
-                                                    view.showPaginationLoader()
-                                                }
-                                            }
-                                            else {
-                                                view.hideExperiencesLoader()
-                                                view.hidePaginationLoader()
                                             }
 
                                             if (it.isError() &&
                                                     it.action == Request.Action.GET_FIRSTS)
                                                     view.showExperiencesRetry()
-                                            else view.hideExperiencesRetry()
 
-                                            if (it.isSuccess())
-                                                view.showExperienceList(it.data!!)
+                                            if (it.isSuccess()) {
+                                                if (it.data!!.isEmpty())
+                                                    view.showNoExperiencesInfo()
+                                                else view.showExperienceList(it.data)
+                                            }
                                         }, { throw it })
         experiencesRepository.getFirstExperiences(ExperienceRepoSwitch.Kind.MINE)
     }
@@ -85,18 +87,16 @@ class MyExperiencesPresenter @Inject constructor(
         profileDisposable = profileRepository.selfProfile()
                 .observeOn(mainScheduler)
                 .subscribe({
-                    if (it.isSuccess()) {
-                        view.showProfile(it.data!!)
-                        view.hideProfileLoader()
-                        view.hideProfileRetry()
-                    }
-                    else if (it.isInProgress()) {
-                        view.showProfileLoader()
-                        view.hideProfileRetry()
-                    }
-                    else {
-                        view.showProfileRetry()
-                        view.hideProfileLoader()
+                    when {
+                        it.isSuccess() -> {
+                            view.showProfile(it.data!!)
+                            view.hideProfileLoader()
+                        }
+                        it.isInProgress() -> view.showProfileLoader()
+                        else -> {
+                            view.showProfileRetry()
+                            view.hideProfileLoader()
+                        }
                     }
                 }, { throw it })
     }

@@ -1,28 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.pachatary.presentation.main.MainActivity"
     tools:showIn="@layout/activity_main">
+
+    <include layout="@layout/toolbar"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/experiences_recyclerview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/create_new_experience_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_margin="@dimen/fab_margin"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_margin="10dp"
         android:src="@android:drawable/ic_input_add"
-        android:tint="@color/black" />
+        app:backgroundTint="@color/colorPrimary"
+        android:tint="@color/white" />
 
-</RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>

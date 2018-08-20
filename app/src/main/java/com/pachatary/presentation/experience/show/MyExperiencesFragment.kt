@@ -2,11 +2,11 @@ package com.pachatary.presentation.experience.show
 
 import android.app.Activity
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
+import android.support.design.widget.CoordinatorLayout
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.Fragment
-import android.support.v7.app.AlertDialog
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.InputType
@@ -24,6 +24,8 @@ import com.pachatary.presentation.common.PachataryApplication
 import com.pachatary.presentation.common.edition.EditTextWithBackListener
 import com.pachatary.presentation.common.edition.PickAndCropImageActivity
 import com.pachatary.presentation.common.view.PictureDeviceCompat
+import com.pachatary.presentation.common.view.SnackbarUtils
+import com.pachatary.presentation.common.view.ToolbarUtils
 import com.pachatary.presentation.experience.edition.CreateExperienceActivity
 import com.pachatary.presentation.experience.show.view.SquareViewHolder
 import com.pachatary.presentation.register.RegisterActivity
@@ -36,6 +38,8 @@ import javax.inject.Inject
 class MyExperiencesFragment : Fragment(), MyExperiencesView {
 
     companion object {
+        private const val SELECT_IMAGE = 1
+
         fun newInstance() = MyExperiencesFragment()
     }
 
@@ -44,11 +48,10 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
     @Inject
     lateinit var pictureDeviceCompat: PictureDeviceCompat
 
+    private lateinit var rootView: CoordinatorLayout
     private lateinit var recyclerView: RecyclerView
     private lateinit var createExperienceButton: FloatingActionButton
     private var experiences = listOf<Experience>()
-
-    private val SELECT_IMAGE = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,6 +64,9 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_my_experiences, container, false)
 
+        ToolbarUtils.setUp(view, activity as AppCompatActivity, "", false)
+
+        rootView = view.findViewById(R.id.root)
         recyclerView = view.findViewById(R.id.experiences_recyclerview)
         recyclerView.layoutManager = GridLayoutManager(activity, 2)
         createExperienceButton = view.findViewById(R.id.create_new_experience_button)
@@ -68,7 +74,6 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
         recyclerView.adapter = MyProfileAdapter(layoutInflater, pictureDeviceCompat,
                 onExperienceClick = { presenter.onExperienceClick(it) },
                 onLastItemShown = { presenter.lastExperienceShown() },
-                onRetryClick = { presenter.onRetryClick() },
                 onProfilePictureClick = { presenter.onProfilePictureClick() },
                 onBioEdited = { presenter.onBioEdited(it) })
         (recyclerView.layoutManager as GridLayoutManager).spanSizeLookup =
@@ -101,13 +106,8 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
     }
 
     override fun showExperiencesRetry() {
-        (recyclerView.adapter as MyProfileAdapter).experiencesError = true
-        recyclerView.adapter.notifyDataSetChanged()
-    }
-
-    override fun hideExperiencesRetry() {
-        (recyclerView.adapter as MyProfileAdapter).experiencesError = false
-        recyclerView.adapter.notifyDataSetChanged()
+        SnackbarUtils.showRetry(rootView, activity as AppCompatActivity)
+            { presenter.onRetryClick() }
     }
 
     override fun showPaginationLoader() {
@@ -123,6 +123,12 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
     override fun showExperienceList(experiences: List<Experience>) {
         this.experiences = experiences
         (recyclerView.adapter as MyProfileAdapter).experiences = experiences
+        (recyclerView.adapter as MyProfileAdapter).noExperiences = false
+        recyclerView.adapter.notifyDataSetChanged()
+    }
+
+    override fun showNoExperiencesInfo() {
+        (recyclerView.adapter as MyProfileAdapter).noExperiences = true
         recyclerView.adapter.notifyDataSetChanged()
     }
 
@@ -136,19 +142,14 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
         recyclerView.adapter.notifyDataSetChanged()
     }
 
-    override fun hideProfileRetry() {
-        (recyclerView.adapter as MyProfileAdapter).profileError = false
-        recyclerView.adapter.notifyDataSetChanged()
-    }
-
     override fun showProfileLoader() {
         (recyclerView.adapter as MyProfileAdapter).profileInProgress = true
         recyclerView.adapter.notifyDataSetChanged()
     }
 
     override fun showProfileRetry() {
-        (recyclerView.adapter as MyProfileAdapter).profileError = true
-        recyclerView.adapter.notifyDataSetChanged()
+        SnackbarUtils.showRetry(rootView, activity as AppCompatActivity)
+            { presenter.onRetryClick() }
     }
 
     override fun navigateToExperience(experienceId: String) {
@@ -177,37 +178,64 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
                            val pictureDeviceCompat: PictureDeviceCompat,
                            val onExperienceClick: (String) -> Unit,
                            private val onLastItemShown: () -> Unit,
-                           private val onRetryClick: () -> Unit,
                            private val onProfilePictureClick: () -> Unit,
                            private val onBioEdited: (String) -> Unit)
         : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+        companion object {
+            private const val LOADER_TYPE = 0
+            private const val PROFILE_TYPE = 1
+            private const val EXPERIENCE_TYPE = 2
+            private const val NO_EXPERIENCES_INFO = 3
+        }
+
         var experiencesInProgress = false
-        var experiencesError = false
         var paginationInProgress = false
+        var noExperiences = false
         var experiences: List<Experience> = listOf()
 
         var profileInProgress = false
-        var profileError = false
         var profile: Profile? = null
 
-        val LOADER_TYPE = 0
-        val RETRY_TYPE = 1
-        val PROFILE_TYPE = 2
-        val EXPERIENCE_TYPE = 3
+        override fun getItemCount(): Int {
+            return if (!experiencesInProgress && !profileInProgress
+                    && experiences.isEmpty() && profile == null && !noExperiences) 0
+            else if (profileInProgress && experiencesInProgress) 1
+            else if (profileInProgress) experiences.size + 1
+            else if (experiencesInProgress || noExperiences) 2
+            else if (paginationInProgress) experiences.size + 2
+            else experiences.size + 1
+        }
 
         override fun getItemViewType(position: Int): Int {
-            if (position == 0) {
-                if (experiencesError || profileError) return RETRY_TYPE
-                else if (profileInProgress) return LOADER_TYPE
-                else return PROFILE_TYPE
+            return if (position == 0) {
+                if (profileInProgress) LOADER_TYPE
+                else PROFILE_TYPE
+            } else if (position == 1) {
+                when {
+                    experiencesInProgress -> LOADER_TYPE
+                    noExperiences -> NO_EXPERIENCES_INFO
+                    else -> EXPERIENCE_TYPE
+                }
+            } else if (position == experiences.size + 1) LOADER_TYPE
+            else EXPERIENCE_TYPE
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+            return when (viewType) {
+                LOADER_TYPE -> object : RecyclerView.ViewHolder(
+                        inflater.inflate(R.layout.item_loader, parent, false)) {}
+                NO_EXPERIENCES_INFO -> object : RecyclerView.ViewHolder(
+                        inflater.inflate(R.layout.item_no_mine_experiences, parent, false)) {}
+                PROFILE_TYPE ->
+                    ProfileViewHolder(
+                            inflater.inflate(R.layout.item_editable_profile, parent, false),
+                            pictureDeviceCompat, onProfilePictureClick, onBioEdited)
+                else ->
+                    SquareViewHolder(
+                            inflater.inflate(R.layout.item_square_experiences_list, parent, false),
+                            onExperienceClick, pictureDeviceCompat)
             }
-            else if (position == 1) {
-                if (experiencesInProgress) return LOADER_TYPE
-                else return EXPERIENCE_TYPE
-            }
-            else if (position == experiences.size + 1) return LOADER_TYPE
-            else return EXPERIENCE_TYPE
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -223,66 +251,33 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
                 else -> {}
             }
 
-            if (!experiencesError && !experiencesInProgress) {
+            if (!experiencesInProgress) {
                 val endHasBeenReached = position == experiences.size
                 if (experiences.isNotEmpty() && endHasBeenReached) onLastItemShown.invoke()
             }
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-            when (viewType) {
-                LOADER_TYPE -> return object : RecyclerView.ViewHolder(
-                        inflater.inflate(R.layout.item_loader, parent, false)) {}
-                RETRY_TYPE -> {
-                    val view = inflater.inflate(R.layout.item_retry, parent, false)
-                    val viewHolder =  object : RecyclerView.ViewHolder(view), View.OnClickListener {
-                        override fun onClick(v: View?) { onRetryClick.invoke() } }
-                    view.setOnClickListener(viewHolder)
-                    return viewHolder
-                }
-                PROFILE_TYPE ->
-                    return ProfileViewHolder(
-                            inflater.inflate(R.layout.item_editable_profile, parent, false),
-                            pictureDeviceCompat, onProfilePictureClick, onBioEdited)
-                else ->
-                    return SquareViewHolder(
-                            inflater.inflate(R.layout.item_square_experiences_list, parent, false),
-                            onExperienceClick, pictureDeviceCompat)
-            }
-        }
-
-        override fun getItemCount(): Int {
-            if (!experiencesInProgress && !profileInProgress
-                    && !experiencesError && !profileError
-                    && experiences.isEmpty() && profile == null) return 0
-            if (experiencesError || profileError) return 1
-            else if (profileInProgress && experiencesInProgress) return 1
-            else if (profileInProgress) return experiences.size + 1
-            else if (experiencesInProgress) return 2
-            else if (paginationInProgress) return experiences.size + 2
-            else return experiences.size + 1
-        }
-
         class ProfileViewHolder(view: View, private val pictureDeviceCompat: PictureDeviceCompat,
-                                val onProfilePictureClick: () -> Unit,
-                                val onBioEdited: (String) -> Unit)
+                                private val onProfilePictureClick: () -> Unit,
+                                private val onBioEdited: (String) -> Unit)
                                                                    : RecyclerView.ViewHolder(view) {
 
             private val usernameView: TextView = view.findViewById(R.id.username)
             private val bioView: EditTextWithBackListener = view.findViewById(R.id.bio)
             private val pictureView: ImageView = view.findViewById(R.id.picture)
+            private val editPictureView: ImageView = view.findViewById(R.id.picture_edit_image)
 
             init {
-                bioView.setImeOptions(EditorInfo.IME_ACTION_DONE)
+                bioView.imeOptions = EditorInfo.IME_ACTION_DONE
                 bioView.setRawInputType(InputType.TYPE_CLASS_TEXT)
-                bioView.setOnKeyListener { v, keyCode, event ->
+                bioView.setOnKeyListener { _, keyCode, event ->
                     if ((event.action == KeyEvent.ACTION_DOWN)
                             && (keyCode == KeyEvent.KEYCODE_ENTER)
                         || event.action == KeyEvent.KEYCODE_BACK)
                         onBioEdited(bioView.text.toString())
                     false
                 }
-                bioView.setOnEditorActionListener { v, actionId, event ->
+                bioView.setOnEditorActionListener { _, actionId, _ ->
                     if (actionId == EditorInfo.IME_ACTION_DONE)
                         onBioEdited(bioView.text.toString())
                     false
@@ -295,6 +290,7 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
                 bioView.setText(profile.bio)
                 usernameView.requestFocus()
                 bioView.clearFocus()
+                if (profile.picture != null) editPictureView.visibility = View.GONE
                 Picasso.with(pictureView.context)
                         .load(pictureDeviceCompat.convert(profile.picture)?.halfScreenSizeUrl)
                         .transform(CropCircleTransformation())
