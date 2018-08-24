@@ -25,7 +25,9 @@
         android:layout_alignParentBottom="true"
         android:layout_gravity="bottom|center_horizontal"
         android:layout_margin="10dp"
-        android:src="@android:drawable/ic_input_add"
+        app:fabSize="mini"
+        app:srcCompat="@drawable/ic_add"
+        android:scaleType="center"
         app:backgroundTint="@color/colorPrimary"
         android:tint="@color/white" />
 

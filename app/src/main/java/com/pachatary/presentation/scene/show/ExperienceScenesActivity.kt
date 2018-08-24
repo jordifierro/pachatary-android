@@ -8,27 +8,30 @@ import android.content.res.Resources
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.support.design.widget.AppBarLayout
+import android.support.design.widget.CoordinatorLayout
 import android.support.design.widget.FloatingActionButton
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.LinearSmoothScroller
 import android.support.v7.widget.RecyclerView
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.*
+import android.view.*
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.TextView
 import com.mapbox.api.staticmap.v1.MapboxStaticMap
 import com.mapbox.api.staticmap.v1.StaticMapCriteria
 import com.mapbox.api.staticmap.v1.models.StaticMarkerAnnotation
 import com.mapbox.geojson.Point
-import com.mapbox.mapboxsdk.constants.Style
 import com.pachatary.BuildConfig
 import com.pachatary.R
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.scene.Scene
 import com.pachatary.presentation.common.PachataryApplication
 import com.pachatary.presentation.common.view.PictureDeviceCompat
+import com.pachatary.presentation.common.view.SnackbarUtils
 import com.pachatary.presentation.experience.edition.EditExperienceActivity
 import com.pachatary.presentation.profile.ProfileActivity
 import com.pachatary.presentation.scene.edition.CreateSceneActivity
@@ -36,7 +39,6 @@ import com.pachatary.presentation.scene.edition.EditSceneActivity
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.CropCircleTransformation
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.activity_experience_scenes.*
 
 class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
 
@@ -46,7 +48,14 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
     lateinit var pictureDeviceCompat: PictureDeviceCompat
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var retryButton: ImageView
+    private lateinit var rootView: CoordinatorLayout
+    private lateinit var addButton: FloatingActionButton
+    private lateinit var shareButton: FloatingActionButton
+    private lateinit var editButton: FloatingActionButton
+    private lateinit var saveButton: FloatingActionButton
+    private lateinit var unsaveButton: FloatingActionButton
+
+    private var experience: Experience? = null
 
     private val registry: LifecycleRegistry = LifecycleRegistry(this)
 
@@ -70,21 +79,34 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_experience_scenes)
-        setSupportActionBar(toolbar)
+
+        findViewById<AppBarLayout>(R.id.appbar)
+                .setBackgroundColor(ContextCompat.getColor(this, R.color.transparent))
 
         recyclerView = findViewById(R.id.scenes_recyclerview)
         recyclerView.layoutManager = LinearLayoutManager(this)
-        retryButton = findViewById(R.id.retry)
-        retryButton.setOnClickListener { presenter.onRetryClick() }
+        rootView = findViewById(R.id.root)
+        addButton = findViewById(R.id.add_button)
+        addButton.setOnClickListener { presenter.onAddSceneButtonClick() }
+        shareButton = findViewById(R.id.share_button)
+        shareButton.setOnClickListener { presenter.onShareClick() }
+        editButton = findViewById(R.id.edit_button)
+        editButton.setOnClickListener { presenter.onEditExperienceClick() }
+        saveButton = findViewById(R.id.save_button)
+        saveButton.setOnClickListener { presenter.onExperienceSave(true) }
+        unsaveButton = findViewById(R.id.unsave_button)
+        unsaveButton.setOnClickListener { presenter.onExperienceSave(false) }
+        findViewById<ImageView>(R.id.back_button).setOnClickListener { super.onBackPressed() }
 
         PachataryApplication.injector.inject(this)
         presenter.setView(view = this, experienceId = intent.getStringExtra(EXPERIENCE_ID),
               finishOnProfileClick = intent.getBooleanExtra(FINISH_ON_PROFILE_CLICK, false))
         registry.addObserver(presenter)
 
-        recyclerView.adapter = ExperienceScenesAdapter(layoutInflater,
-                intent.getBooleanExtra(SHOW_EDITABLE_IF_ITS_MINE, false),
-                pictureDeviceCompat, presenter)
+        recyclerView.adapter =
+                ExperienceScenesAdapter(layoutInflater,
+                                        intent.getBooleanExtra(SHOW_EDITABLE_IF_ITS_MINE, false),
+                                        pictureDeviceCompat, presenter)
     }
 
     override fun navigateToEditScene(sceneId: String, experienceId: String) {
@@ -96,42 +118,49 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
     }
 
     override fun showExperience(experience: Experience) {
-        recyclerView.visibility = View.VISIBLE
-        retryButton.visibility = View.INVISIBLE
+        this.experience = experience
 
         (recyclerView.adapter as ExperienceScenesAdapter).experience = experience
         (recyclerView.adapter as ExperienceScenesAdapter).isExperienceInProgress = false
         recyclerView.adapter.notifyDataSetChanged()
+
+        setAllButtonsGone()
+        if (intent.getBooleanExtra(SHOW_EDITABLE_IF_ITS_MINE, false) && experience.isMine) {
+            addButton.visibility = View.VISIBLE
+            shareButton.visibility = View.VISIBLE
+            editButton.visibility = View.VISIBLE
+        }
+        else if (experience.isMine) {
+            shareButton.visibility = View.VISIBLE
+        } else {
+            shareButton.visibility = View.VISIBLE
+            if (experience.isSaved) unsaveButton.visibility = View.VISIBLE
+            else saveButton.visibility = View.VISIBLE
+        }
     }
 
     override fun showScenes(scenes: List<Scene>) {
-        recyclerView.visibility = View.VISIBLE
-        retryButton.visibility = View.INVISIBLE
-
         (recyclerView.adapter as ExperienceScenesAdapter).scenes = scenes
         (recyclerView.adapter as ExperienceScenesAdapter).areScenesInProgress = false
         recyclerView.adapter.notifyDataSetChanged()
     }
 
     override fun showLoadingExperience() {
-        recyclerView.visibility = View.VISIBLE
-        retryButton.visibility = View.INVISIBLE
-
         (recyclerView.adapter as ExperienceScenesAdapter).isExperienceInProgress = true
         recyclerView.adapter.notifyDataSetChanged()
     }
 
     override fun showLoadingScenes() {
-        recyclerView.visibility = View.VISIBLE
-        retryButton.visibility = View.INVISIBLE
-
         (recyclerView.adapter as ExperienceScenesAdapter).areScenesInProgress = true
         recyclerView.adapter.notifyDataSetChanged()
     }
 
     override fun showRetry() {
-        recyclerView.visibility = View.INVISIBLE
-        retryButton.visibility = View.VISIBLE
+        (recyclerView.adapter as ExperienceScenesAdapter).areScenesInProgress = false
+        (recyclerView.adapter as ExperienceScenesAdapter).isExperienceInProgress = false
+        recyclerView.adapter.notifyDataSetChanged()
+
+        SnackbarUtils.showRetry(rootView, this) { presenter.onRetryClick() }
     }
 
     override fun navigateToExperienceMap(experienceId: String, showSceneWithId: String?) {
@@ -144,21 +173,19 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
     }
 
     override fun showUnsaveDialog() {
-        val builder: AlertDialog.Builder
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            builder = AlertDialog.Builder(this, R.style.MyDialogTheme)
-        else builder = AlertDialog.Builder(this)
+        val builder: AlertDialog.Builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            AlertDialog.Builder(this, R.style.MyDialogTheme)
+        else AlertDialog.Builder(this)
         builder.setTitle(R.string.dialog_title_unsave_experience)
                 .setMessage(R.string.dialog_question_unsave_experience)
                 .setPositiveButton(android.R.string.yes) { _, _ -> presenter.onConfirmUnsaveExperience() }
                 .setNegativeButton(android.R.string.no) { _, _ -> presenter.onCancelUnsaveExperience() }
-                .setIcon(android.R.drawable.ic_dialog_alert)
                 .show()
     }
 
     override fun showSavedMessage() {
         val message = this.resources.getString(R.string.message_experience_saved)
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        SnackbarUtils.showSuccess(rootView, this, message)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -176,17 +203,24 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
         startActivity(ProfileActivity.newIntent(this, username))
     }
 
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
+    }
+
     override fun getLifecycle(): LifecycleRegistry = registry
 
     class ExperienceScenesAdapter(private val inflater: LayoutInflater,
-                                  val showEditable: Boolean,
+                                  private val showEditableIfItsMine: Boolean,
                                   val pictureDeviceCompat: PictureDeviceCompat,
                                   val presenter: ExperienceScenesPresenter)
         : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-        val LOADER_TYPE = 0
-        val EXPERIENCE_TYPE = 1
-        val SCENE_TYPE = 2
+        companion object {
+            private const val LOADER_TYPE = 0
+            private const val EXPERIENCE_TYPE = 1
+            private const val SCENE_TYPE = 2
+        }
 
         lateinit var recyclerView: RecyclerView
         var isExperienceInProgress = true
@@ -194,33 +228,19 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
         var experience: Experience? = null
         var scenes: List<Scene> = listOf()
 
-        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            when (getItemViewType(position)) {
-                EXPERIENCE_TYPE -> {
-                    val experienceViewHolder = holder as ExperienceViewHolder
-                    experienceViewHolder.bind(experience!!, scenes)
-                }
-                SCENE_TYPE -> {
-                    val sceneViewHolder = holder as SceneViewHolder
-                    sceneViewHolder.bind(scenes[position-1])
-                }
-            }
-        }
-
         override fun getItemCount(): Int {
-            if (isExperienceInProgress && areScenesInProgress) return 1
-            else if (areScenesInProgress) return 2
-            else return scenes.size + 1
+            return if (isExperienceInProgress && areScenesInProgress) 1
+            else if (areScenesInProgress) 2
+            else scenes.size + 1
         }
 
         override fun getItemViewType(position: Int): Int {
-            if (position == 0) {
-                if (isExperienceInProgress) return LOADER_TYPE
-                else return EXPERIENCE_TYPE
-            }
-            else {
-                if (areScenesInProgress) return SCENE_TYPE
-                else return SCENE_TYPE
+            return if (position == 0) {
+                if (isExperienceInProgress) LOADER_TYPE
+                else EXPERIENCE_TYPE
+            } else {
+                if (areScenesInProgress) LOADER_TYPE
+                else SCENE_TYPE
             }
         }
 
@@ -228,16 +248,14 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
             when (viewType) {
                 EXPERIENCE_TYPE -> {
                     return ExperienceViewHolder(inflater.inflate(R.layout.item_experience, parent, false),
-                            showEditable, pictureDeviceCompat,
-                            { presenter.onEditExperienceClick() },
-                            { presenter.onAddSceneButtonClick() },
-                            { save -> presenter.onExperienceSave(save) },
+                            pictureDeviceCompat,
                             { presenter.onMapButtonClick() },
                             { presenter.onProfileClick(it) })
                 }
                 SCENE_TYPE -> {
                     var isEditable = false
-                    if (showEditable && experience != null && experience!!.isMine) isEditable = true
+                    if (showEditableIfItsMine && experience != null && experience!!.isMine)
+                        isEditable = true
 
                     return SceneViewHolder(inflater.inflate(R.layout.item_scene, parent, false),
                             isEditable , pictureDeviceCompat,
@@ -247,6 +265,18 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
                 else -> {
                     return object : RecyclerView.ViewHolder(
                             inflater.inflate(R.layout.item_loader, parent, false)) {}
+                }
+            }
+        }
+        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+            when (getItemViewType(position)) {
+                EXPERIENCE_TYPE -> {
+                    val experienceViewHolder = holder as ExperienceViewHolder
+                    experienceViewHolder.bind(experience!!, scenes)
+                }
+                SCENE_TYPE -> {
+                    val sceneViewHolder = holder as SceneViewHolder
+                    sceneViewHolder.bind(scenes[position-1])
                 }
             }
         }
@@ -275,26 +305,19 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
         }
     }
 
-    class ExperienceViewHolder(view: View, private val showEditableIfItsMine: Boolean,
+    class ExperienceViewHolder(view: View,
                                private val pictureDeviceCompat: PictureDeviceCompat,
-                               private val onEditExperienceClick: () -> Unit,
-                               private val onAddSceneClick: () -> Unit,
-                               private val onSaveExperienceClick: (Boolean) -> Unit,
                                private val onMapButtonClick: () -> Unit,
                                private val onProfileClick: (String) -> Unit)
                                                                    : RecyclerView.ViewHolder(view) {
 
-        private val titleView: TextView = view.findViewById(R.id.title)
-        private val descriptionView: TextView = view.findViewById(R.id.description)
-        private val pictureView: ImageView = view.findViewById(R.id.picture)
-        private val editButton: FloatingActionButton = view.findViewById(R.id.edit_button)
-        private val addSceneButton: FloatingActionButton = view.findViewById(R.id.add_scene_button)
-        private val saveButton: FloatingActionButton = view.findViewById(R.id.save_button)
-        private val unsaveButton: FloatingActionButton = view.findViewById(R.id.unsave_button)
-        private val savesCountView: TextView = view.findViewById(R.id.saves_count)
-        private val authorUsernameView: TextView = view.findViewById(R.id.author_username)
-        private val authorPictureView: ImageView = view.findViewById(R.id.author_picture)
-        private val mapView: ImageView = view.findViewById(R.id.map)
+        private val titleView: TextView = view.findViewById(R.id.experience_title)
+        private val descriptionView: TextView = view.findViewById(R.id.experience_description)
+        private val pictureView: ImageView = view.findViewById(R.id.experience_picture)
+        private val savesCountView: TextView = view.findViewById(R.id.experience_saves_count)
+        private val authorUsernameView: TextView = view.findViewById(R.id.experience_author_username)
+        private val authorPictureView: ImageView = view.findViewById(R.id.experience_author_picture)
+        private val mapView: ImageView = view.findViewById(R.id.experience_map)
         lateinit var experienceId: String
 
         fun bind(experience: Experience, scenes: List<Scene>) {
@@ -302,40 +325,12 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
             titleView.text = experience.title
             descriptionView.text = experience.description
 
-            editButton.setOnClickListener { onEditExperienceClick() }
-            addSceneButton.setOnClickListener { onAddSceneClick() }
-            saveButton.setOnClickListener { onSaveExperienceClick(true) }
-            unsaveButton.setOnClickListener { onSaveExperienceClick(false) }
-            if (showEditableIfItsMine && experience.isMine) {
-                editButton.visibility = View.VISIBLE
-                addSceneButton.visibility = View.VISIBLE
-                saveButton.visibility = View.GONE
-                unsaveButton.visibility = View.GONE
-            }
-            else if (!experience.isMine) {
-                addSceneButton.visibility = View.GONE
-                editButton.visibility = View.GONE
-                if (experience.isSaved) {
-                    saveButton.visibility = View.INVISIBLE
-                    unsaveButton.visibility = View.VISIBLE
-                }
-                else {
-                    saveButton.visibility = View.VISIBLE
-                    unsaveButton.visibility = View.INVISIBLE
-                }
-            }
-            else {
-                addSceneButton.visibility = View.GONE
-                editButton.visibility = View.GONE
-                saveButton.visibility = View.GONE
-                unsaveButton.visibility = View.GONE
-            }
 
             authorPictureView.setOnClickListener {
                 onProfileClick(experience.authorProfile.username) }
             authorUsernameView.setOnClickListener {
                 onProfileClick(experience.authorProfile.username) }
-            savesCountView.text = experience.savesCount.toString() + " ★"
+            savesCountView.text = experience.savesCount.toString()
             authorUsernameView.text = experience.authorProfile.username
             Picasso.with(pictureView.context)
                 .load(pictureDeviceCompat.convert(experience.picture)?.fullScreenSizeUrl)
@@ -352,7 +347,7 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
         }
 
         private fun mapUrl(scenes: List<Scene>): String? {
-            if (scenes.size == 0) return null
+            if (scenes.isEmpty()) return null
             val screenWidth = Resources.getSystem().displayMetrics.widthPixels
             val markers = mutableListOf<StaticMarkerAnnotation>()
             for (scene in scenes) {
@@ -398,5 +393,13 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
                     .load(pictureDeviceCompat.convert(scene.picture)?.fullScreenSizeUrl)
                     .into(pictureView)
         }
+    }
+
+    private fun setAllButtonsGone() {
+        addButton.visibility = View.GONE
+        shareButton.visibility = View.GONE
+        editButton.visibility = View.GONE
+        saveButton.visibility = View.GONE
+        unsaveButton.visibility = View.GONE
     }
 }

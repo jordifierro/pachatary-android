@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -8,46 +9,60 @@
     <com.pachatary.presentation.common.view.SquareImageView
         android:id="@+id/picture"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        tools:background="@color/colorPrimary"/>
+
+    <com.pachatary.presentation.common.view.SquareLinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/picture"
+        android:background="@drawable/shadow_experience_or_scene"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/edit_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="-48dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_below="@+id/picture"
+        android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
+        app:fabSize="mini"
         app:srcCompat="@drawable/ic_edit"
         android:tint="@color/black"
-        app:backgroundTint="@color/colorAccent"
-        android:visibility="invisible" />
+        app:backgroundTint="@color/white"
+        android:scaleType="center"
+        android:visibility="invisible"
+        tools:visibility="visible" />
 
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="start"
-        android:layout_margin="10dp"
-        android:layout_below="@id/picture"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="20dp"
+        android:layout_alignBottom="@+id/picture"
         android:layout_toLeftOf="@+id/locate_button"
         android:layout_toStartOf="@+id/locate_button"
+        android:layout_marginRight="20dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:textColor="@color/black"
-        android:textSize="20sp" />
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        tools:text="Title of the scene that can be 80 chars long" />
 
-    <ImageButton
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/locate_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_below="@+id/picture"
-        android:layout_margin="10dp"
-        app:srcCompat="@drawable/ic_navigation_black_24dp"/>
+        android:layout_alignBottom="@+id/picture"
+        android:layout_marginBottom="-10dp"
+        app:fabSize="mini"
+        android:scaleType="center"
+        app:backgroundTint="@color/white"
+        app:srcCompat="@drawable/ic_navigation" />
 
     <TextView
         android:id="@+id/description"
@@ -55,8 +70,13 @@
         android:layout_height="wrap_content"
         android:gravity="start"
         android:layout_below="@id/title"
-        android:layout_margin="10dp"
-        android:textSize="16sp" />
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:textSize="14sp"
+        android:textColor="@color/black"
+        tools:text="@string/lorem_ipsum" />
 
     <RelativeLayout
         android:layout_width="match_parent"

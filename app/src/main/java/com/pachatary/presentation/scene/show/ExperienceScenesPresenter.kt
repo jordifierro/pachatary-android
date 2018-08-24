@@ -105,4 +105,8 @@ class ExperienceScenesPresenter @Inject constructor(
         if (finishOnProfileClick) view.finish()
         else view.navigateToProfile(username)
     }
+
+    fun onShareClick() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 }

@@ -95,4 +95,19 @@
     <string name="mine_experiences_experiences_title">YOUR EXPERIENCES</string>
     <string name="mine_experiences_no_experiences">YOU DON\'T HAVE ANY EXPERIENCE YET. ADD YOUR FIRST ONE!</string>
     <string name="mine_experiences_forbidden_share">You must have at least one experience and upload a profile picture</string>
+
+    <string name="experience_menu_add">Add scene</string>
+    <string name="experience_menu_share">Share experience</string>
+    <string name="experience_menu_edit">Edit experience</string>
+    <string name="experience_menu_save">Save experience</string>
+    <string name="experience_scenes">SCENES</string>
+
+    <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        In nec tincidunt lectus. Aliquam pulvinar sed ante a dapibus. Sed eget congue odio.
+        Donec id sapien dictum, convallis ipsum in, egestas mauris.
+        Sed semper vehicula nulla nec dictum. Quisque pharetra vulputate vehicula.
+        Nam felis lectus, gravida sit amet arcu condimentum, lobortis varius ligula.
+        Fusce eleifend pharetra volutpat. Etiam dictum gravida nisl,
+        sodales sodales massa hendrerit sed. Morbi consequat, turpis porta eleifend interdum,
+        orci turpis hendrerit magna, id faucibus dui elit in velit.</string>
 </resources>

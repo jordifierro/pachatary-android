@@ -1,13 +1,13 @@
 package com.pachatary.presentation.common.view
 
+import android.graphics.Typeface
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
-import android.widget.TextView
-import com.pachatary.R
-import android.graphics.Typeface
-import android.support.v4.app.Fragment
 import android.util.TypedValue
 import android.view.View
+import android.widget.TextView
+import com.pachatary.R
 
 
 class ToolbarUtils {
@@ -16,6 +16,8 @@ class ToolbarUtils {
             val toolbar = appCompatActivity.findViewById<Toolbar>(R.id.toolbar)
             toolbar.setNavigationIcon(R.drawable.ic_keyboard_arrow_left)
             toolbar.findViewById<TextView>(R.id.toolbar_title).text = title
+            toolbar.setBackgroundColor(
+                    ContextCompat.getColor(appCompatActivity, R.color.white))
             appCompatActivity.setSupportActionBar(toolbar)
             appCompatActivity.supportActionBar!!.setHomeButtonEnabled(backEnabled)
             appCompatActivity.supportActionBar!!.setDisplayHomeAsUpEnabled(backEnabled)
@@ -27,6 +29,8 @@ class ToolbarUtils {
             val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
             toolbar.setNavigationIcon(R.drawable.ic_keyboard_arrow_left)
             toolbar.findViewById<TextView>(R.id.toolbar_title).text = title
+            toolbar.setBackgroundColor(
+                    ContextCompat.getColor(appCompatActivity, R.color.white))
             appCompatActivity.setSupportActionBar(toolbar)
             appCompatActivity.supportActionBar!!.setHomeButtonEnabled(backEnabled)
             appCompatActivity.supportActionBar!!.setDisplayHomeAsUpEnabled(backEnabled)

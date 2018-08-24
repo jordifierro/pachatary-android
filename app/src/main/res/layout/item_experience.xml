@@ -6,141 +6,108 @@
     android:layout_height="wrap_content">
 
     <com.pachatary.presentation.common.view.SquareImageView
-        android:id="@+id/picture"
+        android:id="@+id/experience_picture"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/edit_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="-48dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_below="@+id/picture"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        app:srcCompat="@drawable/ic_edit"
-        android:tint="@color/black"
-        app:backgroundTint="@color/colorAccent"
-        android:visibility="invisible" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/add_scene_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="-48dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_below="@+id/picture"
-        android:layout_toLeftOf="@+id/edit_button"
-        android:layout_toStartOf="@+id/edit_button"
-        app:srcCompat="@android:drawable/ic_input_add"
-        android:tint="@color/black"
-        app:backgroundTint="@color/colorAccent"
-        android:visibility="invisible" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/save_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="-48dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_below="@+id/picture"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        app:srcCompat="@drawable/ic_star"
-        android:tint="@color/grey"
-        app:backgroundTint="@color/white"
-        android:visibility="invisible" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/unsave_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="-48dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_below="@+id/picture"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        app:srcCompat="@drawable/ic_star"
-        android:tint="@color/black"
-        app:backgroundTint="@color/colorAccent"
-        android:visibility="invisible" />
-
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="start"
-        android:layout_margin="10dp"
-        android:textColor="@color/black"
-        android:textSize="20sp"
-        android:layout_below="@id/picture" />
-
-    <RelativeLayout
-        android:id="@+id/saves_count_and_author"
+    <com.pachatary.presentation.common.view.SquareLinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/title">
+        android:layout_alignBottom="@+id/experience_picture"
+        android:background="@drawable/shadow_experience_detail"/>
+
+    <TextView
+        android:id="@+id/experience_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/experience_picture"
+        android:gravity="start"
+        android:layout_margin="20dp"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:textSize="18sp" />
+
+    <RelativeLayout
+        android:id="@+id/experience_saves_count_and_author"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
+        android:layout_below="@+id/experience_title">
 
         <ImageView
-            android:id="@+id/author_picture"
+            android:id="@+id/experience_author_picture"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_margin="10dp" />
+            android:layout_centerVertical="true" />
 
         <TextView
-            android:id="@+id/author_username"
+            android:id="@+id/experience_author_username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/author_picture"
-            android:layout_toEndOf="@+id/author_picture"
+            android:layout_toRightOf="@+id/experience_author_picture"
+            android:layout_toEndOf="@+id/experience_author_picture"
             android:layout_centerVertical="true"
-            android:textColor="@color/grey"
-            android:textSize="14sp"
-            android:textStyle="italic" />
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:textColor="@color/black"
+            android:textSize="14sp" />
 
         <TextView
-            android:id="@+id/saves_count"
+            android:id="@+id/experience_saves_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/experience_star"
+            android:layout_toStartOf="@+id/experience_star"
+            android:layout_centerVertical="true"
+            android:textColor="@color/black"
+            android:textSize="14sp" />
+
+        <ImageView
+            android:id="@+id/experience_star"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginStart="4dp"
+            android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:gravity="end"
-            android:layout_toRightOf="@id/author_username"
-            android:layout_toEndOf="@id/author_username"
-            android:layout_margin="10dp"
-            android:textColor="@color/grey"
-            android:textSize="14sp"
-            android:textStyle="italic" />
+            app:srcCompat="@drawable/ic_star_small" />
 
     </RelativeLayout>
 
     <TextView
-        android:id="@+id/description"
+        android:id="@+id/experience_description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="start"
-        android:layout_below="@id/saves_count_and_author"
-        android:layout_margin="10dp"
-        android:textSize="16sp" />
+        android:layout_below="@id/experience_saves_count_and_author"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="20dp"
+        android:maxLines="2"
+        android:textColor="@color/black"
+        android:textSize="14sp" />
 
     <ImageView
-        android:id="@+id/map"
+        android:id="@+id/experience_map"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/description" />
+        android:layout_below="@id/experience_description" />
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="15dp"
-        android:layout_below="@id/map"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/experience_map"
+        android:padding="20dp"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:text="@string/experience_scenes" />
 
 </RelativeLayout>

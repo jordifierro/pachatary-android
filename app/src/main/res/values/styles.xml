@@ -6,7 +6,7 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="buttonStyle">@style/MyButton</item>
         <item name="actionBarDivider">@null</item>
-        <item name="actionBarSize">100dp</item>
+        <item name="actionBarSize">@dimen/toolbar_height</item>
         <item name="actionBarStyle">@style/AppTheme.PopupOverlay</item>
         <item name="editTextStyle">@style/MyEditText</item>
         <item name="actionOverflowButtonStyle">@style/OverFlow</item>
@@ -17,6 +17,8 @@
         <item name="android:alertDialogStyle">@style/MyDialogTheme</item>
         <item name="alertDialogTheme">@style/MyDialogTheme</item>
         <item name="android:alertDialogTheme">@style/MyDialogTheme</item>
+        <item name="android:actionBarItemBackground">@drawable/clickable_background</item>
+        <item name="actionBarItemBackground">@drawable/clickable_background</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -30,9 +32,7 @@
         <item name="android:alertDialogTheme">@style/MyDialogTheme</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
-        <item name="android:background">@color/white</item>
-    </style>
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark">
         <item name="android:textColor">@color/black</item>
@@ -47,11 +47,13 @@
     <style name="MyButton.Colored" parent="MyButton">
         <item name="android:textColor">@color/white</item>
         <item name="android:background">@drawable/button_shape_colored</item>
+        <item name="android:layout_marginRight">5dp</item>
     </style>
 
     <style name="MyButton.White" parent="MyButton">
         <item name="android:textColor">@drawable/text_black</item>
         <item name="android:background">@drawable/button_shape_white</item>
+        <item name="android:layout_marginRight">5dp</item>
     </style>
 
     <style name="MyEditText" parent="Widget.AppCompat.EditText">
@@ -78,6 +80,10 @@
     <style name="MyDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="colorAccent">@color/colorPrimary</item>
         <item name="android:textColorPrimary">@color/black</item>
+        <item name="buttonStyle">@style/MyButton.Colored</item>
+        <item name="buttonBarPositiveButtonStyle">@style/MyButton.Colored</item>
+        <item name="buttonBarNegativeButtonStyle">@style/MyButton.White</item>
+        <item name="buttonBarNeutralButtonStyle">@style/MyButton.White</item>
         <item name="android:windowBackground">@drawable/dialog_shape_white</item>
     </style>
 

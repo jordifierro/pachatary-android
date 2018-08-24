@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/experience_picture"
-        android:background="@drawable/shadow_experience"/>
+        android:background="@drawable/shadow_experience_or_scene"/>
 
     <TextView
         android:id="@+id/experience_title"

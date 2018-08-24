@@ -3,6 +3,7 @@ package com.pachatary.presentation.common
 import android.content.Context
 import android.support.multidex.MultiDex
 import android.support.multidex.MultiDexApplication
+import android.support.v7.app.AppCompatDelegate
 import com.facebook.stetho.Stetho
 import com.jakewharton.picasso.OkHttp3Downloader
 import com.pachatary.BuildConfig
@@ -22,6 +23,8 @@ class PachataryApplication : MultiDexApplication() {
 
     override fun onCreate() {
         super.onCreate()
+
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
 
         injector = DaggerApplicationComponent.builder()
                                                 .applicationModule(ApplicationModule(this))
