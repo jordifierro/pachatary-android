@@ -318,6 +318,7 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
         private val authorUsernameView: TextView = view.findViewById(R.id.experience_author_username)
         private val authorPictureView: ImageView = view.findViewById(R.id.experience_author_picture)
         private val mapView: ImageView = view.findViewById(R.id.experience_map)
+        private val starIcon: ImageView = view.findViewById(R.id.experience_star)
         lateinit var experienceId: String
 
         fun bind(experience: Experience, scenes: List<Scene>) {
@@ -344,6 +345,9 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
             Picasso.with(mapView.context)
                     .load(mapUrl(scenes))
                     .into(mapView)
+            if (experience.isSaved) starIcon.setColorFilter(
+                    ContextCompat.getColor(starIcon.context, R.color.colorPrimary))
+            else starIcon.colorFilter = null
         }
 
         private fun mapUrl(scenes: List<Scene>): String? {
