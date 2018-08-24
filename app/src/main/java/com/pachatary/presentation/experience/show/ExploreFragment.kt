@@ -12,15 +12,16 @@ import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.ImageButton
 import com.pachatary.R
 import com.pachatary.data.experience.Experience
 import com.pachatary.presentation.common.PachataryApplication
+import com.pachatary.presentation.common.edition.EditTextWithBackListener
 import com.pachatary.presentation.common.edition.SelectLocationActivity
 import com.pachatary.presentation.common.edition.SelectLocationPresenter
 import com.pachatary.presentation.common.location.LocationUtils
@@ -32,13 +33,6 @@ import com.pachatary.presentation.main.MainActivity
 import com.pachatary.presentation.profile.ProfileActivity
 import com.pachatary.presentation.scene.show.ExperienceScenesActivity
 import javax.inject.Inject
-import android.view.inputmethod.EditorInfo
-import android.widget.TextView
-import android.content.Context.INPUT_METHOD_SERVICE
-import android.view.inputmethod.InputMethodManager.HIDE_NOT_ALWAYS
-import android.content.Context.INPUT_METHOD_SERVICE
-import android.view.inputmethod.InputMethodManager
-import com.pachatary.presentation.common.edition.EditTextWithBackListener
 
 
 class ExploreFragment : Fragment(), ExploreView {

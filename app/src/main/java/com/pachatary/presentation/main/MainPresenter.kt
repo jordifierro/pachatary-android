@@ -1,6 +1,5 @@
 package com.pachatary.presentation.main
 
-import android.annotation.SuppressLint
 import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.OnLifecycleEvent
@@ -51,9 +50,5 @@ class MainPresenter @Inject constructor(private val authRepository: AuthReposito
 
     fun onUpgradeDialogClick() {
         view.navigateToUpgradeApp()
-    }
-
-    fun onSettingsClick() {
-        view.navigateToSettings()
     }
 }

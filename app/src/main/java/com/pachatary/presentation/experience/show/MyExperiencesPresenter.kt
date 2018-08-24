@@ -148,4 +148,8 @@ class MyExperiencesPresenter @Inject constructor(
             else view.showNotEnoughInfoToShareDialog()
         }
     }
+
+    fun onSettingsClick() {
+        view.navigateToSettings()
+    }
 }

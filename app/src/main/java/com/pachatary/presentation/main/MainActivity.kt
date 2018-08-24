@@ -46,24 +46,6 @@ class MainActivity : AppCompatActivity(), MainView {
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        if (::currentView.isInitialized) {
-            when (currentView) {
-                MainView.ExperiencesViewType.MY_EXPERIENCES ->
-                    menuInflater.inflate(R.menu.main, menu)
-                MainView.ExperiencesViewType.SAVED -> {}
-                MainView.ExperiencesViewType.EXPLORE -> {}
-            }
-        }
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (item!!.itemId == R.id.settings) presenter.onSettingsClick()
-        if (item.itemId == R.id.share) myExperiencesFragment.onShareClick()
-        return super.onOptionsItemSelected(item)
-    }
-
     override fun selectTab(type: MainView.ExperiencesViewType) {
         when (type) {
             MainView.ExperiencesViewType.MY_EXPERIENCES ->
@@ -136,9 +118,6 @@ class MainActivity : AppCompatActivity(), MainView {
         }
         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
         fragmentTransaction.commit()
-
-        currentView = viewType
-        invalidateOptionsMenu()
     }
 
     override fun onBackPressed() {
@@ -173,9 +152,5 @@ class MainActivity : AppCompatActivity(), MainView {
         }
 
         finish()
-    }
-
-    override fun navigateToSettings() {
-        startActivity(SettingsActivity.newIntent(this))
     }
 }

@@ -372,7 +372,17 @@ class MyExperiencesPresenterTest {
         } then {
             should_show_share_dialog("usr")
         }
+    }
 
+    @Test
+    fun test_on_settings_click_navigates_to_settings() {
+        given {
+            nothing()
+        } whenn {
+            settings_click()
+        } then {
+            should_navigate_to_settings()
+        }
     }
 
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
@@ -465,6 +475,10 @@ class MyExperiencesPresenterTest {
 
         fun share_click() {
             presenter.onShareClick()
+        }
+
+        fun settings_click() {
+            presenter.onSettingsClick()
         }
 
         fun should_show_experiences(experiences: List<Experience>) {
@@ -586,6 +600,10 @@ class MyExperiencesPresenterTest {
 
         fun should_show_share_dialog(username: String) {
             BDDMockito.then(mockView).should().showShareDialog(username)
+        }
+
+        fun should_navigate_to_settings() {
+            BDDMockito.then(mockView).should().navigateToSettings()
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

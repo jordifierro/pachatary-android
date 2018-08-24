@@ -25,4 +25,5 @@ interface MyExperiencesView {
     fun navigateToCreateExperience()
     fun navigateToRegister()
     fun navigateToPickAndCropImage()
+    fun navigateToSettings()
 }

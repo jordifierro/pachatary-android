@@ -10,10 +10,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.InputType
-import android.view.KeyEvent
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
 import android.widget.TextView
@@ -29,6 +26,7 @@ import com.pachatary.presentation.common.view.SnackbarUtils
 import com.pachatary.presentation.common.view.ToolbarUtils
 import com.pachatary.presentation.experience.edition.CreateExperienceActivity
 import com.pachatary.presentation.experience.show.view.SquareViewHolder
+import com.pachatary.presentation.main.SettingsActivity
 import com.pachatary.presentation.register.RegisterActivity
 import com.pachatary.presentation.scene.show.ExperienceScenesActivity
 import com.squareup.picasso.Picasso
@@ -59,6 +57,8 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
 
         PachataryApplication.injector.inject(this)
         presenter.view = this
+
+        setHasOptionsMenu(true)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -89,6 +89,17 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
         presenter.create()
 
         return view
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        inflater!!.inflate(R.menu.main, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        if (item!!.itemId == R.id.settings) presenter.onSettingsClick()
+        if (item.itemId == R.id.share) presenter.onShareClick()
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onResume() {
@@ -175,6 +186,10 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
             presenter.onImageSelected(PickAndCropImageActivity.getImageUriFrom(data!!))
     }
 
+    override fun navigateToSettings() {
+        startActivity(SettingsActivity.newIntent(activity!!.applicationContext))
+    }
+
     override fun showShareDialog(username: String) {
         val i = Intent(Intent.ACTION_SEND)
         i.type = "text/plain"
@@ -186,10 +201,6 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
     override fun showNotEnoughInfoToShareDialog() {
         SnackbarUtils.showError(rootView, activity as AppCompatActivity,
                                 getString(R.string.mine_experiences_experiences_title))
-    }
-
-    fun onShareClick() {
-        presenter.onShareClick()
     }
 
     class MyProfileAdapter(private val inflater: LayoutInflater,
