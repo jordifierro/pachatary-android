@@ -250,16 +250,28 @@ class ExperienceApiRepositoryTest {
         }
     }
 
+    @Test
+    fun test_get_experience_share_url() {
+        given {
+            a_web_server_that_returns_experience_share_url()
+        } whenn {
+            get_experience_share_url("4")
+        } then {
+            request_should_get_experience_share_url("4")
+            response_should_be_share_url("pachatary/e/Ab3De6gH")
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
 
-        val testListSubscriber = TestSubscriber<Result<List<Experience>>>()
-        val testSubscriber = TestSubscriber<Result<Experience>>()
-        val testStringSubscriber = TestSubscriber<Result<String>>()
-        val testEmptySubscriber = TestSubscriber<Result<Void>>()
-        val mockImageUploader = mock(ImageUploader::class.java)
-        val mockWebServer = MockWebServer()
+        private val testListSubscriber = TestSubscriber<Result<List<Experience>>>()
+        private val testSubscriber = TestSubscriber<Result<Experience>>()
+        private val testStringSubscriber = TestSubscriber<Result<String>>()
+        private val testEmptySubscriber = TestSubscriber<Result<Void>>()
+        private val mockImageUploader = mock(ImageUploader::class.java)!!
+        private val mockWebServer = MockWebServer()
         val repository = ExperienceApiRepo(Retrofit.Builder()
                 .baseUrl(mockWebServer.url("/"))
                 .addConverterFactory(GsonConverterFactory.create(
@@ -271,7 +283,7 @@ class ExperienceApiRepositoryTest {
                 Schedulers.trampoline(), mockImageUploader)
         lateinit var experience: Experience
         var experienceId = ""
-        var experienceShareId = ""
+        private var experienceShareId = ""
         var url = ""
 
         fun an_experience_id() {
@@ -324,6 +336,12 @@ class ExperienceApiRepositoryTest {
             mockWebServer.enqueue(MockResponse().setResponseCode(201).setBody(
                     ExperienceApiRepositoryTest::class.java.getResource(
                             "/api/GET_experiences_experience_share_id_id.json").readText()))
+        }
+
+        fun a_web_server_that_returns_experience_share_url() {
+            mockWebServer.enqueue(MockResponse().setResponseCode(201).setBody(
+                    ExperienceApiRepositoryTest::class.java.getResource(
+                            "/api/GET_experiences_experience_id_share_url.json").readText()))
         }
 
         fun a_web_server_that_returns_201() {
@@ -405,6 +423,11 @@ class ExperienceApiRepositoryTest {
             testEmptySubscriber.awaitCount(1)
         }
 
+        fun get_experience_share_url(experienceId: String) {
+            repository.getShareUrl(experienceId).subscribe(testStringSubscriber)
+            testStringSubscriber.awaitCount(1)
+        }
+
         fun request_should_call_url() {
             val request = mockWebServer.takeRequest()
             assertEquals(url, request.path)
@@ -475,6 +498,13 @@ class ExperienceApiRepositoryTest {
         fun request_should_get_experience_share_id_id() {
             val request = mockWebServer.takeRequest()
             assertEquals("/experiences/" + experienceShareId + "/id", request.path)
+            assertEquals("GET", request.getMethod())
+            assertEquals("", request.getBody().readUtf8())
+        }
+
+        fun request_should_get_experience_share_url(experienceId: String) {
+            val request = mockWebServer.takeRequest()
+            assertEquals("/experiences/" + experienceId + "/share-url", request.path)
             assertEquals("GET", request.getMethod())
             assertEquals("", request.getBody().readUtf8())
         }
@@ -583,6 +613,10 @@ class ExperienceApiRepositoryTest {
 
         fun response_should_parse_inprogress_result_and_experience_id() {
             testStringSubscriber.assertValues(ResultInProgress(), ResultSuccess("43"))
+        }
+
+        fun response_should_be_share_url(shareUrl: String) {
+            testStringSubscriber.assertValues(ResultInProgress(), ResultSuccess(shareUrl))
         }
 
         fun should_call_upload(image: String, path: String) {

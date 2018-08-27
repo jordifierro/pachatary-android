@@ -53,4 +53,7 @@ interface ExperienceApi {
 
     @DELETE("/experiences/{id}/save")
     fun unsaveExperience(@Path("id") experienceId: String): Flowable<Result<Void>>
+
+    @GET("/experiences/{id}/share-url")
+    fun getExperienceShareUrl(@Path("id") experienceId: String): Flowable<Result<ShareUrlMapper>>
 }

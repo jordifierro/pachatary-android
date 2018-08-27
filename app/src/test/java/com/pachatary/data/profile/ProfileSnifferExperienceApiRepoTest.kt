@@ -133,6 +133,17 @@ class ProfileSnifferExperienceApiRepoTest {
     }
 
     @Test
+    fun test_get_experience_share_url_is_not_sniffed() {
+        given {
+            get_share_url_that_returns("3", "pachatary/e/ASDF")
+        } whenn {
+            get_share_url("3")
+        } then {
+            should_sniff_nothing()
+        }
+    }
+
+    @Test
     fun test_upload_experience_picture_is_not_sniffed() {
         given {
             upload_experience_picture_that_returns("3", "file", DummyExperienceResultSuccess("1", "a"))
@@ -205,7 +216,11 @@ class ProfileSnifferExperienceApiRepoTest {
         fun translate_id_that_returns(shareId: String, experienceId: String) {
             BDDMockito.given(mockApiRepository.translateShareId(shareId))
                     .willReturn(Flowable.just(ResultSuccess(experienceId)))
+        }
 
+        fun get_share_url_that_returns(experienceId: String, shareUrl: String) {
+            BDDMockito.given(mockApiRepository.getShareUrl(experienceId))
+                    .willReturn(Flowable.just(ResultSuccess(shareUrl)))
         }
 
         fun upload_experience_picture_that_returns(experienceId: String, imageUriString: String,
@@ -252,6 +267,10 @@ class ProfileSnifferExperienceApiRepoTest {
 
         fun translate_id(shareId: String) {
             sniffer.translateShareId(shareId).subscribe()
+        }
+
+        fun get_share_url(experienceId: String) {
+            sniffer.getShareUrl(experienceId)
         }
 
         fun upload_experience_picture(experienceId: String, imageUriString: String) {

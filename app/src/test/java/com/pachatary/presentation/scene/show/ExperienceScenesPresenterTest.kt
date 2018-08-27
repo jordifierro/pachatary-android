@@ -3,6 +3,7 @@ package com.pachatary.presentation.scene.show
 import com.pachatary.data.*
 import com.pachatary.data.common.Result
 import com.pachatary.data.common.ResultInProgress
+import com.pachatary.data.common.ResultSuccess
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.experience.ExperienceRepository
 import com.pachatary.data.scene.Scene
@@ -232,13 +233,49 @@ class ExperienceScenesPresenterTest {
             should_finish_view()
         }
     }
+
+    @Test
+    fun test_share_inprogress() {
+        given {
+            a_presenter_with("5", true)
+            repo_that_returns_on_get_share_url("5", ResultInProgress())
+        } whenn {
+            share_click()
+        } then {
+            should_do_nothing()
+        }
+    }
+
+    @Test
+    fun test_share_error() {
+        given {
+            a_presenter_with("5", true)
+            repo_that_returns_on_get_share_url("5", DummyResultError())
+        } whenn {
+            share_click()
+        } then {
+            should_show_error()
+        }
+    }
+
+    @Test
+    fun test_share_success() {
+        given {
+            a_presenter_with("5", true)
+            repo_that_returns_on_get_share_url("5", ResultSuccess("share_url"))
+        } whenn {
+            share_click()
+        } then {
+            should_show_share_dialog("share_url")
+        }
+    }
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
         lateinit var presenter: ExperienceScenesPresenter
         @Mock lateinit var mockView: ExperienceScenesView
-        @Mock lateinit var mockRepository: SceneRepository
-        @Mock lateinit var mockExperienceRepository: ExperienceRepository
+        @Mock private lateinit var mockRepository: SceneRepository
+        @Mock private lateinit var mockExperienceRepository: ExperienceRepository
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
@@ -264,6 +301,11 @@ class ExperienceScenesPresenterTest {
                                        forExperienceId: String) {
             BDDMockito.given(mockRepository.scenesFlowable(forExperienceId))
                     .willReturn(Flowable.fromArray(*results))
+        }
+
+        fun repo_that_returns_on_get_share_url(experienceId: String, result: Result<String>) {
+            BDDMockito.given(mockExperienceRepository.getShareUrl(experienceId))
+                    .willReturn(Flowable.just(result))
         }
 
         fun presenter_action(action: ExperienceScenesPresenterAction) {
@@ -303,6 +345,10 @@ class ExperienceScenesPresenterTest {
 
         fun profile_click(username: String) {
             presenter.onProfileClick(username)
+        }
+
+        fun share_click() {
+            presenter.onShareClick()
         }
 
         fun should_navigate_to_edit_experience(experienceId: String) {
@@ -370,6 +416,18 @@ class ExperienceScenesPresenterTest {
 
         fun should_finish_view() {
             BDDMockito.then(mockView).should().finish()
+        }
+
+        fun should_do_nothing() {
+            BDDMockito.then(mockView).shouldHaveZeroInteractions()
+        }
+
+        fun should_show_error() {
+            BDDMockito.then(mockView).should().showError()
+        }
+
+        fun should_show_share_dialog(shareUrl: String) {
+            BDDMockito.then(mockView).should().showShareDialog(shareUrl)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

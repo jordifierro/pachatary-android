@@ -196,6 +196,18 @@ class ExperienceRepositoryTest {
         }
     }
 
+    @Test
+    fun test_get_share_url_returns_apis_flowable() {
+        given {
+            an_api_repo_that_returns_string_flowable_get_share_url("3")
+        } whenn {
+            get_share_url("3")
+        } then {
+            should_call_api_repo_get_share_url("3")
+            should_return_string_flowable()
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().start(func)
 
     @Suppress("UNCHECKED_CAST")
@@ -289,6 +301,12 @@ class ExperienceRepositoryTest {
                     .willReturn(stringFlowable)
         }
 
+        fun an_api_repo_that_returns_string_flowable_get_share_url(experienceId: String) {
+            stringFlowable = Flowable.empty()
+            BDDMockito.given(mockApiRepository.getShareUrl(experienceId))
+                    .willReturn(stringFlowable)
+        }
+
         fun a_saved_experience() {
             savedExperience = Experience("1", "t", "d", null, false, true)
         }
@@ -357,6 +375,10 @@ class ExperienceRepositoryTest {
 
         fun translate_share_id() {
             stringFlowableResult = repository.translateShareId(experienceShareId)
+        }
+
+        fun get_share_url(experienceId: String) {
+            stringFlowableResult = repository.getShareUrl(experienceId)
         }
 
         fun upload_experience_picture_is_called() {
@@ -527,6 +549,10 @@ class ExperienceRepositoryTest {
                     .modifyResult(ExperienceRepoSwitch.Kind.OTHER,
                                   ExperienceRepoSwitch.Modification.ADD_OR_UPDATE_LIST,
                                   listOf(experience))
+        }
+
+        fun should_call_api_repo_get_share_url(experienceId: String) {
+            BDDMockito.then(mockApiRepository).should().getShareUrl(experienceId)
         }
 
         fun should_return_that_experience() {

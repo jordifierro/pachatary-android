@@ -1,5 +1,6 @@
 package com.pachatary.presentation.scene.show
 
+import android.annotation.SuppressLint
 import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.OnLifecycleEvent
@@ -40,17 +41,21 @@ class ExperienceScenesPresenter @Inject constructor(
     private fun getExperience() {
         experienceDisposable = experienceRepository.experienceFlowable(experienceId)
                 .observeOn(schedulerProvider.observer())
-                .subscribe { if (it.isSuccess()) view.showExperience(it.data!!)
-                             else if (it.isInProgress()) view.showLoadingExperience()
-                             else view.showRetry() }
+                .subscribe({ when {
+                               it.isSuccess() -> view.showExperience(it.data!!)
+                               it.isInProgress() -> view.showLoadingExperience()
+                               else -> view.showRetry()
+                           }}, { throw it })
     }
 
     private fun getScenes() {
         scenesDisposable = sceneRepository.scenesFlowable(experienceId)
                 .observeOn(schedulerProvider.observer())
-                .subscribe { if (it.isSuccess()) view.showScenes(it.data!!)
-                             else if (it.isInProgress()) view.showLoadingScenes()
-                             else view.showRetry() }
+                .subscribe({ when {
+                               it.isSuccess() -> view.showScenes(it.data!!)
+                               it.isInProgress() -> view.showLoadingScenes()
+                               else -> view.showRetry()
+                           }}, { throw it })
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
@@ -106,7 +111,14 @@ class ExperienceScenesPresenter @Inject constructor(
         else view.navigateToProfile(username)
     }
 
+    @SuppressLint("CheckResult")
     fun onShareClick() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        experienceRepository.getShareUrl(experienceId)
+                .observeOn(schedulerProvider.observer())
+                .subscribe({ when {
+                    it.isSuccess() -> view.showShareDialog(it.data!!)
+                    it.isInProgress() -> {}
+                    else -> view.showError()
+                }}, { throw it })
     }
 }

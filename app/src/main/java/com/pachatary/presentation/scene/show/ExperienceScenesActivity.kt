@@ -203,6 +203,17 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
         startActivity(ProfileActivity.newIntent(this, username))
     }
 
+    override fun showError() {
+        SnackbarUtils.showError(rootView, this)
+    }
+
+    override fun showShareDialog(shareUrl: String) {
+        val i = Intent(Intent.ACTION_SEND)
+        i.type = "text/plain"
+        i.putExtra(Intent.EXTRA_TEXT, shareUrl)
+        startActivity(Intent.createChooser(i, "Share URL"))
+    }
+
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         return true

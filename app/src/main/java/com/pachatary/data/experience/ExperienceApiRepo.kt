@@ -66,6 +66,12 @@ class ExperienceApiRepo(retrofit: Retrofit, @Named("io") val ioScheduler: Schedu
                     .subscribeOn(ioScheduler)
     }
 
+    override fun getShareUrl(experienceId: String): Flowable<Result<String>> =
+            experienceApi.getExperienceShareUrl(experienceId)
+                    .subscribeOn(ioScheduler)
+                    .compose(NetworkParserFactory.getTransformer())
+                    .startWith(ResultInProgress())
+
     override fun translateShareId(experienceShareId: String): Flowable<Result<String>> =
             experienceApi.translateShareId(experienceShareId)
                     .subscribeOn(ioScheduler)

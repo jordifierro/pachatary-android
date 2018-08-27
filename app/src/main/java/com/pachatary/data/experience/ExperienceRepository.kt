@@ -69,6 +69,9 @@ class ExperienceRepository(val apiRepository: ExperienceApiRepository,
     fun translateShareId(experienceShareId: String): Flowable<Result<String>> =
         apiRepository.translateShareId(experienceShareId)
 
+    fun getShareUrl(experienceId: String): Flowable<Result<String>> =
+            apiRepository.getShareUrl(experienceId)
+
     internal val addOrUpdateExperienceToMine =
         { experienceResult: Result<Experience> ->
             if (experienceResult.isSuccess())

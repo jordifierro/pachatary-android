@@ -15,6 +15,7 @@ interface ExperienceApiRepository {
     fun createExperience(experience: Experience): Flowable<Result<Experience>>
     fun editExperience(experience: Experience): Flowable<Result<Experience>>
     fun saveExperience(save: Boolean, experienceId: String): Flowable<Result<Void>>
+    fun getShareUrl(experienceId: String): Flowable<Result<String>>
     fun translateShareId(experienceShareId: String): Flowable<Result<String>>
     fun uploadExperiencePicture(experienceId: String, imageUriString: String)
                                                                     : Flowable<Result<Experience>>

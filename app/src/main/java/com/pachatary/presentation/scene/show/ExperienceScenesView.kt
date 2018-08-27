@@ -15,6 +15,8 @@ interface ExperienceScenesView {
     fun navigateToExperienceMap(experienceId: String, showSceneWithId: String? = null)
     fun showUnsaveDialog()
     fun showSavedMessage()
+    fun showShareDialog(shareUrl: String)
+    fun showError()
     fun scrollToScene(sceneId: String)
     fun navigateToCreateScene(experienceId: String)
     fun navigateToProfile(username: String)
