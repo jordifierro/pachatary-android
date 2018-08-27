@@ -1,25 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.pachatary.presentation.register.RegisterActivity">
+    tools:context="com.pachatary.presentation.register.RegisterActivity"
+    android:background="@color/white">
 
-    <android.support.design.widget.AppBarLayout
+    <include layout="@layout/toolbar" />
+
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/toolbar_height">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
+        <RelativeLayout
+            android:id="@+id/edit_title_and_description"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
 
-    </android.support.design.widget.AppBarLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:padding="10dp">
 
-    <include layout="@layout/content_register" />
+                <TextView
+                    android:id="@+id/register_info"
+                    android:layout_width="250dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="30dp"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="center"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"
+                    android:text="@string/register_info" />
+
+                <EditText
+                    android:id="@+id/register_edit_username_edittext"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/register_info"
+                    android:layout_marginRight="30dp"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginBottom="20dp"
+                    android:maxLength="20"
+                    android:inputType="text"
+                    android:digits="abcdefghijklmnopqrstuvwxyz._0123456789"
+                    android:lines="1"
+                    android:hint="@string/register_username" />
+
+                <EditText
+                    android:id="@+id/register_edit_email_edittext"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="30dp"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginBottom="30dp"
+                    android:layout_below="@+id/register_edit_username_edittext"
+                    android:inputType="textEmailAddress"
+                    android:hint="@string/register_email" />
+
+                <Button
+                    android:id="@+id/register_done_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/register_edit_email_edittext"
+                    android:layout_marginRight="30dp"
+                    android:layout_marginLeft="30dp"
+                    android:text="@string/register_button"
+                    style="@style/MyButton.Colored" />
+
+            </RelativeLayout>
+
+            <ProgressBar
+                android:id="@+id/register_progressbar"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:visibility="invisible"
+                tools:visibility="visible" />
+
+        </RelativeLayout>
+    </ScrollView>
 
 </android.support.design.widget.CoordinatorLayout>

@@ -23,7 +23,6 @@ class ConfirmEmailActivity : AppCompatActivity(), ConfirmEmailView {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_confirm_email)
-        setSupportActionBar(toolbar)
 
         confirmationToken = intent.data.getQueryParameter("token")
 

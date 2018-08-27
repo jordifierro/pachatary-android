@@ -47,10 +47,11 @@
     <string name="title_activity_main">Experiences</string>
     <string name="edittext_hint_mine_profile_bio">Tap to add your bio</string>
 
-    <string name="title_register_activity">Register</string>
-    <string name="edit_regsiter_username">Username:</string>
+    <string name="title_register_activity">SIGN UP</string>
+    <string name="edit_register_username">Username:</string>
     <string name="edit_register_email">Email:</string>
     <string name="edit_register_done_button">Done</string>
+    <string name="register_success_message">Great!\n Check your email to finalize the register</string>
     <string name="title_confirm_email_activity">Confirm Email</string>
     <string name="filter_view_confirm_email_activity">Confirm Email</string>
 
@@ -112,4 +113,8 @@
         Fusce eleifend pharetra volutpat. Etiam dictum gravida nisl,
         sodales sodales massa hendrerit sed. Morbi consequat, turpis porta eleifend interdum,
         orci turpis hendrerit magna, id faucibus dui elit in velit.</string>
+    <string name="register_info">Create an account to publish your own experiences</string>
+    <string name="register_username">username…</string>
+    <string name="register_email">email…</string>
+    <string name="register_button">Send confirmation email</string>
 </resources>

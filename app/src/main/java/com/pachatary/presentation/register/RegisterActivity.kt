@@ -3,6 +3,8 @@ package com.pachatary.presentation.register
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.support.design.widget.CoordinatorLayout
 import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.View
@@ -11,9 +13,9 @@ import android.widget.EditText
 import android.widget.ProgressBar
 import com.pachatary.R
 import com.pachatary.presentation.common.PachataryApplication
-import kotlinx.android.synthetic.main.activity_register.*
+import com.pachatary.presentation.common.view.SnackbarUtils
+import com.pachatary.presentation.common.view.ToolbarUtils
 import javax.inject.Inject
-import android.widget.Toast
 
 
 class RegisterActivity : AppCompatActivity(), RegisterView {
@@ -22,6 +24,7 @@ class RegisterActivity : AppCompatActivity(), RegisterView {
     lateinit var usernameEditText: EditText
     lateinit var emailEditText: EditText
     lateinit var doneButton: Button
+    lateinit var rootView: CoordinatorLayout
 
     @Inject
     lateinit var presenter: RegisterPresenter
@@ -33,8 +36,10 @@ class RegisterActivity : AppCompatActivity(), RegisterView {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
-        setSupportActionBar(toolbar)
 
+        ToolbarUtils.setUp(this, getString(R.string.title_register_activity), true)
+
+        rootView = findViewById(R.id.root)
         progressBar = findViewById(R.id.register_progressbar)
         usernameEditText = findViewById(R.id.register_edit_username_edittext)
         emailEditText = findViewById(R.id.register_edit_email_edittext)
@@ -54,6 +59,11 @@ class RegisterActivity : AppCompatActivity(), RegisterView {
         progressBar.visibility = View.INVISIBLE
     }
 
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
+    }
+
     override fun blockDoneButton(block: Boolean) {
         doneButton.isEnabled = !block
     }
@@ -61,11 +71,15 @@ class RegisterActivity : AppCompatActivity(), RegisterView {
     override fun getUsername() = usernameEditText.editableText.toString()
     override fun getEmail() = emailEditText.editableText.toString()
 
-    override fun showMessage(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    override fun showSuccessMessage() {
+        SnackbarUtils.showSuccess(rootView, this, getString(R.string.register_success_message))
+    }
+
+    override fun showErrorMessage(message: String) {
+        SnackbarUtils.showError(rootView, this, message)
     }
 
     override fun finishApplication() {
-        ActivityCompat.finishAffinity(this)
+        Handler().postDelayed({ ActivityCompat.finishAffinity(this) }, 2000)
     }
 }

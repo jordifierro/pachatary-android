@@ -72,8 +72,8 @@ class RegisterPresenterTest {
         @Mock private lateinit var mockView: RegisterView
         @Mock private lateinit var mockAuthRepo: AuthRepository
         var username = ""
-        var email = ""
-        var clientError: ClientException? = null
+        private var email = ""
+        private var clientError: ClientException? = null
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
@@ -122,8 +122,7 @@ class RegisterPresenterTest {
         }
 
         fun should_show_success_message_and_finish_application() {
-            BDDMockito.then(mockView).should()
-                    .showMessage("Successfully registered!\n Check your email to finalize the process")
+            BDDMockito.then(mockView).should().showSuccessMessage()
             BDDMockito.then(mockView).should().finishApplication()
         }
 
@@ -132,7 +131,7 @@ class RegisterPresenterTest {
         }
 
         fun error_should_be_shown() {
-            BDDMockito.then(mockView).should().showMessage(clientError!!.message)
+            BDDMockito.then(mockView).should().showErrorMessage(clientError!!.message)
         }
 
         fun should_show_view_loader() {

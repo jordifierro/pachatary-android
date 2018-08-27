@@ -23,12 +23,12 @@ class RegisterPresenter @Inject constructor(private val authRepository: AuthRepo
                     view.hideLoader()
                     view.blockDoneButton(false)
                     if (it.isSuccess()) {
-                        view.showMessage("Successfully registered!\n Check your email to finalize the process")
+                        view.showSuccessMessage()
                         view.finishApplication()
                     } else if (it.error is ClientException &&
                                it.error.code == "already_registered")
                         view.finish()
-                    else view.showMessage(it.error!!.message!!)
+                    else view.showErrorMessage(it.error!!.message!!)
                 }, { throw it })
     }
 }

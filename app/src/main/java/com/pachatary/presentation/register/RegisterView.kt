@@ -6,8 +6,9 @@ interface RegisterView : LoaderView {
 
     fun getUsername(): String
     fun getEmail(): String
-    fun showMessage(message: String)
     fun finish()
     fun finishApplication()
     fun blockDoneButton(block: Boolean)
+    fun showSuccessMessage()
+    fun showErrorMessage(message: String)
 }
