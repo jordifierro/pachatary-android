@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -8,7 +9,8 @@
     <com.pachatary.presentation.common.view.SquareImageView
         android:id="@+id/experience_picture"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        tools:background="@color/colorPrimary" />
 
     <com.pachatary.presentation.common.view.SquareLinearLayout
         android:layout_width="match_parent"
@@ -25,7 +27,8 @@
         android:layout_margin="20dp"
         android:textColor="@color/white"
         android:textStyle="bold"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        tools:text="Experience title that can be 80 chars long" />
 
     <RelativeLayout
         android:id="@+id/experience_saves_count_and_author"
@@ -43,7 +46,8 @@
             android:layout_height="50dp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_centerVertical="true" />
+            android:layout_centerVertical="true"
+            tools:background="@color/grey" />
 
         <TextView
             android:id="@+id/experience_author_username"
@@ -55,7 +59,8 @@
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:textColor="@color/black"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            tools:text="author.username" />
 
         <TextView
             android:id="@+id/experience_saves_count"
@@ -65,7 +70,8 @@
             android:layout_toStartOf="@+id/experience_star"
             android:layout_centerVertical="true"
             android:textColor="@color/black"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            tools:text="16789" />
 
         <ImageView
             android:id="@+id/experience_star"
@@ -89,16 +95,33 @@
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp"
         android:layout_marginTop="0dp"
-        android:layout_marginBottom="20dp"
-        android:maxLines="2"
+        android:ellipsize="end"
+        android:maxLines="4"
         android:textColor="@color/black"
-        android:textSize="14sp" />
+        android:textSize="14sp"
+        tools:text="@string/lorem_ipsum" />
+
+    <TextView
+        android:id="@+id/experience_description_show_more"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_below="@id/experience_description"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="20dp"
+        android:layout_marginEnd="20dp"
+        android:textColor="@color/colorPrimary"
+        android:textSize="14sp"
+        android:text="show more" />
 
     <ImageView
         android:id="@+id/experience_map"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/experience_description" />
+        android:layout_below="@id/experience_description_show_more"
+        tools:background="@color/colorPrimary" />
 
     <TextView
         android:layout_width="wrap_content"

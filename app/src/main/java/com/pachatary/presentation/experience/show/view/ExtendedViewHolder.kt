@@ -43,9 +43,7 @@ class ExtendedViewHolder(view: View,
                 onUsernameClick.invoke(experience.authorProfile.username)
             }
         })
-        var cutDescription = experience.description.take(80)
-        if (cutDescription.length == 80) cutDescription += "..."
-        descriptionView.text =  cutDescription
+        descriptionView.text =  experience.description
         savesCountView.text = experience.savesCount.toString()
         Picasso.with(pictureView.context)
                 .load(pictureDeviceCompat.convert(experience.picture)?.fullScreenSizeUrl)

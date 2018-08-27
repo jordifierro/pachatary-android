@@ -268,6 +268,7 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
                 }
             }
         }
+
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
             when (getItemViewType(position)) {
                 EXPERIENCE_TYPE -> {
@@ -319,6 +320,7 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
         private val authorPictureView: ImageView = view.findViewById(R.id.experience_author_picture)
         private val mapView: ImageView = view.findViewById(R.id.experience_map)
         private val starIcon: ImageView = view.findViewById(R.id.experience_star)
+        private val showMoreView: TextView = view.findViewById(R.id.experience_description_show_more)
         lateinit var experienceId: String
 
         fun bind(experience: Experience, scenes: List<Scene>) {
@@ -348,6 +350,24 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
             if (experience.isSaved) starIcon.setColorFilter(
                     ContextCompat.getColor(starIcon.context, R.color.colorPrimary))
             else starIcon.colorFilter = null
+
+            descriptionView.viewTreeObserver.addOnGlobalLayoutListener {
+                val layout = descriptionView.layout
+                if (layout != null) {
+                    if (layout.lineCount > 0) {
+                        if (layout.getEllipsisCount(layout.lineCount - 1) > 0) {
+                            showMoreView.visibility = View.VISIBLE
+                            showMoreView.setOnClickListener {
+                                descriptionView.ellipsize = null
+                                descriptionView.maxLines = Int.MAX_VALUE
+                                descriptionView.text = experience.description
+                                showMoreView.visibility = View.INVISIBLE
+                            }
+                        }
+                        else showMoreView.visibility = View.INVISIBLE
+                    }
+                }
+            }
         }
 
         private fun mapUrl(scenes: List<Scene>): String? {
@@ -380,6 +400,7 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
 
         private val titleView: TextView = view.findViewById(R.id.title)
         private val descriptionView: TextView = view.findViewById(R.id.description)
+        private val showMoreView: TextView = view.findViewById(R.id.description_show_more)
         private val pictureView: ImageView = view.findViewById(R.id.picture)
         private val editButton: FloatingActionButton = view.findViewById(R.id.edit_button)
         private val locateButton: ImageButton = view.findViewById(R.id.locate_button)
@@ -396,6 +417,24 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
             Picasso.with(pictureView.context)
                     .load(pictureDeviceCompat.convert(scene.picture)?.fullScreenSizeUrl)
                     .into(pictureView)
+
+            descriptionView.viewTreeObserver.addOnGlobalLayoutListener {
+                val layout = descriptionView.layout
+                if (layout != null) {
+                    if (layout.lineCount > 0) {
+                        if (layout.getEllipsisCount(layout.lineCount - 1) > 0) {
+                            showMoreView.visibility = View.VISIBLE
+                            showMoreView.setOnClickListener {
+                                descriptionView.ellipsize = null
+                                descriptionView.maxLines = Int.MAX_VALUE
+                                descriptionView.text = scene.description
+                                showMoreView.visibility = View.INVISIBLE
+                            }
+                        }
+                        else showMoreView.visibility = View.INVISIBLE
+                    }
+                }
+            }
         }
     }
 

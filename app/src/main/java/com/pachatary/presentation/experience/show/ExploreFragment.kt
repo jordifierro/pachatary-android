@@ -38,11 +38,12 @@ import javax.inject.Inject
 class ExploreFragment : Fragment(), ExploreView {
 
     companion object {
+        private const val PERMISSIONS_DIALOG = 1
+        private const val SELECT_LOCATION_ACTIVITY = 2
+
         fun newInstance() = ExploreFragment()
     }
 
-    private val PERMISSIONS_DIALOG = 1
-    private val SELECT_LOCATION_ACTIVITY = 2
 
     @Inject
     lateinit var presenter: ExplorePresenter
@@ -147,11 +148,10 @@ class ExploreFragment : Fragment(), ExploreView {
     }
 
     override fun navigateToSelectLocation(latitude: Double?, longitude: Double?) {
-        val intent: Intent
-        if (latitude != null && longitude != null)
-            intent = SelectLocationActivity.newIntent(activity!!.applicationContext, latitude,
+        val intent: Intent = if (latitude != null && longitude != null)
+            SelectLocationActivity.newIntent(activity!!.applicationContext, latitude,
                     longitude, SelectLocationPresenter.LocationType.APROX)
-        else intent = SelectLocationActivity.newIntent(activity!!.applicationContext)
+        else SelectLocationActivity.newIntent(activity!!.applicationContext)
         startActivityForResult(intent, SELECT_LOCATION_ACTIVITY)
     }
 

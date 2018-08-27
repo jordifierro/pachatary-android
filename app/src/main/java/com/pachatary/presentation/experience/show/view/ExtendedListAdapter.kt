@@ -16,8 +16,10 @@ class ExtendedListAdapter(private val inflater: LayoutInflater,
                           private val onLastItemShown: () -> Unit)
                                                 : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private val EXPERIENCE_TYPE = 1
-    private val LOADER_TYPE = 2
+    companion object {
+        private const val EXPERIENCE_TYPE = 1
+        private const val LOADER_TYPE = 2
+    }
 
     override fun getItemCount(): Int {
         if (inProgress) return experienceList.size + 1
@@ -39,7 +41,6 @@ class ExtendedListAdapter(private val inflater: LayoutInflater,
                         inflater.inflate(R.layout.item_loader, parent, false)) {}
         }
     }
-
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (!(inProgress && position == experienceList.size)) {
