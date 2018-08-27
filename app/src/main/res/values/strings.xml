@@ -102,6 +102,8 @@
     <string name="experience_menu_save">Save experience</string>
     <string name="experience_scenes">SCENES</string>
 
+    <string name="profile_experiences_title">EXPERIENCES</string>
+
     <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit.
         In nec tincidunt lectus. Aliquam pulvinar sed ante a dapibus. Sed eget congue odio.
         Donec id sapien dictum, convallis ipsum in, egestas mauris.

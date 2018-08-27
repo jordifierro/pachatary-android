@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <ImageView
         android:id="@+id/picture"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
         android:layout_alignParentTop="true"
-        android:layout_margin="10dp"
-        android:layout_centerHorizontal="true" />
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="5dp"
+        android:layout_centerHorizontal="true"
+        tools:background="@color/colorPrimary" />
 
     <TextView
         android:id="@+id/username"
@@ -18,22 +21,42 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/picture"
-        android:layout_margin="10dp"
-        android:textSize="20sp"
-        android:textColor="@color/black" />
+        android:layout_marginBottom="15dp"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        tools:text="user.name" />
 
     <TextView
         android:id="@+id/bio"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
+        android:layout_below="@+id/username"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
         android:gravity="center"
-        android:layout_margin="10dp"
-        android:layout_below="@+id/username" />
+        android:textSize="14sp"
+        android:textColor="@color/black"
+        tools:text="Profile bio description that can be 140 chars long.\nThis is dummy one"/>
 
     <RelativeLayout
+        android:id="@+id/divider"
         android:layout_width="match_parent"
-        android:layout_height="10dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="20dp"
+        android:background="@color/light_grey"
         android:layout_below="@+id/bio" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/divider"
+        android:layout_marginTop="20dp"
+        android:paddingBottom="20dp"
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        android:text="@string/profile_experiences_title" />
 
 </RelativeLayout>

@@ -11,14 +11,11 @@ interface ProfileView {
     fun hideExperiencesLoader()
     fun showPaginationLoader()
     fun hidePaginationLoader()
-    fun showExperiencesRetry()
-    fun hideExperiencesRetry()
+    fun showRetry()
 
     fun showProfile(profile: Profile)
     fun showProfileLoader()
     fun hideProfileLoader()
-    fun showProfileRetry()
-    fun hideProfileRetry()
 
     fun navigateToExperienceWithFinishOnProfileClick(experienceId: String)
 }

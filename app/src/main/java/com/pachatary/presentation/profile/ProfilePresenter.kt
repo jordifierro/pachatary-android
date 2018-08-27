@@ -14,7 +14,7 @@ import javax.inject.Named
 
 class ProfilePresenter @Inject constructor(private val repository: ExperienceRepository,
                                            private val profileRepo: ProfileRepository,
-                                           @Named("main") val mainScheduler: Scheduler)
+                                           @Named("main") private val mainScheduler: Scheduler)
                                                                                : LifecycleObserver {
 
     lateinit var view: ProfileView
@@ -69,8 +69,7 @@ class ProfilePresenter @Inject constructor(private val repository: ExperienceRep
 
                                               if (it.isError() &&
                                                       it.action == Request.Action.GET_FIRSTS)
-                                                  view.showExperiencesRetry()
-                                              else view.hideExperiencesRetry()
+                                                  view.showRetry()
 
                                               if (it.isSuccess())
                                                   view.showExperienceList(it.data!!)
@@ -83,18 +82,16 @@ class ProfilePresenter @Inject constructor(private val repository: ExperienceRep
         profileDisposable = profileRepo.profile(this.username)
                 .observeOn(mainScheduler)
                 .subscribe({
-                    if (it.isSuccess()) {
-                        view.showProfile(it.data!!)
-                        view.hideProfileLoader()
-                        view.hideProfileRetry()
-                    }
-                    else if (it.isInProgress()) {
-                        view.showProfileLoader()
-                        view.hideProfileRetry()
-                    }
-                    else {
-                        view.showProfileRetry()
-                        view.hideProfileLoader()
+                    when {
+                        it.isSuccess() -> {
+                            view.showProfile(it.data!!)
+                            view.hideProfileLoader()
+                        }
+                        it.isInProgress() -> view.showProfileLoader()
+                        else -> {
+                            view.showRetry()
+                            view.hideProfileLoader()
+                        }
                     }
                 }, { throw it })
     }
