@@ -6,6 +6,7 @@ import android.arch.lifecycle.OnLifecycleEvent
 import com.pachatary.data.common.Request
 import com.pachatary.data.experience.ExperienceRepoSwitch
 import com.pachatary.data.experience.ExperienceRepository
+import com.pachatary.data.profile.Profile
 import com.pachatary.data.profile.ProfileRepository
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
@@ -22,6 +23,7 @@ class ProfilePresenter @Inject constructor(private val repository: ExperienceRep
 
     private var experiencesDisposable: Disposable? = null
     private var profileDisposable: Disposable? = null
+    private var profile: Profile? = null
 
     fun setViewAndUsername(view: ProfileView, username: String) {
         this.view = view
@@ -84,7 +86,8 @@ class ProfilePresenter @Inject constructor(private val repository: ExperienceRep
                 .subscribe({
                     when {
                         it.isSuccess() -> {
-                            view.showProfile(it.data!!)
+                            this.profile = it.data!!
+                            view.showProfile(it.data)
                             view.hideProfileLoader()
                         }
                         it.isInProgress() -> view.showProfileLoader()
@@ -100,5 +103,9 @@ class ProfilePresenter @Inject constructor(private val repository: ExperienceRep
     fun destroy() {
         experiencesDisposable?.dispose()
         profileDisposable?.dispose()
+    }
+
+    fun onShareClick() {
+        if (profile != null) view.showShareDialog(profile!!.username)
     }
 }

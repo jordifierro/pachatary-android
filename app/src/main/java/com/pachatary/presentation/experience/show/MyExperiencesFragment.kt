@@ -194,7 +194,7 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
         val i = Intent(Intent.ACTION_SEND)
         i.type = "text/plain"
         i.putExtra(Intent.EXTRA_TEXT,
-                   "http://" + getString(R.string.https_deeplink_host) + "/" + username)
+                   "http://" + getString(R.string.https_deeplink_host) + "/p/" + username)
         startActivity(Intent.createChooser(i, "Share URL"))
     }
 

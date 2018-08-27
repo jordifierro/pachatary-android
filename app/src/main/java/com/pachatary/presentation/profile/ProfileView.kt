@@ -18,4 +18,5 @@ interface ProfileView {
     fun hideProfileLoader()
 
     fun navigateToExperienceWithFinishOnProfileClick(experienceId: String)
+    fun showShareDialog(username: String)
 }

@@ -15,6 +15,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Test
 import org.mockito.BDDMockito
 import org.mockito.BDDMockito.then
+import org.mockito.BDDMockito.times
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
@@ -165,6 +166,33 @@ class ProfilePresenterTest {
         }
     }
 
+    @Test
+    fun test_share_when_no_profile() {
+        given {
+            a_presenter("username")
+            an_experience_repo_that_returns(ResultInProgress())
+            a_profile_repo_that_returns("username", ResultInProgress())
+        } whenn {
+            create_presenter()
+            share_click()
+        } then {
+            should_not_call_share("username")
+        }
+    }
+
+    @Test
+    fun test_share_when_profile() {
+        given {
+            a_presenter("username")
+            an_experience_repo_that_returns(ResultInProgress())
+            a_profile_repo_that_returns("username", DummyProfileResult("other"))
+        } whenn {
+            create_presenter()
+            share_click()
+        } then {
+            should_call_share("other")
+        }
+    }
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().given(func)
 
     class ScenarioMaker {
@@ -212,6 +240,10 @@ class ProfilePresenterTest {
 
         fun experience_click(experienceId: String) {
             presenter.onExperienceClick(experienceId)
+        }
+
+        fun share_click() {
+            presenter.onShareClick()
         }
 
         fun should_show_received_experiences(experiences: List<Experience>) {
@@ -287,6 +319,14 @@ class ProfilePresenterTest {
 
         fun should_hide_profile_loader() {
             BDDMockito.then(mockView).should().hideProfileLoader()
+        }
+
+        fun should_not_call_share(username: String) {
+            BDDMockito.then(mockView).should(Mockito.times(0)).showShareDialog(username)
+        }
+
+        fun should_call_share(username: String) {
+            BDDMockito.then(mockView).should().showShareDialog(username)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

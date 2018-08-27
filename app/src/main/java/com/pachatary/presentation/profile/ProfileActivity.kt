@@ -7,9 +7,7 @@ import android.support.design.widget.CoordinatorLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import com.pachatary.R
@@ -73,6 +71,21 @@ class ProfileActivity : AppCompatActivity(), ProfileView {
         lifecycle.addObserver(presenter)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.profile, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        return when (item!!.itemId) {
+            R.id.share -> {
+                presenter.onShareClick()
+                return true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
     override fun showRetry() {
         SnackbarUtils.showRetry(rootView, this) { presenter.onRetryClick() }
     }
@@ -122,6 +135,14 @@ class ProfileActivity : AppCompatActivity(), ProfileView {
     override fun navigateToExperienceWithFinishOnProfileClick(experienceId: String) {
         startActivity(ExperienceScenesActivity.newIntent(this, experienceId,
                 finishOnProfileClick = true))
+    }
+
+    override fun showShareDialog(username: String) {
+        val i = Intent(Intent.ACTION_SEND)
+        i.type = "text/plain"
+        i.putExtra(Intent.EXTRA_TEXT,
+                "http://" + getString(R.string.https_deeplink_host) + "/p/" + username)
+        startActivity(Intent.createChooser(i, "Share URL"))
     }
 
     override fun onSupportNavigateUp(): Boolean {
