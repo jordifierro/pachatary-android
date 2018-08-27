@@ -7,15 +7,14 @@ import android.support.v7.app.AppCompatActivity
 import android.webkit.WebView
 import com.pachatary.BuildConfig
 import com.pachatary.R
-import kotlinx.android.synthetic.main.activity_webview.*
+import com.pachatary.presentation.common.view.ToolbarUtils
 
 class WebViewActivity : AppCompatActivity() {
-
 
     companion object {
         enum class WebViewType { PRIVACY_POLICY, TERMS_AND_CONDITIONS }
 
-        val WEBVIEWTYPE = "webview_type"
+        const val WEBVIEWTYPE = "webview_type"
 
         fun newPrivacyPolicyIntent(context: Context): Intent {
             val intent = Intent(context, WebViewActivity::class.java)
@@ -33,16 +32,20 @@ class WebViewActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_webview)
-        setSupportActionBar(toolbar)
 
         val type = intent.getSerializableExtra(WEBVIEWTYPE)
 
         if (type == WebViewType.PRIVACY_POLICY)
-            setTitle(R.string.title_webview_privacy)
-        else setTitle(R.string.title_webview_terms)
+            ToolbarUtils.setUp(this, getString(R.string.title_webview_privacy), true)
+        else ToolbarUtils.setUp(this, getString(R.string.title_webview_terms), true)
 
         val path = if (type == WebViewType.PRIVACY_POLICY) "/privacy-policy"
                    else "/terms-and-conditions"
         findViewById<WebView>(R.id.webview_webview).loadUrl(BuildConfig.API_URL + path)
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
     }
 }

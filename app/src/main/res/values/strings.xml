@@ -68,13 +68,13 @@
 
     <string name="title_profile">Profile</string>
 
-    <string name="title_settings_activity">Settings</string>
+    <string name="title_settings_activity">SETTINGS</string>
     <string name="main_menu_share">Share</string>
     <string name="settings_privacy_policy">Privacy policy</string>
     <string name="settings_terms_and_conditions">Terms and conditions</string>
 
-    <string name="title_webview_privacy">Privacy Policy</string>
-    <string name="title_webview_terms">Terms and conditions</string>
+    <string name="title_webview_privacy">PRIVACY POLICY</string>
+    <string name="title_webview_terms">TERMS AND CONDITIONS</string>
 
     <string name="title_router_activity">Router</string>
     <string name="filter_view_experience_router_activity">Open experience</string>
