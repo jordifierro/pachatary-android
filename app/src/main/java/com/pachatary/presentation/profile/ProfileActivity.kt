@@ -206,7 +206,7 @@ class ProfileActivity : AppCompatActivity(), ProfileView {
             when (getItemViewType(position)) {
                 PROFILE_TYPE -> {
                     val profileViewHolder = holder as ProfileViewHolder
-                    profileViewHolder.bind(profile!!)
+                    if (profile != null) profileViewHolder.bind(profile!!)
                 }
                 EXPERIENCE_TYPE -> {
                     val experienceViewHolder = holder as SquareViewHolder
