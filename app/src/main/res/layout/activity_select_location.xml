@@ -2,24 +2,88 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:mapbox="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.pachatary.presentation.common.edition.SelectLocationActivity">
 
-    <android.support.design.widget.AppBarLayout
+    <include layout="@layout/toolbar" />
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/toolbar_height">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
+        <com.mapbox.mapboxsdk.maps.MapView
+            android:id="@+id/select_location_mapview"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+            android:layout_height="match_parent"
+            mapbox:mapbox_styleUrl="@string/mapbox_style_light" />
 
-    </android.support.design.widget.AppBarLayout>
+        <LinearLayout
+            android:id="@+id/select_location_search_relativelayout"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_alignParentTop="true"
+            android:paddingLeft="30dp"
+            android:paddingRight="30dp"
+            android:background="@color/white">
 
-    <include layout="@layout/content_select_location" />
+            <EditText
+                android:id="@+id/select_location_search_edittext"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="14sp"
+                android:imeOptions="actionSearch"
+                android:lines="1"
+                android:inputType="text" />
+
+            <ImageButton
+                android:id="@+id/select_location_search_button"
+                android:layout_width="46dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
+                app:srcCompat="@drawable/ic_search"
+                style="@style/MyButton.White" />
+
+        </LinearLayout>
+
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/select_location_locate_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/select_location_search_relativelayout"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            app:fabSize="mini"
+            app:backgroundTint="@color/white"
+            app:srcCompat="@drawable/ic_navigation" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_location_black"
+            tools:ignore="ContentDescription" />
+
+        <Button
+            android:id="@+id/select_location_done_button"
+            android:layout_width="225dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="10dp"
+            android:text="@string/select_location_done"
+            style="@style/MyButton.Colored" />
+
+    </RelativeLayout>
 
 </android.support.design.widget.CoordinatorLayout>

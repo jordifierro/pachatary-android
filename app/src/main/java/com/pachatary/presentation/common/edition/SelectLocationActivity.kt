@@ -11,10 +11,14 @@ import android.graphics.PointF
 import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
+import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.TextView
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -24,44 +28,42 @@ import com.pachatary.BuildConfig
 import com.pachatary.R
 import com.pachatary.presentation.common.PachataryApplication
 import com.pachatary.presentation.common.edition.SelectLocationPresenter.LocationType
+import com.pachatary.presentation.common.location.LocationUtils
+import com.pachatary.presentation.common.view.ToolbarUtils
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
-import kotlinx.android.synthetic.main.activity_select_location.*
+import java.io.IOException
 import java.util.*
 import javax.inject.Inject
-import android.view.inputmethod.InputMethodManager.HIDE_NOT_ALWAYS
-import android.widget.ImageButton
-import com.pachatary.presentation.common.location.LocationUtils
-import java.io.IOException
 
 
 class SelectLocationActivity : AppCompatActivity(), SelectLocationView {
-
-    val PERMISSIONS_DIALOG = 1
 
     @Inject
     lateinit var presenter: SelectLocationPresenter
 
     lateinit var mapView: MapView
-    lateinit var mapboxMap: MapboxMap
-    lateinit var doneButton: Button
-    lateinit var searchButton: Button
-    lateinit var searchEditText: EditText
-    lateinit var locateButton: ImageButton
+    private lateinit var mapboxMap: MapboxMap
+    private lateinit var doneButton: Button
+    private lateinit var searchButton: ImageButton
+    private lateinit var searchEditText: EditText
+    private lateinit var locateButton: FloatingActionButton
 
-    lateinit var initialLocationType: SelectLocationPresenter.LocationType
-    var initialLatitude = 0.0
-    var initialLongitude = 0.0
+    private lateinit var initialLocationType: SelectLocationPresenter.LocationType
+    private var initialLatitude = 0.0
+    private var initialLongitude = 0.0
 
-    val registry: LifecycleRegistry = LifecycleRegistry(this)
+    private val registry: LifecycleRegistry = LifecycleRegistry(this)
 
     companion object {
-        val LATITUDE = "latitude"
-        val LONGITUDE = "longitude"
+        const val PERMISSIONS_DIALOG = 1
 
-        val INITIAL_LATITUDE = "initial_latitude"
-        val INITIAL_LONGITUDE = "initial_longitude"
-        val INITIAL_LOCATION_TYPE = "initial_location_type"
+        const val LATITUDE = "latitude"
+        const val LONGITUDE = "longitude"
+
+        const val INITIAL_LATITUDE = "initial_latitude"
+        const val INITIAL_LONGITUDE = "initial_longitude"
+        const val INITIAL_LOCATION_TYPE = "initial_location_type"
 
         fun newIntent(context: Context, initialLatitude: Double = 0.0,
                       initialLongitude: Double = 0.0,
@@ -78,7 +80,8 @@ class SelectLocationActivity : AppCompatActivity(), SelectLocationView {
         super.onCreate(savedInstanceState)
         Mapbox.getInstance(this, BuildConfig.MAPBOX_ACCESS_TOKEN)
         setContentView(R.layout.activity_select_location)
-        setSupportActionBar(toolbar)
+
+        ToolbarUtils.setUp(this, title.toString(), true)
 
         initialLatitude = intent.getDoubleExtra(INITIAL_LATITUDE, 0.0)
         initialLongitude = intent.getDoubleExtra(INITIAL_LONGITUDE, 0.0)
@@ -97,6 +100,16 @@ class SelectLocationActivity : AppCompatActivity(), SelectLocationView {
                                                  InputMethodManager.HIDE_NOT_ALWAYS)
             presenter.searchButtonClick(searchEditText.text.toString())
         }
+        searchEditText.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                presenter.searchButtonClick(searchEditText.text.toString())
+                searchEditText.clearFocus()
+                val inm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                inm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
+                return@OnEditorActionListener true
+            }
+            false
+        })
         locateButton = findViewById(R.id.select_location_locate_button)
         locateButton.setOnClickListener { presenter.locateClick() }
 
@@ -150,11 +163,11 @@ class SelectLocationActivity : AppCompatActivity(), SelectLocationView {
     }
 
     override fun moveMapToPoint(latitude: Double, longitude: Double) {
-        mapView.getMapAsync { mapboxMap ->
+        mapView.getMapAsync { _ ->
             val newCameraPosition = CameraPosition.Builder()
                                         .target(LatLng(latitude, longitude))
                                         .build()
-            this.mapboxMap.animateCamera({ _ -> newCameraPosition })
+            this.mapboxMap.animateCamera { _ -> newCameraPosition }
         }
     }
 
@@ -183,6 +196,11 @@ class SelectLocationActivity : AppCompatActivity(), SelectLocationView {
                 return
             }
         }
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
     }
 
     override fun onStart() {
