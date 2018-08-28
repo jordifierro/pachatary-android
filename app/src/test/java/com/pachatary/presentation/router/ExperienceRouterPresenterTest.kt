@@ -13,7 +13,6 @@ import org.junit.Test
 import org.mockito.BDDMockito
 import org.mockito.Mock
 import org.mockito.Mockito
-import org.mockito.Mockito.times
 import org.mockito.MockitoAnnotations
 import java.net.UnknownHostException
 
@@ -29,7 +28,6 @@ class ExperienceRouterPresenterTest {
         } then {
             should_call_get_person_invitation()
             should_show_loader()
-            should_hide_retry_view()
         }
     }
 
@@ -44,7 +42,6 @@ class ExperienceRouterPresenterTest {
             should_call_get_person_invitation()
             should_show_retry_view()
             should_hide_loader()
-            should_show_error_message()
         }
     }
 
@@ -59,8 +56,6 @@ class ExperienceRouterPresenterTest {
         } then {
             should_call_get_person_invitation()
             should_hide_loader()
-
-            should_hide_retry_view(times = 2)
 
             should_call_translate_share_id()
             should_show_loader()
@@ -77,7 +72,6 @@ class ExperienceRouterPresenterTest {
             create_presenter()
         } then {
             should_call_get_person_invitation()
-            should_hide_retry_view()
 
             should_hide_loader(times = 2)
 
@@ -98,7 +92,6 @@ class ExperienceRouterPresenterTest {
             should_call_get_person_invitation()
 
             should_hide_loader(times = 2)
-            should_hide_retry_view(times = 2)
 
             should_call_translate_share_id()
             should_navigate_to_experience("7")
@@ -117,7 +110,6 @@ class ExperienceRouterPresenterTest {
         } then {
             should_call_translate_share_id()
             should_show_loader()
-            should_hide_retry_view()
         }
     }
 
@@ -146,7 +138,6 @@ class ExperienceRouterPresenterTest {
         } then {
             should_call_translate_share_id()
             should_hide_loader()
-            should_hide_retry_view()
             should_navigate_to_experience("7")
             should_finish_view()
         }
@@ -162,7 +153,6 @@ class ExperienceRouterPresenterTest {
         } then {
             should_call_get_person_invitation()
             should_show_loader()
-            should_hide_retry_view()
         }
     }
 
@@ -177,7 +167,6 @@ class ExperienceRouterPresenterTest {
             should_call_get_person_invitation()
             should_show_retry_view()
             should_hide_loader()
-            should_show_error_message()
         }
     }
 
@@ -192,8 +181,6 @@ class ExperienceRouterPresenterTest {
         } then {
             should_call_get_person_invitation()
             should_hide_loader()
-
-            should_hide_retry_view(2)
 
             should_call_translate_share_id()
             should_show_loader()
@@ -210,7 +197,6 @@ class ExperienceRouterPresenterTest {
             retry_click()
         } then {
             should_call_get_person_invitation()
-            should_hide_retry_view()
 
             should_hide_loader(times = 2)
 
@@ -231,7 +217,6 @@ class ExperienceRouterPresenterTest {
             should_call_get_person_invitation()
 
             should_hide_loader(times = 2)
-            should_hide_retry_view(times = 2)
 
             should_call_translate_share_id()
             should_navigate_to_experience("7")
@@ -250,7 +235,6 @@ class ExperienceRouterPresenterTest {
         } then {
             should_call_translate_share_id()
             should_show_loader()
-            should_hide_retry_view()
         }
     }
 
@@ -279,7 +263,6 @@ class ExperienceRouterPresenterTest {
         } then {
             should_call_translate_share_id()
             should_hide_loader()
-            should_hide_retry_view()
             should_navigate_to_experience("7")
             should_finish_view()
         }
@@ -347,20 +330,12 @@ class ExperienceRouterPresenterTest {
             BDDMockito.then(mockView).should().showLoader()
         }
 
-        fun should_hide_retry_view(times: Int = 1) {
-            BDDMockito.then(mockView).should(times(times)).hideRetryView()
-        }
-
         fun should_show_retry_view() {
             BDDMockito.then(mockView).should().showRetryView()
         }
 
         fun should_hide_loader(times: Int = 1) {
             BDDMockito.then(mockView).should(Mockito.times(times)).hideLoader()
-        }
-
-        fun should_show_error_message() {
-            BDDMockito.then(mockView).should().showErrorMessage()
         }
 
         fun should_call_translate_share_id() {

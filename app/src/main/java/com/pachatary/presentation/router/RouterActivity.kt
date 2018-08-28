@@ -3,21 +3,20 @@ package com.pachatary.presentation.router
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
-import android.widget.ImageView
 import android.widget.ProgressBar
-import android.widget.Toast
+import android.widget.RelativeLayout
 import com.pachatary.R
 import com.pachatary.presentation.common.PachataryApplication
+import com.pachatary.presentation.common.view.SnackbarUtils
 import com.pachatary.presentation.profile.ProfileActivity
 import com.pachatary.presentation.scene.show.ExperienceScenesActivity
-import kotlinx.android.synthetic.main.activity_router.*
 import javax.inject.Inject
 
 
 class RouterActivity : AppCompatActivity(), RouterView {
 
-    lateinit var progressBar: ProgressBar
-    lateinit var retryView: ImageView
+    private lateinit var progressBar: ProgressBar
+    lateinit var rootView: RelativeLayout
     lateinit var experienceShareId: String
     lateinit var username: String
 
@@ -28,23 +27,20 @@ class RouterActivity : AppCompatActivity(), RouterView {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_router)
-        setSupportActionBar(toolbar)
+        setContentView(R.layout.activity_loading)
 
-        progressBar = findViewById(R.id.router_progressbar)
-        retryView = findViewById(R.id.router_retry)
+        progressBar = findViewById(R.id.progressbar)
+        rootView = findViewById(R.id.root)
 
         PachataryApplication.injector.inject(this)
         val path = intent.data.pathSegments[0]
         if (path == "e" || path == "experiences") {
             experienceShareId = intent.data.pathSegments[1]
-            retryView.setOnClickListener { experienceRouterPresenter.onRetryClick() }
             experienceRouterPresenter.setViewAndExperienceShareId(this, experienceShareId)
             lifecycle.addObserver(experienceRouterPresenter)
         }
         else if (path == "p" || path == "profiles") {
             username = intent.data.pathSegments[1]
-            retryView.setOnClickListener { profileRouterPresenter.onRetryClick() }
             profileRouterPresenter.setViewAndUsername(this, username)
             lifecycle.addObserver(profileRouterPresenter)
         }
@@ -58,17 +54,8 @@ class RouterActivity : AppCompatActivity(), RouterView {
         progressBar.visibility = View.INVISIBLE
     }
 
-    override fun showErrorMessage() {
-        Toast.makeText(this, "Some error occurred. Connect to internet and retry",
-                       Toast.LENGTH_LONG).show()
-    }
-
     override fun showRetryView() {
-        retryView.visibility = View.VISIBLE
-    }
-
-    override fun hideRetryView() {
-        retryView.visibility = View.INVISIBLE
+        SnackbarUtils.showRetry(rootView, this) { retryClick() }
     }
 
     override fun navigateToExperience(experienceId: String) {
@@ -77,5 +64,11 @@ class RouterActivity : AppCompatActivity(), RouterView {
 
     override fun navigateToProfile(username: String) {
         startActivity(ProfileActivity.newIntent(this, username))
+    }
+
+    private fun retryClick() {
+        val path = intent.data.pathSegments[0]
+        if (path == "e" || path == "experiences") experienceRouterPresenter.onRetryClick()
+        else profileRouterPresenter.onRetryClick()
     }
 }

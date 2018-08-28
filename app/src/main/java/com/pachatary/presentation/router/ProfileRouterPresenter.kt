@@ -14,7 +14,7 @@ class ProfileRouterPresenter @Inject constructor(
         @Named("main") private val mainScheduler: Scheduler) : LifecycleObserver {
 
     lateinit var view: RouterView
-    lateinit var profileUsername: String
+    private lateinit var profileUsername: String
     var disposable: Disposable? = null
 
     fun setViewAndUsername(view: RouterView, username: String) {
@@ -48,20 +48,17 @@ class ProfileRouterPresenter @Inject constructor(
         disposable = authRepository.getPersonInvitation()
                 .observeOn(mainScheduler)
                 .subscribe({
-                    if (it.isSuccess()) {
-                        view.hideLoader()
-                        view.hideRetryView()
-                        view.navigateToProfile(profileUsername)
-                        view.finish()
-                    }
-                    else if (it.isError()) {
-                        view.showErrorMessage()
-                        view.hideLoader()
-                        view.showRetryView()
-                    }
-                    else if (it.isInProgress()) {
-                        view.showLoader()
-                        view.hideRetryView()
+                    when {
+                        it.isSuccess() -> {
+                            view.hideLoader()
+                            view.navigateToProfile(profileUsername)
+                            view.finish()
+                        }
+                        it.isError() -> {
+                            view.hideLoader()
+                            view.showRetryView()
+                        }
+                        it.isInProgress() -> view.showLoader()
                     }
                 }, { throw it })
     }

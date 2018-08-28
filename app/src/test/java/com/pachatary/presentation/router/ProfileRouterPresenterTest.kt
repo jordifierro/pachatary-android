@@ -32,7 +32,6 @@ class ProfileRouterPresenterTest {
             } then {
                 should_call_get_person_invitation()
                 should_show_loader()
-                should_hide_retry_view()
             }
         }
     }
@@ -49,7 +48,6 @@ class ProfileRouterPresenterTest {
                 should_call_get_person_invitation()
                 should_show_retry_view()
                 should_hide_loader()
-                should_show_error_message()
             }
         }
     }
@@ -65,7 +63,6 @@ class ProfileRouterPresenterTest {
             } then {
                 should_call_get_person_invitation()
                 should_hide_loader()
-                should_hide_retry_view()
                 should_navitate_to_profile()
                 should_finish_view()
             }
@@ -134,20 +131,12 @@ class ProfileRouterPresenterTest {
             BDDMockito.then(mockView).should().showLoader()
         }
 
-        fun should_hide_retry_view(times: Int = 1) {
-            BDDMockito.then(mockView).should(times(times)).hideRetryView()
-        }
-
         fun should_show_retry_view() {
             BDDMockito.then(mockView).should().showRetryView()
         }
 
         fun should_hide_loader(times: Int = 1) {
             BDDMockito.then(mockView).should(Mockito.times(times)).hideLoader()
-        }
-
-        fun should_show_error_message() {
-            BDDMockito.then(mockView).should().showErrorMessage()
         }
 
         fun should_finish_view() {

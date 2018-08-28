@@ -48,19 +48,16 @@ class ExperienceRouterPresenter @Inject constructor(
         disposable = authRepository.getPersonInvitation()
                 .observeOn(mainScheduler)
                 .subscribe({
-                    if (it.isSuccess()) {
-                        view.hideLoader()
-                        view.hideRetryView()
-                        translateExperienceShareId()
-                    }
-                    else if (it.isError()) {
-                        view.showErrorMessage()
-                        view.hideLoader()
-                        view.showRetryView()
-                    }
-                    else if (it.isInProgress()) {
-                        view.showLoader()
-                        view.hideRetryView()
+                    when {
+                        it.isSuccess() -> {
+                            view.hideLoader()
+                            translateExperienceShareId()
+                        }
+                        it.isError() -> {
+                            view.hideLoader()
+                            view.showRetryView()
+                        }
+                        it.isInProgress() -> view.showLoader()
                     }
                 }, { throw it })
     }
@@ -70,20 +67,17 @@ class ExperienceRouterPresenter @Inject constructor(
         experienceRepository.translateShareId(experienceShareId)
                 .observeOn(mainScheduler)
                 .subscribe({
-                    if (it.isSuccess()) {
-                        view.hideLoader()
-                        view.hideRetryView()
-                        view.navigateToExperience(it.data!!)
-                        view.finish()
-                    }
-                    else if (it.isError()) {
-                        view.showErrorMessage()
-                        view.hideLoader()
-                        view.showRetryView()
-                    }
-                    else if (it.isInProgress()) {
-                        view.showLoader()
-                        view.hideRetryView()
+                    when {
+                        it.isSuccess() -> {
+                            view.hideLoader()
+                            view.navigateToExperience(it.data!!)
+                            view.finish()
+                        }
+                        it.isError() -> {
+                            view.hideLoader()
+                            view.showRetryView()
+                        }
+                        it.isInProgress() -> view.showLoader()
                     }
                 }, { throw it })
     }
