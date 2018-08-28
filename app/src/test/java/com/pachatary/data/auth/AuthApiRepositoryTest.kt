@@ -64,7 +64,7 @@ class AuthApiRepositoryTest {
             confirm_email_person()
         } then {
             request_should_post_email_confirmation_with_confirmation_token()
-            response_should_be_success()
+            response_should_be_inprogress_and_success()
         }
     }
 
@@ -77,7 +77,7 @@ class AuthApiRepositoryTest {
             confirm_email_person()
         } then {
             request_should_post_email_confirmation_with_confirmation_token()
-            response_should_be_invalid_confirmation_token_error()
+            response_should_be_inprogress_and_invalid_confirmation_token_error()
         }
     }
 
@@ -90,7 +90,7 @@ class AuthApiRepositoryTest {
             ask_login_email()
         } then {
             request_should_post_login_email_with_email()
-            response_should_be_in_progress_and_success()
+            response_should_be_inprogress_and_success()
         }
     }
 
@@ -133,10 +133,8 @@ class AuthApiRepositoryTest {
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build(), clientSecretKey, Schedulers.trampoline())
         val testAuthTokenSubscriber = TestSubscriber<Result<AuthToken>>()
-        val testRegisterSubscriber = TestSubscriber<Result<Void>>()
-        val testAskLoginEmailSubscriber = TestSubscriber<Result<Void>>()
-        val testLoginSubscriber = TestSubscriber<Result<AuthToken>>()
-        val testClientVersionsSubscriber = TestSubscriber<Result<Int>>()
+        val testVoidSubscriber = TestSubscriber<Result<Void>>()
+        val testIntSubscriber = TestSubscriber<Result<Int>>()
         var username = ""
         var email = ""
         var confirmationToken = ""
@@ -207,29 +205,29 @@ class AuthApiRepositoryTest {
 
         fun register_person() {
             repository.register(username = username, email = email)
-                    .subscribeOn(Schedulers.trampoline()).subscribe(testRegisterSubscriber)
-            testRegisterSubscriber.awaitCount(1)
+                    .subscribeOn(Schedulers.trampoline()).subscribe(testVoidSubscriber)
+            testVoidSubscriber.awaitCount(1)
         }
 
         fun confirm_email_person() {
             repository.confirmEmail(confirmationToken = confirmationToken)
-                    .subscribeOn(Schedulers.trampoline()).subscribe(testRegisterSubscriber)
-            testRegisterSubscriber.awaitCount(1)
+                    .subscribeOn(Schedulers.trampoline()).subscribe(testVoidSubscriber)
+            testVoidSubscriber.awaitCount(1)
         }
 
         fun ask_login_email() {
-            repository.askLoginEmail(email).subscribe(testAskLoginEmailSubscriber)
-            testAskLoginEmailSubscriber.awaitCount(2)
+            repository.askLoginEmail(email).subscribe(testVoidSubscriber)
+            testVoidSubscriber.awaitCount(2)
         }
 
         fun login() {
-            repository.login(loginToken).subscribe(testLoginSubscriber)
-            testLoginSubscriber.awaitCount(2)
+            repository.login(loginToken).subscribe(testAuthTokenSubscriber)
+            testAuthTokenSubscriber.awaitCount(2)
         }
 
         fun client_versions() {
-            repository.clientVersions().subscribe(testClientVersionsSubscriber)
-            testClientVersionsSubscriber.awaitCount(2)
+            repository.clientVersions().subscribe(testIntSubscriber)
+            testIntSubscriber.awaitCount(2)
         }
 
         fun request_should_post_to_people_with_client_secret_key() {
@@ -282,33 +280,32 @@ class AuthApiRepositoryTest {
         }
 
         fun response_should_be_success() {
-            testRegisterSubscriber.assertResult( ResultSuccess())
+            testVoidSubscriber.assertResult(ResultSuccess())
+        }
+
+        fun response_should_be_inprogress_and_success() {
+            testVoidSubscriber.assertResult(ResultInProgress(), ResultSuccess())
         }
 
         fun response_should_be_error() {
-            testRegisterSubscriber.assertResult(
+            testVoidSubscriber.assertResult(
                     ResultError(ClientException(source = "username", code = "not_allowed",
                             message = "Username not allowed")))
         }
 
-        fun response_should_be_invalid_confirmation_token_error() {
-            testRegisterSubscriber.assertResult(
+        fun response_should_be_inprogress_and_invalid_confirmation_token_error() {
+            testVoidSubscriber.assertResult(ResultInProgress(),
                     ResultError(ClientException(source = "confirmation_token", code = "invalid",
                             message = "Invalid confirmation token")))
         }
 
-        fun response_should_be_in_progress_and_success() {
-            testAskLoginEmailSubscriber.assertResult(ResultInProgress(), ResultSuccess())
-        }
-
         fun response_should_be_in_progress_and_success_with_auth_token() {
-            testLoginSubscriber.assertResult(ResultInProgress(),
+            testAuthTokenSubscriber.assertResult(ResultInProgress(),
                     ResultSuccess(AuthToken("A_T_12345", "R_T_67890")))
         }
 
         fun response_should_return_inprogress_and_3() {
-            testClientVersionsSubscriber.assertResult(
-                    ResultInProgress(), ResultSuccess(3))
+            testIntSubscriber.assertResult(ResultInProgress(), ResultSuccess(3))
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = apply(func)

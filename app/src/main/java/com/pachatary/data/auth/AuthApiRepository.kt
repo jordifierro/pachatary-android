@@ -27,8 +27,10 @@ class AuthApiRepository (retrofit: Retrofit, private val clientSecretKey: String
 
     fun confirmEmail(confirmationToken: String): Flowable<Result<Void>> =
         authApi.confirmEmail(confirmationToken = confirmationToken)
+                .subscribeOn(ioScheduler)
                 .compose(NetworkParserFactory
                                 .getVoidTransformer { ClientExceptionMapper(it).toError() })
+                .startWith(ResultInProgress())
 
     fun askLoginEmail(email: String): Flowable<Result<Void>> =
         authApi.askLoginEmail(email)

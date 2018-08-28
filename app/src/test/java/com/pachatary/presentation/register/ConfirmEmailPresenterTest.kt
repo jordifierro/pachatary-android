@@ -2,6 +2,7 @@ package com.pachatary.presentation.register
 
 import com.pachatary.data.auth.AuthRepository
 import com.pachatary.data.common.ClientException
+import com.pachatary.data.common.Result
 import com.pachatary.data.common.ResultError
 import com.pachatary.data.common.ResultSuccess
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
@@ -11,39 +12,59 @@ import org.junit.Test
 import org.mockito.BDDMockito
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import java.net.SocketTimeoutException
 
 class ConfirmEmailPresenterTest {
 
+    enum class Action { CREATE, RETRY }
+
     @Test
     fun test_register_ok() {
-        given {
-            a_confirmation_token()
-            an_auth_repo_that_returns_a_flowable_with_success()
-        } whenn {
-            presenter_is_created()
-        } then {
-            should_show_view_loader()
-            should_call_repo_confirm_email_with_confirmation_token()
-            should_hide_view_loader()
-            should_show_success_message()
-            should_navigate_to_main_view()
+        for (action in Action.values()) {
+            given {
+                a_confirmation_token("TK")
+                an_auth_repo_that_returns("TK", ResultSuccess())
+            } whenn {
+                do_action(action)
+            } then {
+                should_call_repo_confirm_email_with("TK")
+                should_hide_view_loader()
+                should_show_success_message()
+                should_navigate_to_main_view()
+            }
         }
     }
 
     @Test
-    fun test_register_error() {
-        given {
-            a_confirmation_token()
-            a_client_error()
-            an_auth_repo_that_returns_a_flowable_with_that_error()
-        } whenn {
-            presenter_is_created()
-        } then {
-            should_show_view_loader()
-            should_call_repo_confirm_email_with_confirmation_token()
-            error_should_be_shown()
-            should_hide_view_loader()
-            should_finish_view()
+    fun test_register_token_error() {
+        for (action in Action.values()) {
+            given {
+                a_confirmation_token("TK")
+                an_auth_repo_that_returns("TK", ResultError(ClientException("", "", "")))
+            } whenn {
+                do_action(action)
+            } then {
+                should_call_repo_confirm_email_with("TK")
+                invalid_token_error_should_be_shown()
+                should_hide_view_loader()
+                should_navigate_to_register()
+            }
+        }
+    }
+
+    @Test
+    fun test_register_connection_error() {
+        for (action in Action.values()) {
+            given {
+                a_confirmation_token("TK")
+                an_auth_repo_that_returns("TK", ResultError(SocketTimeoutException()))
+            } whenn {
+                do_action(action)
+            } then {
+                should_call_repo_confirm_email_with("TK")
+                should_show_retry()
+                should_hide_view_loader()
+            }
         }
     }
 
@@ -53,8 +74,6 @@ class ConfirmEmailPresenterTest {
         private lateinit var presenter: ConfirmEmailPresenter
         @Mock private lateinit var mockView: ConfirmEmailView
         @Mock private lateinit var mockAuthRepo: AuthRepository
-        var confirmationToken = ""
-        var clientError: ClientException? = null
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
@@ -65,27 +84,17 @@ class ConfirmEmailPresenterTest {
             return this
         }
 
-        fun a_confirmation_token() {
-            confirmationToken = "BCDZ"
-            BDDMockito.given(mockView.confirmationToken()).willReturn(confirmationToken)
+        fun a_confirmation_token(token: String) {
+            BDDMockito.given(mockView.confirmationToken()).willReturn(token)
         }
 
-        fun a_client_error() {
-            clientError = ClientException(source = "s", code = "c", message = "mess")
+        fun an_auth_repo_that_returns(token: String, result: Result<Void>) {
+            BDDMockito.given(mockAuthRepo.confirmEmail(token))
+                    .willReturn(Flowable.just(result))
         }
 
-        fun an_auth_repo_that_returns_a_flowable_with_success() {
-            BDDMockito.given(mockAuthRepo.confirmEmail(confirmationToken))
-                    .willReturn(Flowable.just(ResultSuccess()))
-        }
-
-        fun an_auth_repo_that_returns_a_flowable_with_that_error() {
-            BDDMockito.given(mockAuthRepo.confirmEmail(confirmationToken))
-                    .willReturn(Flowable.just(ResultError(clientError!!)))
-        }
-
-        fun error_should_be_shown() {
-            BDDMockito.then(mockView).should().showMessage(clientError!!.message)
+        fun invalid_token_error_should_be_shown() {
+            BDDMockito.then(mockView).should().showInvalidTokenMessage()
         }
 
         fun should_show_view_loader() {
@@ -96,24 +105,31 @@ class ConfirmEmailPresenterTest {
             BDDMockito.then(mockView).should().hideLoader()
         }
 
-        fun presenter_is_created() {
-            presenter.create()
+        fun do_action(action: Action) {
+            when (action) {
+                Action.CREATE -> presenter.create()
+                Action.RETRY -> presenter.onRetryClick()
+            }
         }
 
-        fun should_call_repo_confirm_email_with_confirmation_token() {
-            BDDMockito.then(mockAuthRepo).should().confirmEmail(confirmationToken)
+        fun should_call_repo_confirm_email_with(token: String) {
+            BDDMockito.then(mockAuthRepo).should().confirmEmail(token)
         }
 
         fun should_show_success_message() {
-            BDDMockito.then(mockView).should().showMessage("Email successfully confirmed!")
+            BDDMockito.then(mockView).should().showSuccessMessage()
         }
 
         fun should_navigate_to_main_view() {
             BDDMockito.then(mockView).should().navigateToMain()
         }
 
-        fun should_finish_view() {
-            BDDMockito.then(mockView).should().finish()
+        fun should_navigate_to_register() {
+            BDDMockito.then(mockView).should().navigateToRegisterWithDelay()
+        }
+
+        fun should_show_retry() {
+            BDDMockito.then(mockView).should().showRetry()
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

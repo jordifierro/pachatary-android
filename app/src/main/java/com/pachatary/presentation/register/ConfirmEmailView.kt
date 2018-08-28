@@ -5,7 +5,9 @@ import com.pachatary.presentation.common.view.LoaderView
 interface ConfirmEmailView : LoaderView {
 
     fun confirmationToken(): String
-    fun showMessage(message: String)
-    fun finish()
+    fun showSuccessMessage()
+    fun showRetry()
+    fun showInvalidTokenMessage()
     fun navigateToMain()
+    fun navigateToRegisterWithDelay()
 }

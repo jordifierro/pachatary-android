@@ -6,12 +6,10 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
-import android.widget.Toast
 import com.pachatary.R
 import com.pachatary.presentation.common.PachataryApplication
 import com.pachatary.presentation.common.view.SnackbarUtils
 import com.pachatary.presentation.main.MainActivity
-import kotlinx.android.synthetic.main.activity_register.*
 import javax.inject.Inject
 
 
@@ -26,12 +24,12 @@ class LoginActivity : AppCompatActivity(), LoginView {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+        setContentView(R.layout.activity_loading)
 
         loginToken = intent.data.getQueryParameter("token")
 
         rootView = findViewById(R.id.root)
-        progressBar = findViewById(R.id.login_progressbar)
+        progressBar = findViewById(R.id.progressbar)
 
         PachataryApplication.injector.inject(this)
         presenter.view = this

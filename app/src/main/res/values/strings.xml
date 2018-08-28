@@ -51,7 +51,7 @@
     <string name="edit_register_username">Username:</string>
     <string name="edit_register_email">Email:</string>
     <string name="edit_register_done_button">Done</string>
-    <string name="register_success_message">Great!\n Check your email to finalize the register</string>
+    <string name="register_success_message">Great! Check your email to finalize the register</string>
     <string name="title_confirm_email_activity">Confirm Email</string>
     <string name="filter_view_confirm_email_activity">Confirm Email</string>
 
@@ -117,4 +117,6 @@
     <string name="register_username">username…</string>
     <string name="register_email">email…</string>
     <string name="register_button">Send confirmation email</string>
+    <string name="confirm_email_success">Email successfully confirmed!</string>
+    <string name="confirm_email_error">Invalid token! Ask a new one</string>
 </resources>

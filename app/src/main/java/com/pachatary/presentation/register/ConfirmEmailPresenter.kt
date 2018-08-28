@@ -5,6 +5,7 @@ import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.OnLifecycleEvent
 import com.pachatary.data.auth.AuthRepository
+import com.pachatary.data.common.ClientException
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
 import javax.inject.Inject
 
@@ -16,18 +17,33 @@ class ConfirmEmailPresenter @Inject constructor(private val authRepository: Auth
     @SuppressLint("CheckResult")
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun create() {
-        view.showLoader()
+        confirmEmail()
+    }
+
+    fun onRetryClick() {
+        confirmEmail()
+    }
+
+    @SuppressLint("CheckResult")
+    private fun confirmEmail() {
         authRepository.confirmEmail(view.confirmationToken())
                 .subscribeOn(schedulerProvider.subscriber())
                 .observeOn(schedulerProvider.observer())
                 .subscribe({
-                    view.hideLoader()
-                    if (it.isSuccess()) {
-                        view.showMessage("Email successfully confirmed!")
-                        view.navigateToMain()
-                    } else {
-                        view.showMessage(it.error!!.message!!)
-                        view.finish()
+                    when {
+                        it.isSuccess() -> {
+                            view.hideLoader()
+                            view.showSuccessMessage()
+                            view.navigateToMain()
+                        }
+                        it.isInProgress() -> view.showLoader()
+                        else -> {
+                            view.hideLoader()
+                            if (it.error is ClientException) {
+                                view.showInvalidTokenMessage()
+                                view.navigateToRegisterWithDelay()
+                            } else view.showRetry()
+                        }
                     }
                 }, { throw it })
     }
