@@ -130,7 +130,7 @@ class MainActivity : AppCompatActivity(), MainView {
 
     override fun showUpgradeDialog() {
         val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+            AlertDialog.Builder(this, R.style.MyDialogTheme)
         else AlertDialog.Builder(this)
 
         builder.setTitle("Deprecated version")

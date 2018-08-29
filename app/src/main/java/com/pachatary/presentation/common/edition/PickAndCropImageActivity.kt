@@ -101,7 +101,7 @@ class PickAndCropImageActivity : AppCompatActivity(), PickAndCropImageView {
     override fun showSettingsRecover() {
         val builder: AlertDialog.Builder
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            builder = AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+            builder = AlertDialog.Builder(this, R.style.MyDialogTheme)
         else builder = AlertDialog.Builder(this)
         builder.setTitle(R.string.pick_and_crop_image_recover_dialog_title)
                 .setMessage(R.string.pick_and_crop_image_recover_dialog_message)
@@ -114,7 +114,7 @@ class PickAndCropImageActivity : AppCompatActivity(), PickAndCropImageView {
     override fun showPermissionsExplanationDialog() {
         val builder: AlertDialog.Builder
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            builder = AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+            builder = AlertDialog.Builder(this, R.style.MyDialogTheme)
         else builder = AlertDialog.Builder(this)
         builder.setTitle(R.string.pick_and_crop_image_explanation_dialog_title)
                 .setMessage(R.string.pick_and_crop_image_explanation_dialog_message)
