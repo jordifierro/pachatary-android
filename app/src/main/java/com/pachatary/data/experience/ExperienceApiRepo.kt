@@ -55,8 +55,9 @@ class ExperienceApiRepo(retrofit: Retrofit, @Named("io") val ioScheduler: Schedu
 
     override fun editExperience(experience: Experience): Flowable<Result<Experience>> =
             experienceApi.editExperience(experience.id, experience.title, experience.description)
-                    .compose(NetworkParserFactory.getTransformer())
                     .subscribeOn(ioScheduler)
+                    .compose(NetworkParserFactory.getTransformer())
+                    .startWith(ResultInProgress())
 
     override fun saveExperience(save: Boolean, experienceId: String): Flowable<Result<Void>> {
         if (save) return experienceApi.saveExperience(experienceId)

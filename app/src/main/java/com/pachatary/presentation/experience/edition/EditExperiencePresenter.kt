@@ -9,16 +9,19 @@ import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
 import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
-class EditExperiencePresenter @Inject constructor(private val experienceRepository: ExperienceRepository,
-                                                  private val schedulerProvider: SchedulerProvider): LifecycleObserver {
+class EditExperiencePresenter @Inject constructor(
+        private val experienceRepository: ExperienceRepository,
+        private val schedulerProvider: SchedulerProvider): LifecycleObserver {
 
     lateinit var view: EditExperienceView
     lateinit var experienceId: String
-    lateinit var experience: Experience
-    var getDisposable: Disposable? = null
-    var editDisposable: Disposable? = null
 
-    fun setView(view: EditExperienceView, experienceId: String) {
+    lateinit var experience: Experience
+
+    private var getDisposable: Disposable? = null
+    private var editDisposable: Disposable? = null
+
+    fun setViewAndExperienceId(view: EditExperienceView, experienceId: String) {
         this.view = view
         this.experienceId = experienceId
     }
@@ -30,7 +33,7 @@ class EditExperiencePresenter @Inject constructor(private val experienceReposito
                 .subscribeOn(schedulerProvider.subscriber())
                 .take(1)
                 .subscribe { result -> experience = result.data!!
-                                       view.navigateToEditTitleAndDescription(experience.title, experience.description) }
+                                       view.showExperience(experience) }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
@@ -39,34 +42,36 @@ class EditExperiencePresenter @Inject constructor(private val experienceReposito
         editDisposable?.dispose()
     }
 
-    fun onTitleAndDescriptionEdited(title: String, description: String) {
-        experience = Experience(experience.id, title, description, experience.picture)
+    fun onUpdateButtonClick() {
+        if (view.title().isEmpty() || view.title().length > 80) view.showTitleError()
+        else if (view.description().isEmpty()) view.showDescriptionError()
+        else updateExperience()
+    }
+
+    private fun updateExperience() {
+        experience = Experience(experience.id, view.title(), view.description())
         editDisposable = experienceRepository.editExperience(experience)
-                .subscribeOn(schedulerProvider.subscriber())
                 .observeOn(schedulerProvider.observer())
-                .subscribe { onExperienceEditedCorrectly(it.data!!) }
+                .subscribe({ when {
+                    it.isInProgress() -> {
+                        view.showLoader()
+                        view.disableUpdateButton()
+                    }
+                    it.isSuccess() -> {
+                        view.hideLoader()
+                        onExperienceUpdatedCorrectly(it.data!!)
+                    }
+                    it.isError() -> {
+                        view.hideLoader()
+                        view.enableUpdateButton()
+                        view.showError()
+                    }
+                } }, { throw it })
     }
 
-    fun onEditTitleAndDescriptionCanceled() {
-        view.finish()
-    }
-
-    fun onExperienceEditedCorrectly(experience: Experience) {
-        this.experience = experience
-        view.askUserToEditPicture()
-    }
-
-    fun onAskUserEditPictureResponse(userWantsToEditPicture: Boolean) {
-        if (userWantsToEditPicture) view.navigateToSelectImage()
-        else view.finish()
-    }
-
-    fun onSelectImageSuccess(selectedImageUriString: String) {
-        experienceRepository.uploadExperiencePicture(experience.id, selectedImageUriString)
-        view.finish()
-    }
-
-    fun onSelectImageCancel() {
+    private fun onExperienceUpdatedCorrectly(experience: Experience) {
+        if (view.picture() != null)
+            experienceRepository.uploadExperiencePicture(experience.id, view.picture()!!)
         view.finish()
     }
 }

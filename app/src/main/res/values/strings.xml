@@ -40,7 +40,8 @@
     <string name="dialog_title_scene_edited">Scene changes saved</string>
     <string name="dialog_question_edit_scene_picture">Do you also want to change scene picture?</string>
 
-    <string name="title_activity_edit_experience">Edit experience</string>
+    <string name="title_activity_edit_experience">EDIT EXPERIENCE</string>
+    <string name="edit_experience_button">Update</string>
     <string name="dialog_title_experience_edited">Experience changes saved</string>
     <string name="dialog_question_edit_experience_picture">Do you also want to change experience picture?</string>
 

@@ -116,5 +116,10 @@ class CreateExperienceActivity : AppCompatActivity(), CreateExperienceView {
         loaderView.visibility = View.INVISIBLE
     }
 
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
+    }
+
     override fun getLifecycle(): LifecycleRegistry = registry
 }

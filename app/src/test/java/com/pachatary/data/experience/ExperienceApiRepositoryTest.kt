@@ -124,7 +124,7 @@ class ExperienceApiRepositoryTest {
             experience_is_edited()
         } then {
             request_should_patch_experience_attrs()
-            response_should_parse_experience()
+            response_should_be_inprogress_and_parse_experience()
         }
     }
 
@@ -547,33 +547,6 @@ class ExperienceApiRepositoryTest {
             assertEquals(7, secondExperience.savesCount)
 
             assertEquals("https://next_url", result.nextUrl)
-        }
-
-        fun response_should_parse_experience() {
-            val receivedResult = testSubscriber.events.get(0).get(0) as Result<*>
-            val receivedExperience = receivedResult.data as Experience
-
-            assertEquals("4", receivedExperience.id)
-            assertEquals("Plaça", receivedExperience.title)
-            assertEquals("", receivedExperience.description)
-            assertEquals("https://experiences/00df.small.jpeg",
-                         receivedExperience.picture!!.smallUrl)
-            assertEquals("https://experiences/00df.medium.jpeg",
-                         receivedExperience.picture!!.mediumUrl)
-            assertEquals("https://experiences/00df.large.jpeg",
-                         receivedExperience.picture!!.largeUrl)
-            assertEquals(true, receivedExperience.isMine)
-            assertEquals(false, receivedExperience.isSaved)
-            assertEquals("usr.nam", receivedExperience.authorProfile.username)
-            assertEquals("user info", receivedExperience.authorProfile.bio)
-            assertEquals("https://experiences/029d.tiny.jpg",
-                    receivedExperience.authorProfile.picture!!.tinyUrl)
-            assertEquals("https://experiences/029d.small.jpg",
-                    receivedExperience.authorProfile.picture!!.smallUrl)
-            assertEquals("https://experiences/029d.medium.jpg",
-                    receivedExperience.authorProfile.picture!!.mediumUrl)
-            assertTrue(receivedExperience.authorProfile.isMe)
-            assertEquals(5, receivedExperience.savesCount)
         }
 
         fun response_should_be_inprogress_and_parse_experience() {
