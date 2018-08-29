@@ -23,23 +23,23 @@ class ExperienceApiRepo(retrofit: Retrofit, @Named("io") val ioScheduler: Schedu
 
     override fun myExperiencesFlowable(): Flowable<Result<List<Experience>>> =
             experienceApi.myExperiences()
-                    .compose(NetworkParserFactory.getPaginatedListTransformer<Experience, ExperienceMapper>())
                     .subscribeOn(ioScheduler)
+                    .compose(NetworkParserFactory.getPaginatedListTransformer<Experience, ExperienceMapper>())
 
     override fun savedExperiencesFlowable(): Flowable<Result<List<Experience>>> =
             experienceApi.savedExperiences()
-                    .compose(NetworkParserFactory.getPaginatedListTransformer<Experience, ExperienceMapper>())
                     .subscribeOn(ioScheduler)
+                    .compose(NetworkParserFactory.getPaginatedListTransformer<Experience, ExperienceMapper>())
 
     override fun personsExperienceFlowable(username: String): Flowable<Result<List<Experience>>> =
             experienceApi.personsExperiences(username)
-                    .compose(NetworkParserFactory.getPaginatedListTransformer<Experience, ExperienceMapper>())
                     .subscribeOn(ioScheduler)
+                    .compose(NetworkParserFactory.getPaginatedListTransformer<Experience, ExperienceMapper>())
 
     override fun paginateExperiences(url: String): Flowable<Result<List<Experience>>> =
             experienceApi.paginateExperiences(url)
-                    .compose(NetworkParserFactory.getPaginatedListTransformer<Experience, ExperienceMapper>())
                     .subscribeOn(ioScheduler)
+                    .compose(NetworkParserFactory.getPaginatedListTransformer<Experience, ExperienceMapper>())
 
     override fun experienceFlowable(experienceId: String): Flowable<Result<Experience>> =
             experienceApi.getExperience(experienceId)
@@ -49,8 +49,9 @@ class ExperienceApiRepo(retrofit: Retrofit, @Named("io") val ioScheduler: Schedu
 
     override fun createExperience(experience: Experience): Flowable<Result<Experience>> =
             experienceApi.createExperience(title = experience.title, description = experience.description)
-                    .compose(NetworkParserFactory.getTransformer())
                     .subscribeOn(ioScheduler)
+                    .compose(NetworkParserFactory.getTransformer())
+                    .startWith(ResultInProgress())
 
     override fun editExperience(experience: Experience): Flowable<Result<Experience>> =
             experienceApi.editExperience(experience.id, experience.title, experience.description)

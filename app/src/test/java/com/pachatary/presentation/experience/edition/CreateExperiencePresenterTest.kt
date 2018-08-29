@@ -1,6 +1,9 @@
 package com.pachatary.presentation.experience.edition
 
 import com.pachatary.data.DummyExperienceResultSuccess
+import com.pachatary.data.DummyResultError
+import com.pachatary.data.common.Result
+import com.pachatary.data.common.ResultInProgress
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.experience.ExperienceRepository
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
@@ -14,50 +17,88 @@ import org.mockito.MockitoAnnotations
 class CreateExperiencePresenterTest {
 
     @Test
-    fun on_create_navigates_to_edit_title_and_description() {
+    fun test_empty_title() {
         given {
-
+            a_title("")
         } whenn {
-            presenter_is_created()
+            create_click()
         } then {
-            should_navigate_to_edit_title_and_description()
+            should_show_title_error()
         }
     }
 
     @Test
-    fun on_title_and_description_and_select_image_creates_experience_uploads_image_and_finishes() {
+    fun test_empty_description() {
         given {
-            an_experience_repository_that_returns_created_experience_with_id("3", "ttt", "ddd")
+            a_title("title")
+            a_description("")
         } whenn {
-            title_and_description_are_edited("ttt", "ddd")
-            image_is_selected("picture_path")
+            create_click()
         } then {
-            should_create_experience("ttt", "ddd")
-            should_upload_picture("3", "picture_path")
+            should_show_description_error()
+        }
+    }
+
+    @Test
+    fun test_empty_picture() {
+        given {
+            a_title("title")
+            a_description("desc")
+            a_picture(null)
+        } whenn {
+            create_click()
+        } then {
+            should_show_picture_error()
+        }
+    }
+
+    @Test
+    fun test_inprogress() {
+        given {
+            a_title("title")
+            a_description("desc")
+            a_picture("pic")
+            a_repo_that(forParams = Experience("", "title", "desc", null),
+                        returns = ResultInProgress())
+        } whenn {
+            create_click()
+        } then {
+            should_show_loader()
+            should_disable_button()
+        }
+    }
+
+    @Test
+    fun test_error() {
+        given {
+            a_title("title")
+            a_description("desc")
+            a_picture("pic")
+            a_repo_that(forParams = Experience("", "title", "desc", null),
+                    returns = DummyResultError())
+        } whenn {
+            create_click()
+        } then {
+            should_hide_loader()
+            should_enable_button()
+            should_show_error()
+        }
+    }
+
+    @Test
+    fun test_success() {
+        given {
+            a_title("title")
+            a_description("desc")
+            a_picture("pic")
+            a_repo_that(forParams = Experience("", "title", "desc", null),
+                    returns = DummyExperienceResultSuccess("4"))
+        } whenn {
+            create_click()
+        } then {
+            should_hide_loader()
+            should_call_upload_picture("4", "pic")
             should_finish_view()
-        }
-    }
-
-    @Test
-    fun on_edit_title_and_description_canceled_presenter_should_finsh_view() {
-        given {
-
-        } whenn {
-            title_and_description_edition_canceled()
-        } then {
-            should_finish_view()
-        }
-    }
-
-    @Test
-    fun on_select_image_canceled_presenter_should_finsh_view() {
-        given {
-
-        } whenn {
-            title_and_description_are_edited("t", "s")
-            select_image_is_canceled()
-        } then {
-            should_navigate_to_edit_title_and_description("t", "s")
         }
     }
 
@@ -77,54 +118,65 @@ class CreateExperiencePresenterTest {
             return this
         }
 
-        fun an_experience_repository_that_returns_created_experience_with_id(id: String,
-                                                                             title: String,
-                                                                             description: String) {
-            BDDMockito.given(mockRepository.createExperience(
-                    Experience(id = "", title = title, description = description, picture = null)))
-                    .willReturn(Flowable.just(DummyExperienceResultSuccess(id)))
+        fun a_title(title: String) {
+            BDDMockito.given(mockView.title()).willReturn(title)
         }
 
-        fun presenter_is_created() {
-            presenter.create()
+        fun a_description(description: String) {
+            BDDMockito.given(mockView.description()).willReturn(description)
         }
 
-        fun title_and_description_are_edited(title: String, description: String) {
-            presenter.onTitleAndDescriptionEdited(title = title, description = description)
+        fun a_picture(picture: String?) {
+            BDDMockito.given(mockView.picture()).willReturn(picture)
         }
 
-        fun title_and_description_edition_canceled() {
-            presenter.onEditTitleAndDescriptionCanceled()
+        fun a_repo_that(forParams: Experience, returns: Result<Experience>) {
+            BDDMockito.given(mockRepository.createExperience(forParams))
+                    .willReturn(Flowable.just(returns))
         }
 
-        fun image_is_selected(imageString: String) {
-            presenter.onImageSelectSuccess(imageString)
+        fun create_click() {
+            presenter.onCreateButtonClick()
         }
 
-        fun select_image_is_canceled() {
-            presenter.onImageSelectCancel()
+        fun should_show_title_error() {
+            BDDMockito.then(mockView).should().showTitleError()
         }
 
-        fun should_navigate_to_edit_title_and_description(title: String? = null,
-                                                          description: String? = null) {
-            if (title == null)
-                BDDMockito.then(mockView).should().navigateToEditTitleAndDescription()
-            else
-                BDDMockito.then(mockView).should()
-                        .navigateToEditTitleAndDescription(title, description!!)
+        fun should_show_description_error() {
+            BDDMockito.then(mockView).should().showDescriptionError()
+        }
+
+        fun should_show_picture_error() {
+            BDDMockito.then(mockView).should().showPictureError()
+        }
+
+        fun should_show_loader() {
+            BDDMockito.then(mockView).should().showLoader()
+        }
+
+        fun should_disable_button() {
+            BDDMockito.then(mockView).should().disableCreateButton()
+        }
+
+        fun should_hide_loader() {
+            BDDMockito.then(mockView).should().hideLoader()
+        }
+
+        fun should_enable_button() {
+            BDDMockito.then(mockView).should().enableCreateButton()
+        }
+
+        fun should_show_error() {
+            BDDMockito.then(mockView).should().showError()
+        }
+
+        fun should_call_upload_picture(experienceId: String, picture: String) {
+            BDDMockito.then(mockRepository).should().uploadExperiencePicture(experienceId, picture)
         }
 
         fun should_finish_view() {
             BDDMockito.then(mockView).should().finish()
-        }
-
-        fun should_create_experience(title: String, description: String) {
-            BDDMockito.then(mockRepository).should().createExperience(
-                    Experience(id = "", title = title, description = description, picture = null))
-        }
-
-        fun should_upload_picture(id: String, imageString: String) {
-            BDDMockito.then(mockRepository).should().uploadExperiencePicture(id, imageString)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

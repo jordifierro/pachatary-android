@@ -15,56 +15,45 @@ class CreateExperiencePresenter @Inject constructor(
 
     lateinit var view: CreateExperienceView
 
-    var title = ""
-    var description = ""
-    private var selectedImageUriString: String? = null
-
     var disposable: Disposable? = null
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    fun create() {
-        view.navigateToEditTitleAndDescription()
-    }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun destroy() {
         disposable?.dispose()
     }
 
-    fun onTitleAndDescriptionEdited(title: String, description: String) {
-        this.title = title
-        this.description = description
-        view.navigateToSelectImage()
-    }
-
-    fun onEditTitleAndDescriptionCanceled() {
-        view.finish()
-    }
-
-    fun onImageSelectSuccess(selectedImageUriString: String) {
-        this.selectedImageUriString = selectedImageUriString
-        createExperience()
-    }
-
-    fun onImageSelectCancel() {
-        view.navigateToEditTitleAndDescription(title, description)
+    fun onCreateButtonClick() {
+        if (view.title().isEmpty() || view.title().length > 80) view.showTitleError()
+        else if (view.description().isEmpty()) view.showDescriptionError()
+        else if (view.picture() == null) view.showPictureError()
+        else createExperience()
     }
 
     private fun createExperience() {
-        val newExperience = Experience(id = "", title = this.title,
-                                       description = this.description, picture = null)
+        val newExperience = Experience(id = "", title = view.title(),
+                description = view.description(), picture = null)
         disposable = experienceRepository.createExperience(newExperience)
                 .subscribeOn(schedulerProvider.subscriber())
                 .observeOn(schedulerProvider.observer())
-                .subscribe({ onExperienceCreatedCorrectly(it.data!!) }, { throw it })
+                .subscribe({ when {
+                    it.isInProgress() -> {
+                        view.showLoader()
+                        view.disableCreateButton()
+                    }
+                    it.isSuccess() -> {
+                        view.hideLoader()
+                        onExperienceCreatedCorrectly(it.data!!)
+                    }
+                    it.isError() -> {
+                        view.hideLoader()
+                        view.enableCreateButton()
+                        view.showError()
+                    }
+                } }, { throw it })
     }
 
     private fun onExperienceCreatedCorrectly(experience: Experience) {
-        uploadExperiencePicture(experience.id)
+        experienceRepository.uploadExperiencePicture(experience.id, view.picture()!!)
         view.finish()
-    }
-
-    private fun uploadExperiencePicture(experienceId: String) {
-        experienceRepository.uploadExperiencePicture(experienceId, selectedImageUriString!!)
     }
 }

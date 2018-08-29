@@ -15,7 +15,7 @@
     <string name="message_experience_saved">Experience saved!</string>
     <string name="title_activity_create_scene">Create scene</string>
     <string name="fab_title_add_scene">Add new scene</string>
-    <string name="title_activity_create_experience">Create experience</string>
+    <string name="title_activity_create_experience">NEW EXPERIENCE</string>
     <string name="title_scenes_list_activity">Scenes</string>
     <string name="title_search_settings_activity">Search</string>
 
@@ -119,4 +119,11 @@
     <string name="register_button">Send confirmation email</string>
     <string name="confirm_email_success">Email successfully confirmed!</string>
     <string name="confirm_email_error">Invalid token! Ask a new one</string>
+    <string name="experience_edition_info">Add experience information</string>
+    <string name="experience_edition_title_hint">Experience title…</string>
+    <string name="experience_edition_description_hint">Description…</string>
+    <string name="experience_edition_create_button">Create</string>
+    <string name="experience_edition_title_error">Title must be between 1 and 80 chars</string>
+    <string name="experience_edition_description_error">Write a description</string>
+    <string name="experience_edition_picture_error">Select an image</string>
 </resources>

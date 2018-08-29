@@ -12,7 +12,6 @@ import com.pachatary.R
 import com.pachatary.presentation.common.PachataryApplication
 import com.pachatary.presentation.common.edition.EditTitleAndDescriptionActivity
 import com.pachatary.presentation.common.edition.PickAndCropImageActivity
-import kotlinx.android.synthetic.main.activity_create_experience.*
 import javax.inject.Inject
 
 
@@ -38,8 +37,7 @@ class EditExperienceActivity : AppCompatActivity(), EditExperienceView {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_create_experience)
-        setSupportActionBar(toolbar)
+        setContentView(R.layout.activity_experience_edition)
 
         PachataryApplication.injector.inject(this)
         presenter.setView(this, intent.getStringExtra(EXPERIENCE_ID))
