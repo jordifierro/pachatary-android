@@ -1,13 +1,17 @@
 package com.pachatary.data.common.injection
 
 import android.content.Context
-import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
-import com.google.gson.JsonObject
 import com.pachatary.BuildConfig
-import com.pachatary.data.auth.*
-import com.pachatary.data.common.*
+import com.pachatary.data.auth.AuthApiRepository
+import com.pachatary.data.auth.AuthHttpInterceptor
+import com.pachatary.data.auth.AuthRepository
+import com.pachatary.data.auth.AuthStorageRepository
+import com.pachatary.data.common.AcceptLanguageHttpInterceptor
+import com.pachatary.data.common.ClientVersionHttpInterceptor
+import com.pachatary.data.common.ImageUploader
+import com.pachatary.data.common.ResultCacheFactory
 import com.pachatary.data.experience.*
 import com.pachatary.data.profile.ProfileApiRepository
 import com.pachatary.data.profile.ProfileRepository
@@ -17,7 +21,6 @@ import com.pachatary.data.scene.SceneApiRepository
 import com.pachatary.data.scene.SceneRepository
 import dagger.Module
 import dagger.Provides
-import io.reactivex.Flowable
 import io.reactivex.Scheduler
 import okhttp3.OkHttpClient
 import retrofit2.Converter
@@ -52,11 +55,10 @@ class DataModule {
                             clientVersionHttpInterceptor: ClientVersionHttpInterceptor,
                             acceptLanguageHttpInterceptor: AcceptLanguageHttpInterceptor) =
             OkHttpClient.Builder()
-                  .addNetworkInterceptor(StethoInterceptor())
-                  .addInterceptor(authHttpInterceptor)
-                  .addInterceptor(clientVersionHttpInterceptor)
-                  .addInterceptor(acceptLanguageHttpInterceptor)
-                  .build()
+                    .addInterceptor(authHttpInterceptor)
+                    .addInterceptor(clientVersionHttpInterceptor)
+                    .addInterceptor(acceptLanguageHttpInterceptor)
+                    .build()!!
 
     @Provides
     @Singleton
@@ -72,7 +74,7 @@ class DataModule {
                     .addConverterFactory(gsonConverterFactory)
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                     .client(okHttpClient)
-                    .build()
+                    .build()!!
 
     @Provides
     @Singleton
