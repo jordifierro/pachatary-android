@@ -68,41 +68,41 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:support-vector-drawable:27.1.1'
-    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.android.support:appcompat-v7:27.1.1'
-    testImplementation 'junit:junit:4.12'
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     implementation 'com.android.support:design:27.1.1'
-    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
-    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
-    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
-    testImplementation 'com.squareup.okhttp3:mockwebserver:3.8.1'
-    implementation 'io.reactivex.rxjava2:rxjava:2.1.8'
-    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    implementation 'com.squareup.okhttp3:okhttp:3.11.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.4.0'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.1'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
     implementation 'com.squareup.picasso:picasso:2.5.2'
     implementation 'com.jakewharton.picasso:picasso2-okhttp3-downloader:1.1.0'
     implementation 'jp.wasabeef:picasso-transformations:2.2.1'
-    implementation 'com.google.dagger:dagger:2.14.1'
-    kapt 'com.google.dagger:dagger-compiler:2.14.1'
+    implementation 'com.google.dagger:dagger:2.16'
+    kapt 'com.google.dagger:dagger-compiler:2.16'
     compileOnly 'javax.annotation:jsr250-api:1.0'
     implementation 'android.arch.lifecycle:runtime:1.1.1'
     implementation 'android.arch.lifecycle:extensions:1.1.1'
     kapt 'android.arch.lifecycle:compiler:1.1.1'
-    testImplementation 'org.mockito:mockito-core:2.8.47'
     implementation('com.mapbox.mapboxsdk:mapbox-android-sdk:6.3.0@aar') { transitive = true }
     implementation 'com.mapbox.mapboxsdk:mapbox-sdk-services:3.3.0'
-    implementation 'com.zhihu.android:matisse:0.4.3'
-    implementation 'com.github.yalantis:ucrop:2.2.1-native'
-    implementation 'net.gotev:uploadservice:3.4'
-    implementation 'net.gotev:uploadservice-okhttp:3.4'
+    implementation 'com.zhihu.android:matisse:0.5.1'
+    implementation 'com.github.yalantis:ucrop:2.2.2-native'
+    implementation 'net.gotev:uploadservice:3.4.2'
+    implementation 'net.gotev:uploadservice-okhttp:3.4.2'
     implementation 'com.google.android.gms:play-services-location:15.0.1'
-
-    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.4'
+    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.5'
     implementation 'com.android.support:multidex:1.0.3'
+
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'com.squareup.okhttp3:mockwebserver:3.8.1'
+    testImplementation 'org.mockito:mockito-core:2.8.47'
 }
 
 apply plugin: 'com.google.gms.google-services'
