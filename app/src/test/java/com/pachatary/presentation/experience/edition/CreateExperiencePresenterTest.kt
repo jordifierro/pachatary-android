@@ -111,8 +111,7 @@ class CreateExperiencePresenterTest {
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
-            val testSchedulerProvider = SchedulerProvider(Schedulers.trampoline(), Schedulers.trampoline())
-            presenter = CreateExperiencePresenter(mockRepository, testSchedulerProvider)
+            presenter = CreateExperiencePresenter(mockRepository, Schedulers.trampoline())
             presenter.view = mockView
 
             return this

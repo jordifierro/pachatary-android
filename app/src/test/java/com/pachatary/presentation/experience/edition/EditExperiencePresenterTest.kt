@@ -140,8 +140,7 @@ class EditExperiencePresenterTest {
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
-            val testSchedulerProvider = SchedulerProvider(Schedulers.trampoline(), Schedulers.trampoline())
-            presenter = EditExperiencePresenter(mockRepository, testSchedulerProvider)
+            presenter = EditExperiencePresenter(mockRepository, Schedulers.trampoline())
 
             return this
         }

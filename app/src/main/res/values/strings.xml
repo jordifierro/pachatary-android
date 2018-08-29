@@ -13,7 +13,7 @@
     <string name="dialog_title_unsave_experience">Unsave experience</string>
     <string name="dialog_question_unsave_experience">Are you sure you want to unsave this experience?</string>
     <string name="message_experience_saved">Experience saved!</string>
-    <string name="title_activity_create_scene">Create scene</string>
+    <string name="title_activity_create_scene">ADD SCENE</string>
     <string name="fab_title_add_scene">Add new scene</string>
     <string name="title_activity_create_experience">NEW EXPERIENCE</string>
     <string name="title_scenes_list_activity">Scenes</string>
@@ -127,4 +127,12 @@
     <string name="experience_edition_title_error">Title must be between 1 and 80 chars</string>
     <string name="experience_edition_description_error">Write a description</string>
     <string name="experience_edition_picture_error">Select an image</string>
+    <string name="scene_edition_info">Add scene information</string>
+    <string name="scene_edition_title_hint">Scene title…</string>
+    <string name="scene_edition_description_hint">Description…</string>
+    <string name="scene_edition_create_button">Create</string>
+    <string name="scene_edition_title_error">Title must be between 1 and 80 chars</string>
+    <string name="scene_edition_description_error">Write a description</string>
+    <string name="scene_edition_picture_error">Select an image</string>
+    <string name="scene_edition_location_error">Select a location</string>
 </resources>

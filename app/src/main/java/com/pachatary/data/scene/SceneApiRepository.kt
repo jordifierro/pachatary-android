@@ -30,12 +30,16 @@ class SceneApiRepository(retrofit: Retrofit, @Named("io") private val ioSchedule
         sceneApi.createScene(title = scene.title, description = scene.description,
                              latitude = scene.latitude, longitude = scene.longitude,
                              experienceId = scene.experienceId)
+                .subscribeOn(ioScheduler)
                 .compose(NetworkParserFactory.getTransformer())
+                .startWith(ResultInProgress())
 
     fun editScene(scene: Scene): Flowable<Result<Scene>> =
         sceneApi.editScene(scene.id, scene.title, scene.description,
                            scene.latitude, scene.longitude, scene.experienceId)
+                .subscribeOn(ioScheduler)
                 .compose(NetworkParserFactory.getTransformer())
+                .startWith(ResultInProgress())
 
     fun uploadScenePicture(sceneId: String, imageUriString: String): Flowable<Result<Scene>> =
             imageUploader.upload(imageUriString, "/scenes/$sceneId/picture")

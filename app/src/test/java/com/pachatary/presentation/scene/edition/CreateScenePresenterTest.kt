@@ -1,13 +1,14 @@
 package com.pachatary.presentation.scene.edition
 
-import com.pachatary.data.common.ResultSuccess
+import com.pachatary.data.DummyResultError
+import com.pachatary.data.DummySceneResultSuccess
+import com.pachatary.data.common.Result
+import com.pachatary.data.common.ResultInProgress
 import com.pachatary.data.scene.Scene
 import com.pachatary.data.scene.SceneRepository
 import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
-import com.pachatary.presentation.common.edition.SelectLocationPresenter
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
-import org.junit.Assert
 import org.junit.Test
 import org.mockito.BDDMockito
 import org.mockito.Mock
@@ -16,117 +17,112 @@ import org.mockito.MockitoAnnotations
 class CreateScenePresenterTest {
 
     @Test
-    fun on_create_navigates_to_edit_title_and_description() {
+    fun test_empty_title() {
         given {
-            nothing()
+            an_experience_id("7")
+            a_title("")
         } whenn {
-            presenter_is_created()
+            create_click()
         } then {
-            presenter_should_navigate_to_edit_title_and_description()
+            should_show_title_error()
         }
     }
 
     @Test
-    fun on_title_and_description_edited_saves_them_and_navigates_to_select_location() {
+    fun test_empty_description() {
         given {
-            a_title()
-            a_description()
+            an_experience_id("7")
+            a_title("title")
+            a_description("")
         } whenn {
-            title_and_description_are_edited()
+            create_click()
         } then {
-            title_should_be_saved()
-            description_should_be_saved()
-            presenter_should_navigate_to_select_location_initially_unknown()
+            should_show_description_error()
         }
     }
 
     @Test
-    fun on_last_location_found_it_sets_an_initial_location_when_select() {
+    fun test_empty_picture() {
         given {
-            a_title()
-            a_description()
-            a_person_latitude()
-            a_person_longitude()
+            an_experience_id("7")
+            a_title("title")
+            a_description("desc")
+            a_picture(null)
         } whenn {
-            last_location_found()
-            title_and_description_are_edited()
+            create_click()
         } then {
-            title_should_be_saved()
-            description_should_be_saved()
-            presenter_should_navigate_to_select_location_with_initial_aproximation()
+            should_show_picture_error()
         }
     }
 
     @Test
-    fun on_edit_title_and_description_canceled_presenter_should_finsh_view() {
+    fun test_empty_location() {
         given {
-            nothing()
+            an_experience_id("7")
+            a_title("title")
+            a_description("desc")
+            a_picture("pic")
+            a_latitude_and_longitude(null, null)
         } whenn {
-            title_and_description_edition_canceled()
+            create_click()
         } then {
-            presenter_should_finish_view()
+            should_show_location_error()
         }
     }
 
     @Test
-    fun on_location_selected_should_navigate_to_pick_image() {
+    fun test_inprogress() {
         given {
-            a_title()
-            a_description()
-            a_latitude()
-            a_longitude()
+            an_experience_id("7")
+            a_title("title")
+            a_description("desc")
+            a_picture("pic")
+            a_latitude_and_longitude(2.0, -3.5)
+            a_repo_that(forParams = Scene("", "title", "desc", null, 2.0, -3.5, "7"),
+                    returns = ResultInProgress())
         } whenn {
-            title_and_description_are_edited()
-            location_is_selected()
+            create_click()
         } then {
-            presenter_should_navigate_to_select_image()
+            should_show_loader()
+            should_disable_button()
         }
     }
 
     @Test
-    fun on_location_selection_canceled_should_navigate_to_edit_title() {
+    fun test_error() {
         given {
-            a_title()
-            a_description()
-            nothing()
+            an_experience_id("7")
+            a_title("title")
+            a_description("desc")
+            a_picture("pic")
+            a_latitude_and_longitude(2.0, -3.5)
+            a_repo_that(forParams = Scene("", "title", "desc", null, 2.0, -3.5, "7"),
+                    returns = DummyResultError())
         } whenn {
-            title_and_description_are_edited()
-            select_location_canceled()
+            create_click()
         } then {
-            presenter_should_navigate_to_edit_title_and_description_with_previous_title_and_description()
+            should_hide_loader()
+            should_enable_button()
+            should_show_error()
         }
     }
 
     @Test
-    fun on_image_picked_presenter_should_create_scene_and_upload_picture() {
+    fun test_success() {
         given {
-            a_title()
-            a_description()
-            a_latitude()
-            a_longitude()
-            an_scene_repository_that_returns_created_scene()
-            an_image()
+            an_experience_id("7")
+            a_title("title")
+            a_description("desc")
+            a_picture("pic")
+            a_latitude_and_longitude(2.0, -3.5)
+            a_repo_that(forParams = Scene("", "title", "desc", null, 2.0, -3.5, "7"),
+                    returns = DummySceneResultSuccess("4"))
         } whenn {
-            title_and_description_are_edited()
-            location_is_selected()
-            image_is_selected()
+            create_click()
         } then {
-            presenter_should_create_scene()
-            presenter_should_upload_that_selected_image_with_created_scene_id()
-            presenter_should_finish_view()
-        }
-    }
-
-    @Test
-    fun on_pick_image_canceled_should_navigate_to_select_location() {
-        given {
-            a_latitude()
-            a_longitude()
-        } whenn {
-            location_is_selected()
-            select_image_is_canceled()
-        } then {
-            presenter_should_navigate_to_select_location_with_previous_location()
+            should_hide_loader()
+            should_call_upload_picture("4", "pic")
+            should_finish_view()
         }
     }
 
@@ -135,155 +131,87 @@ class CreateScenePresenterTest {
     class ScenarioMaker {
         private lateinit var presenter: CreateScenePresenter
         @Mock private lateinit var mockView: CreateSceneView
-        @Mock lateinit var mockRepository: SceneRepository
-        val experienceId = "4"
-        var title = ""
-        var description = ""
-        var latitude = 0.0
-        var longitude = 0.0
-        var personLastKnowLatitude = 0.0
-        var personLastKnowLongitude = 0.0
-        var image = ""
-        var sentCreatedScene: Scene? = null
-        var receivedCreatedScene: Scene? = null
+        @Mock private lateinit var mockRepository: SceneRepository
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
-            val testSchedulerProvider = SchedulerProvider(Schedulers.trampoline(), Schedulers.trampoline())
-            presenter = CreateScenePresenter(mockRepository, testSchedulerProvider)
-            presenter.setView(mockView, experienceId)
+            presenter = CreateScenePresenter(mockRepository, Schedulers.trampoline())
 
             return this
         }
 
-        fun nothing() {}
-
-        fun a_title() {
-            title = "Some title"
+        fun an_experience_id(experienceId: String) {
+            presenter.setViewAndExperienceId(mockView, experienceId)
         }
 
-        fun a_description() {
-            description = "Some description"
+        fun a_title(title: String) {
+            BDDMockito.given(mockView.title()).willReturn(title)
         }
 
-        fun a_latitude() {
-            latitude = 1.4
+        fun a_description(description: String) {
+            BDDMockito.given(mockView.description()).willReturn(description)
         }
 
-        fun a_longitude() {
-            longitude = -0.3
+        fun a_picture(picture: String?) {
+            BDDMockito.given(mockView.picture()).willReturn(picture)
         }
 
-        fun a_person_latitude() {
-            personLastKnowLatitude = 1.7
+        fun a_latitude_and_longitude(latitude: Double?, longitude: Double?) {
+            BDDMockito.given(mockView.latitude()).willReturn(latitude)
+            BDDMockito.given(mockView.longitude()).willReturn(longitude)
         }
 
-        fun a_person_longitude() {
-            personLastKnowLongitude = -4.3
+        fun a_repo_that(forParams: Scene, returns: Result<Scene>) {
+            BDDMockito.given(mockRepository.createScene(forParams))
+                    .willReturn(Flowable.just(returns))
         }
 
-        fun an_image() {
-            image = "image_uri_string"
+        fun create_click() {
+            presenter.onCreateButtonClick()
         }
 
-        fun a_created_scene() {
-            receivedCreatedScene = Scene(id = "1", title = title, description = description,
-                    latitude = latitude, longitude = longitude,
-                    experienceId = experienceId, picture = null)
+        fun should_show_title_error() {
+            BDDMockito.then(mockView).should().showTitleError()
         }
 
-        fun an_scene_repository_that_returns_created_scene() {
-            sentCreatedScene = Scene(id = "", title = title, description = description,
-                                     latitude = latitude, longitude = longitude,
-                                     experienceId = experienceId, picture = null)
-            a_created_scene()
-
-            BDDMockito.given(mockRepository.createScene(scene = sentCreatedScene!!))
-                    .willReturn(Flowable.just(ResultSuccess(receivedCreatedScene!!)))
+        fun should_show_description_error() {
+            BDDMockito.then(mockView).should().showDescriptionError()
         }
 
-        fun presenter_is_created() {
-            presenter.create()
+        fun should_show_picture_error() {
+            BDDMockito.then(mockView).should().showPictureError()
         }
 
-        fun title_and_description_are_edited() {
-            presenter.onTitleAndDescriptionEdited(title = title, description = description)
+        fun should_show_location_error() {
+            BDDMockito.then(mockView).should().showLocationError()
         }
 
-        fun title_and_description_edition_canceled() {
-            presenter.onEditTitleAndDescriptionCanceled()
+        fun should_show_loader() {
+            BDDMockito.then(mockView).should().showLoader()
         }
 
-        fun last_location_found() {
-            presenter.onLastLocationFound(personLastKnowLatitude, personLastKnowLongitude)
+        fun should_disable_button() {
+            BDDMockito.then(mockView).should().disableCreateButton()
         }
 
-        fun location_is_selected() {
-            presenter.onLocationSelected(latitude, longitude)
+        fun should_hide_loader() {
+            BDDMockito.then(mockView).should().hideLoader()
         }
 
-        fun select_location_canceled() {
-            presenter.onSelectLocationCanceled()
+        fun should_enable_button() {
+            BDDMockito.then(mockView).should().enableCreateButton()
         }
 
-        fun image_is_selected() {
-            presenter.onSelectImageSuccess(image)
+        fun should_show_error() {
+            BDDMockito.then(mockView).should().showError()
         }
 
-        fun select_image_is_canceled() {
-            presenter.onSelectImageCanceled()
+        fun should_call_upload_picture(sceneId: String, picture: String) {
+            BDDMockito.then(mockRepository).should().uploadScenePicture(sceneId, picture)
         }
 
-        fun presenter_should_navigate_to_edit_title_and_description() {
-            BDDMockito.then(mockView).should().navigateToEditTitleAndDescription()
-        }
-
-        fun presenter_should_navigate_to_edit_title_and_description_with_previous_title_and_description() {
-            BDDMockito.then(mockView).should().navigateToEditTitleAndDescription(title, description)
-        }
-
-        fun title_should_be_saved() {
-            Assert.assertEquals(title, presenter.title)
-        }
-
-        fun description_should_be_saved() {
-            Assert.assertEquals(description, presenter.description)
-        }
-
-        fun presenter_should_navigate_to_select_location_initially_unknown() {
-            BDDMockito.then(mockView).should().navigateToSelectLocation(personLastKnowLatitude, personLastKnowLongitude,
-                                                                        SelectLocationPresenter.LocationType.UNKNWON)
-        }
-
-        fun presenter_should_navigate_to_select_location_with_initial_aproximation() {
-            BDDMockito.then(mockView).should().navigateToSelectLocation(personLastKnowLatitude, personLastKnowLongitude,
-                                                                        SelectLocationPresenter.LocationType.APROX)
-        }
-
-        fun presenter_should_navigate_to_select_location_with_previous_location() {
-            BDDMockito.then(mockView).should().navigateToSelectLocation(latitude, longitude,
-                    SelectLocationPresenter.LocationType.APROX)
-        }
-
-        fun presenter_should_finish_view() {
+        fun should_finish_view() {
             BDDMockito.then(mockView).should().finish()
-        }
-
-        fun presenter_should_create_scene() {
-            BDDMockito.then(mockRepository).should().createScene(sentCreatedScene!!)
-        }
-
-        fun presenter_should_save_received_scene() {
-            Assert.assertEquals(receivedCreatedScene, presenter.createdScene)
-        }
-
-        fun presenter_should_navigate_to_select_image() {
-            BDDMockito.then(mockView).should().navigateToSelectImage()
-        }
-
-        fun presenter_should_upload_that_selected_image_with_created_scene_id() {
-            BDDMockito.then(mockRepository).should()
-                    .uploadScenePicture(receivedCreatedScene!!.id, image)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

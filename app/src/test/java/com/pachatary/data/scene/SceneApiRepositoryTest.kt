@@ -1,7 +1,5 @@
 package com.pachatary.data.scene
 
-import android.content.Context
-import com.pachatary.data.auth.AuthHttpInterceptor
 import com.pachatary.data.common.Result
 import com.pachatary.data.experience.ExperienceApiRepositoryTest
 import com.google.gson.FieldNamingPolicy
@@ -50,7 +48,7 @@ class SceneApiRepositoryTest {
             create_scene_with_that_scene()
         } then {
             should_call_with_that_scene_params(path = "/scenes/", method = "POST")
-            should_return_parsed_scene_response()
+            should_return_inprogress_and_parsed_scene_response()
         }
     }
 
@@ -63,7 +61,7 @@ class SceneApiRepositoryTest {
             edit_scene_with_that_scene()
         } then {
             should_call_with_that_scene_params(path = "/scenes/7", method = "PATCH")
-            should_return_parsed_scene_response()
+            should_return_inprogress_and_parsed_scene_response()
         }
     }
 
@@ -229,14 +227,16 @@ class SceneApiRepositoryTest {
 
         }
 
-        fun should_return_parsed_scene_response() {
-            testSceneSubscriber.awaitCount(1)
+        fun should_return_inprogress_and_parsed_scene_response() {
+            testSceneSubscriber.awaitCount(2)
 
             assertEquals(0, testSceneSubscriber.events.get(1).size)
-            assertEquals(1, testSceneSubscriber.events.get(0).size)
+            assertEquals(2, testSceneSubscriber.events.get(0).size)
 
-            val receivedResult = testSceneSubscriber.events.get(0).get(0) as Result<*>
-            val receivedScene = receivedResult.data as Scene
+            val receivedResult = testSceneSubscriber.events[0][0] as Result<*>
+            assertEquals(receivedResult, ResultInProgress<Scene>())
+            val secondResult = testSceneSubscriber.events[0][1] as Result<*>
+            val receivedScene = secondResult.data as Scene
 
             assertEquals("4", receivedScene.id)
             assertEquals("Plaça", receivedScene.title)

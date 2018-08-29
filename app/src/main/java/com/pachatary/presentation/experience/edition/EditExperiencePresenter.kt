@@ -5,13 +5,14 @@ import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.OnLifecycleEvent
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.experience.ExperienceRepository
-import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
 import io.reactivex.disposables.Disposable
+import io.reactivex.Scheduler
 import javax.inject.Inject
+import javax.inject.Named
 
 class EditExperiencePresenter @Inject constructor(
         private val experienceRepository: ExperienceRepository,
-        private val schedulerProvider: SchedulerProvider): LifecycleObserver {
+        @Named("main") private val mainScheduler: Scheduler): LifecycleObserver {
 
     lateinit var view: EditExperienceView
     lateinit var experienceId: String
@@ -29,8 +30,7 @@ class EditExperiencePresenter @Inject constructor(
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun create() {
         getDisposable = experienceRepository.experienceFlowable(experienceId)
-                .observeOn(schedulerProvider.observer())
-                .subscribeOn(schedulerProvider.subscriber())
+                .observeOn(mainScheduler)
                 .take(1)
                 .subscribe { result -> experience = result.data!!
                                        view.showExperience(experience) }
@@ -51,7 +51,7 @@ class EditExperiencePresenter @Inject constructor(
     private fun updateExperience() {
         experience = Experience(experience.id, view.title(), view.description())
         editDisposable = experienceRepository.editExperience(experience)
-                .observeOn(schedulerProvider.observer())
+                .observeOn(mainScheduler)
                 .subscribe({ when {
                     it.isInProgress() -> {
                         view.showLoader()

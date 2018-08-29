@@ -25,6 +25,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="20dp"
                 android:layout_centerHorizontal="true"
+                android:gravity="center"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:textSize="20sp"
