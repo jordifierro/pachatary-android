@@ -28,15 +28,11 @@
     <string name="retry">Retry</string>
     <string name="snackbar_retry">RETRY</string>
 
-    <string name="title_activity_edit_title_and_description">Edit scene</string>
-    <string name="edit_title_and_description_title">Title:</string>
-    <string name="edit_title_and_description_description">Description:</string>
-    <string name="edit_title_and_description_done">Done</string>
-
     <string name="title_activity_select_location">SELECT LOCATION</string>
     <string name="select_location_done">Done</string>
 
-    <string name="title_activity_edit_scene">Edit scene</string>
+    <string name="title_activity_edit_scene">EDIT SCENE</string>
+    <string name="edit_scene_button">Update</string>
     <string name="dialog_title_scene_edited">Scene changes saved</string>
     <string name="dialog_question_edit_scene_picture">Do you also want to change scene picture?</string>
 

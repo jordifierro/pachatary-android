@@ -5,13 +5,13 @@ import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.OnLifecycleEvent
 import com.pachatary.data.scene.Scene
 import com.pachatary.data.scene.SceneRepository
-import com.pachatary.presentation.common.injection.scheduler.SchedulerProvider
-import com.pachatary.presentation.common.edition.SelectLocationPresenter
+import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import javax.inject.Inject
+import javax.inject.Named
 
 class EditScenePresenter @Inject constructor(private val sceneRepository: SceneRepository,
-                                             private val schedulerProvider: SchedulerProvider)
+                                             @Named("main") private val mainScheduler: Scheduler)
                                                                                : LifecycleObserver {
 
     lateinit var view: EditSceneView
@@ -21,7 +21,7 @@ class EditScenePresenter @Inject constructor(private val sceneRepository: SceneR
     var disposable: Disposable? = null
     var editDisposable: Disposable? = null
 
-    fun setView(view: EditSceneView, experienceId: String, sceneId: String) {
+    fun setViewExperienceIdAndSceneId(view: EditSceneView, experienceId: String, sceneId: String) {
         this.view = view
         this.experienceId = experienceId
         this.sceneId = sceneId
@@ -30,11 +30,11 @@ class EditScenePresenter @Inject constructor(private val sceneRepository: SceneR
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun create() {
         disposable = sceneRepository.sceneFlowable(experienceId, sceneId)
-                .observeOn(schedulerProvider.observer())
-                .subscribeOn(schedulerProvider.subscriber())
+                .observeOn(mainScheduler)
                 .take(1)
-                .subscribe { result -> scene = result.data!!
-                                       view.navigateToEditTitleAndDescription(scene.title, scene.description) }
+                .subscribe({ scene = it.data!!
+                             view.showScene(it.data) },
+                           { throw it })
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
@@ -43,43 +43,37 @@ class EditScenePresenter @Inject constructor(private val sceneRepository: SceneR
         editDisposable?.dispose()
     }
 
-    fun onTitleAndDescriptionEdited(title: String, description: String) {
-        scene = Scene(scene.id, title, description, scene.picture, scene.latitude, scene.longitude, scene.experienceId)
-        view.navigateToSelectLocation(scene.latitude, scene.longitude, SelectLocationPresenter.LocationType.SPECIFIC)
+    fun onUpdateButtonClick() {
+        if (view.title().isEmpty() || view.title().length > 80) view.showTitleError()
+        else if (view.description().isEmpty()) view.showDescriptionError()
+        else if (view.latitude() == null || view. longitude() == null) view.showLocationError()
+        else updateScene()
     }
 
-    fun onEditTitleAndDescriptionCanceled() {
-        view.finish()
-    }
-
-    fun onLocationSelected(latitude: Double, longitude: Double) {
-        scene = Scene(scene.id, scene.title, scene.description, scene.picture, latitude, longitude, scene.experienceId)
+    private fun updateScene() {
+        scene = Scene(scene.id, view.title(), view.description(), scene.picture,
+                      view.latitude()!!, view.longitude()!!, scene.experienceId)
         editDisposable = sceneRepository.editScene(scene)
-                .subscribeOn(schedulerProvider.subscriber())
-                .observeOn(schedulerProvider.observer())
-                .subscribe { onSceneEditedCorrectly(it.data!!) }
+                .observeOn(mainScheduler)
+                .subscribe({ when {
+                    it.isInProgress() -> {
+                        view.showLoader()
+                        view.disableUpdateButton()
+                    }
+                    it.isSuccess() -> {
+                        view.hideLoader()
+                        onSceneEditedCorrectly()
+                    }
+                    it.isError() -> {
+                        view.hideLoader()
+                        view.enableUpdateButton()
+                        view.showError()
+                    }
+                } }, { throw it })
     }
 
-    fun onSelectLocationCanceled() {
-        view.navigateToEditTitleAndDescription(scene.title, scene.description)
-    }
-
-    private fun onSceneEditedCorrectly(scene: Scene) {
-        this.scene = scene
-        view.askUserToEditPicture()
-    }
-
-    fun onAskUserEditPictureResponse(userWantsToEditPicture: Boolean) {
-        if (userWantsToEditPicture) view.navigateToSelectImage()
-        else view.finish()
-    }
-
-    fun onSelectImageSuccess(selectedImageUriString: String) {
-        sceneRepository.uploadScenePicture(scene.id, selectedImageUriString)
-        view.finish()
-    }
-
-    fun onSelectImageCanceled() {
+    private fun onSceneEditedCorrectly() {
+        if (view.picture() != null) sceneRepository.uploadScenePicture(scene.id, view.picture()!!)
         view.finish()
     }
 }

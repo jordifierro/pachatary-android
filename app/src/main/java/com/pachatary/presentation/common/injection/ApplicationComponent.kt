@@ -1,7 +1,6 @@
 package com.pachatary.presentation.common.injection
 
 import com.pachatary.data.common.injection.DataModule
-import com.pachatary.presentation.common.edition.EditTitleAndDescriptionActivity
 import com.pachatary.presentation.common.edition.PickAndCropImageActivity
 import com.pachatary.presentation.common.edition.SelectLocationActivity
 import com.pachatary.presentation.experience.edition.CreateExperienceActivity
@@ -29,7 +28,6 @@ import javax.inject.Singleton
 interface ApplicationComponent {
 
     fun inject(experienceMapActivity: ExperienceMapActivity)
-    fun inject(editTitleAndDescriptionActivity: EditTitleAndDescriptionActivity)
     fun inject(selectLocationActivity: SelectLocationActivity)
     fun inject(createSceneActivity: CreateSceneActivity)
     fun inject(editSceneActivity: EditSceneActivity)

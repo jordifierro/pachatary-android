@@ -55,11 +55,6 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.pachatary.presentation.common.edition.EditTitleAndDescriptionActivity"
-            android:label="@string/title_activity_edit_title_and_description"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
             android:name="com.pachatary.presentation.common.edition.SelectLocationActivity"
             android:label="@string/title_activity_select_location"
             android:screenOrientation="portrait"

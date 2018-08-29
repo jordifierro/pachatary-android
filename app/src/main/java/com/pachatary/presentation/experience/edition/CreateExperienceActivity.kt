@@ -11,7 +11,6 @@ import android.view.View
 import android.widget.*
 import com.pachatary.R
 import com.pachatary.presentation.common.PachataryApplication
-import com.pachatary.presentation.common.edition.EditTitleAndDescriptionActivity
 import com.pachatary.presentation.common.edition.PickAndCropImageActivity
 import com.pachatary.presentation.common.view.SnackbarUtils
 import com.pachatary.presentation.common.view.ToolbarUtils
