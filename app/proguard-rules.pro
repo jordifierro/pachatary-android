@@ -52,16 +52,17 @@
 -keepattributes InnerClasses
 # Mappers
 -keep class com.pachatary.data.auth.AuthTokenMapper { *; }
+-keep class com.pachatary.data.picture.BigPictureMapper { *; }
 -keep class com.pachatary.data.common.ClientExceptionMapper { *; }
 -keep class com.pachatary.data.common.ClientVersionsMapper { *; }
 -keep class com.pachatary.data.common.ClientVersionsMapper$AndroidClient { *; }
--keep class com.pachatary.data.common.PaginatedListMapper { *; }
+-keep class com.pachatary.data.experience.ExperienceIdMapper { *; }
 -keep class com.pachatary.data.experience.ExperienceMapper { *; }
--keep class com.pachatary.data.picture.BigPictureMapper { *; }
 -keep class com.pachatary.data.picture.LittlePictureMapper { *; }
--keep class com.pachatary.data.auth.AuthTokenMapper { *; }
--keep class com.pachatary.data.scene.SceneMapper { *; }
+-keep class com.pachatary.data.common.PaginatedListMapper { *; }
 -keep class com.pachatary.data.profile.ProfileMapper { *; }
+-keep class com.pachatary.data.scene.SceneMapper { *; }
+-keep class com.pachatary.data.experience.ShareUrlMapper { *; }
 
 # Dagger
 -dontwarn com.google.errorprone.annotations.**
