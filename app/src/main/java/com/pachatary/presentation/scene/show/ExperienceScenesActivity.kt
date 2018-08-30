@@ -5,6 +5,7 @@ import android.arch.lifecycle.LifecycleRegistry
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
+import android.graphics.PointF
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -17,7 +18,9 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.LinearSmoothScroller
 import android.support.v7.widget.RecyclerView
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -106,7 +109,8 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
         recyclerView.adapter =
                 ExperienceScenesAdapter(layoutInflater,
                                         intent.getBooleanExtra(SHOW_EDITABLE_IF_ITS_MINE, false),
-                                        pictureDeviceCompat, presenter)
+                                        pictureDeviceCompat, presenter,
+                                        findViewById(R.id.appbar))
     }
 
     override fun navigateToEditScene(sceneId: String, experienceId: String) {
@@ -224,7 +228,8 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
     class ExperienceScenesAdapter(private val inflater: LayoutInflater,
                                   private val showEditableIfItsMine: Boolean,
                                   val pictureDeviceCompat: PictureDeviceCompat,
-                                  val presenter: ExperienceScenesPresenter)
+                                  val presenter: ExperienceScenesPresenter,
+                                  val appBarLayout: AppBarLayout)
         : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         companion object {
@@ -301,12 +306,15 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
         fun scrollToScene(sceneId: String) {
             if (scenes.count { it.id == sceneId } > 0) {
                 val selectedPosition = scenes.indexOfFirst { it.id == sceneId }
+                val offset = recyclerView.resources.getDimension(R.dimen.toolbar_height) *
+                             recyclerView.resources.displayMetrics.density
                 val smoothScroller = object : LinearSmoothScroller(recyclerView.context) {
-                    override fun getVerticalSnapPreference(): Int {
-                        return LinearSmoothScroller.SNAP_TO_START
-                    }
+                    override fun getVerticalSnapPreference() = LinearSmoothScroller.SNAP_TO_START
+                    override fun calculateDyToMakeVisible(view: View?, snapPreference: Int) =
+                        super.calculateDyToMakeVisible(view, snapPreference) + (offset / 2).toInt()
                 }
                 smoothScroller.targetPosition = selectedPosition + 1
+                appBarLayout.setExpanded(false)
                 Handler().postDelayed({
                     try {
                         this.recyclerView.layoutManager.startSmoothScroll(smoothScroller)
