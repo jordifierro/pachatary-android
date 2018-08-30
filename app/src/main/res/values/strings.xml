@@ -131,4 +131,6 @@
     <string name="scene_edition_description_error">Write a description</string>
     <string name="scene_edition_picture_error">Select an image</string>
     <string name="scene_edition_location_error">Select a location</string>
+    <string name="item_experience_show_more">show more</string>
+    <string name="item_scene_show_more">show more</string>
 </resources>

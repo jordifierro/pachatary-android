@@ -345,8 +345,6 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
         fun bind(experience: Experience, scenes: List<Scene>) {
             this.experienceId = experience.id
             titleView.text = experience.title
-            descriptionView.text = experience.description
-
 
             authorPictureView.setOnClickListener {
                 onProfileClick(experience.authorProfile.username) }
@@ -370,6 +368,7 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
                     ContextCompat.getColor(starIcon.context, R.color.colorPrimary))
             else starIcon.colorFilter = null
 
+            descriptionView.text = experience.description
             descriptionView.viewTreeObserver.addOnGlobalLayoutListener {
                 val layout = descriptionView.layout
                 if (layout != null) {
@@ -428,7 +427,6 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
         fun bind(scene: Scene) {
             this.sceneId = scene.id
             titleView.text = scene.title
-            descriptionView.text = scene.description
             editButton.setOnClickListener { onEditSceneClick(this.sceneId) }
             locateButton.setOnClickListener { onLocateSceneClick(this.sceneId) }
             if (isEditable) editButton.visibility = View.VISIBLE
@@ -437,6 +435,7 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
                     .load(pictureDeviceCompat.convert(scene.picture)?.fullScreenSizeUrl)
                     .into(pictureView)
 
+            descriptionView.text = scene.description
             descriptionView.viewTreeObserver.addOnGlobalLayoutListener {
                 val layout = descriptionView.layout
                 if (layout != null) {

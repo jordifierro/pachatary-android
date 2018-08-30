@@ -110,11 +110,14 @@
         android:layout_below="@id/experience_description"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
+        android:padding="10dp"
         android:layout_marginRight="20dp"
         android:layout_marginEnd="20dp"
         android:textColor="@color/colorPrimary"
         android:textSize="14sp"
-        android:text="show more" />
+        android:text="@string/item_experience_show_more"
+        android:visibility="invisible"
+        tools:visibility="visible" />
 
     <ImageView
         android:id="@+id/experience_map"
