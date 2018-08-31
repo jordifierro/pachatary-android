@@ -51,7 +51,7 @@ class ConfirmEmailActivity : AppCompatActivity(), ConfirmEmailView {
     }
 
     override fun showSuccessMessage() {
-        SnackbarUtils.showSuccess(rootView, this, getString(R.string.confirm_email_success))
+        SnackbarUtils.showSuccess(rootView, this, getString(R.string.activity_confirm_email_success_message))
     }
 
     override fun showRetry() {
@@ -59,7 +59,7 @@ class ConfirmEmailActivity : AppCompatActivity(), ConfirmEmailView {
     }
 
     override fun showInvalidTokenMessage() {
-        SnackbarUtils.showError(rootView, this, getString(R.string.confirm_email_error))
+        SnackbarUtils.showError(rootView, this, getString(R.string.activity_confirm_email_error_message))
     }
 
     override fun navigateToRegisterWithDelay() {

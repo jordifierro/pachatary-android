@@ -103,8 +103,8 @@ class PickAndCropImageActivity : AppCompatActivity(), PickAndCropImageView {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
             builder = AlertDialog.Builder(this, R.style.MyDialogTheme)
         else builder = AlertDialog.Builder(this)
-        builder.setTitle(R.string.pick_and_crop_image_recover_dialog_title)
-                .setMessage(R.string.pick_and_crop_image_recover_dialog_message)
+        builder.setTitle(R.string.activity_pick_and_crop_image_recover_dialog_title)
+                .setMessage(R.string.activity_pick_and_crop_image_recover_dialog_text)
                 .setPositiveButton(android.R.string.yes, { _, _ -> presenter.onSettingsClick() })
                 .setNegativeButton(android.R.string.no, { _, _ -> presenter.onSettingsRecoverCancel() })
                 .setIcon(android.R.drawable.ic_dialog_alert)
@@ -116,8 +116,8 @@ class PickAndCropImageActivity : AppCompatActivity(), PickAndCropImageView {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
             builder = AlertDialog.Builder(this, R.style.MyDialogTheme)
         else builder = AlertDialog.Builder(this)
-        builder.setTitle(R.string.pick_and_crop_image_explanation_dialog_title)
-                .setMessage(R.string.pick_and_crop_image_explanation_dialog_message)
+        builder.setTitle(R.string.activity_pick_and_crop_image_explanation_dialog_title)
+                .setMessage(R.string.activity_pick_and_crop_image_explanation_dialog_text)
                 .setPositiveButton(android.R.string.yes) {
                     _, _ -> presenter.onPermissionsExplanationDialogAccept() }
                 .setNegativeButton(android.R.string.no) {

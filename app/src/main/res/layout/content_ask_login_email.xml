@@ -17,7 +17,7 @@
         android:layout_above="@+id/central_layout"
         android:layout_marginBottom="30dp"
         android:gravity="center"
-        android:text="@string/ask_login_email_info"
+        android:text="@string/activity_ask_login_email_info"
         android:textColor="@color/black"
         android:textSize="16sp" />
 
@@ -34,7 +34,7 @@
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
             android:inputType="textEmailAddress"
-            android:hint="@string/ask_login_email_hint"/>
+            android:hint="@string/activity_ask_login_email_hint"/>
 
         <ProgressBar
             android:id="@+id/ask_login_email_progressbar"
@@ -53,7 +53,7 @@
             android:layout_below="@+id/ask_login_email_progressbar"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
-            android:text="@string/ask_login_email_button"
+            android:text="@string/activity_ask_login_email_button"
             style="@style/MyButton.Colored"/>
 
     </RelativeLayout>

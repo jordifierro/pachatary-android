@@ -46,17 +46,17 @@
         </activity>
         <activity
             android:name="com.pachatary.presentation.scene.show.ExperienceMapActivity"
-            android:label="@string/title_activity_experience_map"
+            android:label="@string/activity_experience_map_title"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="com.pachatary.presentation.scene.edition.CreateSceneActivity"
-            android:label="@string/title_activity_create_scene"
+            android:label="@string/activity_create_scene_title"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="com.pachatary.presentation.common.edition.SelectLocationActivity"
-            android:label="@string/title_activity_select_location"
+            android:label="@string/activity_select_location_title"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
@@ -65,30 +65,30 @@
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
             android:name="com.pachatary.presentation.scene.edition.EditSceneActivity"
-            android:label="@string/title_activity_edit_scene"
+            android:label="@string/activity_edit_scene_title"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="com.pachatary.presentation.experience.edition.CreateExperienceActivity"
-            android:label="@string/title_activity_create_experience"
+            android:label="@string/activity_create_experience_title"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="com.pachatary.presentation.experience.edition.EditExperienceActivity"
-            android:label="@string/title_activity_edit_experience"
+            android:label="@string/activity_edit_experience_title"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="com.pachatary.presentation.register.RegisterActivity"
-            android:label="@string/title_register_activity"
+            android:label="@string/activity_register_title"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name="com.pachatary.presentation.register.ConfirmEmailActivity"
-            android:label="@string/title_confirm_email_activity"
+            android:label="@string/activity_confirm_email_title"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter android:label="@string/filter_view_confirm_email_activity">
+            <intent-filter android:label="@string/filter_view_activity_confirm_email">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
@@ -106,23 +106,23 @@
         </activity>
         <activity
             android:name=".presentation.scene.show.ExperienceScenesActivity"
-            android:label="@string/title_scenes_list_activity"
+            android:label="@string/activity_experience_scenes_title"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".presentation.main.WelcomeActivity"
-            android:label="@string/title_welcome_activity"
+            android:label="@string/activity_welcome_title"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".presentation.login.AskLoginEmailActivity"
-            android:label="@string/title_ask_login_email_activity"
+            android:label="@string/activity_ask_login_email_title"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name="com.pachatary.presentation.login.LoginActivity"
-            android:label="@string/title_login_activity"
+            android:label="@string/activity_login_title"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter android:label="@string/filter_view_login_activity">
+            <intent-filter android:label="@string/filter_view_activity_login">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
@@ -139,22 +139,22 @@
             </intent-filter>
         </activity>
         <activity android:name=".presentation.profile.ProfileActivity"
-            android:label="@string/title_profile"
+            android:label="@string/activity_profile_title"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".presentation.main.SettingsActivity"
-            android:label="@string/title_settings_activity"
+            android:label="@string/activity_settings_title"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".presentation.main.WebViewActivity"
-            android:label="@string/title_settings_activity"
+            android:label="@string/activity_webview_title"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name="com.pachatary.presentation.router.RouterActivity"
-            android:label="@string/title_router_activity"
+            android:label="@string/activity_router_title"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter android:label="@string/filter_view_experience_router_activity">
+            <intent-filter android:label="@string/filter_view_activity_experience_router">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
@@ -169,7 +169,7 @@
                     android:host="app"
                     android:pathPattern="/experiences/..*" />
             </intent-filter>
-            <intent-filter android:label="@string/filter_view_profile_router_activity">
+            <intent-filter android:label="@string/filter_view_activity_profile_router">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
@@ -186,7 +186,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".presentation.common.edition.PickAndCropImageActivity"
-            android:label="@string/title_pick_and_crop_image_activity"
+            android:label="@string/activity_pick_and_crop_image_title"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>

@@ -54,7 +54,7 @@
         android:inputType="textMultiLine"
         android:maxLines="6"
         android:maxLength="140"
-        android:hint="@string/edittext_hint_mine_profile_bio"
+        android:hint="@string/fragment_myexperiences_bio_edittext_hint"
         style="@style/BioEditText" />
 
     <RelativeLayout
@@ -73,6 +73,6 @@
         android:paddingBottom="20dp"
         android:textSize="16sp"
         android:textColor="@color/black"
-        android:text="@string/mine_experiences_experiences_title" />
+        android:text="@string/fragment_myexperiences_title" />
 
 </RelativeLayout>

@@ -55,7 +55,7 @@ class EditExperienceActivity : AppCompatActivity(), EditExperienceView {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_experience_edition)
 
-        ToolbarUtils.setUp(this, getString(R.string.title_activity_edit_experience), true)
+        ToolbarUtils.setUp(this, getString(R.string.activity_edit_experience_title), true)
 
         rootView = findViewById(R.id.root)
         titleEditText = findViewById(R.id.experience_edition_title_edittext)
@@ -65,7 +65,7 @@ class EditExperienceActivity : AppCompatActivity(), EditExperienceView {
         editPictureLayout.setOnClickListener { navigateToSelectImage() }
         updateButton = findViewById(R.id.experience_edition_button)
         updateButton.setOnClickListener { presenter.onUpdateButtonClick() }
-        updateButton.text = getString(R.string.edit_experience_button)
+        updateButton.text = getString(R.string.activity_edit_experience_button)
         loaderView = findViewById(R.id.experience_edition_progressbar)
 
         PachataryApplication.injector.inject(this)
@@ -106,12 +106,12 @@ class EditExperienceActivity : AppCompatActivity(), EditExperienceView {
     }
 
     override fun showTitleError() {
-        SnackbarUtils.showError(rootView, this, getString(R.string.experience_edition_title_error))
+        SnackbarUtils.showError(rootView, this, getString(R.string.activity_experience_edition_title_error))
     }
 
     override fun showDescriptionError() {
         SnackbarUtils.showError(rootView, this,
-                getString(R.string.experience_edition_description_error))
+                getString(R.string.activity_experience_edition_description_error))
     }
 
     override fun enableUpdateButton() {

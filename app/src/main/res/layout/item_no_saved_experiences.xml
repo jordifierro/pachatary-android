@@ -12,7 +12,7 @@
         android:gravity="center"
         android:textSize="16sp"
         android:textColor="@color/black"
-        android:text="@string/saved_experience_info_1" />
+        android:text="@string/fragment_saved_experience_info_1" />
 
     <TextView
         android:id="@+id/saved_experiences_info_2"
@@ -23,6 +23,6 @@
         android:gravity="center"
         android:textSize="16sp"
         android:textColor="@color/black"
-        android:text="@string/saved_experience_info_2" />
+        android:text="@string/fragment_saved_experience_info_2" />
 
 </RelativeLayout>

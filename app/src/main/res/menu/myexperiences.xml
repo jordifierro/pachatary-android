@@ -6,12 +6,12 @@
         android:id="@+id/share"
         android:icon="@drawable/ic_share"
         app:showAsAction="always"
-        android:title="@string/main_menu_share" />
+        android:title="@string/menu_myexperiences_share" />
 
     <item
         android:id="@+id/settings"
         android:icon="@drawable/ic_settings"
         app:showAsAction="always"
-        android:title="@string/title_settings_activity" />
+        android:title="@string/activity_settings_title" />
 
 </menu>

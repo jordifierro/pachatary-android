@@ -36,8 +36,8 @@ class WebViewActivity : AppCompatActivity() {
         val type = intent.getSerializableExtra(WEBVIEWTYPE)
 
         if (type == WebViewType.PRIVACY_POLICY)
-            ToolbarUtils.setUp(this, getString(R.string.title_webview_privacy), true)
-        else ToolbarUtils.setUp(this, getString(R.string.title_webview_terms), true)
+            ToolbarUtils.setUp(this, getString(R.string.activity_webview_privacy_title), true)
+        else ToolbarUtils.setUp(this, getString(R.string.activity_webview_terms_title), true)
 
         val path = if (type == WebViewType.PRIVACY_POLICY) "/privacy-policy"
                    else "/terms-and-conditions"

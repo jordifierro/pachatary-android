@@ -57,6 +57,6 @@
         android:paddingBottom="20dp"
         android:textSize="16sp"
         android:textColor="@color/black"
-        android:text="@string/profile_experiences_title" />
+        android:text="@string/item_profile_experiences_title" />
 
 </RelativeLayout>

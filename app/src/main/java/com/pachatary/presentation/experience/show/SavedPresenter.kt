@@ -10,7 +10,7 @@ import javax.inject.Inject
 import javax.inject.Named
 
 class SavedPresenter @Inject constructor(private val repository: ExperienceRepository,
-                                         @Named("main") val scheduler: Scheduler)
+                                         @Named("myexperiences") val scheduler: Scheduler)
                                                                                : LifecycleObserver {
 
     lateinit var view: SavedView

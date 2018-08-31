@@ -45,7 +45,7 @@ class CreateExperienceActivity : AppCompatActivity(), CreateExperienceView {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_experience_edition)
 
-        ToolbarUtils.setUp(this, getString(R.string.title_activity_create_experience), true)
+        ToolbarUtils.setUp(this, getString(R.string.activity_create_experience_title), true)
 
         rootView = findViewById(R.id.root)
         titleEditText = findViewById(R.id.experience_edition_title_edittext)
@@ -82,17 +82,17 @@ class CreateExperienceActivity : AppCompatActivity(), CreateExperienceView {
     }
 
     override fun showTitleError() {
-        SnackbarUtils.showError(rootView, this, getString(R.string.experience_edition_title_error))
+        SnackbarUtils.showError(rootView, this, getString(R.string.activity_experience_edition_title_error))
     }
 
     override fun showDescriptionError() {
         SnackbarUtils.showError(rootView, this,
-                                getString(R.string.experience_edition_description_error))
+                                getString(R.string.activity_experience_edition_description_error))
     }
 
     override fun showPictureError() {
         SnackbarUtils.showError(rootView, this,
-                                getString(R.string.experience_edition_picture_error))
+                                getString(R.string.activity_experience_edition_picture_error))
     }
 
     override fun enableCreateButton() {

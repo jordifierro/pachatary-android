@@ -1,136 +1,129 @@
 <resources>
-    <string name="app_slogan">Remember moments.\n Discover the world.</string>
+    <string name="auth_sharedpreferences_file" translatable="false">auth_prefs</string>
+    <string name="auth_access_token_key" translatable="false">auth_access_token</string>
+    <string name="auth_refresh_token_key" translatable="false">auth_refresh_token</string>
+    <string name="auth_is_register_completed_key" translatable="false">auth_is_register_completed</string>
 
-    <string name="error_message">Oops! Something went wrong. Please try again</string>
+    <string name="snackbar_error_message">Oops! Something went wrong. Please try again</string>
+    <string name="snackbar_retry_action">RETRY</string>
 
-    <string name="auth_sharedpreferences_file">auth_prefs</string>
-    <string name="auth_access_token_key">auth_access_token</string>
-    <string name="auth_refresh_token_key">auth_refresh_token</string>
-    <string name="auth_is_register_completed_key">auth_is_register_completed</string>
+    <string name="activity_experience_map_title">MAP</string>
 
-    <string name="title_activity_experiences_list">Experiences</string>
-    <string name="title_activity_experience_map">Map</string>
-    <string name="dialog_title_unsave_experience">Unsave experience</string>
-    <string name="dialog_question_unsave_experience">Are you sure you want to unsave this experience?</string>
-    <string name="message_experience_saved">Experience saved!</string>
-    <string name="title_activity_create_scene">ADD SCENE</string>
-    <string name="fab_title_add_scene">Add new scene</string>
-    <string name="title_activity_create_experience">NEW EXPERIENCE</string>
-    <string name="title_scenes_list_activity">Scenes</string>
-    <string name="title_search_settings_activity">Search</string>
+    <string name="activity_experience_scenes_title">EXPERIENCE SCENES</string>
+    <string name="activity_experience_scenes_unsave_dialog_title">REMOVE FROM SAVED</string>
+    <string name="activity_experience_scenes_unsave_dialog_text">Are you sure you want to remove it from your saved experiences?</string>
+    <string name="activity_experience_scenes_saved_message">Experience saved!</string>
+    <string name="item_experience_scenes_title">SCENES</string>
+    <string name="item_experience_show_more">show more</string>
+    <string name="item_scene_show_more">show more</string>
+    <string name="menu_experience_add">Add scene</string>
+    <string name="menu_experience_share">Share experience</string>
+    <string name="menu_experience_edit">Edit experience</string>
+    <string name="menu_experience_save">Save experience</string>
 
-    <string name="title_welcome_activity">Welcome</string>
-    <string name="welcome_legal1_text">by clicking start new adventure you accept our </string>
-    <string name="welcome_legal2_text"><u>privacy policy</u></string>
-    <string name="welcome_legal3_text">&#160;and&#160;</string>
-    <string name="welcome_legal4_text"><u>terms and conditions</u></string>
+    <string name="activity_welcome_title">WELCOME</string>
+    <string name="activity_welcome_legal1_text">by clicking start new adventure you accept our </string>
+    <string name="activity_welcome_legal2_text"><u>privacy policy</u></string>
+    <string name="activity_welcome_legal3_text">&#160;and&#160;</string>
+    <string name="activity_welcome_legal4_text"><u>terms and conditions</u></string>
+    <string name="activity_welcome_slogan">Remember moments.\n Discover the world.</string>
 
-    <string name="retry">Retry</string>
-    <string name="snackbar_retry">RETRY</string>
+    <string name="activity_select_location_title">SELECT LOCATION</string>
+    <string name="activity_select_location_done">Done</string>
 
-    <string name="title_activity_select_location">SELECT LOCATION</string>
-    <string name="select_location_done">Done</string>
+    <string name="fragment_myexperiences_bio_edittext_hint">Tap to add your bio</string>
+    <string name="menu_myexperiences_share">SHARE</string>
 
-    <string name="title_activity_edit_scene">EDIT SCENE</string>
-    <string name="edit_scene_button">Update</string>
-    <string name="dialog_title_scene_edited">Scene changes saved</string>
-    <string name="dialog_question_edit_scene_picture">Do you also want to change scene picture?</string>
+    <string name="activity_register_title">SIGN UP</string>
+    <string name="activity_register_success_message">Great! Check your email to finalize the register</string>
+    <string name="activity_register_info">Create an account to publish your own experiences</string>
+    <string name="activity_register_username_edittext_hint">username…</string>
+    <string name="activity_register_email_edittext_hint">email…</string>
+    <string name="activity_register_button">Send confirmation email</string>
 
-    <string name="title_activity_edit_experience">EDIT EXPERIENCE</string>
-    <string name="edit_experience_button">Update</string>
-    <string name="dialog_title_experience_edited">Experience changes saved</string>
-    <string name="dialog_question_edit_experience_picture">Do you also want to change experience picture?</string>
+    <string name="activity_confirm_email_title">CONFIRM EMAIL</string>
+    <string name="filter_view_activity_confirm_email">Confirm Email</string>
+    <string name="activity_confirm_email_success_message">Email successfully confirmed!</string>
+    <string name="activity_confirm_email_error_message">Invalid token! Ask a new one</string>
 
-    <string name="title_activity_main">Experiences</string>
-    <string name="edittext_hint_mine_profile_bio">Tap to add your bio</string>
+    <string name="activity_ask_login_email_title">LOGIN</string>
+    <string name="activity_ask_login_email_hint">Email…</string>
+    <string name="activity_ask_login_email_button">Send login email</string>
+    <string name="activity_ask_login_email_info">We will send an email to you with a login link</string>
+    <string name="activity_ask_login_email_message">We\'ve send an email to you</string>
 
-    <string name="title_register_activity">SIGN UP</string>
-    <string name="edit_register_username">Username:</string>
-    <string name="edit_register_email">Email:</string>
-    <string name="edit_register_done_button">Done</string>
-    <string name="register_success_message">Great! Check your email to finalize the register</string>
-    <string name="title_confirm_email_activity">Confirm Email</string>
-    <string name="filter_view_confirm_email_activity">Confirm Email</string>
+    <string name="activity_login_title">LOGIN</string>
+    <string name="filter_view_activity_login">Login</string>
+    <string name="activity_login_success_message">Login successful!</string>
+    <string name="activity_login_error_message">Invalid login token. Ask a new email</string>
 
-    <string name="title_ask_login_email_activity">LOGIN</string>
-    <string name="ask_login_email_hint">Email…</string>
-    <string name="ask_login_email_button">Send login email</string>
-    <string name="ask_login_email_info">We will send an email to you with a login link</string>
-    <string name="ask_login_email_message">We\'ve send an email to you</string>
-    <string name="ask_login_email_email">Email:</string>
-    <string name="title_login_activity">Login</string>
-    <string name="login_success">Login successful!</string>
-    <string name="login_error">Invalid login token. Ask a new email</string>
-    <string name="filter_view_login_activity">Login</string>
+    <string name="activity_settings_title">SETTINGS</string>
+    <string name="activity_settings_privacy_policy">Privacy policy</string>
+    <string name="activity_settings_terms_and_conditions">Terms and conditions</string>
 
-    <string name="title_profile">Profile</string>
+    <string name="activity_webview_title">WEBVIEW</string>
+    <string name="activity_webview_privacy_title">PRIVACY POLICY</string>
+    <string name="activity_webview_terms_title">TERMS AND CONDITIONS</string>
 
-    <string name="title_settings_activity">SETTINGS</string>
-    <string name="main_menu_share">Share</string>
-    <string name="settings_privacy_policy">Privacy policy</string>
-    <string name="settings_terms_and_conditions">Terms and conditions</string>
+    <string name="activity_router_title">Router</string>
+    <string name="filter_view_activity_experience_router">Open experience</string>
+    <string name="filter_view_activity_profile_router">Open profile</string>
 
-    <string name="title_webview_privacy">PRIVACY POLICY</string>
-    <string name="title_webview_terms">TERMS AND CONDITIONS</string>
-
-    <string name="title_router_activity">Router</string>
-    <string name="filter_view_experience_router_activity">Open experience</string>
-    <string name="filter_view_profile_router_activity">Open profile</string>
-
-    <string name="title_pick_and_crop_image_activity">Pick and crop image</string>
-    <string name="pick_and_crop_image_recover_dialog_title">Storage Permissions Required</string>
-    <string name="pick_and_crop_image_recover_dialog_message">Picture is needed to create content.
+    <string name="activity_pick_and_crop_image_title">PICK AND CROP IMAGE</string>
+    <string name="activity_pick_and_crop_image_recover_dialog_title">Storage Permissions Required</string>
+    <string name="activity_pick_and_crop_image_recover_dialog_text">Picture is needed to create content.
         To select an image you need to grant read and write storage access permissions.
         Would you like to open settings to modify app\'s permissions?</string>
-    <string name="pick_and_crop_image_explanation_dialog_title">Storage Permissions Required</string>
-    <string name="pick_and_crop_image_explanation_dialog_message">Picture is needed to create content.
+    <string name="activity_pick_and_crop_image_explanation_dialog_title">Storage Permissions Required</string>
+    <string name="activity_pick_and_crop_image_explanation_dialog_text">Picture is needed to create content.
         To select an image you need to grant read and write storage access permissions.
         Would you like to grant that permissions?</string>
-    <string name="explore_search_button">Search…</string>
-    <string name="title_saved_experiences">SAVED EXPERIENCES</string>
-    <string name="saved_experience_info_1">YOU HAVEN\'T SAVED ANY EXPERIENCE YET.</string>
-    <string name="saved_experience_info_2">SAVE ANY EXPERIENCE CLICKING TOP STAR ICON ON EXPERIENCE DETAIL.</string>
-    <string name="mine_experiences_experiences_title">YOUR EXPERIENCES</string>
-    <string name="mine_experiences_no_experiences">YOU DON\'T HAVE ANY EXPERIENCE YET. ADD YOUR FIRST ONE!</string>
-    <string name="mine_experiences_forbidden_share">You must have at least one experience and upload a profile picture</string>
 
-    <string name="experience_menu_add">Add scene</string>
-    <string name="experience_menu_share">Share experience</string>
-    <string name="experience_menu_edit">Edit experience</string>
-    <string name="experience_menu_save">Save experience</string>
-    <string name="experience_scenes">SCENES</string>
+    <string name="fragment_explore_search_button">Search…</string>
 
-    <string name="profile_experiences_title">EXPERIENCES</string>
+    <string name="fragment_saved_experiences_title">SAVED EXPERIENCES</string>
+    <string name="fragment_saved_experience_info_1">YOU HAVEN\'T SAVED ANY EXPERIENCE YET.</string>
+    <string name="fragment_saved_experience_info_2">SAVE ANY EXPERIENCE CLICKING TOP STAR ICON ON EXPERIENCE DETAIL.</string>
 
-    <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+    <string name="fragment_myexperiences_title">YOUR EXPERIENCES</string>
+    <string name="fragment_myexperiences_no_experiences">YOU DON\'T HAVE ANY EXPERIENCE YET. ADD YOUR FIRST ONE!</string>
+    <string name="fragment_myexperiences_forbidden_share">You must have at least one experience and upload a profile picture</string>
+
+    <string name="activity_profile_title">PROFILE</string>
+    <string name="item_profile_experiences_title">EXPERIENCES</string>
+    <string name="menu_profile_share">SHARE</string>
+
+    <string name="activity_create_experience_title">NEW EXPERIENCE</string>
+    <string name="activity_edit_experience_title">EDIT EXPERIENCE</string>
+    <string name="activity_edit_experience_button">Update</string>
+    <string name="activity_experience_edition_info">Add experience information</string>
+    <string name="activity_experience_edition_title_hint">Experience title…</string>
+    <string name="activity_experience_edition_description_hint">Description…</string>
+    <string name="activity_experience_edition_create_button">Create</string>
+    <string name="activity_experience_edition_title_error">Title must be between 1 and 80 chars</string>
+    <string name="activity_experience_edition_description_error">Write a description</string>
+    <string name="activity_experience_edition_picture_error">Select an image</string>
+
+    <string name="activity_edit_scene_title">EDIT SCENE</string>
+    <string name="activity_edit_scene_button">Update</string>
+    <string name="activity_create_scene_title">ADD SCENE</string>
+    <string name="activity_scene_edition_info">Add scene information</string>
+    <string name="activity_scene_edition_title_hint">Scene title…</string>
+    <string name="activity_scene_edition_description_hint">Description…</string>
+    <string name="activity_scene_edition_create_button">Create</string>
+    <string name="activity_scene_edition_title_error">Title must be between 1 and 80 chars</string>
+    <string name="activity_scene_edition_description_error">Write a description</string>
+    <string name="activity_scene_edition_picture_error">Select an image</string>
+    <string name="activity_scene_edition_location_error">Select a location</string>
+
+    <string name="lorem_ipsum" translatable="false">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
         In nec tincidunt lectus. Aliquam pulvinar sed ante a dapibus. Sed eget congue odio.
         Donec id sapien dictum, convallis ipsum in, egestas mauris.
         Sed semper vehicula nulla nec dictum. Quisque pharetra vulputate vehicula.
         Nam felis lectus, gravida sit amet arcu condimentum, lobortis varius ligula.
         Fusce eleifend pharetra volutpat. Etiam dictum gravida nisl,
         sodales sodales massa hendrerit sed. Morbi consequat, turpis porta eleifend interdum,
-        orci turpis hendrerit magna, id faucibus dui elit in velit.</string>
-    <string name="register_info">Create an account to publish your own experiences</string>
-    <string name="register_username">username…</string>
-    <string name="register_email">email…</string>
-    <string name="register_button">Send confirmation email</string>
-    <string name="confirm_email_success">Email successfully confirmed!</string>
-    <string name="confirm_email_error">Invalid token! Ask a new one</string>
-    <string name="experience_edition_info">Add experience information</string>
-    <string name="experience_edition_title_hint">Experience title…</string>
-    <string name="experience_edition_description_hint">Description…</string>
-    <string name="experience_edition_create_button">Create</string>
-    <string name="experience_edition_title_error">Title must be between 1 and 80 chars</string>
-    <string name="experience_edition_description_error">Write a description</string>
-    <string name="experience_edition_picture_error">Select an image</string>
-    <string name="scene_edition_info">Add scene information</string>
-    <string name="scene_edition_title_hint">Scene title…</string>
-    <string name="scene_edition_description_hint">Description…</string>
-    <string name="scene_edition_create_button">Create</string>
-    <string name="scene_edition_title_error">Title must be between 1 and 80 chars</string>
-    <string name="scene_edition_description_error">Write a description</string>
-    <string name="scene_edition_picture_error">Select an image</string>
-    <string name="scene_edition_location_error">Select a location</string>
-    <string name="item_experience_show_more">show more</string>
-    <string name="item_scene_show_more">show more</string>
+        orci turpis hendrerit magna, id faucibus dui elit in velit.
+    </string>
 </resources>

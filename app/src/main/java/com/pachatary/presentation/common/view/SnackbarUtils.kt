@@ -20,14 +20,14 @@ class SnackbarUtils {
         }
 
         fun showError(view: View, context: Context,
-                      message: String = context.getString(R.string.error_message).toString()) {
+                      message: String = context.getString(R.string.snackbar_error_message).toString()) {
             val snackbar = Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
             showSnackbar(snackbar, context, false)
         }
 
         fun showRetry(view: View, context: Context, doOnRetry: () -> Unit) {
             val snackbar = Snackbar.make(view,
-                                         context.getString(R.string.error_message).toString(),
+                                         context.getString(R.string.snackbar_error_message).toString(),
                                          Snackbar.LENGTH_INDEFINITE)
             showSnackbar(snackbar, context, false, doOnRetry)
         }
@@ -48,7 +48,7 @@ class SnackbarUtils {
             if (success)
                 textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_check, 0, 0, 0)
             else textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_cross, 0, 0, 0)
-            if (doOnRetry != null) snackbar.setAction(R.string.snackbar_retry) { doOnRetry() }
+            if (doOnRetry != null) snackbar.setAction(R.string.snackbar_retry_action) { doOnRetry() }
             snackbar.setActionTextColor(ContextCompat.getColor(context, R.color.colorPrimary))
             textView.compoundDrawablePadding = context.resources
                     .getDimensionPixelOffset(R.dimen.snackbar_icon_padding)

@@ -5,7 +5,6 @@ import android.arch.lifecycle.LifecycleRegistry
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
-import android.graphics.PointF
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -180,15 +179,15 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
         val builder: AlertDialog.Builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
             AlertDialog.Builder(this, R.style.MyDialogTheme)
         else AlertDialog.Builder(this)
-        builder.setTitle(R.string.dialog_title_unsave_experience)
-                .setMessage(R.string.dialog_question_unsave_experience)
+        builder.setTitle(R.string.activity_experience_scenes_unsave_dialog_title)
+                .setMessage(R.string.activity_experience_scenes_unsave_dialog_text)
                 .setPositiveButton(android.R.string.yes) { _, _ -> presenter.onConfirmUnsaveExperience() }
                 .setNegativeButton(android.R.string.no) { _, _ -> presenter.onCancelUnsaveExperience() }
                 .show()
     }
 
     override fun showSavedMessage() {
-        val message = this.resources.getString(R.string.message_experience_saved)
+        val message = this.resources.getString(R.string.activity_experience_scenes_saved_message)
         SnackbarUtils.showSuccess(rootView, this, message)
     }
 

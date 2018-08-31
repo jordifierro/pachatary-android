@@ -64,7 +64,7 @@ class EditSceneActivity : AppCompatActivity(), EditSceneView {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scene_edition)
 
-        ToolbarUtils.setUp(this, getString(R.string.title_activity_edit_experience), true)
+        ToolbarUtils.setUp(this, getString(R.string.activity_edit_experience_title), true)
 
         rootView = findViewById(R.id.root)
         titleEditText = findViewById(R.id.scene_edition_title_edittext)
@@ -77,7 +77,7 @@ class EditSceneActivity : AppCompatActivity(), EditSceneView {
         locationIcon = findViewById(R.id.scene_edition_location_icon)
         updateButton = findViewById(R.id.scene_edition_button)
         updateButton.setOnClickListener { presenter.onUpdateButtonClick() }
-        updateButton.text = getString(R.string.edit_scene_button)
+        updateButton.text = getString(R.string.activity_edit_scene_button)
         loaderView = findViewById(R.id.scene_edition_progressbar)
 
         PachataryApplication.injector.inject(this)
@@ -135,16 +135,16 @@ class EditSceneActivity : AppCompatActivity(), EditSceneView {
     }
 
     override fun showTitleError() {
-        SnackbarUtils.showError(rootView, this, getString(R.string.scene_edition_title_error))
+        SnackbarUtils.showError(rootView, this, getString(R.string.activity_scene_edition_title_error))
     }
 
     override fun showDescriptionError() {
         SnackbarUtils.showError(rootView, this,
-                getString(R.string.scene_edition_description_error))
+                getString(R.string.activity_scene_edition_description_error))
     }
 
     override fun showLocationError() {
-        SnackbarUtils.showError(rootView, this, getString(R.string.scene_edition_location_error))
+        SnackbarUtils.showError(rootView, this, getString(R.string.activity_scene_edition_location_error))
     }
 
     override fun enableUpdateButton() {

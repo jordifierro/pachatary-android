@@ -65,7 +65,7 @@ class CreateSceneActivity : AppCompatActivity(), CreateSceneView {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scene_edition)
 
-        ToolbarUtils.setUp(this, getString(R.string.title_activity_create_scene), true)
+        ToolbarUtils.setUp(this, getString(R.string.activity_create_scene_title), true)
 
         LocationUtils.addListenerToLocation(this) { location: Location? ->
             if (location != null) {
@@ -129,21 +129,21 @@ class CreateSceneActivity : AppCompatActivity(), CreateSceneView {
     }
 
     override fun showTitleError() {
-        SnackbarUtils.showError(rootView, this, getString(R.string.scene_edition_title_error))
+        SnackbarUtils.showError(rootView, this, getString(R.string.activity_scene_edition_title_error))
     }
 
     override fun showDescriptionError() {
         SnackbarUtils.showError(rootView, this,
-                getString(R.string.scene_edition_description_error))
+                getString(R.string.activity_scene_edition_description_error))
     }
 
     override fun showPictureError() {
         SnackbarUtils.showError(rootView, this,
-                getString(R.string.scene_edition_picture_error))
+                getString(R.string.activity_scene_edition_picture_error))
     }
 
     override fun showLocationError() {
-        SnackbarUtils.showError(rootView, this, getString(R.string.scene_edition_location_error))
+        SnackbarUtils.showError(rootView, this, getString(R.string.activity_scene_edition_location_error))
     }
 
     override fun enableCreateButton() {

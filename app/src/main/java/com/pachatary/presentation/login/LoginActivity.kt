@@ -47,11 +47,11 @@ class LoginActivity : AppCompatActivity(), LoginView {
     override fun loginToken() = loginToken!!
 
     override fun showSuccessMessage() {
-        SnackbarUtils.showSuccess(rootView, this, getString(R.string.login_success))
+        SnackbarUtils.showSuccess(rootView, this, getString(R.string.activity_login_success_message))
     }
 
     override fun showErrorMessage() {
-        SnackbarUtils.showError(rootView, this, getString(R.string.login_error))
+        SnackbarUtils.showError(rootView, this, getString(R.string.activity_login_error_message))
     }
 
     override fun showRetry() {

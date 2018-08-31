@@ -36,7 +36,7 @@
                     android:gravity="center"
                     android:textSize="16sp"
                     android:textColor="@color/black"
-                    android:text="@string/register_info" />
+                    android:text="@string/activity_register_info" />
 
                 <EditText
                     android:id="@+id/register_edit_username_edittext"
@@ -50,7 +50,7 @@
                     android:inputType="text"
                     android:digits="abcdefghijklmnopqrstuvwxyz._0123456789"
                     android:lines="1"
-                    android:hint="@string/register_username" />
+                    android:hint="@string/activity_register_username_edittext_hint" />
 
                 <EditText
                     android:id="@+id/register_edit_email_edittext"
@@ -61,7 +61,7 @@
                     android:layout_marginBottom="30dp"
                     android:layout_below="@+id/register_edit_username_edittext"
                     android:inputType="textEmailAddress"
-                    android:hint="@string/register_email" />
+                    android:hint="@string/activity_register_email_edittext_hint" />
 
                 <Button
                     android:id="@+id/register_done_button"
@@ -70,7 +70,7 @@
                     android:layout_below="@+id/register_edit_email_edittext"
                     android:layout_marginRight="30dp"
                     android:layout_marginLeft="30dp"
-                    android:text="@string/register_button"
+                    android:text="@string/activity_register_button"
                     style="@style/MyButton.Colored" />
 
             </RelativeLayout>

@@ -40,7 +40,7 @@
             android:inputType="text"
             android:textSize="14sp"
             android:imeOptions="actionSearch"
-            android:hint="@string/explore_search_button"/>
+            android:hint="@string/fragment_explore_search_button"/>
 
         <ImageButton
             android:id="@+id/experiences_location_button"

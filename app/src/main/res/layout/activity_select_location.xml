@@ -81,7 +81,7 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="10dp"
-            android:text="@string/select_location_done"
+            android:text="@string/activity_select_location_done"
             style="@style/MyButton.Colored" />
 
     </RelativeLayout>

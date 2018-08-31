@@ -37,7 +37,7 @@ class RegisterActivity : AppCompatActivity(), RegisterView {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
-        ToolbarUtils.setUp(this, getString(R.string.title_register_activity), true)
+        ToolbarUtils.setUp(this, getString(R.string.activity_register_title), true)
 
         rootView = findViewById(R.id.root)
         progressBar = findViewById(R.id.register_progressbar)
@@ -72,7 +72,7 @@ class RegisterActivity : AppCompatActivity(), RegisterView {
     override fun getEmail() = emailEditText.editableText.toString()
 
     override fun showSuccessMessage() {
-        SnackbarUtils.showSuccess(rootView, this, getString(R.string.register_success_message))
+        SnackbarUtils.showSuccess(rootView, this, getString(R.string.activity_register_success_message))
     }
 
     override fun showErrorMessage(message: String) {

@@ -9,8 +9,6 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.ProgressBar
 import com.pachatary.R
 import com.pachatary.data.experience.Experience
 import com.pachatary.presentation.common.PachataryApplication
@@ -47,7 +45,7 @@ class SavedFragment : Fragment(), SavedView {
         val view = inflater.inflate(R.layout.fragment_saved, container, false)
 
         ToolbarUtils.setUp(view, activity as AppCompatActivity,
-                           getString(R.string.title_saved_experiences), false)
+                           getString(R.string.fragment_saved_experiences_title), false)
 
         rootView = view.findViewById(R.id.root)
         recyclerView = view.findViewById(R.id.experiences_recyclerview)

@@ -10,7 +10,7 @@ import javax.inject.Inject
 import javax.inject.Named
 
 class MainPresenter @Inject constructor(private val authRepository: AuthRepository,
-                                        @Named("main") val mainScheduler: Scheduler)
+                                        @Named("myexperiences") val mainScheduler: Scheduler)
                                                                             : LifecycleObserver {
 
     lateinit var view: MainView

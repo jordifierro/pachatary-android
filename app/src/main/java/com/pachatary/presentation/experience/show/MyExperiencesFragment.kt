@@ -14,7 +14,6 @@ import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
 import android.widget.TextView
-import com.pachatary.BuildConfig
 import com.pachatary.R
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.profile.Profile
@@ -92,7 +91,7 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        inflater!!.inflate(R.menu.main, menu)
+        inflater!!.inflate(R.menu.myexperiences, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -200,7 +199,7 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
 
     override fun showNotEnoughInfoToShareDialog() {
         SnackbarUtils.showError(rootView, activity as AppCompatActivity,
-                                getString(R.string.mine_experiences_experiences_title))
+                                getString(R.string.fragment_myexperiences_title))
     }
 
     class MyProfileAdapter(private val inflater: LayoutInflater,

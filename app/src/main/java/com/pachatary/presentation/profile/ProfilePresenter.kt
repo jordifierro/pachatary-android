@@ -15,7 +15,7 @@ import javax.inject.Named
 
 class ProfilePresenter @Inject constructor(private val repository: ExperienceRepository,
                                            private val profileRepo: ProfileRepository,
-                                           @Named("main") private val mainScheduler: Scheduler)
+                                           @Named("myexperiences") private val mainScheduler: Scheduler)
                                                                                : LifecycleObserver {
 
     lateinit var view: ProfileView

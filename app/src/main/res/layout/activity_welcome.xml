@@ -36,7 +36,7 @@
                 android:layout_centerHorizontal="true"
                 android:gravity="center"
                 android:layout_below="@+id/title"
-                android:text="@string/app_slogan"
+                android:text="@string/activity_welcome_slogan"
                 android:textSize="16sp"
                 android:textColor="@color/black"
                 tools:ignore="PrivateResource" />
@@ -84,7 +84,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:textSize="10sp"
-                android:text="@string/welcome_legal1_text" />
+                android:text="@string/activity_welcome_legal1_text" />
 
             <RelativeLayout
                 android:id="@+id/second_line"
@@ -98,7 +98,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="10sp"
-                    android:text="@string/welcome_legal2_text" />
+                    android:text="@string/activity_welcome_legal2_text" />
 
                 <TextView
                     android:id="@+id/welcome_legal3_textview"
@@ -107,7 +107,7 @@
                     android:layout_toRightOf="@+id/welcome_legal2_textview"
                     android:layout_toEndOf="@+id/welcome_legal2_textview"
                     android:textSize="10sp"
-                    android:text="@string/welcome_legal3_text" />
+                    android:text="@string/activity_welcome_legal3_text" />
 
                 <TextView
                     android:id="@+id/welcome_legal4_textview"
@@ -116,7 +116,7 @@
                     android:layout_toRightOf="@+id/welcome_legal3_textview"
                     android:layout_toEndOf="@+id/welcome_legal3_textview"
                     android:textSize="10sp"
-                    android:text="@string/welcome_legal4_text" />
+                    android:text="@string/activity_welcome_legal4_text" />
 
             </RelativeLayout>
 

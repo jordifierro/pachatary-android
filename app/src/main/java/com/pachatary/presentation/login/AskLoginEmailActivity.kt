@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.support.design.widget.CoordinatorLayout
-import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.View
@@ -55,7 +54,7 @@ class AskLoginEmailActivity : AppCompatActivity(), AskLoginEmailView {
     }
 
     override fun showSuccessMessage() {
-        SnackbarUtils.showSuccess(rootView, this, getString(R.string.ask_login_email_message))
+        SnackbarUtils.showSuccess(rootView, this, getString(R.string.activity_ask_login_email_message))
     }
 
     override fun showErrorMessage() {

@@ -30,7 +30,7 @@
                 android:focusableInTouchMode="true"
                 android:textSize="20sp"
                 android:textColor="@color/black"
-                android:text="@string/scene_edition_info" />
+                android:text="@string/activity_scene_edition_info" />
 
             <RelativeLayout
                 android:id="@+id/scene_picture_and_location_layout"
@@ -94,7 +94,7 @@
                 android:layout_below="@+id/scene_picture_and_location_layout"
                 android:maxLength="80"
                 android:inputType="textCapSentences"
-                android:hint="@string/scene_edition_title_hint" />
+                android:hint="@string/activity_scene_edition_title_hint" />
 
             <EditText
                 android:id="@+id/scene_edition_description_edittext"
@@ -106,7 +106,7 @@
                 android:gravity="top"
                 android:lines="4"
                 android:inputType="textCapSentences|textMultiLine"
-                android:hint="@string/scene_edition_description_hint" />
+                android:hint="@string/activity_scene_edition_description_hint" />
 
             <ProgressBar
                 android:id="@+id/scene_edition_progressbar"
@@ -125,7 +125,7 @@
                 android:layout_marginRight="30dp"
                 android:layout_marginBottom="10dp"
                 android:layout_below="@+id/scene_edition_progressbar"
-                android:text="@string/scene_edition_create_button"
+                android:text="@string/activity_scene_edition_create_button"
                 style="@style/MyButton.Colored" />
 
         </RelativeLayout>

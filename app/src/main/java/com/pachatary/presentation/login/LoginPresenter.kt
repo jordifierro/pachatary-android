@@ -11,7 +11,7 @@ import javax.inject.Inject
 import javax.inject.Named
 
 class LoginPresenter @Inject constructor(private val authRepository: AuthRepository,
-                                         @Named("main") private val mainScheduler: Scheduler)
+                                         @Named("myexperiences") private val mainScheduler: Scheduler)
                                                                                : LifecycleObserver {
 
     lateinit var view: LoginView
