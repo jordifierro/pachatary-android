@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="snackbar_error_message">Ueppa! Algo va mal. Prueba de nuevo!</string>
+    <string name="snackbar_retry_action">REINTENTAR</string>
+
+    <string name="activity_experience_map_title">MAPA</string>
+
+    <string name="dialog_share_url_title">Compartir enlace</string>
+
+    <string name="activity_experience_scenes_title">ESCENAS</string>
+    <string name="activity_experience_scenes_unsave_dialog_title">BORRAR DE GUARDADOS</string>
+    <string name="activity_experience_scenes_unsave_dialog_text">Estás seguro de que quieres borrarla de tus experiencias guardadas?</string>
+    <string name="activity_experience_scenes_saved_message">Experiencia guardada!</string>
+    <string name="item_experience_scenes_title">ESCENAS</string>
+    <string name="item_experience_show_more">mostrar más</string>
+    <string name="item_scene_show_more">mostrar más</string>
+    <string name="menu_experience_add">Añadir escena</string>
+    <string name="menu_experience_share">Compartir experiencia</string>
+    <string name="menu_experience_edit">Editar experiencia</string>
+    <string name="menu_experience_save">Guardar experiencia</string>
+
+    <string name="activity_welcome_title">BIENVENID@</string>
+    <string name="activity_welcome_legal1_text">pulsando comenzar nueva aventura aceptas nuestra </string>
+    <string name="activity_welcome_legal2_text"><u>política de privacidad</u></string>
+    <string name="activity_welcome_legal3_text">&#160;y&#160;</string>
+    <string name="activity_welcome_legal4_text"><u>términos y condiciones</u></string>
+    <string name="activity_welcome_slogan">Recuerda momentos.\n Descubre el mundo.</string>
+    <string name="activity_welcome_start_button">Comenzar nueva aventura</string>
+    <string name="activity_welcome_login_button">Ya tengo una cuenta</string>
+
+    <string name="activity_select_location_title">SELECCIONA LOCALIZACIÓN</string>
+    <string name="activity_select_location_done">Hecho</string>
+
+    <string name="fragment_myexperiences_bio_edittext_hint">Pulsa para añadir tu biografía</string>
+    <string name="menu_myexperiences_share">COMPARTIR</string>
+
+    <string name="activity_register_title">REGISTRO</string>
+    <string name="activity_register_success_message">Fantástico! Comprueba tu correo para finalizar el registro</string>
+    <string name="activity_register_info">Create una cuento para publicar tus propias experiencias</string>
+    <string name="activity_register_username_edittext_hint">nombre de usuario…</string>
+    <string name="activity_register_email_edittext_hint">email…</string>
+    <string name="activity_register_button">Mandar correo de confirmación</string>
+
+    <string name="activity_confirm_email_title">CONFIRMAR EMAIL</string>
+    <string name="filter_view_activity_confirm_email">Confirmar Email</string>
+    <string name="activity_confirm_email_success_message">Email confirmado correctamente!</string>
+    <string name="activity_confirm_email_error_message">Clave no válida! Pide una nueva</string>
+
+    <string name="activity_ask_login_email_title">ENTRAR</string>
+    <string name="activity_ask_login_email_hint">Email…</string>
+    <string name="activity_ask_login_email_button">Mandar correo para entrar</string>
+    <string name="activity_ask_login_email_info">Te mandaremos un correo con un enlace para entrar</string>
+    <string name="activity_ask_login_email_message">Te hemos mandado un correo</string>
+
+    <string name="activity_login_title">ENTRAR</string>
+    <string name="filter_view_activity_login">Entrar</string>
+    <string name="activity_login_success_message">Login correcto!</string>
+    <string name="activity_login_error_message">Clave de login no válida. Pide un nuevo correo</string>
+
+    <string name="activity_settings_title">AJUSTES</string>
+    <string name="activity_settings_privacy_policy">Política de privacidad</string>
+    <string name="activity_settings_terms_and_conditions">Términos y condiciones</string>
+
+    <string name="activity_webview_title">WEBVIEW</string>
+    <string name="activity_webview_privacy_title">POLÍTICA DE PRIVACIDAD</string>
+    <string name="activity_webview_terms_title">TÉRMINOS Y CONDICIONES</string>
+
+    <string name="activity_router_title">ROUTER</string>
+    <string name="filter_view_activity_experience_router">Abrir experiencia</string>
+    <string name="filter_view_activity_profile_router">Abrir perfil</string>
+
+    <string name="activity_pick_and_crop_image_title">SELECCIONA Y RECORTA IMAGEN</string>
+    <string name="activity_pick_and_crop_image_recover_dialog_title">Permisos de almacenamiento requeridos</string>
+    <string name="activity_pick_and_crop_image_recover_dialog_text">Se requiere una imagen para crear contenido.
+        Para seleccionar una imagen es necesario dar permisos de lectura y escritura en almacenamiento.
+        Deseas abrir los ajustes para modificar los permisos de la aplicación?</string>
+    <string name="activity_pick_and_crop_image_explanation_dialog_title">Permisos de almacenamiento requeridos</string>
+    <string name="activity_pick_and_crop_image_explanation_dialog_text">Se requiere una imagen para crear contenido.
+        Para seleccionar una imagen es necesario dar permisos de lectura y escritura en almacenamiento.
+        Desea dar estos permisos?</string>
+
+    <string name="fragment_explore_search_button">Buscar…</string>
+
+    <string name="fragment_saved_experiences_title">EXPERIENCIAS GUARDADAS</string>
+    <string name="fragment_saved_experience_info_1">AÚN NO HA GUARDADO NINGUNA EXPERIENCIA.</string>
+    <string name="fragment_saved_experience_info_2">PULSE EN EL ICONO DE ESTRELLA EN EL DETALLE DE UNA EXPERIENCIA PARA GUARDARLA.</string>
+
+    <string name="fragment_myexperiences_title">TUS EXPERIENCIAS</string>
+    <string name="fragment_myexperiences_no_experiences">AÚN NO TIENES NINGUNA EXPERIENCIA. AÑADE LA PRIMERA!</string>
+    <string name="fragment_myexperiences_forbidden_share">Debes tener al menos una experiencia y una foto de perfil</string>
+
+    <string name="activity_profile_title">PERFIL</string>
+    <string name="item_profile_experiences_title">EXPERIENCIAS</string>
+    <string name="menu_profile_share">COMPARTIR</string>
+
+    <string name="activity_create_experience_title">NUEVA EXPERIENCIA</string>
+    <string name="activity_edit_experience_title">EDITAR EXPERIENCIA</string>
+    <string name="activity_edit_experience_button">Actualizar</string>
+    <string name="activity_experience_edition_info">Añade información de la experiencia</string>
+    <string name="activity_experience_edition_title_hint">Título de la experiencia…</string>
+    <string name="activity_experience_edition_description_hint">Descripción…</string>
+    <string name="activity_experience_edition_create_button">Crear</string>
+    <string name="activity_experience_edition_title_error">El título debe tener entre 1 y 80 caracteres</string>
+    <string name="activity_experience_edition_description_error">Escriba una descripción</string>
+    <string name="activity_experience_edition_picture_error">Selecciona una imagen</string>
+
+    <string name="activity_edit_scene_title">EDITAR ESCENA</string>
+    <string name="activity_edit_scene_button">Actualizar</string>
+    <string name="activity_create_scene_title">AÑADIR ESCENA</string>
+    <string name="activity_scene_edition_info">Añade información de la escena</string>
+    <string name="activity_scene_edition_title_hint">Título de la escena…</string>
+    <string name="activity_scene_edition_description_hint">Descripción…</string>
+    <string name="activity_scene_edition_create_button">Crear</string>
+    <string name="activity_scene_edition_title_error">El título debe tener entre 1 y 80 caracteres</string>
+    <string name="activity_scene_edition_description_error">Escribe una descripción</string>
+    <string name="activity_scene_edition_picture_error">Selecciona una imagen</string>
+    <string name="activity_scene_edition_location_error">Selecciona una localización</string>
+</resources>

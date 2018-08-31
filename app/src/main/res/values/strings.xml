@@ -9,6 +9,8 @@
 
     <string name="activity_experience_map_title">MAP</string>
 
+    <string name="dialog_share_url_title">Share url</string>
+
     <string name="activity_experience_scenes_title">EXPERIENCE SCENES</string>
     <string name="activity_experience_scenes_unsave_dialog_title">REMOVE FROM SAVED</string>
     <string name="activity_experience_scenes_unsave_dialog_text">Are you sure you want to remove it from your saved experiences?</string>
@@ -27,6 +29,8 @@
     <string name="activity_welcome_legal3_text">&#160;and&#160;</string>
     <string name="activity_welcome_legal4_text"><u>terms and conditions</u></string>
     <string name="activity_welcome_slogan">Remember moments.\n Discover the world.</string>
+    <string name="activity_welcome_start_button">Start new adventure</string>
+    <string name="activity_welcome_login_button">I have an account</string>
 
     <string name="activity_select_location_title">SELECT LOCATION</string>
     <string name="activity_select_location_done">Done</string>
@@ -65,7 +69,7 @@
     <string name="activity_webview_privacy_title">PRIVACY POLICY</string>
     <string name="activity_webview_terms_title">TERMS AND CONDITIONS</string>
 
-    <string name="activity_router_title">Router</string>
+    <string name="activity_router_title">ROUTER</string>
     <string name="filter_view_activity_experience_router">Open experience</string>
     <string name="filter_view_activity_profile_router">Open profile</string>
 

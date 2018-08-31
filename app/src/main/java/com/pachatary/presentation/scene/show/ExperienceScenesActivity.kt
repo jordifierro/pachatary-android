@@ -33,6 +33,7 @@ import com.pachatary.data.experience.Experience
 import com.pachatary.data.scene.Scene
 import com.pachatary.presentation.common.PachataryApplication
 import com.pachatary.presentation.common.view.PictureDeviceCompat
+import com.pachatary.presentation.common.view.ShareDialogUtils
 import com.pachatary.presentation.common.view.SnackbarUtils
 import com.pachatary.presentation.experience.edition.EditExperienceActivity
 import com.pachatary.presentation.profile.ProfileActivity
@@ -211,10 +212,7 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
     }
 
     override fun showShareDialog(shareUrl: String) {
-        val i = Intent(Intent.ACTION_SEND)
-        i.type = "text/plain"
-        i.putExtra(Intent.EXTRA_TEXT, shareUrl)
-        startActivity(Intent.createChooser(i, "Share URL"))
+        ShareDialogUtils.shareUrl(this, shareUrl)
     }
 
     override fun onSupportNavigateUp(): Boolean {

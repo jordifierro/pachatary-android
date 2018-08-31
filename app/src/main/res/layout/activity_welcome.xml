@@ -66,7 +66,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_above="@+id/legals"
-            android:text="Start new adventure"
+            android:text="@string/activity_welcome_start_button"
             style="@style/MyButton.Colored" />
 
 
@@ -83,6 +83,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
+                android:gravity="center"
                 android:textSize="10sp"
                 android:text="@string/activity_welcome_legal1_text" />
 
@@ -130,7 +131,7 @@
             android:layout_marginTop="30dp"
             android:layout_centerHorizontal="true"
             android:layout_alignParentBottom="true"
-            android:text="I have an account"
+            android:text="@string/activity_welcome_login_button"
             style="@style/MyButton.White" />
 
     </RelativeLayout>

@@ -21,6 +21,7 @@ import com.pachatary.presentation.common.PachataryApplication
 import com.pachatary.presentation.common.edition.EditTextWithBackListener
 import com.pachatary.presentation.common.edition.PickAndCropImageActivity
 import com.pachatary.presentation.common.view.PictureDeviceCompat
+import com.pachatary.presentation.common.view.ShareDialogUtils
 import com.pachatary.presentation.common.view.SnackbarUtils
 import com.pachatary.presentation.common.view.ToolbarUtils
 import com.pachatary.presentation.experience.edition.CreateExperienceActivity
@@ -190,11 +191,8 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
     }
 
     override fun showShareDialog(username: String) {
-        val i = Intent(Intent.ACTION_SEND)
-        i.type = "text/plain"
-        i.putExtra(Intent.EXTRA_TEXT,
-                   "http://" + getString(R.string.https_deeplink_host) + "/p/" + username)
-        startActivity(Intent.createChooser(i, "Share URL"))
+        val url = "http://" + getString(R.string.https_deeplink_host) + "/p/" + username
+        ShareDialogUtils.shareUrl(activity!! as AppCompatActivity, url)
     }
 
     override fun showNotEnoughInfoToShareDialog() {

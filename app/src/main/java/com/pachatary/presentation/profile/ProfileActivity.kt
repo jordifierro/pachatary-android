@@ -15,6 +15,7 @@ import com.pachatary.data.experience.Experience
 import com.pachatary.data.profile.Profile
 import com.pachatary.presentation.common.PachataryApplication
 import com.pachatary.presentation.common.view.PictureDeviceCompat
+import com.pachatary.presentation.common.view.ShareDialogUtils
 import com.pachatary.presentation.common.view.SnackbarUtils
 import com.pachatary.presentation.common.view.ToolbarUtils
 import com.pachatary.presentation.experience.show.view.SquareViewHolder
@@ -138,11 +139,8 @@ class ProfileActivity : AppCompatActivity(), ProfileView {
     }
 
     override fun showShareDialog(username: String) {
-        val i = Intent(Intent.ACTION_SEND)
-        i.type = "text/plain"
-        i.putExtra(Intent.EXTRA_TEXT,
-                "http://" + getString(R.string.https_deeplink_host) + "/p/" + username)
-        startActivity(Intent.createChooser(i, "Share URL"))
+        val url = "http://" + getString(R.string.https_deeplink_host) + "/p/" + username
+        ShareDialogUtils.shareUrl(this, url)
     }
 
     override fun onSupportNavigateUp(): Boolean {
