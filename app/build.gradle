@@ -15,8 +15,8 @@ android {
         applicationId 'com.pachatary'
         minSdkVersion 15
         targetSdkVersion 27
-        versionCode 3
-        versionName '0.1-alpha2'
+        versionCode 4
+        versionName '0.1-alpha4'
         testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
         vectorDrawables.useSupportLibrary = true
     }
