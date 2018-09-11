@@ -30,20 +30,20 @@ import javax.inject.Inject
 
 class PickAndCropImageActivity : AppCompatActivity(), PickAndCropImageView {
 
-    private val REQUEST_READ_WRITE_EXTERNAL_STORAGE_PERMISSIONS = 1
-    private val REQUEST_SETTINGS = 2
-    private val PICK_IMAGE_ACTIVITY_INTENT = 3
-    private val CROP_IMAGE_ACTIVITY_INTENT = UCrop.REQUEST_CROP
-
     @Inject
     lateinit var presenter: PickAndCropImagePresenter
 
-    val registry: LifecycleRegistry = LifecycleRegistry(this)
+    private val registry: LifecycleRegistry = LifecycleRegistry(this)
 
     companion object {
+        private const val REQUEST_READ_WRITE_EXTERNAL_STORAGE_PERMISSIONS = 1
+        private const val REQUEST_SETTINGS = 2
+        private const val PICK_IMAGE_ACTIVITY_INTENT = 3
+        private const val CROP_IMAGE_ACTIVITY_INTENT = UCrop.REQUEST_CROP
+
         private const val RESULT_IMAGE_URI = "result_image_uri"
         fun newIntent(context: Context) = Intent(context, PickAndCropImageActivity::class.java)
-        fun getImageUriFrom(data: Intent) = data.getStringExtra(RESULT_IMAGE_URI)
+        fun getImageUriFrom(data: Intent) = data.getStringExtra(RESULT_IMAGE_URI)!!
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -99,23 +99,24 @@ class PickAndCropImageActivity : AppCompatActivity(), PickAndCropImageView {
     }
 
     override fun showSettingsRecover() {
-        val builder: AlertDialog.Builder
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            builder = AlertDialog.Builder(this, R.style.MyDialogTheme)
-        else builder = AlertDialog.Builder(this)
+        val builder: AlertDialog.Builder =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                    AlertDialog.Builder(this, R.style.MyDialogTheme)
+                else AlertDialog.Builder(this)
         builder.setTitle(R.string.activity_pick_and_crop_image_recover_dialog_title)
                 .setMessage(R.string.activity_pick_and_crop_image_recover_dialog_text)
-                .setPositiveButton(android.R.string.yes, { _, _ -> presenter.onSettingsClick() })
-                .setNegativeButton(android.R.string.no, { _, _ -> presenter.onSettingsRecoverCancel() })
+                .setPositiveButton(android.R.string.yes) { _, _ -> presenter.onSettingsClick() }
+                .setNegativeButton(android.R.string.no)
+                    { _, _ -> presenter.onSettingsRecoverCancel() }
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show()
     }
 
     override fun showPermissionsExplanationDialog() {
-        val builder: AlertDialog.Builder
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            builder = AlertDialog.Builder(this, R.style.MyDialogTheme)
-        else builder = AlertDialog.Builder(this)
+        val builder: AlertDialog.Builder =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                    AlertDialog.Builder(this, R.style.MyDialogTheme)
+                else AlertDialog.Builder(this)
         builder.setTitle(R.string.activity_pick_and_crop_image_explanation_dialog_title)
                 .setMessage(R.string.activity_pick_and_crop_image_explanation_dialog_text)
                 .setPositiveButton(android.R.string.yes) {
@@ -129,12 +130,18 @@ class PickAndCropImageActivity : AppCompatActivity(), PickAndCropImageView {
     override fun navigateToSettings() {
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
         val uri = Uri.fromParts("package", packageName, null)
-        intent.setData(uri)
+        intent.data = uri
         startActivityForResult(intent, REQUEST_SETTINGS)
     }
 
     override fun showPickImage() {
-        Matisse.from(this)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+            intent.addCategory(Intent.CATEGORY_OPENABLE)
+            intent.type = "image/*"
+            startActivityForResult(intent, PICK_IMAGE_ACTIVITY_INTENT)
+        } else {
+            Matisse.from(this)
                 .choose(MimeType.of(JPEG, PNG))
                 .countable(false)
                 .maxSelectable(1)
@@ -142,15 +149,16 @@ class PickAndCropImageActivity : AppCompatActivity(), PickAndCropImageView {
                 .thumbnailScale(0.85f)
                 .imageEngine(PicassoEngine())
                 .forResult(PICK_IMAGE_ACTIVITY_INTENT)
+        }
     }
 
     override fun showCropImage(selectedImageUriString: String) {
         var extension = File(Uri.parse(selectedImageUriString).path).extension
         if (extension == "") extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(
-                this.getContentResolver().getType(Uri.parse(selectedImageUriString)))
+                this.contentResolver.getType(Uri.parse(selectedImageUriString)))
 
         val outputUri = Uri.fromFile(
-                File.createTempFile("pachatary", "." + extension, this.cacheDir))
+                File.createTempFile("pachatary", ".$extension", this.cacheDir))
         UCrop.of(Uri.parse(selectedImageUriString), outputUri)
                 .withAspectRatio(1.0f, 1.0f)
                 .withMaxResultSize(BuildConfig.MAX_IMAGE_SIZE, BuildConfig.MAX_IMAGE_SIZE)
@@ -158,22 +166,24 @@ class PickAndCropImageActivity : AppCompatActivity(), PickAndCropImageView {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == PICK_IMAGE_ACTIVITY_INTENT) {
-            if (resultCode == Activity.RESULT_OK)
-                presenter.onPickImageSuccess(Matisse.obtainResult(data)[0].toString())
-            else if (resultCode == Activity.RESULT_CANCELED) presenter.onPickImageCancel()
-            else throw Exception(resultCode.toString())
+        when (requestCode) {
+            PICK_IMAGE_ACTIVITY_INTENT -> when (resultCode) {
+                Activity.RESULT_OK -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                        presenter.onPickImageSuccess(data!!.data.toString())
+                    else presenter.onPickImageSuccess(Matisse.obtainResult(data)[0].toString())
+                }
+                Activity.RESULT_CANCELED -> presenter.onPickImageCancel()
+                else -> throw Exception(resultCode.toString())
+            }
+            CROP_IMAGE_ACTIVITY_INTENT -> when (resultCode) {
+                Activity.RESULT_OK -> presenter.onCropImageSuccess(UCrop.getOutput(data!!).toString())
+                Activity.RESULT_CANCELED -> presenter.onCropImageCancel()
+                else -> throw Exception(resultCode.toString())
+            }
+            REQUEST_SETTINGS -> presenter.onSettingsClosed()
+            else -> throw Exception(requestCode.toString())
         }
-        else if (requestCode == CROP_IMAGE_ACTIVITY_INTENT) {
-            if (resultCode == Activity.RESULT_OK)
-                presenter.onCropImageSuccess(UCrop.getOutput(data!!).toString())
-            else if (resultCode == Activity.RESULT_CANCELED) presenter.onCropImageCancel()
-            else throw Exception(resultCode.toString())
-        }
-        else if (requestCode == REQUEST_SETTINGS) {
-            presenter.onSettingsClosed()
-        }
-        else throw Exception(requestCode.toString())
     }
 
     override fun finishWithResultCancel() {
