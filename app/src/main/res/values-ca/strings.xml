@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="snackbar_error_message">Òndia! Quelcom no va bé. Intenta de nou!</string>
+    <string name="snackbar_retry_action">PROVAR</string>
+
+    <string name="activity_experience_map_title">MAPA</string>
+
+    <string name="dialog_share_url_title">Compartir enllaç</string>
+
+    <string name="activity_experience_scenes_title">ESCENES</string>
+    <string name="activity_experience_scenes_unsave_dialog_title">ESBORRAR DE GUARDATS</string>
+    <string name="activity_experience_scenes_unsave_dialog_text">Estàs segur de que vols borrar-la de les teves experiències guardades?</string>
+    <string name="activity_experience_scenes_saved_message">Experiència guardada!</string>
+    <string name="item_experience_scenes_title">ESCENES</string>
+    <string name="item_experience_show_more">mostrar més</string>
+    <string name="item_scene_show_more">mostrar més</string>
+    <string name="menu_experience_add">Afegir escena</string>
+    <string name="menu_experience_share">Compartir experiència</string>
+    <string name="menu_experience_edit">Editar experiència</string>
+    <string name="menu_experience_save">Guardar experiència</string>
+
+    <string name="activity_welcome_title">BENVINGUT/DA</string>
+    <string name="activity_welcome_legal1_text">prement començar nova aventura acceptes la nostra </string>
+    <string name="activity_welcome_legal2_text"><u>política de privacitat</u></string>
+    <string name="activity_welcome_legal3_text">&#160;i&#160;</string>
+    <string name="activity_welcome_legal4_text"><u>termes i condicions</u></string>
+    <string name="activity_welcome_slogan">Recorda moments.\n Descobreix el món.</string>
+    <string name="activity_welcome_start_button">Començar nova aventura</string>
+    <string name="activity_welcome_login_button">Ja tinc un compte</string>
+
+    <string name="activity_select_location_title">SELECCIONA LOCALITZACIÓ</string>
+    <string name="activity_select_location_done">Fet</string>
+
+    <string name="fragment_myexperiences_bio_edittext_hint">Prem per afegir la teva biografia</string>
+    <string name="menu_myexperiences_share">COMPARTIR</string>
+
+    <string name="activity_register_title">REGISTRE</string>
+    <string name="activity_register_success_message">Fantàstic! Comprova el teu correu per finalitzar el registre</string>
+    <string name="activity_register_info">Crea\'t un compte per publicar les teves pròpies experiències</string>
+    <string name="activity_register_username_edittext_hint">nom d\'usuari…</string>
+    <string name="activity_register_email_edittext_hint">email…</string>
+    <string name="activity_register_button">Enviar correu de confirmació</string>
+
+    <string name="activity_confirm_email_title">CONFIRMAR EMAIL</string>
+    <string name="filter_view_activity_confirm_email">Confirmar Email</string>
+    <string name="activity_confirm_email_success_message">Email confirmat correctament!</string>
+    <string name="activity_confirm_email_error_message">Clau no vàlida! Demana\'n una nova</string>
+
+    <string name="activity_ask_login_email_title">ENTRAR</string>
+    <string name="activity_ask_login_email_hint">Email…</string>
+    <string name="activity_ask_login_email_button">Enviar correu per entrar</string>
+    <string name="activity_ask_login_email_info">T\'enviarem un correu amb un enllaç per entrar</string>
+    <string name="activity_ask_login_email_message">T\'hem enviat un correu</string>
+
+    <string name="activity_login_title">ENTRAR</string>
+    <string name="filter_view_activity_login">Entrar</string>
+    <string name="activity_login_success_message">Login correcte!</string>
+    <string name="activity_login_error_message">Clau d\'entrada no vàlida. Demana un nou correu</string>
+
+    <string name="activity_settings_title">CONFIGURACIÓ</string>
+    <string name="activity_settings_privacy_policy">Política de privacitat</string>
+    <string name="activity_settings_terms_and_conditions">Termes i condicions</string>
+
+    <string name="activity_webview_title">WEBVIEW</string>
+    <string name="activity_webview_privacy_title">POLÍTICA DE PRIVACITAT</string>
+    <string name="activity_webview_terms_title">TERMES I CONDICIONS</string>
+
+    <string name="activity_router_title">ROUTER</string>
+    <string name="filter_view_activity_experience_router">Obrir experiència</string>
+    <string name="filter_view_activity_profile_router">Obrir perfil</string>
+
+    <string name="activity_pick_and_crop_image_title">SELECCIONA I RETALLA LA IMATGE</string>
+    <string name="activity_pick_and_crop_image_recover_dialog_title">Permisos d\'emmagatzematge necessaris</string>
+    <string name="activity_pick_and_crop_image_recover_dialog_text">Es necessita una imatge per crear contingut.
+            Per seleccionar una imatge és necessari donar permisos de lectura i escriptura a l\'emmagatzematge.
+            Vols obrir la configuración per modificar els permisos de l\'aplicació?</string>
+    <string name="activity_pick_and_crop_image_explanation_dialog_title">Permisos d\'emmagetzematge necessaris</string>
+    <string name="activity_pick_and_crop_image_explanation_dialog_text">Es necessita una imatge per crear contingut.
+            Per seleccionar una imatge és necessari donar permisos de lectura i escriptura a l\'emmagatzematge.
+            Vols donar aquests permisos?</string>
+
+    <string name="fragment_explore_search_button">Cercar…</string>
+
+    <string name="fragment_saved_experiences_title">EXPERIÈNCIES GUARDADES</string>
+    <string name="fragment_saved_experience_info_1">ENCARA NO HAS GUARDAT CAP EXPERIÈNCIA.</string>
+    <string name="fragment_saved_experience_info_2">PREM LA ICONA DE L\'ESTRELLA AL DETALL D\'UNA EXPERIÈNCIA PER GUARDAR-LA.</string>
+
+    <string name="fragment_myexperiences_title">LES TEVES EXPERIÈNCIES</string>
+    <string name="fragment_myexperiences_no_experiences">ENCARA NO TENS CAP EXPERIÈNCIA. AFEGEIX LA PRIMERA!</string>
+    <string name="fragment_myexperiences_forbidden_share">Necesites com a mínim una experiència i una foto de perfil</string>
+
+    <string name="activity_profile_title">PERFIL</string>
+    <string name="item_profile_experiences_title">EXPERIÈNCIES</string>
+    <string name="menu_profile_share">COMPARTIR</string>
+
+    <string name="activity_create_experience_title">NOVA EXPERIÈNCIA</string>
+    <string name="activity_edit_experience_title">EDITAR EXPERIÈNCIA</string>
+    <string name="activity_edit_experience_button">Actualitzar</string>
+    <string name="activity_experience_edition_info">Afegeix informació de l\'experiència</string>
+    <string name="activity_experience_edition_title_hint">Títol de l\'experiència…</string>
+    <string name="activity_experience_edition_description_hint">Descripció…</string>
+    <string name="activity_experience_edition_create_button">Crear</string>
+    <string name="activity_experience_edition_title_error">El títol ha de ser d\'entre 1 i 80 caràcters</string>
+    <string name="activity_experience_edition_description_error">Escriu una descripció</string>
+    <string name="activity_experience_edition_picture_error">Selecciona una imatge</string>
+
+    <string name="activity_edit_scene_title">EDITAR ESCENA</string>
+    <string name="activity_edit_scene_button">Actualitzar</string>
+    <string name="activity_create_scene_title">AFEGIR ESCENA</string>
+    <string name="activity_scene_edition_info">Afegir informació de l\'escena</string>
+    <string name="activity_scene_edition_title_hint">Títol de l\'escena…</string>
+    <string name="activity_scene_edition_description_hint">Descripció…</string>
+    <string name="activity_scene_edition_create_button">Crear</string>
+    <string name="activity_scene_edition_title_error">El títol ha de ser d\'entre 1 i 80 caràcters</string>
+    <string name="activity_scene_edition_description_error">Escriu una descripció</string>
+    <string name="activity_scene_edition_picture_error">Selecciona una imatge</string>
+    <string name="activity_scene_edition_location_error">Selecciona una localizació</string>
+</resources>

@@ -77,7 +77,7 @@
     <string name="activity_pick_and_crop_image_explanation_dialog_title">Permisos de almacenamiento requeridos</string>
     <string name="activity_pick_and_crop_image_explanation_dialog_text">Se requiere una imagen para crear contenido.
         Para seleccionar una imagen es necesario dar permisos de lectura y escritura en almacenamiento.
-        Desea dar estos permisos?</string>
+        Deseas dar estos permisos?</string>
 
     <string name="fragment_explore_search_button">Buscar…</string>
 
@@ -101,7 +101,7 @@
     <string name="activity_experience_edition_description_hint">Descripción…</string>
     <string name="activity_experience_edition_create_button">Crear</string>
     <string name="activity_experience_edition_title_error">El título debe tener entre 1 y 80 caracteres</string>
-    <string name="activity_experience_edition_description_error">Escriba una descripción</string>
+    <string name="activity_experience_edition_description_error">Escribe una descripción</string>
     <string name="activity_experience_edition_picture_error">Selecciona una imagen</string>
 
     <string name="activity_edit_scene_title">EDITAR ESCENA</string>
