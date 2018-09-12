@@ -12,6 +12,7 @@ import android.support.design.widget.AppBarLayout
 import android.support.design.widget.CoordinatorLayout
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.content.ContextCompat
+import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
@@ -52,6 +53,7 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
     lateinit var pictureDeviceCompat: PictureDeviceCompat
 
     private lateinit var recyclerView: RecyclerView
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var rootView: CoordinatorLayout
     private lateinit var addButton: FloatingActionButton
     private lateinit var shareButton: FloatingActionButton
@@ -112,6 +114,11 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
                                         intent.getBooleanExtra(SHOW_EDITABLE_IF_ITS_MINE, false),
                                         pictureDeviceCompat, presenter,
                                         findViewById(R.id.appbar))
+        swipeRefreshLayout = findViewById(R.id.swiperefresh)
+        swipeRefreshLayout.setOnRefreshListener {
+            swipeRefreshLayout.isRefreshing = false
+            presenter.onRefresh()
+        }
     }
 
     override fun navigateToEditScene(sceneId: String, experienceId: String) {

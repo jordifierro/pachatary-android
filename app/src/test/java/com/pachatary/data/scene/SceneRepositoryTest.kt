@@ -151,15 +151,32 @@ class SceneRepositoryTest {
         }
     }
 
+    @Test
+    fun test_refresh() {
+        given {
+            an_scenes_cache_factory_that_returns_cache_with(DummyScenesResultSuccess("8"))
+            an_api_repo_that_returns_scenes_flowable_for("1", DummyScenesResultSuccess("4"))
+        } whenn {
+            scenes_flowable("1")
+        } given {
+            an_api_repo_that_returns_scenes_flowable_for("1", DummyScenesResultSuccess("5"))
+        } whenn {
+            refresh_scenes("1")
+        } then {
+            should_emit_through_cache_replace(DummyScenesResultSuccess("4"), ResultInProgress(),
+                                              DummyScenesResultSuccess("5"))
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().buildScenario().given(func)
 
     class ScenarioMaker {
         lateinit var repository: SceneRepository
         @Mock lateinit var mockApiRepository: SceneApiRepository
         @Mock lateinit var mockScenesCacheFactory: ResultCacheFactory<Scene>
-        var scenesResultFlowables = mutableListOf<Flowable<Result<List<Scene>>>>()
-        var sceneResultFlowables = mutableListOf<Flowable<Result<Scene>>>()
-        var caches = mutableListOf<ResultCacheFactory.ResultCache<Scene>>()
+        private var scenesResultFlowables = mutableListOf<Flowable<Result<List<Scene>>>>()
+        private var sceneResultFlowables = mutableListOf<Flowable<Result<Scene>>>()
+        private var caches = mutableListOf<ResultCacheFactory.ResultCache<Scene>>()
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
@@ -211,6 +228,10 @@ class SceneRepositoryTest {
 
         fun scene_flowable(sceneId: String, experienceId: String) {
             sceneResultFlowables.add(repository.sceneFlowable(experienceId, sceneId))
+        }
+
+        fun refresh_scenes(experienceId: String) {
+            repository.refreshScenes(experienceId)
         }
 
         fun create_scene(scene: Scene) {

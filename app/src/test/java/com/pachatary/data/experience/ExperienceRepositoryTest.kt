@@ -1,5 +1,7 @@
 package com.pachatary.data.experience
 
+import com.pachatary.data.DummyExperience
+import com.pachatary.data.DummyExperienceResultSuccess
 import com.pachatary.data.common.*
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -157,6 +159,17 @@ class ExperienceRepositoryTest {
     }
 
     @Test
+    fun test_refresh_calls_api_and_updates_all_kind_of_caches() {
+        given {
+            an_experience_repo_that_returns_experience("4", DummyExperienceResultSuccess("4"))
+        } whenn {
+            refresh_experience("4")
+        } then {
+            should_emit_on_all_kind_of_caches_experience(DummyExperience("4"))
+        }
+    }
+
+    @Test
     fun test_get_first_experiences_emits_action_through_switch() {
         for (kind in ExperienceRepoSwitch.Kind.values()) {
             given {
@@ -295,6 +308,11 @@ class ExperienceRepositoryTest {
                     .willReturn(Flowable.just(ResultSuccess(experience)))
         }
 
+        fun an_experience_repo_that_returns_experience(forId: String, result: Result<Experience>) {
+            BDDMockito.given(mockApiRepository.experienceFlowable(forId))
+                    .willReturn(Flowable.just(result))
+        }
+
         fun an_api_repo_that_returns_string_flowable_when_translate_share_id() {
             stringFlowable = Flowable.empty()
             BDDMockito.given(mockApiRepository.translateShareId(experienceShareId))
@@ -391,6 +409,10 @@ class ExperienceRepositoryTest {
 
         fun unsave_experience_is_called() {
             repository.saveExperience(experienceId, false)
+        }
+
+        fun refresh_experience(experienceId: String) {
+            repository.refreshExperience(experienceId)
         }
 
         fun experience_flowable_is_called() {
@@ -567,6 +589,14 @@ class ExperienceRepositoryTest {
 
         fun should_return_string_flowable() {
             assertEquals(stringFlowableResult, stringFlowable)
+        }
+
+        fun should_emit_on_all_kind_of_caches_experience(experience: Experience) {
+            for (kind in ExperienceRepoSwitch.Kind.values()) {
+                BDDMockito.then(mockExperiencesRepoSwitch).should()
+                        .modifyResult(kind, ExperienceRepoSwitch.Modification.UPDATE_LIST,
+                                      listOf(experience))
+            }
         }
 
         infix fun start(func: ScenarioMaker.() -> Unit) = buildScenario().given(func)

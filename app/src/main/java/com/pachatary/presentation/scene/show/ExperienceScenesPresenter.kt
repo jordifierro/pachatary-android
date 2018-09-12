@@ -121,4 +121,9 @@ class ExperienceScenesPresenter @Inject constructor(
                     else -> view.showError()
                 }}, { throw it })
     }
+
+    fun onRefresh() {
+        sceneRepository.refreshScenes(experienceId)
+        experienceRepository.refreshExperience(experienceId)
+    }
 }

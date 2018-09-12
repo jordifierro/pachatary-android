@@ -113,6 +113,18 @@ class ExperienceScenesPresenterTest {
     }
 
     @Test
+    fun test_refresh() {
+        given {
+            a_presenter_with(experienceId = "4")
+        } whenn {
+            refresh()
+        } then {
+            should_refresh_scenes("4")
+            should_refresh_experience("4")
+        }
+    }
+
+    @Test
     fun test_save() {
         given {
             a_presenter_with(experienceId = "4")
@@ -343,6 +355,10 @@ class ExperienceScenesPresenterTest {
             presenter.onExperienceSave(save)
         }
 
+        fun refresh() {
+            presenter.onRefresh()
+        }
+
         fun profile_click(username: String) {
             presenter.onProfileClick(username)
         }
@@ -428,6 +444,14 @@ class ExperienceScenesPresenterTest {
 
         fun should_show_share_dialog(shareUrl: String) {
             BDDMockito.then(mockView).should().showShareDialog(shareUrl)
+        }
+
+        fun should_refresh_scenes(experienceId: String) {
+            BDDMockito.then(mockRepository).should().refreshScenes(experienceId)
+        }
+
+        fun should_refresh_experience(experienceId: String) {
+            BDDMockito.then(mockExperienceRepository).should().refreshExperience(experienceId)
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)
