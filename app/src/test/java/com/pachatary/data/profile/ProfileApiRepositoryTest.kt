@@ -57,7 +57,7 @@ class ProfileApiRepositoryTest {
         } whenn {
             edit_profile("description")
         } then {
-            request_should_patch_profile("bio description")
+            request_should_patch_profile("description")
             response_should_be_inprogress_and_profile()
         }
     }
@@ -166,7 +166,7 @@ class ProfileApiRepositoryTest {
             val request = mockWebServer.takeRequest()
             assertEquals("/profiles/self", request.path)
             assertEquals("PATCH", request.getMethod())
-            assertEquals("bio=description", request.getBody().readUtf8())
+            assertEquals("bio=$bio", request.getBody().readUtf8())
         }
 
         fun response_should_be_inprogress_and_profile() {

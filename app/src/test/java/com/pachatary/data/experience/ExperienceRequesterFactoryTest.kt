@@ -5,6 +5,7 @@ import io.reactivex.Flowable
 import io.reactivex.Observer
 import io.reactivex.observers.TestObserver
 import junit.framework.Assert.assertEquals
+import junit.framework.Assert.fail
 import org.junit.Test
 import org.mockito.BDDMockito
 import org.mockito.Mock
@@ -274,6 +275,7 @@ class ExperienceRequesterFactoryTest {
                             mockApiRepository.personsExperienceFlowable(requestParams!!.username!!))
                             .willReturn(Flowable.just(
                                     ResultSuccess(listOf(experienceA, experienceB))))
+                else -> fail()
             }
         }
 
@@ -360,6 +362,7 @@ class ExperienceRequesterFactoryTest {
                         requestParams!!.word, requestParams!!.latitude, requestParams!!.longitude)
                 ExperienceRepoSwitch.Kind.PERSONS -> BDDMockito.then(mockApiRepository).should()
                             .personsExperienceFlowable(requestParams!!.username!!)
+                else -> fail()
             }
         }
 

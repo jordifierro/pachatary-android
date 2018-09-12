@@ -1,5 +1,6 @@
 package com.pachatary.data.experience
 
+import android.annotation.SuppressLint
 import com.pachatary.data.common.*
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -9,10 +10,11 @@ import io.reactivex.subjects.PublishSubject
 
 class ExperienceRequesterFactory(val apiRepository: ExperienceApiRepository) {
 
+    @SuppressLint("CheckResult")
     fun create(resultCache: ResultCacheFactory.ResultCache<Experience>,
                kind: ExperienceRepoSwitch.Kind): Observer<Request> {
         val actionsSubject = PublishSubject.create<Request>()
-        val disposable = actionsSubject.toFlowable(BackpressureStrategy.LATEST)
+        actionsSubject.toFlowable(BackpressureStrategy.LATEST)
                 .withLatestFrom(resultCache.resultFlowable,
                         BiFunction<Request, Result<List<Experience>>,
                                 Pair<Request, Result<List<Experience>>>>
