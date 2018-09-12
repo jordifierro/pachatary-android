@@ -35,21 +35,6 @@ class ExperienceRequesterFactoryTest {
     }
 
     @Test
-    fun test_get_firsts_does_nothing_when_result_has_been_initialized_and_has_no_errors() {
-        for (kind in requesterKindValues) {
-            given {
-                a_kind(kind)
-                a_result_cache_that_return_success_not_initial_result()
-            } whenn {
-                create_requester()
-                emit_get_firsts()
-            } then {
-                should_do_nothing()
-            }
-        }
-    }
-
-    @Test
     fun test_get_firsts_emits_loading_and_calls_api_to_emit_its_result() {
         for (kind in requesterKindValues) {
             given {

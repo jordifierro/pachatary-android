@@ -208,6 +208,18 @@ class MyExperiencesPresenterTest {
     }
 
     @Test
+    fun test_on_refresh_gets_firsts_experiences() {
+        given {
+            an_experience_repo_that_returns(DummyExperiencesResultSuccess(listOf()))
+            a_profile_repo_that_returns(DummyProfileResult(""))
+        } whenn {
+            refresh()
+        } then {
+            should_call_repo_get_firsts_experiences()
+        }
+    }
+
+    @Test
     fun test_experience_tapped() {
         given {
             nothing()
@@ -443,6 +455,10 @@ class MyExperiencesPresenterTest {
 
         fun retry_clicked() {
             presenter.onRetryClick()
+        }
+
+        fun refresh() {
+            presenter.onRefresh()
         }
 
         fun on_create_experience_click() {

@@ -108,4 +108,9 @@ class ProfilePresenter @Inject constructor(private val repository: ExperienceRep
     fun onShareClick() {
         if (profile != null) view.showShareDialog(profile!!.username)
     }
+
+    fun onRefresh() {
+        repository.getFirstExperiences(ExperienceRepoSwitch.Kind.PERSONS,
+                                       Request.Params(username = this.username))
+    }
 }

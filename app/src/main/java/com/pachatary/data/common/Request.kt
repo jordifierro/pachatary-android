@@ -3,7 +3,7 @@ package com.pachatary.data.common
 data class Request(val action: Action, val params: Params? = null) {
 
     enum class Action {
-        NONE, GET_FIRSTS, PAGINATE, REFRESH
+        NONE, GET_FIRSTS, PAGINATE
     }
 
     data class Params(val word: String? = null,

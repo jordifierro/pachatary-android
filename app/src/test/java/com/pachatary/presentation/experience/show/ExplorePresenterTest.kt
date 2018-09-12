@@ -78,6 +78,17 @@ class ExplorePresenterTest {
     }
 
     @Test
+    fun test_on_refresh_calls_get_firsts_experiences() {
+        given {
+            nothing()
+        } whenn {
+            refresh()
+        } then {
+            should_call_repo_get_firsts_experiences()
+        }
+    }
+
+    @Test
     fun test_create_with_last_location_known_ask_firsts_experiences() {
         given {
             an_experience_repo_that_returns_in_progress(Request.Action.GET_FIRSTS)
@@ -295,6 +306,10 @@ class ExplorePresenterTest {
 
         fun retry_clicked() {
             presenter.onRetryClick()
+        }
+
+        fun refresh() {
+            presenter.onRefresh()
         }
 
         fun last_location_known(latitude: Double, longitude: Double) {

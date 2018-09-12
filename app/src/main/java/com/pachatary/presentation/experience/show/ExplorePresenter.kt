@@ -110,4 +110,8 @@ class ExplorePresenter @Inject constructor(private val repository: ExperienceRep
         this.searchText = view.searchText()
         getFirstsExperiences()
     }
+
+    fun onRefresh() {
+        getFirstsExperiences()
+    }
 }

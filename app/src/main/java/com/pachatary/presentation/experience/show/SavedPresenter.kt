@@ -62,4 +62,8 @@ class SavedPresenter @Inject constructor(private val repository: ExperienceRepos
     fun destroy() {
         experiencesDisposable?.dispose()
     }
+
+    fun onRefresh() {
+        repository.getFirstExperiences(ExperienceRepoSwitch.Kind.SAVED)
+    }
 }

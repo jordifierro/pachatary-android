@@ -132,6 +132,18 @@ class ProfilePresenterTest {
     }
 
     @Test
+    fun test_on_refresh_calls_get_firsts_experiences() {
+        given {
+            a_presenter("username")
+            a_profile_repo_that_returns("username", DummyProfileResult("other"))
+        } whenn {
+            refresh()
+        } then {
+            should_call_repo_get_firsts_experiences("username")
+        }
+    }
+
+    @Test
     fun test_experience_tapped() {
         given {
             a_presenter("username")
@@ -232,6 +244,10 @@ class ProfilePresenterTest {
 
         fun retry_clicked() {
             presenter.onRetryClick()
+        }
+
+        fun refresh() {
+            presenter.onRefresh()
         }
 
         fun last_experience_shown() {

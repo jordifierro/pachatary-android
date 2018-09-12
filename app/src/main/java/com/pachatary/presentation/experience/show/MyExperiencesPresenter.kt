@@ -152,4 +152,8 @@ class MyExperiencesPresenter @Inject constructor(
     fun onSettingsClick() {
         view.navigateToSettings()
     }
+
+    fun onRefresh() {
+        experiencesRepository.getFirstExperiences(ExperienceRepoSwitch.Kind.MINE)
+    }
 }

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.support.design.widget.CoordinatorLayout
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.Fragment
+import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -49,6 +50,7 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
 
     private lateinit var rootView: CoordinatorLayout
     private lateinit var recyclerView: RecyclerView
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var createExperienceButton: FloatingActionButton
     private var experiences = listOf<Experience>()
 
@@ -85,6 +87,11 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
                         return 1
                     }
                 }
+        swipeRefreshLayout = view.findViewById(R.id.swiperefresh)
+        swipeRefreshLayout.setOnRefreshListener {
+            swipeRefreshLayout.isRefreshing = false
+            presenter.onRefresh()
+        }
 
         presenter.create()
 

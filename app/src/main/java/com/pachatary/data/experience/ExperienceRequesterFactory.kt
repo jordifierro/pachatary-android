@@ -21,8 +21,7 @@ class ExperienceRequesterFactory(val apiRepository: ExperienceApiRepository) {
                         { request, result -> Pair(request, result) })
                 .subscribe({
                     if (it.first.action == Request.Action.GET_FIRSTS) {
-                        if ((!it.second.isInProgress() &&
-                                (!it.second.hasBeenInitialized() || it.second.isError()))
+                        if (!it.second.isInProgress()
                         || it.first.params != it.second.params) {
                             resultCache.replaceResultObserver.onNext(
                                     ResultInProgress(listOf(), action = Request.Action.GET_FIRSTS,

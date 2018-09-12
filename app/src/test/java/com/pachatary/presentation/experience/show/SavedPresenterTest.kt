@@ -29,6 +29,17 @@ class SavedPresenterTest {
     }
 
     @Test
+    fun test_refresh_asks_firsts_experiences() {
+        given {
+            an_experience_repo_that_returns_in_progress(Request.Action.GET_FIRSTS)
+        } whenn {
+            refresh()
+        } then {
+            should_call_repo_get_firsts_experiences()
+        }
+    }
+
+    @Test
     fun test_when_result_in_progress_last_event_get_firsts_shows_loader() {
         given {
             an_experience_repo_that_returns_in_progress(action = Request.Action.GET_FIRSTS)
@@ -197,6 +208,10 @@ class SavedPresenterTest {
 
         fun create_presenter() {
             presenter.create()
+        }
+
+        fun refresh() {
+            presenter.onRefresh()
         }
 
         fun retry_clicked() {

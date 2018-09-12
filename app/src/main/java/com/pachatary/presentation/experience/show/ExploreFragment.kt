@@ -9,6 +9,7 @@ import android.location.Location
 import android.os.Bundle
 import android.support.design.widget.CoordinatorLayout
 import android.support.v4.app.Fragment
+import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -51,6 +52,7 @@ class ExploreFragment : Fragment(), ExploreView {
     lateinit var pictureDeviceCompat: PictureDeviceCompat
 
     private lateinit var recyclerView: RecyclerView
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var searchEditText: EditTextWithBackListener
     private lateinit var locationButton: ImageButton
     private lateinit var rootView: CoordinatorLayout
@@ -87,6 +89,11 @@ class ExploreFragment : Fragment(), ExploreView {
         locationButton.setOnClickListener {
             hideKeyboard()
             presenter.locationClick()
+        }
+        swipeRefreshLayout = view.findViewById(R.id.swiperefresh)
+        swipeRefreshLayout.setOnRefreshListener {
+            swipeRefreshLayout.isRefreshing = false
+            presenter.onRefresh()
         }
 
         presenter.create()

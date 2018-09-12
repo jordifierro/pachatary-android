@@ -3,6 +3,7 @@ package com.pachatary.presentation.experience.show
 import android.os.Bundle
 import android.support.design.widget.CoordinatorLayout
 import android.support.v4.app.Fragment
+import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -31,6 +32,7 @@ class SavedFragment : Fragment(), SavedView {
     lateinit var pictureDeviceCompat: PictureDeviceCompat
 
     private lateinit var recyclerView: RecyclerView
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var rootView: CoordinatorLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,6 +64,11 @@ class SavedFragment : Fragment(), SavedView {
                         return 1
                     }
                 }
+        swipeRefreshLayout = view.findViewById(R.id.swiperefresh)
+        swipeRefreshLayout.setOnRefreshListener {
+            swipeRefreshLayout.isRefreshing = false
+            presenter.onRefresh()
+        }
 
         presenter.create()
 

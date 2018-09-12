@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.CoordinatorLayout
+import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -42,6 +43,7 @@ class ProfileActivity : AppCompatActivity(), ProfileView {
     lateinit var pictureDeviceCompat: PictureDeviceCompat
 
     private lateinit var recyclerView: RecyclerView
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var rootView: CoordinatorLayout
     var experiences: List<Experience> = listOf()
 
@@ -67,6 +69,11 @@ class ProfileActivity : AppCompatActivity(), ProfileView {
                         return 1
                     }
                 }
+        swipeRefreshLayout = findViewById(R.id.swiperefresh)
+        swipeRefreshLayout.setOnRefreshListener {
+            swipeRefreshLayout.isRefreshing = false
+            presenter.onRefresh()
+        }
 
         presenter.setViewAndUsername(this, username)
         lifecycle.addObserver(presenter)
