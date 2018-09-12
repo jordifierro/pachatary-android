@@ -75,8 +75,6 @@
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp"
         android:layout_marginTop="20dp"
-        android:ellipsize="end"
-        android:maxLines="4"
         android:textSize="14sp"
         android:textColor="@color/black"
         tools:text="@string/lorem_ipsum" />

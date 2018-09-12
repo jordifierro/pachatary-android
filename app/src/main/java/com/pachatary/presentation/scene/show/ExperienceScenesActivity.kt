@@ -17,6 +17,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.LinearSmoothScroller
 import android.support.v7.widget.RecyclerView
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -226,7 +227,7 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
                                   private val showEditableIfItsMine: Boolean,
                                   val pictureDeviceCompat: PictureDeviceCompat,
                                   val presenter: ExperienceScenesPresenter,
-                                  val appBarLayout: AppBarLayout)
+                                  private val appBarLayout: AppBarLayout)
         : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         companion object {
@@ -240,6 +241,7 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
         var areScenesInProgress = true
         var experience: Experience? = null
         var scenes: List<Scene> = listOf()
+        private var isShowMoreExpanded = mutableMapOf<String, Boolean>()
 
         override fun getItemCount(): Int {
             return if (isExperienceInProgress && areScenesInProgress) 1
@@ -273,7 +275,8 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
                     return SceneViewHolder(inflater.inflate(R.layout.item_scene, parent, false),
                             isEditable , pictureDeviceCompat,
                             { presenter.onEditSceneClick(it) },
-                            { presenter.onLocateSceneClick(it) })
+                            { presenter.onLocateSceneClick(it) },
+                            { isShowMoreExpanded[it] = true })
                 }
                 else -> {
                     return object : RecyclerView.ViewHolder(
@@ -290,7 +293,8 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
                 }
                 SCENE_TYPE -> {
                     val sceneViewHolder = holder as SceneViewHolder
-                    sceneViewHolder.bind(scenes[position-1])
+                    sceneViewHolder.bind(scenes[position-1],
+                                         isShowMoreExpanded[scenes[position-1].id] ?: false)
                 }
             }
         }
@@ -410,7 +414,8 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
     class SceneViewHolder(view: View, private val isEditable: Boolean,
                           private val pictureDeviceCompat: PictureDeviceCompat,
                           private val onEditSceneClick: (String) -> Unit,
-                          private val onLocateSceneClick: (String) -> Unit)
+                          private val onLocateSceneClick: (String) -> Unit,
+                          private val onShowMoreClick: (String) -> Unit)
                                                                    : RecyclerView.ViewHolder(view) {
 
         private val titleView: TextView = view.findViewById(R.id.title)
@@ -421,7 +426,7 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
         private val locateButton: ImageButton = view.findViewById(R.id.locate_button)
         lateinit var sceneId: String
 
-        fun bind(scene: Scene) {
+        fun bind(scene: Scene, isShowMoreExpanded: Boolean) {
             this.sceneId = scene.id
             titleView.text = scene.title
             editButton.setOnClickListener { onEditSceneClick(this.sceneId) }
@@ -433,22 +438,30 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
                     .into(pictureView)
 
             descriptionView.text = scene.description
-            descriptionView.viewTreeObserver.addOnGlobalLayoutListener {
-                val layout = descriptionView.layout
-                if (layout != null) {
-                    if (layout.lineCount > 0) {
-                        if (layout.getEllipsisCount(layout.lineCount - 1) > 0) {
-                            showMoreView.visibility = View.VISIBLE
-                            showMoreView.setOnClickListener {
-                                descriptionView.ellipsize = null
-                                descriptionView.maxLines = Int.MAX_VALUE
-                                descriptionView.text = scene.description
-                                showMoreView.visibility = View.INVISIBLE
-                            }
+            if (!isShowMoreExpanded) {
+                descriptionView.ellipsize = TextUtils.TruncateAt.END
+                descriptionView.maxLines = 4
+                showMoreView.setOnClickListener {
+                    descriptionView.ellipsize = null
+                    descriptionView.maxLines = Int.MAX_VALUE
+                    showMoreView.visibility = View.INVISIBLE
+                    onShowMoreClick.invoke(sceneId)
+                }
+                descriptionView.viewTreeObserver.addOnGlobalLayoutListener {
+                    val layout = descriptionView.layout
+                    if (layout != null) {
+                        if (layout.lineCount > 0) {
+                            if (layout.getEllipsisCount(layout.lineCount - 1) > 0)
+                                showMoreView.visibility = View.VISIBLE
+                            else showMoreView.visibility = View.INVISIBLE
                         }
-                        else showMoreView.visibility = View.INVISIBLE
                     }
                 }
+            }
+            else {
+                descriptionView.ellipsize = null
+                descriptionView.maxLines = Int.MAX_VALUE
+                showMoreView.visibility = View.INVISIBLE
             }
         }
     }
