@@ -241,6 +241,7 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
             private const val LOADER_TYPE = 0
             private const val EXPERIENCE_TYPE = 1
             private const val SCENE_TYPE = 2
+            private const val EMPTY_TYPE = 3
         }
 
         lateinit var recyclerView: RecyclerView
@@ -252,13 +253,14 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
 
         override fun getItemCount(): Int {
             return if (isExperienceInProgress && areScenesInProgress) 1
-            else if (areScenesInProgress) 2
+            else if (areScenesInProgress || isExperienceInProgress) 2
             else scenes.size + 1
         }
 
         override fun getItemViewType(position: Int): Int {
             return if (position == 0) {
                 if (isExperienceInProgress) LOADER_TYPE
+                else if (experience == null) EMPTY_TYPE
                 else EXPERIENCE_TYPE
             } else {
                 if (areScenesInProgress) LOADER_TYPE
@@ -284,6 +286,10 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
                             { presenter.onEditSceneClick(it) },
                             { presenter.onLocateSceneClick(it) },
                             { isShowMoreExpanded[it] = true })
+                }
+                EMPTY_TYPE -> {
+                    return object : RecyclerView.ViewHolder(
+                            inflater.inflate(R.layout.item_empty, parent, false)) {}
                 }
                 else -> {
                     return object : RecyclerView.ViewHolder(
