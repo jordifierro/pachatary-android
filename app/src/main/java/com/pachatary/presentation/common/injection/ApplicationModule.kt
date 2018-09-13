@@ -31,12 +31,12 @@ class ApplicationModule(val application: Application) {
     fun providerIOScheduler(): Scheduler = Schedulers.io()
 
     @Provides
-    @Named("myexperiences")
+    @Named("main")
     fun providerMainScheduler(): Scheduler = AndroidSchedulers.mainThread()
 
     @Provides
     fun provideSchedulerProvider(@Named("io") subscriberScheduler: Scheduler,
-                                 @Named("myexperiences") observerScheduler: Scheduler): SchedulerProvider =
+                                 @Named("main") observerScheduler: Scheduler): SchedulerProvider =
         SchedulerProvider(subscriberScheduler, observerScheduler)
 
     @Provides

@@ -19,7 +19,7 @@ class MyExperiencesPresenter @Inject constructor(
         private val experiencesRepository: ExperienceRepository,
         private val profileRepository: ProfileRepository,
         private val authRepository: AuthRepository,
-        @Named("myexperiences") private val mainScheduler: Scheduler) : LifecycleObserver {
+        @Named("main") private val mainScheduler: Scheduler) : LifecycleObserver {
 
     lateinit var view: MyExperiencesView
 

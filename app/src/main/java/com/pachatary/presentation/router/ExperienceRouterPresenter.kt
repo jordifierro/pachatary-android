@@ -14,7 +14,7 @@ import javax.inject.Named
 class ExperienceRouterPresenter @Inject constructor(
         private val authRepository: AuthRepository,
         private val experienceRepository: ExperienceRepository,
-        @Named("myexperiences") private val mainScheduler: Scheduler) : LifecycleObserver {
+        @Named("main") private val mainScheduler: Scheduler) : LifecycleObserver {
 
     lateinit var view: RouterView
     lateinit var experienceShareId: String

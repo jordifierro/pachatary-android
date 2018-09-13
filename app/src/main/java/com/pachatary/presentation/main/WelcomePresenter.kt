@@ -8,7 +8,7 @@ import javax.inject.Inject
 import javax.inject.Named
 
 class WelcomePresenter @Inject constructor(private val authRepository: AuthRepository,
-                                           @Named("myexperiences") private val mainScheduler: Scheduler)
+                                           @Named("main") private val mainScheduler: Scheduler)
                                                                             : LifecycleObserver {
 
     lateinit var view: WelcomeView
