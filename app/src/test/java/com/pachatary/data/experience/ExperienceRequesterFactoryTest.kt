@@ -172,6 +172,23 @@ class ExperienceRequesterFactoryTest {
         }
     }
 
+    @Test
+    fun test_paginate_after_search_params_changed_reset_and_acts_like_normal_get_firsts() {
+        given {
+            a_kind(ExperienceRepoSwitch.Kind.EXPLORE)
+            a_request_params()
+            a_result_cache_that_returns_paginated_search()
+            an_api_repo_that_returns_two_experiences()
+        } whenn {
+            create_requester()
+            paginate()
+        } then {
+            should_emit_loading_through_replace_result_cache()
+            should_call_api()
+            should_replace_result_with_that_two_experiences_and_last_event_get_firsts()
+        }
+    }
+
     private fun given(func: ScenarioMaker.() -> Unit) = ScenarioMaker().start(func)
 
     @Suppress("UNCHECKED_CAST")
@@ -306,7 +323,7 @@ class ExperienceRequesterFactoryTest {
         }
 
         fun paginate() {
-            requesterObserver.onNext(Request(Request.Action.PAGINATE))
+            requesterObserver.onNext(Request(Request.Action.PAGINATE, requestParams))
         }
 
         fun should_do_nothing() {

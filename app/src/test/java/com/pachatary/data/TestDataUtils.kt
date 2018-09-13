@@ -1,9 +1,6 @@
 package com.pachatary.data
 
-import com.pachatary.data.common.ClientException
-import com.pachatary.data.common.Result
-import com.pachatary.data.common.ResultError
-import com.pachatary.data.common.ResultSuccess
+import com.pachatary.data.common.*
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.profile.Profile
 import com.pachatary.data.scene.Scene
@@ -38,12 +35,13 @@ fun DummyExperience(id: String, username: String = "") =
 fun DummyExperienceResultSuccess(id: String, username: String = "") =
         ResultSuccess(DummyExperience(id, username))
 
-fun DummyExperiencesResultSuccess(ids: List<String>, usernames: List<String>? = null)
+fun DummyExperiencesResultSuccess(ids: List<String>, usernames: List<String>? = null,
+                                  params: Request.Params? = null)
                                                                         : Result<List<Experience>> {
     val experiences = mutableListOf<Experience>()
     for (i in 0..ids.size-1) {
         if (usernames != null) experiences.add(DummyExperience(ids[i], usernames[i]))
         else experiences.add(DummyExperience(ids[i]))
     }
-    return ResultSuccess(experiences)
+    return ResultSuccess(experiences, params = params)
 }

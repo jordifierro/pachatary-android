@@ -89,6 +89,19 @@ class ExplorePresenterTest {
     }
 
     @Test
+    fun test_on_last_experience_shown_calls_paginate() {
+        given {
+            nothing()
+        } whenn {
+            last_location_known(latitude = 1.3, longitude = -4.5)
+            search_button_click_with_text("museums")
+            last_experience_shown()
+        } then {
+            should_call_repo_paginate(text = "museums", latitude = 1.3, longitude = -4.5)
+        }
+    }
+
+    @Test
     fun test_create_with_last_location_known_ask_firsts_experiences() {
         given {
             an_experience_repo_that_returns_in_progress(Request.Action.GET_FIRSTS)
@@ -312,6 +325,10 @@ class ExplorePresenterTest {
             presenter.onRefresh()
         }
 
+        fun last_experience_shown() {
+            presenter.lastExperienceShown()
+        }
+
         fun last_location_known(latitude: Double, longitude: Double) {
             presenter.onLastLocationFound(latitude, longitude)
         }
@@ -362,6 +379,14 @@ class ExplorePresenterTest {
             then(mockRepository).should()
                     .getFirstExperiences(ExperienceRepoSwitch.Kind.EXPLORE,
                                          Request.Params(text, latitude, longitude))
+        }
+
+        fun should_call_repo_paginate(text: String? = null,
+                                      latitude: Double? = null,
+                                      longitude: Double? = null) {
+            then(mockRepository).should()
+                    .getMoreExperiences(ExperienceRepoSwitch.Kind.EXPLORE,
+                                        Request.Params(text, latitude, longitude))
         }
 
         fun should_show_empty_experiences() {

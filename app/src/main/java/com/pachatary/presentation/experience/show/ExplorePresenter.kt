@@ -51,7 +51,8 @@ class ExplorePresenter @Inject constructor(private val repository: ExperienceRep
     }
 
     fun lastExperienceShown() {
-        repository.getMoreExperiences(ExperienceRepoSwitch.Kind.EXPLORE)
+        repository.getMoreExperiences(ExperienceRepoSwitch.Kind.EXPLORE,
+                                      Request.Params(searchText, latitude, longitude))
     }
 
     fun onLastLocationFound(latitude: Double, longitude: Double) {

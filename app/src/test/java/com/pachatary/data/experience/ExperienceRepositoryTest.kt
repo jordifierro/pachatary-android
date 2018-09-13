@@ -188,6 +188,7 @@ class ExperienceRepositoryTest {
         for (kind in ExperienceRepoSwitch.Kind.values()) {
             given {
                 kind_of_experiences(kind)
+                a_search_params()
             } whenn {
                 get_more_experiences_is_called()
             } then {
@@ -228,22 +229,22 @@ class ExperienceRepositoryTest {
         lateinit var repository: ExperienceRepository
         @Mock lateinit var mockApiRepository: ExperienceApiRepo
         @Mock lateinit var mockExperiencesRepoSwitch: ExperienceRepoSwitch
-        lateinit var experiencesFlowable: Flowable<Result<List<Experience>>>
-        lateinit var experienceFlowable: Flowable<Result<Experience>>
-        var kind = ExperienceRepoSwitch.Kind.MINE
-        lateinit var resultExperiencesFlowable: Flowable<Result<List<Experience>>>
-        lateinit var resultExperienceFlowable: Flowable<Result<Experience>>
-        val testExperienceSubscriber = TestSubscriber.create<Result<Experience>>()
-        val saveExperiencePublisher = PublishSubject.create<Result<Void>>()
-        lateinit var nonSavedExperience: Experience
-        lateinit var savedExperience: Experience
+        private lateinit var experiencesFlowable: Flowable<Result<List<Experience>>>
+        private lateinit var experienceFlowable: Flowable<Result<Experience>>
+        private var kind = ExperienceRepoSwitch.Kind.MINE
+        private lateinit var resultExperiencesFlowable: Flowable<Result<List<Experience>>>
+        private lateinit var resultExperienceFlowable: Flowable<Result<Experience>>
+        private val testExperienceSubscriber = TestSubscriber.create<Result<Experience>>()
+        private val saveExperiencePublisher = PublishSubject.create<Result<Void>>()
+        private lateinit var nonSavedExperience: Experience
+        private lateinit var savedExperience: Experience
         lateinit var experience: Experience
         var experienceId = ""
-        var experienceShareId = ""
-        var croppedImageString = ""
-        lateinit var searchParams: Request.Params
-        lateinit var stringFlowable: Flowable<Result<String>>
-        lateinit var stringFlowableResult: Flowable<Result<String>>
+        private var experienceShareId = ""
+        private var croppedImageString = ""
+        private lateinit var searchParams: Request.Params
+        private lateinit var stringFlowable: Flowable<Result<String>>
+        private lateinit var stringFlowableResult: Flowable<Result<String>>
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
@@ -388,7 +389,7 @@ class ExperienceRepositoryTest {
         }
 
         fun get_more_experiences_is_called() {
-            repository.getMoreExperiences(kind)
+            repository.getMoreExperiences(kind, searchParams)
         }
 
         fun translate_share_id() {
@@ -441,7 +442,7 @@ class ExperienceRepositoryTest {
             resultExperiencesFlowable.subscribe(testSubscriber)
             testSubscriber.awaitCount(1)
 
-            val result = testSubscriber.events.get(0).get(0) as Result<List<Experience>>
+            val result = testSubscriber.events[0][0] as Result<List<Experience>>
             assertEquals(listOf(savedExperience), result.data!!)
         }
 
@@ -469,7 +470,7 @@ class ExperienceRepositoryTest {
 
         fun should_return_a_flowable_with_that_experience() {
             testExperienceSubscriber.awaitCount(1)
-            val result = testExperienceSubscriber.events.get(0).get(0) as Result<Experience>
+            val result = testExperienceSubscriber.events[0][0] as Result<Experience>
             assertEquals(experience, result.data)
         }
 
@@ -559,7 +560,7 @@ class ExperienceRepositoryTest {
 
         fun should_call_switch_execute_paginate_action() {
             BDDMockito.then(mockExperiencesRepoSwitch).should()
-                    .executeAction(kind, Request.Action.PAGINATE)
+                    .executeAction(kind, Request.Action.PAGINATE, searchParams)
         }
 
         fun should_call_api_repo_get_experience_with_id() {

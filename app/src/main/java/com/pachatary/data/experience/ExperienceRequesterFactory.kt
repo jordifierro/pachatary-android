@@ -36,6 +36,10 @@ class ExperienceRequesterFactory(val apiRepository: ExperienceApiRepository) {
                                     }, { throw it })
                         }
                     }
+                    else if (it.first.action == Request.Action.PAGINATE &&
+                             it.first.params != it.second.params) {
+                        actionsSubject.onNext(Request(Request.Action.GET_FIRSTS, it.first.params))
+                    }
                     else if (it.first.action == Request.Action.PAGINATE) {
                         if (!it.second.isInProgress() &&
                                 (it.second.isSuccess() && it.second.hasBeenInitialized() ||
@@ -61,6 +65,7 @@ class ExperienceRequesterFactory(val apiRepository: ExperienceApiRepository) {
                                                 .data(it.second.data!!
                                                         .union(apiResult.data!!).toList())
                                                 .action(Request.Action.PAGINATE)
+                                                .params(it.second.params)
                                                 .build()
                                     }
                                 resultCache.replaceResultObserver.onNext(newResult)

@@ -1,7 +1,10 @@
 package com.pachatary.presentation.profile
 
 import com.pachatary.data.*
-import com.pachatary.data.common.*
+import com.pachatary.data.common.Request
+import com.pachatary.data.common.Result
+import com.pachatary.data.common.ResultError
+import com.pachatary.data.common.ResultInProgress
 import com.pachatary.data.experience.Experience
 import com.pachatary.data.experience.ExperienceRepoSwitch
 import com.pachatary.data.experience.ExperienceRepository
@@ -15,7 +18,6 @@ import org.junit.Assert.assertFalse
 import org.junit.Test
 import org.mockito.BDDMockito
 import org.mockito.BDDMockito.then
-import org.mockito.BDDMockito.times
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
@@ -26,7 +28,8 @@ class ProfilePresenterTest {
     fun test_create_asks_firsts_experiences_and_profile() {
         given {
             a_presenter("username")
-            an_experience_repo_that_returns(ResultInProgress(action = Request.Action.GET_FIRSTS))
+            an_experience_repo_that_returns(ResultInProgress(action = Request.Action.GET_FIRSTS,
+                                                    params = Request.Params(username = "username")))
             a_profile_repo_that_returns("username", ResultInProgress())
         } whenn {
             create_presenter()
@@ -40,7 +43,8 @@ class ProfilePresenterTest {
     fun test_when_result_in_progress_last_event_get_firsts_shows_loader() {
         given {
             a_presenter("username")
-            an_experience_repo_that_returns(ResultInProgress(action = Request.Action.GET_FIRSTS))
+            an_experience_repo_that_returns(ResultInProgress(action = Request.Action.GET_FIRSTS,
+                                                    params = Request.Params(username = "username")))
             a_profile_repo_that_returns("username", ResultInProgress())
         } whenn {
             create_presenter()
@@ -55,7 +59,8 @@ class ProfilePresenterTest {
     fun test_when_result_in_progress_last_event_pagination_shows_pagination_loader() {
         given {
             a_presenter("username")
-            an_experience_repo_that_returns(ResultInProgress(action = Request.Action.PAGINATE))
+            an_experience_repo_that_returns(ResultInProgress(action = Request.Action.PAGINATE,
+                                                    params = Request.Params(username = "username")))
             a_profile_repo_that_returns("username", ResultInProgress())
         } whenn {
             create_presenter()
@@ -70,7 +75,8 @@ class ProfilePresenterTest {
     fun test_when_result_success_shows_data() {
         given {
             a_presenter("username")
-            an_experience_repo_that_returns(DummyExperiencesResultSuccess(listOf("3", "4")))
+            an_experience_repo_that_returns(DummyExperiencesResultSuccess(listOf("3", "4"),
+                                                    params = Request.Params(username = "username")))
             a_profile_repo_that_returns("username", DummyProfileResult("other"))
         } whenn {
             create_presenter()
@@ -89,7 +95,8 @@ class ProfilePresenterTest {
         given {
             a_presenter("username")
             an_experience_repo_that_returns(
-                    ResultError(Exception(), action = Request.Action.GET_FIRSTS))
+                    ResultError(Exception(), action = Request.Action.GET_FIRSTS,
+                                params = Request.Params(username = "username")))
             a_profile_repo_that_returns("username", DummyResultError())
         } whenn {
             create_presenter()
@@ -106,7 +113,8 @@ class ProfilePresenterTest {
         given {
             a_presenter("username")
             an_experience_repo_that_returns(
-                    ResultError(Exception(), action = Request.Action.PAGINATE))
+                    ResultError(Exception(), action = Request.Action.PAGINATE,
+                                params = Request.Params(username = "username")))
             a_profile_repo_that_returns("username", DummyResultError())
         } whenn {
             create_presenter()
@@ -174,7 +182,7 @@ class ProfilePresenterTest {
         } whenn {
             last_experience_shown()
         } then {
-            should_call_repo_get_more_experiences()
+            should_call_repo_get_more_experiences(Request.Params(username = "username"))
         }
     }
 
@@ -213,8 +221,8 @@ class ProfilePresenterTest {
         @Mock lateinit var mockView: ProfileView
         @Mock lateinit var mockRepository: ExperienceRepository
         @Mock lateinit var mockProfileRepo: ProfileRepository
-        lateinit var experienceTestObservable: PublishSubject<Result<List<Experience>>>
-        lateinit var profileTestObservable: PublishSubject<Result<Profile>>
+        private lateinit var experienceTestObservable: PublishSubject<Result<List<Experience>>>
+        private lateinit var profileTestObservable: PublishSubject<Result<Profile>>
 
         fun buildScenario(): ScenarioMaker {
             MockitoAnnotations.initMocks(this)
@@ -325,8 +333,9 @@ class ProfilePresenterTest {
             assertFalse(profileTestObservable.hasObservers())
         }
 
-        fun should_call_repo_get_more_experiences() {
-            then(mockRepository).should().getMoreExperiences(ExperienceRepoSwitch.Kind.PERSONS)
+        fun should_call_repo_get_more_experiences(params: Request.Params) {
+            then(mockRepository).should().getMoreExperiences(ExperienceRepoSwitch.Kind.PERSONS,
+                                                             params)
         }
 
         fun should_show_profile_loader() {

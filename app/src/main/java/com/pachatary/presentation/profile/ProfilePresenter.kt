@@ -47,35 +47,38 @@ class ProfilePresenter @Inject constructor(private val repository: ExperienceRep
     }
 
     fun lastExperienceShown() {
-        repository.getMoreExperiences(ExperienceRepoSwitch.Kind.PERSONS)
+        repository.getMoreExperiences(ExperienceRepoSwitch.Kind.PERSONS,
+                                      Request.Params(username = this.username))
     }
 
     private fun connectToExperiences() {
-        experiencesDisposable = repository.experiencesFlowable(ExperienceRepoSwitch.Kind.PERSONS)
-                                          .observeOn(mainScheduler)
-                                          .subscribe({
-                                              if (it.isInProgress()) {
-                                                  if (it.action == Request.Action.GET_FIRSTS) {
-                                                      view.showExperiencesLoader()
-                                                      view.hidePaginationLoader()
-                                                  }
-                                                  else if (it.action == Request.Action.PAGINATE) {
-                                                      view.hideExperiencesLoader()
-                                                      view.showPaginationLoader()
-                                                  }
-                                              }
-                                              else {
-                                                  view.hideExperiencesLoader()
-                                                  view.hidePaginationLoader()
-                                              }
+        experiencesDisposable =
+                repository.experiencesFlowable(ExperienceRepoSwitch.Kind.PERSONS)
+                                  .observeOn(mainScheduler)
+                                  .filter { it.params == Request.Params(username = username) }
+                                  .subscribe({
+                                      if (it.isInProgress()) {
+                                          if (it.action == Request.Action.GET_FIRSTS) {
+                                              view.showExperiencesLoader()
+                                              view.hidePaginationLoader()
+                                          }
+                                          else if (it.action == Request.Action.PAGINATE) {
+                                              view.hideExperiencesLoader()
+                                              view.showPaginationLoader()
+                                          }
+                                      }
+                                      else {
+                                          view.hideExperiencesLoader()
+                                          view.hidePaginationLoader()
+                                      }
 
-                                              if (it.isError() &&
-                                                      it.action == Request.Action.GET_FIRSTS)
-                                                  view.showRetry()
+                                      if (it.isError() &&
+                                              it.action == Request.Action.GET_FIRSTS)
+                                          view.showRetry()
 
-                                              if (it.isSuccess())
-                                                  view.showExperienceList(it.data!!)
-                                          }, { throw it })
+                                      if (it.isSuccess())
+                                          view.showExperienceList(it.data!!)
+                                  }, { throw it })
         repository.getFirstExperiences(ExperienceRepoSwitch.Kind.PERSONS,
                                        Request.Params(username = this.username))
     }
