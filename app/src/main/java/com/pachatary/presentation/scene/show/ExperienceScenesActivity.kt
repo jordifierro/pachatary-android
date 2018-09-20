@@ -12,6 +12,7 @@ import android.support.design.widget.AppBarLayout
 import android.support.design.widget.CoordinatorLayout
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.content.ContextCompat
+import android.support.v4.text.util.LinkifyCompat
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
@@ -19,6 +20,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.LinearSmoothScroller
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
+import android.text.util.Linkify
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -258,12 +260,13 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
         }
 
         override fun getItemViewType(position: Int): Int {
-            return if (position == 0) {
-                if (isExperienceInProgress) LOADER_TYPE
-                else if (experience == null) EMPTY_TYPE
-                else EXPERIENCE_TYPE
-            } else {
-                if (areScenesInProgress) LOADER_TYPE
+            return when (position) {
+                0 -> when {
+                    isExperienceInProgress -> LOADER_TYPE
+                    experience == null -> EMPTY_TYPE
+                    else -> EXPERIENCE_TYPE
+                }
+                else -> if (areScenesInProgress) LOADER_TYPE
                 else SCENE_TYPE
             }
         }
@@ -394,9 +397,13 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
                                 descriptionView.maxLines = Int.MAX_VALUE
                                 descriptionView.text = experience.description
                                 showMoreView.visibility = View.INVISIBLE
+                                LinkifyCompat.addLinks(descriptionView, Linkify.WEB_URLS)
                             }
                         }
-                        else showMoreView.visibility = View.INVISIBLE
+                        else {
+                            showMoreView.visibility = View.INVISIBLE
+                            LinkifyCompat.addLinks(descriptionView, Linkify.WEB_URLS)
+                        }
                     }
                 }
             }
@@ -454,10 +461,12 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
             if (!isShowMoreExpanded) {
                 descriptionView.ellipsize = TextUtils.TruncateAt.END
                 descriptionView.maxLines = 4
+                showMoreView.visibility = View.VISIBLE
                 showMoreView.setOnClickListener {
                     descriptionView.ellipsize = null
                     descriptionView.maxLines = Int.MAX_VALUE
                     showMoreView.visibility = View.INVISIBLE
+                    LinkifyCompat.addLinks(descriptionView, Linkify.WEB_URLS)
                     onShowMoreClick.invoke(sceneId)
                 }
                 descriptionView.viewTreeObserver.addOnGlobalLayoutListener {
@@ -475,6 +484,7 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
                 descriptionView.ellipsize = null
                 descriptionView.maxLines = Int.MAX_VALUE
                 showMoreView.visibility = View.INVISIBLE
+                LinkifyCompat.addLinks(descriptionView, Linkify.WEB_URLS)
             }
         }
     }

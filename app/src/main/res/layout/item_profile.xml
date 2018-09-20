@@ -36,6 +36,7 @@
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp"
         android:gravity="center"
+        android:autoLink="web"
         android:textSize="14sp"
         android:textColor="@color/black"
         tools:text="Profile bio description that can be 140 chars long.\nThis is dummy one"/>

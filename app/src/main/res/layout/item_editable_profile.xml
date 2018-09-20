@@ -52,6 +52,7 @@
         android:layout_below="@+id/username"
         android:gravity="center"
         android:inputType="textMultiLine"
+        android:autoLink="web"
         android:maxLines="6"
         android:maxLength="140"
         android:hint="@string/fragment_myexperiences_bio_edittext_hint"
