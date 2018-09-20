@@ -27,7 +27,7 @@ class ProfileRepository(val apiRepository: ProfileApiRepository) {
                 .distinct()
                 .replay(1)
                 .autoConnect()
-        val startConnectionDisposable = profilesFlowable.subscribe()
+        val startConnectionDisposable = profilesFlowable.subscribe({}, { throw it })
         startConnectionDisposable.dispose()
     }
 
@@ -60,6 +60,6 @@ class ProfileRepository(val apiRepository: ProfileApiRepository) {
     fun uploadProfilePicture(imageUriString: String) {
         apiRepository.uploadProfilePicture(imageUriString)
                 .doOnNext { if (it.isSuccess()) this.cacheProfile(it.data!!) }
-                .subscribe()
+                .subscribe({}, { throw it })
     }
 }

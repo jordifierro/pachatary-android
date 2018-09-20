@@ -32,8 +32,9 @@ class EditExperiencePresenter @Inject constructor(
         getDisposable = experienceRepository.experienceFlowable(experienceId)
                 .observeOn(mainScheduler)
                 .take(1)
-                .subscribe { result -> experience = result.data!!
-                                       view.showExperience(experience) }
+                .subscribe({ result -> experience = result.data!!
+                                       view.showExperience(experience) },
+                           { throw it })
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
