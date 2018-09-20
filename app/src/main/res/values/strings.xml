@@ -84,6 +84,7 @@
         Would you like to grant that permissions?</string>
 
     <string name="fragment_explore_search_button">Search…</string>
+    <string name="fragment_explore_no_results_found">NO RESULTS FOUND :(</string>
 
     <string name="fragment_saved_experiences_title">SAVED EXPERIENCES</string>
     <string name="fragment_saved_experience_info_1">YOU HAVEN\'T SAVED ANY EXPERIENCE YET.</string>

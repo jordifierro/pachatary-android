@@ -80,6 +80,7 @@
             Vols donar aquests permisos?</string>
 
     <string name="fragment_explore_search_button">Cercar…</string>
+    <string name="fragment_explore_no_results_found">NO S\'HA TROBAT CAP RESULTAT :(</string>
 
     <string name="fragment_saved_experiences_title">EXPERIÈNCIES GUARDADES</string>
     <string name="fragment_saved_experience_info_1">ENCARA NO HAS GUARDAT CAP EXPERIÈNCIA.</string>

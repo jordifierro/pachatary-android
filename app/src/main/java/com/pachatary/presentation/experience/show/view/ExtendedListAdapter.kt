@@ -19,14 +19,13 @@ class ExtendedListAdapter(private val inflater: LayoutInflater,
     companion object {
         private const val EXPERIENCE_TYPE = 1
         private const val LOADER_TYPE = 2
+        private const val NO_RESULTS_TYPE = 3
     }
 
-    override fun getItemCount(): Int {
-        if (inProgress) return experienceList.size + 1
-        return experienceList.size
-    }
+    override fun getItemCount(): Int = experienceList.size + 1
 
     override fun getItemViewType(position: Int): Int {
+        if (!inProgress && experienceList.isEmpty()) return NO_RESULTS_TYPE
         if (inProgress && position == experienceList.size) return LOADER_TYPE
         return EXPERIENCE_TYPE
     }
@@ -36,6 +35,9 @@ class ExtendedListAdapter(private val inflater: LayoutInflater,
             EXPERIENCE_TYPE ->
                 ExtendedViewHolder(inflater.inflate(R.layout.item_extended_experience_list,
                         parent, false), pictureDeviceCompat, onClick, onUsernameClick)
+            NO_RESULTS_TYPE ->
+                object : RecyclerView.ViewHolder(
+                        inflater.inflate(R.layout.item_no_results_found, parent, false)) {}
             else ->
                 object : RecyclerView.ViewHolder(
                         inflater.inflate(R.layout.item_loader, parent, false)) {}
@@ -43,10 +45,13 @@ class ExtendedListAdapter(private val inflater: LayoutInflater,
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (!(inProgress && position == experienceList.size)) {
-            val endHasBeenReached = position == experienceList.size - 1
-            if (experienceList.isNotEmpty() && endHasBeenReached) onLastItemShown.invoke()
-            (holder as ExtendedViewHolder).bind(experienceList[position])
+        when (getItemViewType(position)) {
+            EXPERIENCE_TYPE -> {
+                val endHasBeenReached = position == experienceList.size - 1
+                if (experienceList.isNotEmpty() && endHasBeenReached) onLastItemShown.invoke()
+                (holder as ExtendedViewHolder).bind(experienceList[position])
+            }
+            else -> {}
         }
     }
 }

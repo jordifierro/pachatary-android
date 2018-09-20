@@ -80,6 +80,7 @@
         Deseas dar estos permisos?</string>
 
     <string name="fragment_explore_search_button">Buscar…</string>
+    <string name="fragment_explore_no_results_found">NO SE HAN ENCONTRADO RESULTADOS :(</string>
 
     <string name="fragment_saved_experiences_title">EXPERIENCIAS GUARDADAS</string>
     <string name="fragment_saved_experience_info_1">AÚN NO HA GUARDADO NINGUNA EXPERIENCIA.</string>
