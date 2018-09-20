@@ -60,6 +60,7 @@
     <string name="activity_settings_title">AJUSTES</string>
     <string name="activity_settings_privacy_policy">Política de privacidad</string>
     <string name="activity_settings_terms_and_conditions">Términos y condiciones</string>
+    <string name="activity_settings_feedback">Envíanos tu opinión</string>
 
     <string name="activity_webview_title">WEBVIEW</string>
     <string name="activity_webview_privacy_title">POLÍTICA DE PRIVACIDAD</string>

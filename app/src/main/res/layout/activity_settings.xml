@@ -98,6 +98,44 @@
             android:background="@color/light_grey"
             android:layout_below="@+id/settings_privacy_button" />
 
+        <RelativeLayout
+            android:id="@+id/feedback_button"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:paddingRight="30dp"
+            android:paddingLeft="30dp"
+            android:layout_below="@id/divider_3"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="@drawable/clickable_background">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:text="@string/activity_settings_feedback" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                app:srcCompat="@drawable/ic_chevron_right" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/divider_4"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/light_grey"
+            android:layout_below="@+id/feedback_button" />
+
     </RelativeLayout>
 
 </LinearLayout>

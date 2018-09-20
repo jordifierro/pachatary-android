@@ -3,12 +3,14 @@ devHttpsDeeplinkHost=dev_host_base_url_without_https
 devAppDeeplinkScheme=dev_scheme_to_catch_deeplink
 devMapboxAccessToken=get_dev_token_from_mapbox
 devClientSecretKey=get_client_key_from_dev_host
+devFeedbackEmail=dev-hello@mydomain.com
 
 apiUrl=https://host_base_url
 httpsDeeplinkHost=host_base_url_without_https
 appDeeplinkScheme=scheme_to_catch_deeplink
 mapboxAccessToken=get_token_from_mapbox
 clientSecretKey=get_client_key_from_host
+feedbackEmail=hello@mydomain.com
 RELEASE_STORE_FILE=path_to_keystore_file
 RELEASE_STORE_PASSWORD=file_password
 RELEASE_KEY_ALIAS=key_alias

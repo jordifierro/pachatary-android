@@ -60,6 +60,7 @@
     <string name="activity_settings_title">CONFIGURACIÓ</string>
     <string name="activity_settings_privacy_policy">Política de privacitat</string>
     <string name="activity_settings_terms_and_conditions">Termes i condicions</string>
+    <string name="activity_settings_feedback">Envia\'ns què en penses</string>
 
     <string name="activity_webview_title">WEBVIEW</string>
     <string name="activity_webview_privacy_title">POLÍTICA DE PRIVACITAT</string>
