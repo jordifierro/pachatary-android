@@ -22,7 +22,11 @@ class ExtendedListAdapter(private val inflater: LayoutInflater,
         private const val NO_RESULTS_TYPE = 3
     }
 
-    override fun getItemCount(): Int = experienceList.size + 1
+    override fun getItemCount(): Int {
+        if (inProgress) return experienceList.size + 1
+        if (experienceList.isEmpty()) return 1
+        return experienceList.size
+    }
 
     override fun getItemViewType(position: Int): Int {
         if (!inProgress && experienceList.isEmpty()) return NO_RESULTS_TYPE
