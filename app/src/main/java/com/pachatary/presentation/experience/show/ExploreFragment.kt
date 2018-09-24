@@ -55,6 +55,7 @@ class ExploreFragment : Fragment(), ExploreView {
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var searchEditText: EditTextWithBackListener
     private lateinit var locationButton: ImageButton
+    private lateinit var searchButton: ImageButton
     private lateinit var rootView: CoordinatorLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,6 +91,8 @@ class ExploreFragment : Fragment(), ExploreView {
             hideKeyboard()
             presenter.locationClick()
         }
+        searchButton = view.findViewById(R.id.experiences_search_button)
+        searchButton.setOnClickListener { searchAndHideKeyboard() }
         swipeRefreshLayout = view.findViewById(R.id.swiperefresh)
         swipeRefreshLayout.setOnRefreshListener {
             swipeRefreshLayout.isRefreshing = false
