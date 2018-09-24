@@ -61,6 +61,11 @@ class AskLoginEmailActivity : AppCompatActivity(), AskLoginEmailView {
         SnackbarUtils.showError(rootView, this)
     }
 
+    override fun showEmptyEmailError() {
+        SnackbarUtils.showError(rootView, this,
+                                getString(R.string.activity_ask_login_email_empty_email_message))
+    }
+
     override fun showLoader() {
         progressBar.visibility = View.VISIBLE
     }

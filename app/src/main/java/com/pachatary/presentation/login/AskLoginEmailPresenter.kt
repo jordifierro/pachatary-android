@@ -18,24 +18,23 @@ class AskLoginEmailPresenter @Inject constructor(
     var disposable: Disposable? = null
 
     fun onAskClick(email: String) {
-        disposable = authRepository.askLoginEmail(email)
-                .observeOn(mainScheduler)
-                .subscribe {
-                    if (it.isSuccess()) {
-                        view.hideLoader()
-                        view.showSuccessMessage()
-                        view.finishApplication()
+        if (email.isEmpty()) view.showEmptyEmailError()
+        else disposable = authRepository.askLoginEmail(email)
+                    .observeOn(mainScheduler)
+                    .subscribe {
+                        if (it.isSuccess()) {
+                            view.hideLoader()
+                            view.showSuccessMessage()
+                            view.finishApplication()
+                        } else if (it.isError()) {
+                            view.showErrorMessage()
+                            view.enableAskButton()
+                            view.hideLoader()
+                        } else if (it.isInProgress()) {
+                            view.showLoader()
+                            view.disableAskButton()
+                        }
                     }
-                    else if (it.isError()) {
-                        view.showErrorMessage()
-                        view.enableAskButton()
-                        view.hideLoader()
-                    }
-                    else if (it.isInProgress()) {
-                        view.showLoader()
-                        view.disableAskButton()
-                    }
-                }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)

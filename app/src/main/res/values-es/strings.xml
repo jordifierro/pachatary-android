@@ -51,6 +51,7 @@
     <string name="activity_ask_login_email_button">Mandar correo para entrar</string>
     <string name="activity_ask_login_email_info">Te mandaremos un correo con un enlace para entrar</string>
     <string name="activity_ask_login_email_message">Te hemos mandado un correo</string>
+    <string name="activity_ask_login_email_empty_email_message">Introduce tu correo</string>
 
     <string name="activity_login_title">ENTRAR</string>
     <string name="filter_view_activity_login">Entrar</string>

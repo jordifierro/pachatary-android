@@ -14,6 +14,17 @@ import org.mockito.MockitoAnnotations
 class AskLoginEmailPresenterTest {
 
     @Test
+    fun test_on_ask_with_empty_email_shows_error() {
+        given {
+            an_empty_email()
+        } whenn {
+            on_ask_click()
+        } then {
+            should_show_empty_email_error()
+        }
+    }
+
+    @Test
     fun test_on_ask_click_receives_in_progress() {
         given {
             an_email()
@@ -78,6 +89,10 @@ class AskLoginEmailPresenterTest {
             email = "e@c.m"
         }
 
+        fun an_empty_email() {
+            email = ""
+        }
+
         fun an_auth_repo_that_returns_loading_result_when_ask_login_email() {
             BDDMockito.given(mockAuthRepository.askLoginEmail(email))
                     .willReturn(Flowable.just(ResultInProgress()))
@@ -127,6 +142,10 @@ class AskLoginEmailPresenterTest {
 
         fun should_show_success_message() {
             BDDMockito.then(mockView).should().showSuccessMessage()
+        }
+
+        fun should_show_empty_email_error() {
+            BDDMockito.then(mockView).should().showEmptyEmailError()
         }
 
         infix fun given(func: ScenarioMaker.() -> Unit) = buildScenario().apply(func)

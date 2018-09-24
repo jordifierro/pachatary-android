@@ -51,6 +51,7 @@
     <string name="activity_ask_login_email_button">Enviar correu per entrar</string>
     <string name="activity_ask_login_email_info">T\'enviarem un correu amb un enllaç per entrar</string>
     <string name="activity_ask_login_email_message">T\'hem enviat un correu</string>
+    <string name="activity_ask_login_email_empty_email_message">Introdueix el teu correu</string>
 
     <string name="activity_login_title">ENTRAR</string>
     <string name="filter_view_activity_login">Entrar</string>

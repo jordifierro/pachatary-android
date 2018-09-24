@@ -7,6 +7,7 @@ interface AskLoginEmailView : LoaderView {
     fun finishApplication()
     fun showSuccessMessage()
     fun showErrorMessage()
+    fun showEmptyEmailError()
     fun disableAskButton()
     fun enableAskButton()
 }

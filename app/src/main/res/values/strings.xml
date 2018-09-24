@@ -55,6 +55,7 @@
     <string name="activity_ask_login_email_button">Send login email</string>
     <string name="activity_ask_login_email_info">We will send an email to you with a login link</string>
     <string name="activity_ask_login_email_message">We\'ve send an email to you</string>
+    <string name="activity_ask_login_email_empty_email_message">Insert your email</string>
 
     <string name="activity_login_title">LOGIN</string>
     <string name="filter_view_activity_login">Login</string>
