@@ -35,13 +35,13 @@
                 <!-- Accepts URIs that begin with "https://pachatary.com -->
                 <data android:scheme="https"
                     android:host="@string/https_deeplink_host"
-                    android:path="/"/>
+                    android:path="/open"/>
                 <data android:scheme="http"
                     android:host="@string/https_deeplink_host"
-                    android:path="/"/>
+                    android:path="/open"/>
                 <data android:scheme="@string/app_deeplink_scheme"
                     android:host="app"
-                    android:path="/"/>
+                    android:path="/open"/>
             </intent-filter>
         </activity>
         <activity
