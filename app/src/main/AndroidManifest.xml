@@ -95,10 +95,10 @@
                 <!-- Accepts URIs that begin with "https://pachatary.com -->
                 <data android:scheme="https"
                     android:host="@string/https_deeplink_host"
-                    android:path="/people/me/email-confirmation"/>
+                    android:path="/redirects/people/me/email-confirmation"/>
                 <data android:scheme="http"
                     android:host="@string/https_deeplink_host"
-                    android:path="/people/me/email-confirmation"/>
+                    android:path="/redirects/people/me/email-confirmation"/>
                 <data android:scheme="@string/app_deeplink_scheme"
                     android:host="app"
                     android:path="/people/me/email-confirmation"/>
@@ -129,10 +129,10 @@
                 <!-- Accepts URIs that begin with "https://pachatary.com -->
                 <data android:scheme="https"
                     android:host="@string/https_deeplink_host"
-                    android:path="/people/me/login"/>
+                    android:path="/redirects/people/me/login"/>
                 <data android:scheme="http"
                     android:host="@string/https_deeplink_host"
-                    android:path="/people/me/login"/>
+                    android:path="/redirects/people/me/login"/>
                 <data android:scheme="@string/app_deeplink_scheme"
                     android:host="app"
                     android:path="/people/me/login"/>
