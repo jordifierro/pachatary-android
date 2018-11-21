@@ -152,18 +152,14 @@ The search bar is used to search an specific address, city or country.
 Locate icon centers the map on the current user location.
 
 
-#### PickImageActivity
+#### PickAndCropImageActivity
 
 It uses [Matisse](https://github.com/zhihu/Matisse) library to make
 user pick an image from gallery for old versions.
 Default documents app is used on new devices.
-
-
-#### CropImageActivity
-![CropImageActivity](https://lh3.googleusercontent.com/1AaLxbfgADNljb4626mYYydeVSrpe1rGX04v25SRbDMPc2yO0O0fpLY2Wxz4TRva4Q=h900)
-
 It uses [uCrop](https://github.com/Yalantis/uCrop) library to let
 user crop image to make it square.
+It also handles storage permissions.
 
 
 #### SettingsActivity
