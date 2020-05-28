@@ -4,6 +4,7 @@ import android.content.Context
 import android.support.multidex.MultiDex
 import android.support.multidex.MultiDexApplication
 import android.support.v7.app.AppCompatDelegate
+import com.google.android.gms.security.ProviderInstaller
 import com.jakewharton.picasso.OkHttp3Downloader
 import com.pachatary.BuildConfig
 import com.pachatary.data.common.injection.DataModule
@@ -24,6 +25,8 @@ class PachataryApplication : MultiDexApplication() {
         super.onCreate()
 
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
+
+        ProviderInstaller.installIfNeeded(this)
 
         injector = DaggerApplicationComponent.builder()
                                                 .applicationModule(ApplicationModule(this))
