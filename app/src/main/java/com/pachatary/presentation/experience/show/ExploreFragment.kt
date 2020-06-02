@@ -105,12 +105,12 @@ class ExploreFragment : Fragment(), ExploreView {
 
     override fun showLoader() {
         (recyclerView.adapter as ExtendedListAdapter).inProgress = true
-        recyclerView.adapter.notifyDataSetChanged()
+        (recyclerView.adapter as ExtendedListAdapter).notifyDataSetChanged()
     }
 
     override fun hideLoader() {
         (recyclerView.adapter as ExtendedListAdapter).inProgress = false
-        recyclerView.adapter.notifyDataSetChanged()
+        (recyclerView.adapter as ExtendedListAdapter).notifyDataSetChanged()
     }
 
     override fun showRetry() {
@@ -120,7 +120,7 @@ class ExploreFragment : Fragment(), ExploreView {
 
     override fun showExperienceList(experienceList: List<Experience>) {
         (recyclerView.adapter as ExtendedListAdapter).experienceList = experienceList
-        recyclerView.adapter.notifyDataSetChanged()
+        (recyclerView.adapter as ExtendedListAdapter).notifyDataSetChanged()
     }
 
     override fun navigateToExperience(experienceId: String) {

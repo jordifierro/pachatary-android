@@ -116,12 +116,12 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
 
     override fun showExperiencesLoader() {
         (recyclerView.adapter as MyProfileAdapter).experiencesInProgress = true
-        recyclerView.adapter.notifyDataSetChanged()
+        (recyclerView.adapter as MyProfileAdapter).notifyDataSetChanged()
     }
 
     override fun hideExperiencesLoader() {
         (recyclerView.adapter as MyProfileAdapter).experiencesInProgress = false
-        recyclerView.adapter.notifyDataSetChanged()
+        (recyclerView.adapter as MyProfileAdapter).notifyDataSetChanged()
     }
 
     override fun showExperiencesRetry() {
@@ -131,39 +131,39 @@ class MyExperiencesFragment : Fragment(), MyExperiencesView {
 
     override fun showPaginationLoader() {
         (recyclerView.adapter as MyProfileAdapter).paginationInProgress = true
-        recyclerView.adapter.notifyDataSetChanged()
+        (recyclerView.adapter as MyProfileAdapter).notifyDataSetChanged()
     }
 
     override fun hidePaginationLoader() {
         (recyclerView.adapter as MyProfileAdapter).paginationInProgress = false
-        recyclerView.adapter.notifyDataSetChanged()
+        (recyclerView.adapter as MyProfileAdapter).notifyDataSetChanged()
     }
 
     override fun showExperienceList(experiences: List<Experience>) {
         this.experiences = experiences
         (recyclerView.adapter as MyProfileAdapter).experiences = experiences
         (recyclerView.adapter as MyProfileAdapter).noExperiences = false
-        recyclerView.adapter.notifyDataSetChanged()
+        (recyclerView.adapter as MyProfileAdapter).notifyDataSetChanged()
     }
 
     override fun showNoExperiencesInfo() {
         (recyclerView.adapter as MyProfileAdapter).noExperiences = true
-        recyclerView.adapter.notifyDataSetChanged()
+        (recyclerView.adapter as MyProfileAdapter).notifyDataSetChanged()
     }
 
     override fun showProfile(profile: Profile) {
         (recyclerView.adapter as MyProfileAdapter).profile = profile
-        recyclerView.adapter.notifyDataSetChanged()
+        (recyclerView.adapter as MyProfileAdapter).notifyDataSetChanged()
     }
 
     override fun hideProfileLoader() {
         (recyclerView.adapter as MyProfileAdapter).profileInProgress = false
-        recyclerView.adapter.notifyDataSetChanged()
+        (recyclerView.adapter as MyProfileAdapter).notifyDataSetChanged()
     }
 
     override fun showProfileLoader() {
         (recyclerView.adapter as MyProfileAdapter).profileInProgress = true
-        recyclerView.adapter.notifyDataSetChanged()
+        (recyclerView.adapter as MyProfileAdapter).notifyDataSetChanged()
     }
 
     override fun showProfileRetry() {

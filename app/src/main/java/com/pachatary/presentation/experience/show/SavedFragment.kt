@@ -78,13 +78,13 @@ class SavedFragment : Fragment(), SavedView {
     override fun showLoader() {
         (recyclerView.adapter as SquareListAdapter).inProgress = true
         (recyclerView.adapter as SquareListAdapter).noSavedExperiences = false
-        recyclerView.adapter.notifyDataSetChanged()
+        (recyclerView.adapter as SquareListAdapter).notifyDataSetChanged()
     }
 
     override fun hideLoader() {
         (recyclerView.adapter as SquareListAdapter).inProgress = false
         (recyclerView.adapter as SquareListAdapter).noSavedExperiences = false
-        recyclerView.adapter.notifyDataSetChanged()
+        (recyclerView.adapter as SquareListAdapter).notifyDataSetChanged()
     }
 
     override fun showRetry() {
@@ -95,12 +95,12 @@ class SavedFragment : Fragment(), SavedView {
     override fun showExperienceList(experienceList: List<Experience>) {
         (recyclerView.adapter as SquareListAdapter).experienceList = experienceList
         (recyclerView.adapter as SquareListAdapter).noSavedExperiences = false
-        recyclerView.adapter.notifyDataSetChanged()
+        (recyclerView.adapter as SquareListAdapter).notifyDataSetChanged()
     }
 
     override fun showNoSavedExperiencesInfo() {
         (recyclerView.adapter as SquareListAdapter).noSavedExperiences = true
-        recyclerView.adapter.notifyDataSetChanged()
+        (recyclerView.adapter as SquareListAdapter).notifyDataSetChanged()
     }
 
     override fun navigateToExperience(experienceId: String) {

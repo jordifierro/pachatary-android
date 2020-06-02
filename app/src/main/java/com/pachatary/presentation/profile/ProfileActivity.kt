@@ -100,44 +100,44 @@ class ProfileActivity : AppCompatActivity(), ProfileView {
 
     override fun showExperiencesLoader() {
         (recyclerView.adapter as ProfileAdapter).experiencesInProgress = true
-        recyclerView.adapter.notifyDataSetChanged()
+        (recyclerView.adapter as ProfileAdapter).notifyDataSetChanged()
     }
 
     override fun hideExperiencesLoader() {
         (recyclerView.adapter as ProfileAdapter).experiencesInProgress = false
-        recyclerView.adapter.notifyDataSetChanged()
+        (recyclerView.adapter as ProfileAdapter).notifyDataSetChanged()
     }
 
     override fun showProfileLoader() {
         (recyclerView.adapter as ProfileAdapter).profileInProgress = true
-        recyclerView.adapter.notifyDataSetChanged()
+        (recyclerView.adapter as ProfileAdapter).notifyDataSetChanged()
     }
 
     override fun hideProfileLoader() {
         (recyclerView.adapter as ProfileAdapter).profileInProgress = false
-        recyclerView.adapter.notifyDataSetChanged()
+        (recyclerView.adapter as ProfileAdapter).notifyDataSetChanged()
     }
 
     override fun showPaginationLoader() {
         (recyclerView.adapter as ProfileAdapter).paginationInProgress = true
-        recyclerView.adapter.notifyDataSetChanged()
+        (recyclerView.adapter as ProfileAdapter).notifyDataSetChanged()
     }
 
     override fun hidePaginationLoader() {
         (recyclerView.adapter as ProfileAdapter).paginationInProgress = false
-        recyclerView.adapter.notifyDataSetChanged()
+        (recyclerView.adapter as ProfileAdapter).notifyDataSetChanged()
     }
 
     override fun showExperienceList(experienceList: List<Experience>) {
         this.experiences = experienceList
         (recyclerView.adapter as ProfileAdapter).experiences = experienceList
-        recyclerView.adapter.notifyDataSetChanged()
+        (recyclerView.adapter as ProfileAdapter).notifyDataSetChanged()
     }
 
     override fun showProfile(profile: Profile) {
         (recyclerView.adapter as ProfileAdapter).profileInProgress = false
         (recyclerView.adapter as ProfileAdapter).profile = profile
-        recyclerView.adapter.notifyDataSetChanged()
+        (recyclerView.adapter as ProfileAdapter).notifyDataSetChanged()
     }
 
     override fun navigateToExperienceWithFinishOnProfileClick(experienceId: String) {

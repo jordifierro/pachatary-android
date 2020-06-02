@@ -136,43 +136,43 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
 
         (recyclerView.adapter as ExperienceScenesAdapter).experience = experience
         (recyclerView.adapter as ExperienceScenesAdapter).isExperienceInProgress = false
-        recyclerView.adapter.notifyDataSetChanged()
+        (recyclerView.adapter as ExperienceScenesAdapter).notifyDataSetChanged()
 
         setAllButtonsGone()
         if (intent.getBooleanExtra(SHOW_EDITABLE_IF_ITS_MINE, false) && experience.isMine) {
-            addButton.visibility = View.VISIBLE
-            shareButton.visibility = View.VISIBLE
-            editButton.visibility = View.VISIBLE
+            (addButton as View).visibility = View.VISIBLE
+            (shareButton as View).visibility = View.VISIBLE
+            (editButton as View).visibility = View.VISIBLE
         }
         else if (experience.isMine) {
-            shareButton.visibility = View.VISIBLE
+            (shareButton as View).visibility = View.VISIBLE
         } else {
-            shareButton.visibility = View.VISIBLE
-            if (experience.isSaved) unsaveButton.visibility = View.VISIBLE
-            else saveButton.visibility = View.VISIBLE
+            (shareButton as View).visibility = View.VISIBLE
+            if (experience.isSaved) (unsaveButton as View).visibility = View.VISIBLE
+            else (saveButton as View).visibility = View.VISIBLE
         }
     }
 
     override fun showScenes(scenes: List<Scene>) {
         (recyclerView.adapter as ExperienceScenesAdapter).scenes = scenes
         (recyclerView.adapter as ExperienceScenesAdapter).areScenesInProgress = false
-        recyclerView.adapter.notifyDataSetChanged()
+        (recyclerView.adapter as ExperienceScenesAdapter).notifyDataSetChanged()
     }
 
     override fun showLoadingExperience() {
         (recyclerView.adapter as ExperienceScenesAdapter).isExperienceInProgress = true
-        recyclerView.adapter.notifyDataSetChanged()
+        (recyclerView.adapter as ExperienceScenesAdapter).notifyDataSetChanged()
     }
 
     override fun showLoadingScenes() {
         (recyclerView.adapter as ExperienceScenesAdapter).areScenesInProgress = true
-        recyclerView.adapter.notifyDataSetChanged()
+        (recyclerView.adapter as ExperienceScenesAdapter).notifyDataSetChanged()
     }
 
     override fun showRetry() {
         (recyclerView.adapter as ExperienceScenesAdapter).areScenesInProgress = false
         (recyclerView.adapter as ExperienceScenesAdapter).isExperienceInProgress = false
-        recyclerView.adapter.notifyDataSetChanged()
+        (recyclerView.adapter as ExperienceScenesAdapter).notifyDataSetChanged()
 
         SnackbarUtils.showRetry(rootView, this) { presenter.onRetryClick() }
     }
@@ -334,7 +334,7 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
                 appBarLayout.setExpanded(false)
                 Handler().postDelayed({
                     try {
-                        this.recyclerView.layoutManager.startSmoothScroll(smoothScroller)
+                        this.recyclerView.layoutManager!!.startSmoothScroll(smoothScroller)
                     } catch (e: Exception) {
                     }
                 }, 100)
@@ -451,8 +451,8 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
             titleView.text = scene.title
             editButton.setOnClickListener { onEditSceneClick(this.sceneId) }
             locateButton.setOnClickListener { onLocateSceneClick(this.sceneId) }
-            if (isEditable) editButton.visibility = View.VISIBLE
-            else editButton.visibility = View.GONE
+            if (isEditable) (editButton as View).visibility = View.VISIBLE
+            else (editButton as View).visibility = View.GONE
             Picasso.with(pictureView.context)
                     .load(pictureDeviceCompat.convert(scene.picture)?.fullScreenSizeUrl)
                     .into(pictureView)
@@ -490,10 +490,10 @@ class ExperienceScenesActivity : AppCompatActivity(), ExperienceScenesView {
     }
 
     private fun setAllButtonsGone() {
-        addButton.visibility = View.GONE
-        shareButton.visibility = View.GONE
-        editButton.visibility = View.GONE
-        saveButton.visibility = View.GONE
-        unsaveButton.visibility = View.GONE
+        (addButton as View).visibility = View.GONE
+        (shareButton as View).visibility = View.GONE
+        (editButton as View).visibility = View.GONE
+        (saveButton as View).visibility = View.GONE
+        (unsaveButton as View).visibility = View.GONE
     }
 }
