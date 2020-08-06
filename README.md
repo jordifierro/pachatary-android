@@ -1,6 +1,7 @@
 # Pachatary Android App
 This repo contains the Android application
-code for Pachatary project.
+code for Pachatary project
+(available on [Google Playstore](https://play.google.com/store/apps/details?id=com.pachatary&hl=en)).
 This simple app aims to be a reference
 to discover interesting places
 and also to record our past experiences,
